@@ -94,11 +94,12 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
 
         ConfigParser.parseConfig(game, this, this, this, config.getConfigName(), config.getBaseConfig());
 
-        prepareStart();
+        if (currentMap != null) defaultAndMapListeners = createDefaultAndMapListeners(currentMap.getListenerMap());
+        else defaultAndMapListeners = createDefaultAndMapListeners();
 
         changeGameState(config.getStartGameStateName());
 
-        if(config.getStartMapName() != null) changeMap(config.getStartMapName());
+        if (config.getStartMapName() != null) changeMap(config.getStartMapName());
     }
 
     @SuppressWarnings("unchecked")
@@ -116,8 +117,11 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         return result;
     }
 
-    public void prepareStart() {
-        createDefaultAndMapListeners();
+    public void changeGameState(String gameStateName) {
+        GameState gameState = gameStates.get(gameStateName);
+        if (gameState == null) throw new IllegalArgumentException("Unknown game state name: " + gameStateName);
+
+        changeGameState(gameState);
     }
 
     public void changeMap(String mapName) {
@@ -125,6 +129,24 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         Validate.notNull(mapInfo, "The map " + mapName + " does not exist");
 
         changeMap(mapInfo);
+    }
+
+    @SuppressWarnings("unchecked")
+    public void changeGameState(GameState gameState) {
+        if (gameState.equals(this.gameState)) return;
+        stopCountdown();
+
+        GameState oldState = this.gameState;
+        GameState newState = this.gameState = gameState;
+
+        List<Listener> oldListeners = new ArrayList<>(gameStateListeners);
+        gameStateListeners.clear();
+        gameStateListeners.addAll(newState.createListeners(this));
+
+        gameStateTaskList.cancelAllTasks();
+
+        MinigamesEvent event = new GameStateChangedEvent(this, oldState, newState);
+        EventExecutor.executeEvent(event, getListeners(getAllUserListeners(), getAllTeamListeners(), oldListeners));
     }
 
     public void changeMap(GameMapInfo mapInfo) {
@@ -145,6 +167,16 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         defaultAndMapListeners = createDefaultAndMapListeners(newMap.getListenerMap());
 
         if (oldMap != null) oldMap.unloadMap();
+    }
+
+    public void stopCountdown() {
+        if (countdown == null) return;
+        countdown.cancel();
+
+        //Remove countdown level from Users
+        for (User user : getUsers()) {
+            user.setXpLevel(0);
+        }
     }
 
     @SafeVarargs
@@ -175,6 +207,14 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         }
 
         return result;
+    }
+
+    public Collection<User> getUsers() {
+        return usersInGroup.values();
+    }
+
+    public void prepareStart() {
+        createDefaultAndMapListeners();
     }
 
     @Override
@@ -258,45 +298,6 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     @Override
     public File getDataFolder() {
         return game.getDataFolder();
-    }
-
-    public void changeGameState(String gameStateName) {
-        GameState gameState = gameStates.get(gameStateName);
-        if (gameState == null) throw new IllegalArgumentException("Unknown game state name: " + gameStateName);
-
-        changeGameState(gameState);
-    }
-
-    @SuppressWarnings("unchecked")
-    public void changeGameState(GameState gameState) {
-        if (gameState.equals(this.gameState)) return;
-        stopCountdown();
-
-        GameState oldState = this.gameState;
-        GameState newState = this.gameState = gameState;
-
-        List<Listener> oldListeners = new ArrayList<>(gameStateListeners);
-        gameStateListeners.clear();
-        gameStateListeners.addAll(newState.createListeners(this));
-
-        gameStateTaskList.cancelAllTasks();
-
-        MinigamesEvent event = new GameStateChangedEvent(this, oldState, newState);
-        EventExecutor.executeEvent(event, getListeners(getAllUserListeners(), getAllTeamListeners(), oldListeners));
-    }
-
-    public void stopCountdown() {
-        if (countdown == null) return;
-        countdown.cancel();
-
-        //Remove countdown level from Users
-        for (User user : getUsers()) {
-            user.setXpLevel(0);
-        }
-    }
-
-    public Collection<User> getUsers() {
-        return usersInGroup.values();
     }
 
     public GameState getCurrentGameState() {
@@ -424,13 +425,6 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         gameGroupTaskList.cancelAllTasks();
     }
 
-    public void setDefaultListeners(HashMap<String, Listener> defaultListeners) {
-        this.defaultListeners = defaultListeners;
-
-        if (currentMap != null) defaultAndMapListeners = createDefaultAndMapListeners(currentMap.getListenerMap());
-        else defaultAndMapListeners = createDefaultAndMapListeners();
-    }
-
     public boolean hasActiveCountdown() {
         return countdown != null;
     }
@@ -467,38 +461,12 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         return metadataMap.containsKey(clazz);
     }
 
-    public void setKits(Collection<Kit> kits) {
-        this.kits.clear();
-
-        for (Kit kit : kits) {
-            this.kits.put(kit.getName(), kit);
-        }
-    }
-
     public GameState getGameState(String gameStateName) {
         return gameStates.get(gameStateName);
     }
 
     public Collection<TeamIdentifier> getTeamIdentifiers() {
         return teamIdentifiers.values();
-    }
-
-    public void setTeamIdentifiers(Collection<TeamIdentifier> identifiers) {
-        for (TeamIdentifier identifier : identifiers) {
-            teamIdentifiers.put(identifier.getName(), identifier);
-        }
-        recreateTeamObjects();
-    }
-
-    public void recreateTeamObjects() {
-        for (User user : getUsers()) {
-            user.setTeam(null);
-        }
-
-        teamsInGroup.clear();
-        for (TeamIdentifier teamIdentifier : teamIdentifiers.values()) {
-            teamsInGroup.put(teamIdentifier, createTeam(teamIdentifier));
-        }
     }
 
     private Team createTeam(TeamIdentifier teamIdentifier) {
@@ -508,6 +476,8 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     @Override
     public void addListener(String name, Listener listener) {
         defaultListeners.put(name, listener);
+
+        createDefaultAndMapListeners();
     }
 
     @Override
@@ -533,6 +503,8 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     @Override
     public void addTeamIdentifier(TeamIdentifier teamIdentifier) {
         teamIdentifiers.put(teamIdentifier.getName(), teamIdentifier);
+
+        teamsInGroup.put(teamIdentifier, createTeam(teamIdentifier));
     }
 
     @Override
