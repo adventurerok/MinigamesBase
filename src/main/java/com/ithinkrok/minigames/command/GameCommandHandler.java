@@ -46,13 +46,13 @@ public class GameCommandHandler implements CommandExecutor {
         Map<String, Object> arguments = parseArgumentListToMap(correctedArgs);
 
         User user = null;
-        GameGroup gameGroup = null;
+        GameGroup gameGroup = game.getSpawnGameGroup();
         TeamIdentifier teamIdentifier = null;
 
         User userSender = null;
         if (sender instanceof Player) {
             user = userSender = game.getUser(((Player) sender).getUniqueId());
-        }
+        } else
 
         if (arguments.containsKey("u")) {
             OfflinePlayer player = Bukkit.getPlayer(arguments.get("u").toString());
@@ -64,22 +64,22 @@ public class GameCommandHandler implements CommandExecutor {
             teamIdentifier = user.getTeamIdentifier();
         }
 
-        if(arguments.containsKey("t")) {
-            teamIdentifier = game.getTeamIdentifier(arguments.get("t").toString());
-        }
-
         if(gameGroup == null) gameGroup = game.getSpawnGameGroup();
+
+        if(arguments.containsKey("t")) {
+            teamIdentifier = gameGroup.getTeamIdentifier(arguments.get("t").toString());
+        }
 
         Kit kit = null;
         if(arguments.containsKey("k")) {
-            kit = game.getKit(arguments.get("k").toString());
+            kit = gameGroup.getKit(arguments.get("k").toString());
         }
 
         Command gameCommand = new Command(command.getName(), arguments, gameGroup, user, teamIdentifier, kit);
 
         com.ithinkrok.minigames.command.CommandSender messagable;
         if(userSender != null) messagable = userSender;
-        else messagable = new ConsoleSender(game);
+        else messagable = new ConsoleSender(gameGroup);
 
         return executors.get(command.getName()).onCommand(messagable, gameCommand);
     }
@@ -152,15 +152,16 @@ public class GameCommandHandler implements CommandExecutor {
     private static class ConsoleSender implements com.ithinkrok.minigames.command.CommandSender {
 
         private static ConsoleCommandSender consoleCommandSender = Bukkit.getConsoleSender();
-        private final Game game;
+        private final GameGroup gameGroup;
 
-        public ConsoleSender(Game game) {
-            this.game = game;
+        private ConsoleSender(GameGroup gameGroup) {
+            this.gameGroup = gameGroup;
         }
+
 
         @Override
         public void sendMessage(String message) {
-            sendMessageNoPrefix(game.getChatPrefix() + message);
+            sendMessageNoPrefix(gameGroup.getChatPrefix() + message);
         }
 
         @Override
@@ -170,17 +171,17 @@ public class GameCommandHandler implements CommandExecutor {
 
         @Override
         public void sendLocale(String locale, Object... args) {
-            sendMessage(game.getLocale(locale, args));
+            sendMessage(gameGroup.getLocale(locale, args));
         }
 
         @Override
         public void sendLocaleNoPrefix(String locale, Object... args) {
-            sendMessageNoPrefix(game.getLocale(locale, args));
+            sendMessageNoPrefix(gameGroup.getLocale(locale, args));
         }
 
         @Override
         public LanguageLookup getLanguageLookup() {
-            return game;
+            return gameGroup;
         }
 
         @Override

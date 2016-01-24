@@ -76,6 +76,8 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
 
     private Countdown countdown;
 
+    private String chatPrefix;
+
     private HashMap<String, Listener> defaultListeners = new HashMap<>();
     private IdentifierMap<CustomItem> customItemIdentifierMap = new IdentifierMap<>();
     private Map<String, ConfigurationSection> sharedObjectMap = new HashMap<>();
@@ -91,6 +93,8 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
 
         gameGroupListener = new GameGroupListener();
         defaultAndMapListeners = createDefaultAndMapListeners();
+
+        chatPrefix = config.getBaseConfig().getString("chat_prefix");
 
         ConfigParser.parseConfig(game, this, this, this, config.getConfigName(), config.getBaseConfig());
 
@@ -469,10 +473,6 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         return teamIdentifiers.values();
     }
 
-    private Team createTeam(TeamIdentifier teamIdentifier) {
-        return new Team(teamIdentifier, this);
-    }
-
     @Override
     public void addListener(String name, Listener listener) {
         defaultListeners.put(name, listener);
@@ -505,6 +505,10 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         teamIdentifiers.put(teamIdentifier.getName(), teamIdentifier);
 
         teamsInGroup.put(teamIdentifier, createTeam(teamIdentifier));
+    }
+
+    private Team createTeam(TeamIdentifier teamIdentifier) {
+        return new Team(teamIdentifier, this);
     }
 
     @Override
