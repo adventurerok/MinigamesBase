@@ -36,6 +36,8 @@ import com.ithinkrok.minigames.team.Team;
 import com.ithinkrok.minigames.team.TeamIdentifier;
 import com.ithinkrok.minigames.team.TeamUserResolver;
 import com.ithinkrok.minigames.util.EventExecutor;
+import com.ithinkrok.minigames.util.io.ConfigHolder;
+import com.ithinkrok.minigames.util.io.ConfigParser;
 import com.ithinkrok.minigames.util.io.FileLoader;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
@@ -51,43 +53,52 @@ import java.util.concurrent.ConcurrentMap;
  * Created by paul on 31/12/15.
  */
 public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, FileLoader, SharedObjectAccessor,
-        MetadataHolder<Metadata>, SchematicResolver, TeamUserResolver, DatabaseTaskRunner {
+        MetadataHolder<Metadata>, SchematicResolver, TeamUserResolver, DatabaseTaskRunner, ConfigHolder {
 
     private ConcurrentMap<UUID, User> usersInGroup = new ConcurrentHashMap<>();
-
-    private Map<String, TeamIdentifier> teamIdentifiers = new HashMap<>();
-    private Map<String, Kit> kits = new HashMap<>();
 
     private Map<TeamIdentifier, Team> teamsInGroup = new HashMap<>();
     private Game game;
 
-    private MultipleLanguageLookup languageLookup = new MultipleLanguageLookup();
-
-    private Map<String, GameState> gameStates = new HashMap<>();
     private GameState gameState;
 
     private GameMap currentMap;
 
     private TaskList gameGroupTaskList = new TaskList();
     private TaskList gameStateTaskList = new TaskList();
-    private HashMap<String, Listener> defaultListeners = new HashMap<>();
 
     private Listener gameGroupListener;
     private List<Listener> defaultAndMapListeners = new ArrayList<>();
+
     private List<Listener> gameStateListeners = new ArrayList<>();
 
     private ClassToInstanceMap<Metadata> metadataMap = MutableClassToInstanceMap.create();
 
     private Countdown countdown;
-    private IdentifierMap<CustomItem> customItemIdentifierMap;
-    private HashMap<String, Schematic> schematicMap;
-    private HashMap<String, ConfigurationSection> sharedObjectMap;
 
-    public GameGroup(Game game) {
+    private HashMap<String, Listener> defaultListeners = new HashMap<>();
+    private IdentifierMap<CustomItem> customItemIdentifierMap = new IdentifierMap<>();
+    private Map<String, ConfigurationSection> sharedObjectMap = new HashMap<>();
+    private Map<String, Schematic> schematicMap = new HashMap<>();
+    private Map<String, TeamIdentifier> teamIdentifiers = new HashMap<>();
+    private Map<String, GameState> gameStates = new HashMap<>();
+    private Map<String, Kit> kits = new HashMap<>();
+
+    private MultipleLanguageLookup languageLookup = new MultipleLanguageLookup();
+
+    public GameGroup(Game game, GameGroupConfig config) {
         this.game = game;
 
         gameGroupListener = new GameGroupListener();
         defaultAndMapListeners = createDefaultAndMapListeners();
+
+        ConfigParser.parseConfig(game, this, this, this, config.getConfigName(), config.getBaseConfig());
+
+        prepareStart();
+
+        changeGameState(config.getStartGameStateName());
+
+        if(config.getStartMapName() != null) changeMap(config.getStartMapName());
     }
 
     @SuppressWarnings("unchecked")
@@ -494,30 +505,44 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         return new Team(teamIdentifier, this);
     }
 
-    public void setSchematics(Map<String, Schematic> schematicMap) {
-        this.schematicMap = new HashMap<>(schematicMap);
+    @Override
+    public void addListener(String name, Listener listener) {
+        defaultListeners.put(name, listener);
     }
 
-    public void setCustomItems(HashMap<String, CustomItem> customItemMap) {
-        this.customItemIdentifierMap = new IdentifierMap<>();
-
-        for(Map.Entry<String, CustomItem> entry : customItemMap.entrySet()) {
-            this.customItemIdentifierMap.put(entry.getKey(), entry.getValue());
-        }
+    @Override
+    public void addCustomItem(CustomItem customItem) {
+        customItemIdentifierMap.put(customItem.getName(), customItem);
     }
 
-    public void setGameStates(HashMap<String, GameState> gameStateMap) {
-        this.gameStates = new HashMap<>(gameStateMap);
+    @Override
+    public void addLanguageLookup(LanguageLookup languageLookup) {
+        this.languageLookup.addLanguageLookup(languageLookup);
     }
 
-    public void setSharedObjects(HashMap<String, ConfigurationSection> sharedObjectMap) {
-        this.sharedObjectMap = new HashMap<>(sharedObjectMap);
+    @Override
+    public void addSharedObject(String name, ConfigurationSection config) {
+        sharedObjectMap.put(name, config);
     }
 
-    public void setLanguageLookups(List<LanguageLookup> languageLookupList) {
-        for(LanguageLookup lookup : languageLookupList) {
-            this.languageLookup.addLanguageLookup(lookup);
-        }
+    @Override
+    public void addSchematic(Schematic schematic) {
+        schematicMap.put(schematic.getName(), schematic);
+    }
+
+    @Override
+    public void addTeamIdentifier(TeamIdentifier teamIdentifier) {
+        teamIdentifiers.put(teamIdentifier.getName(), teamIdentifier);
+    }
+
+    @Override
+    public void addGameState(GameState gameState) {
+        gameStates.put(gameState.getName(), gameState);
+    }
+
+    @Override
+    public void addKit(Kit kit) {
+        kits.put(kit.getName(), kit);
     }
 
     private class GameGroupListener implements Listener {
