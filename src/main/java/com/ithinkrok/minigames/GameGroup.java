@@ -17,9 +17,11 @@ import com.ithinkrok.minigames.event.user.game.UserJoinEvent;
 import com.ithinkrok.minigames.event.user.game.UserQuitEvent;
 import com.ithinkrok.minigames.event.user.world.UserBreakBlockEvent;
 import com.ithinkrok.minigames.item.CustomItem;
+import com.ithinkrok.minigames.item.IdentifierMap;
 import com.ithinkrok.minigames.lang.LangFile;
 import com.ithinkrok.minigames.lang.LanguageLookup;
 import com.ithinkrok.minigames.lang.Messagable;
+import com.ithinkrok.minigames.lang.MultipleLanguageLookup;
 import com.ithinkrok.minigames.map.GameMap;
 import com.ithinkrok.minigames.map.GameMapInfo;
 import com.ithinkrok.minigames.metadata.Metadata;
@@ -59,6 +61,8 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     private Map<TeamIdentifier, Team> teamsInGroup = new HashMap<>();
     private Game game;
 
+    private MultipleLanguageLookup languageLookup = new MultipleLanguageLookup();
+
     private Map<String, GameState> gameStates = new HashMap<>();
     private GameState gameState;
 
@@ -75,6 +79,9 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     private ClassToInstanceMap<Metadata> metadataMap = MutableClassToInstanceMap.create();
 
     private Countdown countdown;
+    private IdentifierMap<CustomItem> customItemIdentifierMap;
+    private HashMap<String, Schematic> schematicMap;
+    private HashMap<String, ConfigurationSection> sharedObjectMap;
 
     public GameGroup(Game game) {
         this.game = game;
@@ -100,10 +107,6 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
 
     public void prepareStart() {
         createDefaultAndMapListeners();
-
-        for (GameState gs : game.getGameStates()) {
-            this.gameStates.put(gs.getName(), gs);
-        }
     }
 
     public void changeMap(String mapName) {
@@ -176,7 +179,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     public ConfigurationSection getSharedObject(String name) {
         ConfigurationSection result = null;
         if (currentMap != null) result = currentMap.getSharedObject(name);
-        return result != null ? result : game.getSharedObject(name);
+        return result != null ? result : sharedObjectMap.get(name);
     }
 
     @Override
@@ -299,20 +302,20 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     public CustomItem getCustomItem(String name) {
         CustomItem item = null;
         if (currentMap != null) item = currentMap.getCustomItem(name);
-        return item != null ? item : game.getCustomItem(name);
+        return item != null ? item : customItemIdentifierMap.get(name);
     }
 
     public CustomItem getCustomItem(int identifier) {
         CustomItem item = null;
         if (currentMap != null) item = currentMap.getCustomItem(identifier);
-        return item != null ? item : game.getCustomItem(identifier);
+        return item != null ? item : customItemIdentifierMap.get(identifier);
     }
 
     @Override
     public Schematic getSchematic(String name) {
         Schematic schem = null;
         if (currentMap != null) schem = currentMap.getSchematic(name);
-        return schem != null ? schem : game.getSchematic(name);
+        return schem != null ? schem : schematicMap.get(name);
     }
 
     public void gameEvent(GameEvent event) {
@@ -335,12 +338,12 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     @Override
     public String getLocale(String name) {
         if (currentMap != null && currentMap.hasLocale(name)) return currentMap.getLocale(name);
-        else return game.getLocale(name);
+        else return languageLookup.getLocale(name);
     }
 
     @Override
     public boolean hasLocale(String name) {
-        return (currentMap != null && currentMap.hasLocale(name) || game.hasLocale(name));
+        return (currentMap != null && currentMap.hasLocale(name) || languageLookup.hasLocale(name));
     }
 
     public Game getGame() {
@@ -360,7 +363,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     @Override
     public String getLocale(String name, Object... args) {
         if (currentMap != null && currentMap.hasLocale(name)) return currentMap.getLocale(name, args);
-        else return game.getLocale(name, args);
+        else return languageLookup.getLocale(name, args);
     }
 
     @Override
@@ -489,6 +492,32 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
 
     private Team createTeam(TeamIdentifier teamIdentifier) {
         return new Team(teamIdentifier, this);
+    }
+
+    public void setSchematics(Map<String, Schematic> schematicMap) {
+        this.schematicMap = new HashMap<>(schematicMap);
+    }
+
+    public void setCustomItems(HashMap<String, CustomItem> customItemMap) {
+        this.customItemIdentifierMap = new IdentifierMap<>();
+
+        for(Map.Entry<String, CustomItem> entry : customItemMap.entrySet()) {
+            this.customItemIdentifierMap.put(entry.getKey(), entry.getValue());
+        }
+    }
+
+    public void setGameStates(HashMap<String, GameState> gameStateMap) {
+        this.gameStates = new HashMap<>(gameStateMap);
+    }
+
+    public void setSharedObjects(HashMap<String, ConfigurationSection> sharedObjectMap) {
+        this.sharedObjectMap = new HashMap<>(sharedObjectMap);
+    }
+
+    public void setLanguageLookups(List<LanguageLookup> languageLookupList) {
+        for(LanguageLookup lookup : languageLookupList) {
+            this.languageLookup.addLanguageLookup(lookup);
+        }
     }
 
     private class GameGroupListener implements Listener {

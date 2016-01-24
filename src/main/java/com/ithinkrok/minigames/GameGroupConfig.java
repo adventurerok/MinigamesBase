@@ -43,6 +43,11 @@ public class GameGroupConfig {
         gameGroup.setDefaultListeners(loader.listenerMap);
         gameGroup.setTeamIdentifiers(loader.teamIdentifierMap.values());
         gameGroup.setKits(loader.kitMap.values());
+        gameGroup.setCustomItems(loader.customItemMap);
+        gameGroup.setSchematics(loader.schematicMap);
+        gameGroup.setGameStates(loader.gameStateMap);
+        gameGroup.setSharedObjects(loader.sharedObjectMap);
+        gameGroup.setLanguageLookups(loader.languageLookupList);
 
         gameGroup.prepareStart();
         gameGroup.changeGameState(startGameStateName);
