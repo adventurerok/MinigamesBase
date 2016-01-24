@@ -1,0 +1,19 @@
+name: "MinigamesBase"
+version: "${project.version}"
+main: "com.ithinkrok.minigames.MinigamesPlugin"
+author: "ithinkrok"
+depend: ["HologramAPI", "ProtocolLib"]
+softdepend: ["DisguiseCraft"]
+database: true
+
+permissions:
+  mg.base.mg:
+    description: "Allows use of /mg"
+    default: "op"
+
+commands:
+  minigames:
+    description: "Execute minigames commands as the console"
+    aliases: ["mg"]
+    permission: "mg.base.mg"
+    usage: "/<command> <gamegroup> <minigames command> [minigames command arguments...]"
