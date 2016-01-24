@@ -1,6 +1,8 @@
 package com.ithinkrok.minigames.map;
 
 import com.ithinkrok.minigames.GameGroup;
+import com.ithinkrok.minigames.GameState;
+import com.ithinkrok.minigames.Kit;
 import com.ithinkrok.minigames.User;
 import com.ithinkrok.minigames.item.CustomItem;
 import com.ithinkrok.minigames.item.IdentifierMap;
@@ -11,6 +13,7 @@ import com.ithinkrok.minigames.schematic.Schematic;
 import com.ithinkrok.minigames.schematic.SchematicPaster;
 import com.ithinkrok.minigames.task.GameTask;
 import com.ithinkrok.minigames.task.TaskList;
+import com.ithinkrok.minigames.team.TeamIdentifier;
 import com.ithinkrok.minigames.util.BoundingBox;
 import com.ithinkrok.minigames.util.io.ConfigHolder;
 import com.ithinkrok.minigames.util.io.ConfigParser;
@@ -207,6 +210,21 @@ public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.Bo
     @Override
     public void addSchematic(Schematic schematic) {
         schematicMap.put(schematic.getName(), schematic);
+    }
+
+    @Override
+    public void addTeamIdentifier(TeamIdentifier teamIdentifier) {
+        //TODO custom TeamIdentifier support for maps
+    }
+
+    @Override
+    public void addGameState(GameState gameState) {
+        //TODO custom GameState support for maps
+    }
+
+    @Override
+    public void addKit(Kit kit) {
+        //TODO custom Kit support for maps
     }
 
     public Schematic getSchematic(String name) {

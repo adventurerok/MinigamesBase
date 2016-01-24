@@ -62,6 +62,8 @@ import java.util.logging.Logger;
 
 /**
  * Created by paul on 31/12/15.
+ * <p>
+ * In future: Will be a TaskScheduler, UserResolver, FileLoader and DatabaseTaskRunner only
  */
 @SuppressWarnings("unchecked")
 public class Game implements LanguageLookup, TaskScheduler, UserResolver, FileLoader, ConfigHolder, DatabaseTaskRunner {
@@ -180,11 +182,13 @@ public class Game implements LanguageLookup, TaskScheduler, UserResolver, FileLo
 
         config = plugin.getConfig();
 
-        reloadTeamIdentifiers();
-        reloadGameStates();
-        reloadKits();
         reloadMaps();
 
+        startGameStateName = config.getString("start_game_state");
+
+        teamIdentifiers.clear();
+        gameStates.clear();
+        kits.clear();
         sharedObjects.clear();
         defaultListeners.clear();
         multipleLanguageLookup = new MultipleLanguageLookup();
@@ -192,82 +196,6 @@ public class Game implements LanguageLookup, TaskScheduler, UserResolver, FileLo
 
         ConfigParser.parseConfig(this, this, this, this, "config.yml", config);
     }
-
-    private void reloadTeamIdentifiers() {
-        teamIdentifiers.clear();
-
-        ConfigurationSection teamConfigs = config.getConfigurationSection("team_identifiers");
-
-        for (String name : teamConfigs.getKeys(false)) {
-            ConfigurationSection teamConfig = teamConfigs.getConfigurationSection(name);
-
-            DyeColor dyeColor = DyeColor.valueOf(teamConfig.getString("dye_color").toUpperCase());
-
-            String formattedName = teamConfig.getString("formatted_name", null);
-
-            String armorColorString = teamConfig.getString("armor_color", null);
-            Color armorColor = null;
-            if (armorColorString != null) {
-                armorColor = Color.fromRGB(Integer.parseInt(armorColorString.replace("#", "")));
-            }
-            String chatColorString = teamConfig.getString("chat_color", null);
-            ChatColor chatColor = null;
-            if (chatColorString != null) {
-                chatColor = ChatColor.valueOf(chatColorString);
-            }
-
-            teamIdentifiers.put(name, new TeamIdentifier(name, formattedName, dyeColor, armorColor, chatColor));
-        }
-    }
-
-    private void reloadGameStates() {
-        gameStates.clear();
-
-        ConfigurationSection gameStatesConfig = config.getConfigurationSection("game_states");
-
-        for (String name : gameStatesConfig.getKeys(false)) {
-            ConfigurationSection gameStateConfig = gameStatesConfig.getConfigurationSection(name);
-            List<ConfigurationSection> listeners = new ArrayList<>();
-
-            ConfigurationSection listenersConfig = gameStateConfig.getConfigurationSection("listeners");
-
-            for (String listenerName : listenersConfig.getKeys(false)) {
-                ConfigurationSection listenerConfig = listenersConfig.getConfigurationSection(listenerName);
-
-                listeners.add(listenerConfig);
-            }
-            gameStates.put(name, new GameState(name, listeners));
-        }
-
-        startGameStateName = config.getString("start_game_state");
-
-    }
-
-
-    private void reloadKits() {
-        kits.clear();
-
-        ConfigurationSection kitsConfig = config.getConfigurationSection("kits");
-
-        for (String name : kitsConfig.getKeys(false)) {
-            ConfigurationSection gameStateConfig = kitsConfig.getConfigurationSection(name);
-
-            String formattedName = gameStateConfig.getString("formatted_name", null);
-
-            ConfigurationSection listenersConfig = gameStateConfig.getConfigurationSection("listeners");
-
-            Collection<ConfigurationSection> listeners = new ArrayList<>();
-
-            for (String listenerName : listenersConfig.getKeys(false)) {
-                ConfigurationSection listenerConfig = listenersConfig.getConfigurationSection(listenerName);
-
-                listeners.add(listenerConfig);
-            }
-            kits.put(name, new Kit(name, formattedName, listeners));
-        }
-
-    }
-
 
     private void reloadMaps() {
         maps.clear();
@@ -290,6 +218,21 @@ public class Game implements LanguageLookup, TaskScheduler, UserResolver, FileLo
 
     private void loadMapInfo(String mapName) {
         maps.put(mapName, new GameMapInfo(this, mapName));
+    }
+
+    @Override
+    public void addKit(Kit kit) {
+        kits.put(kit.getName(), kit);
+    }
+
+    @Override
+    public void addGameState(GameState gameState) {
+        gameStates.put(gameState.getName(), gameState);
+    }
+
+    @Override
+    public void addTeamIdentifier(TeamIdentifier teamIdentifier) {
+        teamIdentifiers.put(teamIdentifier.getName(), teamIdentifier);
     }
 
     public ConfigurationSection getSharedObject(String name) {

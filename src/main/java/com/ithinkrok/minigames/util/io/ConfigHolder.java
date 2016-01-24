@@ -1,8 +1,11 @@
 package com.ithinkrok.minigames.util.io;
 
+import com.ithinkrok.minigames.GameState;
+import com.ithinkrok.minigames.Kit;
 import com.ithinkrok.minigames.item.CustomItem;
 import com.ithinkrok.minigames.lang.LanguageLookup;
 import com.ithinkrok.minigames.schematic.Schematic;
+import com.ithinkrok.minigames.team.TeamIdentifier;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
 
@@ -23,5 +26,9 @@ public interface ConfigHolder {
 
     void addSchematic(Schematic schematic);
 
-    //TODO Add ClickableInventories/ClickableItems in future
+    void addTeamIdentifier(TeamIdentifier teamIdentifier);
+
+    void addGameState(GameState gameState);
+
+    void addKit(Kit kit);
 }
