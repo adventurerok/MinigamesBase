@@ -1,9 +1,12 @@
 package com.ithinkrok.minigames;
 
 import com.comphenix.protocol.ProtocolLibrary;
+import com.ithinkrok.minigames.command.Command;
+import com.ithinkrok.minigames.command.GameCommandHandler;
 import com.ithinkrok.minigames.database.DatabaseTask;
 import com.ithinkrok.minigames.database.DatabaseTaskRunner;
 import com.ithinkrok.minigames.database.Persistence;
+import com.ithinkrok.minigames.event.game.GameCommandEvent;
 import com.ithinkrok.minigames.event.map.*;
 import com.ithinkrok.minigames.event.user.game.UserJoinEvent;
 import com.ithinkrok.minigames.event.user.game.UserQuitEvent;
@@ -21,6 +24,7 @@ import com.ithinkrok.minigames.task.GameRunnable;
 import com.ithinkrok.minigames.task.GameTask;
 import com.ithinkrok.minigames.task.TaskScheduler;
 import com.ithinkrok.minigames.team.Team;
+import com.ithinkrok.minigames.team.TeamIdentifier;
 import com.ithinkrok.minigames.user.UserResolver;
 import com.ithinkrok.minigames.util.EntityUtils;
 import com.ithinkrok.minigames.util.InventoryUtils;
@@ -439,6 +443,54 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         public void eventBlockPlace(BlockPlaceEvent event) {
             User user = getUser(event.getPlayer().getUniqueId());
             user.getGameGroup().userEvent(new UserPlaceBlockEvent(user, event));
+        }
+
+        @EventHandler
+        public void eventCommandPreprocess(PlayerCommandPreprocessEvent event) {
+            User sender = getUser(event.getPlayer().getUniqueId());
+
+            List<String> correctedArgs = GameCommandHandler.splitStringIntoArguments(event.getMessage());
+            String commandName = correctedArgs.get(0).toLowerCase();
+            correctedArgs.remove(0);
+
+            Map<String, Object> arguments = GameCommandHandler.parseArgumentListToMap(correctedArgs);
+
+            User user = sender;
+            TeamIdentifier teamIdentifier;
+
+            if (arguments.containsKey("u")) {
+                OfflinePlayer player = Bukkit.getPlayer(arguments.get("u").toString());
+                if (player != null) {
+                    User other = sender.getUser(player.getUniqueId());
+                    if (other != null) user = other;
+                }
+            }
+
+            teamIdentifier = user.getTeamIdentifier();
+
+
+            if (arguments.containsKey("t")) {
+                teamIdentifier = sender.getGameGroup().getTeamIdentifier(arguments.get("t").toString());
+            }
+
+            Kit kit = null;
+            if (arguments.containsKey("k")) {
+                kit = sender.getGameGroup().getKit(arguments.get("k").toString());
+            }
+
+            Command gameCommand = new Command(commandName, arguments, sender.getGameGroup(), user, teamIdentifier, kit);
+
+            GameCommandEvent commandEvent = new GameCommandEvent(user.getGameGroup(), sender, gameCommand);
+
+            //TODO gameEvent call every user's listeners. We only want to call senders listeners.
+            //FIX: Add user command event and console command event
+            sender.getGameGroup().gameEvent(commandEvent);
+
+            if(!commandEvent.isHandled()) return;
+
+            event.setCancelled(true);
+
+            //TODO usage will be handled by GameGroups onCommand method
         }
 
         @EventHandler(priority = EventPriority.LOW)
