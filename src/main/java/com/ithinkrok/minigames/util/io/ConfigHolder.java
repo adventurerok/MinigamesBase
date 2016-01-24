@@ -2,6 +2,7 @@ package com.ithinkrok.minigames.util.io;
 
 import com.ithinkrok.minigames.GameState;
 import com.ithinkrok.minigames.Kit;
+import com.ithinkrok.minigames.command.CommandConfig;
 import com.ithinkrok.minigames.item.CustomItem;
 import com.ithinkrok.minigames.lang.LanguageLookup;
 import com.ithinkrok.minigames.schematic.Schematic;
@@ -31,4 +32,6 @@ public interface ConfigHolder {
     void addGameState(GameState gameState);
 
     void addKit(Kit kit);
+
+    void addCommand(CommandConfig command);
 }

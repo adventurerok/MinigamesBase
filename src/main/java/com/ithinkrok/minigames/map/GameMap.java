@@ -4,6 +4,7 @@ import com.ithinkrok.minigames.GameGroup;
 import com.ithinkrok.minigames.GameState;
 import com.ithinkrok.minigames.Kit;
 import com.ithinkrok.minigames.User;
+import com.ithinkrok.minigames.command.CommandConfig;
 import com.ithinkrok.minigames.item.CustomItem;
 import com.ithinkrok.minigames.item.IdentifierMap;
 import com.ithinkrok.minigames.lang.LanguageLookup;
@@ -225,6 +226,11 @@ public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.Bo
     @Override
     public void addKit(Kit kit) {
         //TODO custom Kit support for maps
+    }
+
+    @Override
+    public void addCommand(CommandConfig command) {
+        //TODO custom CommandConfig support for maps
     }
 
     public Schematic getSchematic(String name) {

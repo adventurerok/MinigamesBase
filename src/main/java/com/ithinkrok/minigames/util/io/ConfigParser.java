@@ -2,6 +2,7 @@ package com.ithinkrok.minigames.util.io;
 
 import com.ithinkrok.minigames.GameState;
 import com.ithinkrok.minigames.Kit;
+import com.ithinkrok.minigames.command.CommandConfig;
 import com.ithinkrok.minigames.item.CustomItem;
 import com.ithinkrok.minigames.schematic.Schematic;
 import com.ithinkrok.minigames.team.TeamIdentifier;
@@ -56,7 +57,18 @@ public class ConfigParser {
         if (config.contains("game_states")) loadGameStates(config.getConfigurationSection("game_states"));
 
         if (config.contains("listeners")) loadListeners(config.getConfigurationSection("listeners"));
+        if(config.contains("commands")) loadCommands(config.getConfigurationSection("commands"));
+
         if (config.contains("additional_configs")) loadAdditionalConfigs(config.getStringList("additional_configs"));
+    }
+
+    private void loadCommands(ConfigurationSection config) {
+        for(String name : config.getKeys(false)) {
+            CommandConfig commandConfig = new CommandConfig(name, config.getConfigurationSection(name),
+                    listenerCreator);
+
+            holder.addCommand(commandConfig);
+        }
     }
 
     private void loadGameStates(ConfigurationSection config) {

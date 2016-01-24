@@ -2,6 +2,7 @@ package com.ithinkrok.minigames;
 
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.MutableClassToInstanceMap;
+import com.ithinkrok.minigames.command.CommandConfig;
 import com.ithinkrok.minigames.database.DatabaseTask;
 import com.ithinkrok.minigames.database.DatabaseTaskRunner;
 import com.ithinkrok.minigames.event.MinigamesEvent;
@@ -85,6 +86,8 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     private Map<String, TeamIdentifier> teamIdentifiers = new HashMap<>();
     private Map<String, GameState> gameStates = new HashMap<>();
     private Map<String, Kit> kits = new HashMap<>();
+
+    private Map<String, CommandConfig> commandMap = new HashMap<>();
 
     private MultipleLanguageLookup languageLookup = new MultipleLanguageLookup();
 
@@ -519,6 +522,13 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     @Override
     public void addKit(Kit kit) {
         kits.put(kit.getName(), kit);
+    }
+
+    @Override
+    public void addCommand(CommandConfig command) {
+        for(String alias : command.getAliases()) {
+            commandMap.put(alias.toLowerCase(), command);
+        }
     }
 
     private class GameGroupListener implements Listener {
