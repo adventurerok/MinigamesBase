@@ -37,7 +37,7 @@ public class HelpCommand implements Listener {
             Map<String, CommandConfig> commands = event.getCommand().getGameGroup().getCommands();
 
             for (CommandConfig command : commands.values()) {
-                sender.sendLocaleNoPrefix("command.help.line", command.getUsage(), command.getDescription());
+                sender.sendLocaleNoPrefix("command.help.line", command.getName(), command.getDescription());
             }
         }
 
