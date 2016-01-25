@@ -101,7 +101,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         gameGroupListener = new GameGroupListener();
         defaultAndMapListeners = createDefaultAndMapListeners();
 
-        chatPrefix = config.getBaseConfig().getString("chat_prefix");
+        chatPrefix = config.getBaseConfig().getString("chat_prefix").replace('&', '§');
 
         addDefaultCommands();
         ConfigParser.parseConfig(game, this, this, this, config.getConfigName(), config.getBaseConfig());
