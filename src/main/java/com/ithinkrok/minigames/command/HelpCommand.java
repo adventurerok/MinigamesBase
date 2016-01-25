@@ -17,7 +17,6 @@ public class HelpCommand implements Listener {
 
 
         CommandSender sender = event.getCommandSender();
-        sender.sendLocale("command.help.title");
 
         if (event.getCommand().hasArg(0)) {
             String commandName = event.getCommand().getStringArg(0, "unspecified").toLowerCase();
@@ -33,6 +32,7 @@ public class HelpCommand implements Listener {
 
             sender.sendLocaleNoPrefix("command.help.usage", commandName, usage, desc);
         } else {
+            sender.sendLocaleNoPrefix("command.help.title");
             //Commands are stored as a TreeMap so no need to sort
             Map<String, CommandConfig> commands = event.getCommand().getGameGroup().getCommands();
 
