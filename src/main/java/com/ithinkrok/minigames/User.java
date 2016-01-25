@@ -52,7 +52,7 @@ import static com.ithinkrok.minigames.util.InventoryUtils.setUnbreakable;
  */
 @SuppressWarnings("unchecked")
 public class User implements CommandSender, TaskScheduler, Listener, UserResolver, MetadataHolder<UserMetadata>,
-        SharedObjectAccessor {
+        SharedObjectAccessor, Nameable {
 
     private static final HashSet<Material> SEE_THROUGH = new HashSet<>();
 
@@ -639,11 +639,13 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
         return gameGroup.getCurrentMap().getLocation(inventoryTether);
     }
 
+    @Override
     public String getFormattedName() {
         String displayName = getDisplayName();
         return displayName != null ? displayName : getName();
     }
 
+    @Override
     public String getName() {
         return name;
     }

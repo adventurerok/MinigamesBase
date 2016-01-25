@@ -1,5 +1,6 @@
 package com.ithinkrok.minigames.command;
 
+import com.ithinkrok.minigames.Nameable;
 import com.ithinkrok.minigames.util.io.ListenerLoader;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
@@ -11,9 +12,10 @@ import java.util.List;
 /**
  * Created by paul on 24/01/16.
  */
-public class CommandConfig {
+public class CommandConfig implements Nameable {
 
     private final String name;
+    private final String formattedName;
     private final String permission;
 
     private final List<String> aliases;
@@ -24,6 +26,9 @@ public class CommandConfig {
 
     public CommandConfig(String name, ConfigurationSection config, Object creator) {
         this.name = name.toLowerCase();
+
+        if(config.contains("formatted_name")) formattedName = config.getString("formatted_name");
+        else formattedName = name;
 
         this.permission = config.getString("permission");
         if(this.permission == null) throw new RuntimeException("All commands must have permissions");
@@ -49,9 +54,15 @@ public class CommandConfig {
         this.executor = executor;
     }
 
-    public CommandConfig(String name, String permission, String description, String usage,
-                         Listener executor, String...aliases) {
+    public CommandConfig(String name, String permission, String description, String usage, Listener executor,
+                     String... aliases) {
+        this(name, name, permission, description, usage, executor, aliases);
+    }
+
+    public CommandConfig(String name, String formattedName, String permission, String description, String usage,
+                         Listener executor, String... aliases) {
         this.name = name;
+        this.formattedName = formattedName;
         this.permission = permission;
         this.aliases = Arrays.asList(aliases);
         this.description = description;
@@ -61,6 +72,11 @@ public class CommandConfig {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getFormattedName() {
+        return formattedName;
     }
 
     public String getPermission() {

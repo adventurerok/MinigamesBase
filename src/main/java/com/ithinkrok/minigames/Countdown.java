@@ -8,7 +8,7 @@ import com.ithinkrok.minigames.task.GameTask;
 /**
  * Created by paul on 04/01/16.
  */
-public class Countdown {
+public class Countdown implements Nameable {
 
     private final String name;
     private final String localeStub;
@@ -24,7 +24,13 @@ public class Countdown {
         return secondsRemaining;
     }
 
+    @Override
     public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getFormattedName() {
         return name;
     }
 

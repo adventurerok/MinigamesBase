@@ -1,5 +1,6 @@
 package com.ithinkrok.minigames.item;
 
+import com.ithinkrok.minigames.Nameable;
 import com.ithinkrok.minigames.User;
 import com.ithinkrok.minigames.event.MinigamesEventHandler;
 import com.ithinkrok.minigames.event.user.game.UserAbilityCooldownEvent;
@@ -28,7 +29,7 @@ import java.util.UUID;
  * <p>
  * An item with custom use or inventory click listeners
  */
-public class CustomItem implements Identifiable, Listener {
+public class CustomItem implements Identifiable, Listener, Nameable {
 
     private static int customItemCount = 0;
 
@@ -243,7 +244,13 @@ public class CustomItem implements Identifiable, Listener {
         return InventoryUtils.addIdentifier(item, customItemId);
     }
 
+    @Override
     public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getFormattedName() {
         return name;
     }
 

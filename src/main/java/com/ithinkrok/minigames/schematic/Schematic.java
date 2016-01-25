@@ -2,6 +2,7 @@ package com.ithinkrok.minigames.schematic;
 
 import com.flowpowered.nbt.*;
 import com.flowpowered.nbt.stream.NBTInputStream;
+import com.ithinkrok.minigames.Nameable;
 import com.ithinkrok.minigames.util.ConfigUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.util.Vector;
@@ -15,30 +16,37 @@ import java.util.List;
 /**
  * Created by paul on 07/01/16.
  */
-public class Schematic {
+public class Schematic implements Nameable {
 
-    private String name;
-    private int baseRotation;
-    private Vector offset;
-    private Vector size;
+    private final String name;
+    private final String formattedName;
 
-    private byte[] blocks;
-    private byte[] data;
+    private final int baseRotation;
+    private final Vector offset;
+    private final Vector size;
 
-    private ConfigurationSection config;
+    private final byte[] blocks;
+    private final byte[] data;
 
-    private List<String> upgradesTo;
+    private final ConfigurationSection config;
 
-    private boolean allowOverlap;
+    private final List<String> upgradesTo;
+
+    private final boolean allowOverlap;
 
     public Schematic(String name, File dataFolder, ConfigurationSection config) {
         this.name = name;
+        this.formattedName = config.getString("formatted_name", name);
         this.config = config.getConfigurationSection("config");
         this.baseRotation = config.getInt("rotation", 0);
-        this.upgradesTo = config.getStringList("upgrades");
-        this.allowOverlap = config.getBoolean("allow_overlap");
-        if(this.upgradesTo == null) this.upgradesTo = Collections.emptyList();
 
+        this.allowOverlap = config.getBoolean("allow_overlap");
+
+        List<String> upgradesToTemp;
+        upgradesToTemp = config.getStringList("upgrades");
+        if (upgradesToTemp == null) upgradesToTemp = Collections.emptyList();
+
+        this.upgradesTo = upgradesToTemp;
         Vector baseOffset = ConfigUtils.getVector(config, "offset");
 
         String schematicFile = config.getString("file");
@@ -83,6 +91,11 @@ public class Schematic {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getFormattedName() {
+        return formattedName;
     }
 
     public int getBaseRotation() {

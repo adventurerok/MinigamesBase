@@ -27,5 +27,7 @@ public class HelpCommand implements Listener {
 
             sender.sendMessageNoPrefix(usage + ": " + command.getDescription());
         }
+
+        //TODO don't show usage unless requested. Split into pages, etc...
     }
 }

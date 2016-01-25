@@ -10,18 +10,30 @@ import java.util.Collection;
 /**
  * Created by paul on 31/12/15.
  */
-public class GameState {
+public class GameState implements Nameable {
 
     private final String name;
+    private final String formattedName;
     private final Collection<ConfigurationSection> listeners;
 
     public GameState(String name, Collection<ConfigurationSection> listeners) {
+        this(name, name, listeners);
+    }
+
+    public GameState(String name, String formattedName, Collection<ConfigurationSection> listeners) {
         this.name = name;
+        this.formattedName = formattedName;
         this.listeners = listeners;
     }
 
+    @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getFormattedName() {
+        return formattedName;
     }
 
     public Collection<ConfigurationSection> getListeners() {

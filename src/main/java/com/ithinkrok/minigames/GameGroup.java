@@ -114,13 +114,6 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         if (config.getStartMapName() != null) changeMap(config.getStartMapName());
     }
 
-    private void addDefaultCommands() {
-        CommandConfig help = new CommandConfig("help", "mg.base.help", "Shows command help", "/<command>", new
-                HelpCommand(), "?");
-
-        addCommand(help);
-    }
-
     @SuppressWarnings("unchecked")
     @SafeVarargs
     private final List<Listener> createDefaultAndMapListeners(Map<String, Listener>... extra) {
@@ -136,6 +129,13 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         return result;
     }
 
+    private void addDefaultCommands() {
+        CommandConfig help =
+                new CommandConfig("help", "mg.base.help", "Shows command help", "/<command>", new HelpCommand(), "?");
+
+        addCommand(help);
+    }
+
     public void changeGameState(String gameStateName) {
         GameState gameState = gameStates.get(gameStateName);
         if (gameState == null) throw new IllegalArgumentException("Unknown game state name: " + gameStateName);
@@ -148,6 +148,16 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         Validate.notNull(mapInfo, "The map " + mapName + " does not exist");
 
         changeMap(mapInfo);
+    }
+
+    @Override
+    public void addCommand(CommandConfig command) {
+        commandMap.put(command.getName(), command);
+        commandAliasesMap.put(command.getName(), command);
+
+        for (String alias : command.getAliases()) {
+            commandAliasesMap.put(alias.toLowerCase(), command);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -536,16 +546,6 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         kits.put(kit.getName(), kit);
     }
 
-    @Override
-    public void addCommand(CommandConfig command) {
-        commandMap.put(command.getName(), command);
-        commandAliasesMap.put(command.getName(), command);
-
-        for(String alias : command.getAliases()) {
-            commandAliasesMap.put(alias.toLowerCase(), command);
-        }
-    }
-
     public Map<String, CommandConfig> getCommands() {
         return commandMap;
     }
@@ -601,14 +601,14 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         public void eventCommand(CommandEvent event) {
             CommandConfig commandConfig = commandAliasesMap.get(event.getCommand().getCommand().toLowerCase());
 
-            if(commandConfig == null) return;
+            if (commandConfig == null) return;
             event.setHandled(true);
 
-            if(!Command.requirePermission(event.getCommandSender(), commandConfig.getPermission())) return;
+            if (!Command.requirePermission(event.getCommandSender(), commandConfig.getPermission())) return;
 
             EventExecutor.executeEvent(event, commandConfig.getExecutor());
 
-            if(event.isValidCommand()) return;
+            if (event.isValidCommand()) return;
 
             event.getCommandSender().sendMessage(commandConfig.getUsage());
         }

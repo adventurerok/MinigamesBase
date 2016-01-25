@@ -3,6 +3,7 @@ package com.ithinkrok.minigames.team;
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.MutableClassToInstanceMap;
 import com.ithinkrok.minigames.GameGroup;
+import com.ithinkrok.minigames.Nameable;
 import com.ithinkrok.minigames.SharedObjectAccessor;
 import com.ithinkrok.minigames.User;
 import com.ithinkrok.minigames.event.MinigamesEventHandler;
@@ -35,17 +36,17 @@ import java.util.concurrent.ConcurrentMap;
  * Created by paul on 31/12/15.
  */
 public class Team implements Listener, Messagable, LanguageLookup, SharedObjectAccessor, TaskScheduler, UserResolver,
-        MetadataHolder<Metadata> {
+        MetadataHolder<Metadata>, Nameable {
 
-    private TeamIdentifier teamIdentifier;
-    private ConcurrentMap<UUID, User> usersInTeam = new ConcurrentHashMap<>();
-    private GameGroup gameGroup;
+    private final TeamIdentifier teamIdentifier;
+    private final ConcurrentMap<UUID, User> usersInTeam = new ConcurrentHashMap<>();
+    private final GameGroup gameGroup;
 
-    private ClassToInstanceMap<Metadata> metadataMap = MutableClassToInstanceMap.create();
+    private final ClassToInstanceMap<Metadata> metadataMap = MutableClassToInstanceMap.create();
 
-    private TaskList teamTaskList = new TaskList();
+    private final TaskList teamTaskList = new TaskList();
 
-    private Collection<Listener> listeners = new ArrayList<>();
+    private final Collection<Listener> listeners = new ArrayList<>();
 
     public Team(TeamIdentifier teamIdentifier, GameGroup gameGroup) {
         this.teamIdentifier = teamIdentifier;
@@ -70,14 +71,20 @@ public class Team implements Listener, Messagable, LanguageLookup, SharedObjectA
         return getUsers().size();
     }
 
+    public Collection<User> getUsers() {
+        return usersInTeam.values();
+    }
+
     public TeamIdentifier getTeamIdentifier() {
         return teamIdentifier;
     }
 
+    @Override
     public String getName() {
         return teamIdentifier.getName();
     }
 
+    @Override
     public String getFormattedName() {
         return teamIdentifier.getFormattedName();
     }
@@ -99,12 +106,9 @@ public class Team implements Listener, Messagable, LanguageLookup, SharedObjectA
         return gameGroup.getLocale(name);
     }
 
-    public void addUser(User user) {
-        usersInTeam.put(user.getUuid(), user);
-    }
-
-    public void removeUser(User user) {
-        usersInTeam.remove(user.getUuid());
+    @Override
+    public String getLocale(String name, Object... args) {
+        return gameGroup.getLocale(name, args);
     }
 
     @Override
@@ -112,40 +116,12 @@ public class Team implements Listener, Messagable, LanguageLookup, SharedObjectA
         return gameGroup.hasLocale(name);
     }
 
-    @Override
-    public void sendLocale(String locale, Object... args) {
-        sendMessage(getLocale(locale, args));
+    public void addUser(User user) {
+        usersInTeam.put(user.getUuid(), user);
     }
 
-    @Override
-    public void sendMessage(String message) {
-        sendMessageNoPrefix(gameGroup.getChatPrefix() + message);
-    }
-
-    @Override
-    public String getLocale(String name, Object... args) {
-        return gameGroup.getLocale(name, args);
-    }
-
-    @Override
-    public void sendMessageNoPrefix(String message) {
-        for (User user : getUsers()) {
-            user.sendMessageNoPrefix(message);
-        }
-    }
-
-    public Collection<User> getUsers() {
-        return usersInTeam.values();
-    }
-
-    @Override
-    public void sendLocaleNoPrefix(String locale, Object... args) {
-        sendMessageNoPrefix(getLocale(locale, args));
-    }
-
-    @Override
-    public LanguageLookup getLanguageLookup() {
-        return gameGroup.getLanguageLookup();
+    public void removeUser(User user) {
+        usersInTeam.remove(user.getUuid());
     }
 
     @Override
@@ -157,7 +133,7 @@ public class Team implements Listener, Messagable, LanguageLookup, SharedObjectA
     public <B extends Metadata> void setMetadata(B metadata) {
         Metadata oldMetadata = metadataMap.put(metadata.getMetadataClass(), metadata);
 
-        if(oldMetadata != null && oldMetadata != metadata) {
+        if (oldMetadata != null && oldMetadata != metadata) {
             oldMetadata.cancelAllTasks();
             oldMetadata.removed();
         }
@@ -222,7 +198,7 @@ public class Team implements Listener, Messagable, LanguageLookup, SharedObjectA
             while (iterator.hasNext()) {
                 Metadata metadata = iterator.next();
 
-                if (metadata.removeOnGameStateChange(event)){
+                if (metadata.removeOnGameStateChange(event)) {
                     metadata.cancelAllTasks();
                     metadata.removed();
                     iterator.remove();
@@ -237,7 +213,7 @@ public class Team implements Listener, Messagable, LanguageLookup, SharedObjectA
             while (iterator.hasNext()) {
                 Metadata metadata = iterator.next();
 
-                if (metadata.removeOnMapChange(event)){
+                if (metadata.removeOnMapChange(event)) {
                     metadata.cancelAllTasks();
                     metadata.removed();
                     iterator.remove();
@@ -245,4 +221,37 @@ public class Team implements Listener, Messagable, LanguageLookup, SharedObjectA
             }
         }
     }
+
+    @Override
+    public void sendLocale(String locale, Object... args) {
+        sendMessage(getLocale(locale, args));
+    }
+
+
+    @Override
+    public void sendMessage(String message) {
+        sendMessageNoPrefix(gameGroup.getChatPrefix() + message);
+    }
+
+
+    @Override
+    public void sendMessageNoPrefix(String message) {
+        for (User user : getUsers()) {
+            user.sendMessageNoPrefix(message);
+        }
+    }
+
+
+    @Override
+    public void sendLocaleNoPrefix(String locale, Object... args) {
+        sendMessageNoPrefix(getLocale(locale, args));
+    }
+
+
+    @Override
+    public LanguageLookup getLanguageLookup() {
+        return gameGroup.getLanguageLookup();
+    }
+
+
 }

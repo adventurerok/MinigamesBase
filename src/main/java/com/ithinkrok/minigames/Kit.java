@@ -10,7 +10,7 @@ import java.util.Collection;
 /**
  * Created by paul on 07/01/16.
  */
-public class Kit {
+public class Kit implements Nameable {
 
     private final String name;
     private final String formattedName;
@@ -22,10 +22,12 @@ public class Kit {
         this.listeners = listeners;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public String getFormattedName() {
         return formattedName;
     }
