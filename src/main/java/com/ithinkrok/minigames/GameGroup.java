@@ -539,6 +539,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     @Override
     public void addCommand(CommandConfig command) {
         commandMap.put(command.getName(), command);
+        commandAliasesMap.put(command.getName(), command);
 
         for(String alias : command.getAliases()) {
             commandAliasesMap.put(alias.toLowerCase(), command);
