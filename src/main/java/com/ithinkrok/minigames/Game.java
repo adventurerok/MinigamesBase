@@ -193,10 +193,6 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         return user;
     }
 
-    public String getChatPrefix() {
-        return ChatColor.GRAY + "[" + ChatColor.DARK_AQUA + "ColonyWars" + ChatColor.GRAY + "] " + ChatColor.YELLOW;
-    }
-
     public void unload() {
         gameGroups.forEach(GameGroup::unload);
 

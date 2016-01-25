@@ -5,6 +5,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -45,6 +46,16 @@ public class CommandConfig {
             e.printStackTrace();
         }
 
+        this.executor = executor;
+    }
+
+    public CommandConfig(String name, String permission, String description, String usage,
+                         Listener executor, String...aliases) {
+        this.name = name;
+        this.permission = permission;
+        this.aliases = Arrays.asList(aliases);
+        this.description = description;
+        this.usage = usage;
         this.executor = executor;
     }
 

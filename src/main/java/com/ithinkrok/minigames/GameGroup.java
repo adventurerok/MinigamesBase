@@ -4,6 +4,7 @@ import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.MutableClassToInstanceMap;
 import com.ithinkrok.minigames.command.Command;
 import com.ithinkrok.minigames.command.CommandConfig;
+import com.ithinkrok.minigames.command.HelpCommand;
 import com.ithinkrok.minigames.database.DatabaseTask;
 import com.ithinkrok.minigames.database.DatabaseTaskRunner;
 import com.ithinkrok.minigames.event.CommandEvent;
@@ -89,7 +90,8 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     private Map<String, GameState> gameStates = new HashMap<>();
     private Map<String, Kit> kits = new HashMap<>();
 
-    private Map<String, CommandConfig> commandMap = new HashMap<>();
+    private Map<String, CommandConfig> commandMap = new TreeMap<>();
+    private Map<String, CommandConfig> commandAliasesMap = new HashMap<>();
 
     private MultipleLanguageLookup languageLookup = new MultipleLanguageLookup();
 
@@ -101,6 +103,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
 
         chatPrefix = config.getBaseConfig().getString("chat_prefix");
 
+        addDefaultCommands();
         ConfigParser.parseConfig(game, this, this, this, config.getConfigName(), config.getBaseConfig());
 
         if (currentMap != null) defaultAndMapListeners = createDefaultAndMapListeners(currentMap.getListenerMap());
@@ -109,6 +112,13 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         changeGameState(config.getStartGameStateName());
 
         if (config.getStartMapName() != null) changeMap(config.getStartMapName());
+    }
+
+    private void addDefaultCommands() {
+        CommandConfig help = new CommandConfig("help", "mg.base.help", "Shows command help", "/<command>", new
+                HelpCommand(), "?");
+
+        addCommand(help);
     }
 
     @SuppressWarnings("unchecked")
@@ -397,7 +407,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     }
 
     public String getChatPrefix() {
-        return game.getChatPrefix();
+        return chatPrefix;
     }
 
     @Override
@@ -528,9 +538,15 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
 
     @Override
     public void addCommand(CommandConfig command) {
+        commandMap.put(command.getName(), command);
+
         for(String alias : command.getAliases()) {
-            commandMap.put(alias.toLowerCase(), command);
+            commandAliasesMap.put(alias.toLowerCase(), command);
         }
+    }
+
+    public Map<String, CommandConfig> getCommands() {
+        return commandMap;
     }
 
     private class GameGroupListener implements Listener {
@@ -582,7 +598,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
 
         @MinigamesEventHandler
         public void eventCommand(CommandEvent event) {
-            CommandConfig commandConfig = commandMap.get(event.getCommand().getCommand().toLowerCase());
+            CommandConfig commandConfig = commandAliasesMap.get(event.getCommand().getCommand().toLowerCase());
 
             if(commandConfig == null) return;
             event.setHandled(true);
