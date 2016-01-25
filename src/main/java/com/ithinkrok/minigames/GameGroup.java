@@ -2,9 +2,11 @@ package com.ithinkrok.minigames;
 
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.MutableClassToInstanceMap;
+import com.ithinkrok.minigames.command.Command;
 import com.ithinkrok.minigames.command.CommandConfig;
 import com.ithinkrok.minigames.database.DatabaseTask;
 import com.ithinkrok.minigames.database.DatabaseTaskRunner;
+import com.ithinkrok.minigames.event.CommandEvent;
 import com.ithinkrok.minigames.event.MinigamesEvent;
 import com.ithinkrok.minigames.event.MinigamesEventHandler;
 import com.ithinkrok.minigames.event.game.CountdownFinishedEvent;
@@ -576,6 +578,22 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         @MinigamesEventHandler
         public void eventUserBreakBlock(UserBreakBlockEvent event) {
             checkInventoryTethers(event.getBlock().getLocation());
+        }
+
+        @MinigamesEventHandler
+        public void eventCommand(CommandEvent event) {
+            CommandConfig commandConfig = commandMap.get(event.getCommand().getCommand().toLowerCase());
+
+            if(commandConfig == null) return;
+            event.setHandled(true);
+
+            if(!Command.requirePermission(event.getCommandSender(), commandConfig.getPermission())) return;
+
+            EventExecutor.executeEvent(event, commandConfig.getExecutor());
+
+            if(event.isValidCommand()) return;
+
+            event.getCommandSender().sendMessage(commandConfig.getUsage());
         }
 
         @MinigamesEventHandler(priority = MinigamesEventHandler.INTERNAL_FIRST)

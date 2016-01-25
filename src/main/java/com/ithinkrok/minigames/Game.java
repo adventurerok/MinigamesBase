@@ -6,7 +6,7 @@ import com.ithinkrok.minigames.command.GameCommandHandler;
 import com.ithinkrok.minigames.database.DatabaseTask;
 import com.ithinkrok.minigames.database.DatabaseTaskRunner;
 import com.ithinkrok.minigames.database.Persistence;
-import com.ithinkrok.minigames.event.game.GameCommandEvent;
+import com.ithinkrok.minigames.event.user.game.UserCommandEvent;
 import com.ithinkrok.minigames.event.map.*;
 import com.ithinkrok.minigames.event.user.game.UserJoinEvent;
 import com.ithinkrok.minigames.event.user.game.UserQuitEvent;
@@ -480,17 +480,13 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
 
             Command gameCommand = new Command(commandName, arguments, sender.getGameGroup(), user, teamIdentifier, kit);
 
-            GameCommandEvent commandEvent = new GameCommandEvent(user.getGameGroup(), sender, gameCommand);
+            UserCommandEvent commandEvent = new UserCommandEvent(sender, gameCommand);
 
-            //TODO gameEvent call every user's listeners. We only want to call senders listeners.
-            //FIX: Add user command event and console command event
-            sender.getGameGroup().gameEvent(commandEvent);
+            sender.getGameGroup().userEvent(commandEvent);
 
             if(!commandEvent.isHandled()) return;
 
             event.setCancelled(true);
-
-            //TODO usage will be handled by GameGroups onCommand method
         }
 
         @EventHandler(priority = EventPriority.LOW)

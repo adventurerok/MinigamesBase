@@ -1,15 +1,15 @@
-package com.ithinkrok.minigames.event.game;
+package com.ithinkrok.minigames.event.user.game;
 
-import com.ithinkrok.minigames.GameGroup;
+import com.ithinkrok.minigames.User;
 import com.ithinkrok.minigames.command.Command;
-import com.ithinkrok.minigames.command.CommandSender;
+import com.ithinkrok.minigames.event.CommandEvent;
+import com.ithinkrok.minigames.event.user.UserEvent;
 
 /**
  * Created by paul on 24/01/16.
  */
-public class GameCommandEvent extends GameEvent {
+public class UserCommandEvent extends UserEvent implements CommandEvent {
 
-    private final CommandSender sender;
     private final Command command;
 
     /**
@@ -22,32 +22,37 @@ public class GameCommandEvent extends GameEvent {
      */
     private boolean validCommand = true;
 
-    public GameCommandEvent(GameGroup gameGroup, CommandSender sender, Command command) {
-        super(gameGroup);
-        this.sender = sender;
+    public UserCommandEvent(User user, Command command) {
+        super(user);
         this.command = command;
     }
 
-    public CommandSender getSender() {
-        return sender;
-    }
-
+    @Override
     public Command getCommand() {
         return command;
     }
 
+    @Override
+    public User getCommandSender() {
+        return getUser();
+    }
+
+    @Override
     public boolean isHandled() {
         return handled;
     }
 
+    @Override
     public void setHandled(boolean handled) {
         this.handled = handled;
     }
 
+    @Override
     public boolean isValidCommand() {
         return validCommand;
     }
 
+    @Override
     public void setValidCommand(boolean validCommand) {
         this.validCommand = validCommand;
     }
