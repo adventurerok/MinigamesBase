@@ -64,21 +64,15 @@ import java.util.logging.Logger;
 @SuppressWarnings("unchecked")
 public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTaskRunner {
 
-    private ConcurrentMap<UUID, User> usersInServer = new ConcurrentHashMap<>();
-    private List<GameGroup> gameGroups = new ArrayList<>();
+    private final ConcurrentMap<UUID, User> usersInServer = new ConcurrentHashMap<>();
+    private final List<GameGroup> gameGroups = new ArrayList<>();
 
-    private Plugin plugin;
-
+    private final Plugin plugin;
+    private final WeakHashMap<String, GameGroup> mapToGameGroup = new WeakHashMap<>();
+    private final Map<String, GameMapInfo> maps = new HashMap<>();
+    private final Persistence persistence;
     private GameGroup spawnGameGroup;
-
     private DisguiseController disguiseController;
-
-    private WeakHashMap<String, GameGroup> mapToGameGroup = new WeakHashMap<>();
-
-    private Map<String, GameMapInfo> maps = new HashMap<>();
-
-    private Persistence persistence;
-
     private GameGroupConfig gameGroupConfig;
 
     public Game(MinigamesPlugin plugin) {
@@ -152,18 +146,8 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         maps.put(mapName, new GameMapInfo(this, mapName));
     }
 
-    @Override
-    public LangFile loadLangFile(String path) {
-        return new LangFile(ResourceHandler.getPropertiesResource(plugin, path));
-    }
-
     public void removeUser(User user) {
         usersInServer.values().remove(user);
-    }
-
-    @Override
-    public File getDataFolder() {
-        return plugin.getDataFolder();
     }
 
     public GameMapInfo getMapInfo(String mapName) {
@@ -175,6 +159,15 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         return ResourceHandler.getConfigResource(plugin, path);
     }
 
+    @Override
+    public LangFile loadLangFile(String path) {
+        return new LangFile(ResourceHandler.getPropertiesResource(plugin, path));
+    }
+
+    @Override
+    public File getDataFolder() {
+        return plugin.getDataFolder();
+    }
 
     @Override
     public User getUser(UUID uuid) {
@@ -480,7 +473,7 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
 
             sender.getGameGroup().userEvent(commandEvent);
 
-            if(!commandEvent.isHandled()) return;
+            if (!commandEvent.isHandled()) return;
 
             event.setCancelled(true);
         }

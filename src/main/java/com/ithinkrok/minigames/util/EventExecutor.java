@@ -14,7 +14,7 @@ import java.util.*;
  */
 public class EventExecutor {
 
-    private static Map<Class<? extends Listener>, ListenerHandler> listenerHandlerMap = new HashMap<>();
+    private static final Map<Class<? extends Listener>, ListenerHandler> listenerHandlerMap = new HashMap<>();
 
     public static void executeEvent(MinigamesEvent event, Listener... listeners) {
         executeListeners(event, getMethodExecutorMap(event, listeners));
@@ -99,9 +99,9 @@ public class EventExecutor {
     }
 
     private static class ListenerHandler {
-        private Class<? extends Listener> listenerClass;
+        private final Class<? extends Listener> listenerClass;
 
-        private Map<Class<? extends MinigamesEvent>, List<MethodExecutor>> eventMethodsMap = new HashMap<>();
+        private final Map<Class<? extends MinigamesEvent>, List<MethodExecutor>> eventMethodsMap = new HashMap<>();
 
         public ListenerHandler(Class<? extends Listener> listenerClass) {
             this.listenerClass = listenerClass;
@@ -135,8 +135,8 @@ public class EventExecutor {
     }
 
     private static class MethodExecutor implements Comparable<MethodExecutor> {
-        private Method method;
-        private boolean ignoreCancelled;
+        private final Method method;
+        private final boolean ignoreCancelled;
 
         public MethodExecutor(Method method, boolean ignoreCancelled) {
             this.method = method;
@@ -155,13 +155,20 @@ public class EventExecutor {
 
         @Override
         public int compareTo(MethodExecutor o) {
-            int priorityCompare = Integer.compare(method.getAnnotation(MinigamesEventHandler.class).priority(), o
-                    .method.getAnnotation(MinigamesEventHandler.class).priority());
+            int priorityCompare = Integer.compare(method.getAnnotation(MinigamesEventHandler.class).priority(),
+                    o.method.getAnnotation(MinigamesEventHandler.class).priority());
 
             if (priorityCompare != 0) return priorityCompare;
 
             //TODO possible speed improvement here
             return method.toString().compareTo(o.method.toString());
+        }
+
+        @Override
+        public int hashCode() {
+            int result = method.hashCode();
+            result = 31 * result + (ignoreCancelled ? 1 : 0);
+            return result;
         }
 
         @Override
@@ -174,13 +181,6 @@ public class EventExecutor {
             if (ignoreCancelled != that.ignoreCancelled) return false;
             return method.equals(that.method);
 
-        }
-
-        @Override
-        public int hashCode() {
-            int result = method.hashCode();
-            result = 31 * result + (ignoreCancelled ? 1 : 0);
-            return result;
         }
     }
 }

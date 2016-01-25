@@ -59,41 +59,30 @@ import java.util.concurrent.ConcurrentMap;
 public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, FileLoader, SharedObjectAccessor,
         MetadataHolder<Metadata>, SchematicResolver, TeamUserResolver, DatabaseTaskRunner, ConfigHolder {
 
-    private ConcurrentMap<UUID, User> usersInGroup = new ConcurrentHashMap<>();
+    private final ConcurrentMap<UUID, User> usersInGroup = new ConcurrentHashMap<>();
 
-    private Map<TeamIdentifier, Team> teamsInGroup = new HashMap<>();
-    private Game game;
-
+    private final Map<TeamIdentifier, Team> teamsInGroup = new HashMap<>();
+    private final Game game;
+    private final TaskList gameGroupTaskList = new TaskList();
+    private final TaskList gameStateTaskList = new TaskList();
+    private final Listener gameGroupListener;
+    private final List<Listener> gameStateListeners = new ArrayList<>();
+    private final ClassToInstanceMap<Metadata> metadataMap = MutableClassToInstanceMap.create();
+    private final String chatPrefix;
+    private final HashMap<String, Listener> defaultListeners = new HashMap<>();
+    private final IdentifierMap<CustomItem> customItemIdentifierMap = new IdentifierMap<>();
+    private final Map<String, ConfigurationSection> sharedObjectMap = new HashMap<>();
+    private final Map<String, Schematic> schematicMap = new HashMap<>();
+    private final Map<String, TeamIdentifier> teamIdentifiers = new HashMap<>();
+    private final Map<String, GameState> gameStates = new HashMap<>();
+    private final Map<String, Kit> kits = new HashMap<>();
+    private final Map<String, CommandConfig> commandMap = new TreeMap<>();
+    private final Map<String, CommandConfig> commandAliasesMap = new HashMap<>();
+    private final MultipleLanguageLookup languageLookup = new MultipleLanguageLookup();
     private GameState gameState;
-
     private GameMap currentMap;
-
-    private TaskList gameGroupTaskList = new TaskList();
-    private TaskList gameStateTaskList = new TaskList();
-
-    private Listener gameGroupListener;
     private List<Listener> defaultAndMapListeners = new ArrayList<>();
-
-    private List<Listener> gameStateListeners = new ArrayList<>();
-
-    private ClassToInstanceMap<Metadata> metadataMap = MutableClassToInstanceMap.create();
-
     private Countdown countdown;
-
-    private String chatPrefix;
-
-    private HashMap<String, Listener> defaultListeners = new HashMap<>();
-    private IdentifierMap<CustomItem> customItemIdentifierMap = new IdentifierMap<>();
-    private Map<String, ConfigurationSection> sharedObjectMap = new HashMap<>();
-    private Map<String, Schematic> schematicMap = new HashMap<>();
-    private Map<String, TeamIdentifier> teamIdentifiers = new HashMap<>();
-    private Map<String, GameState> gameStates = new HashMap<>();
-    private Map<String, Kit> kits = new HashMap<>();
-
-    private Map<String, CommandConfig> commandMap = new TreeMap<>();
-    private Map<String, CommandConfig> commandAliasesMap = new HashMap<>();
-
-    private MultipleLanguageLookup languageLookup = new MultipleLanguageLookup();
 
     public GameGroup(Game game, GameGroupConfig config) {
         this.game = game;
@@ -148,16 +137,6 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         Validate.notNull(mapInfo, "The map " + mapName + " does not exist");
 
         changeMap(mapInfo);
-    }
-
-    @Override
-    public void addCommand(CommandConfig command) {
-        commandMap.put(command.getName(), command);
-        commandAliasesMap.put(command.getName(), command);
-
-        for (String alias : command.getAliases()) {
-            commandAliasesMap.put(alias.toLowerCase(), command);
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -260,11 +239,6 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         ConfigurationSection result = null;
         if (currentMap != null) result = currentMap.getSharedObject(name);
         return result != null ? result : sharedObjectMap.get(name);
-    }
-
-    @Override
-    public LanguageLookup getLanguageLookup() {
-        return this;
     }
 
     @Override
@@ -383,46 +357,18 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     }
 
     @Override
-    public boolean hasLocale(String name) {
-        return (currentMap != null && currentMap.hasLocale(name) || languageLookup.hasLocale(name));
-    }
-
-    public Game getGame() {
-        return game;
-    }
-
-    @Override
-    public void sendLocale(String locale, Object... args) {
-        sendMessage(getLocale(locale, args));
-    }
-
-    @Override
-    public void sendMessage(String message) {
-        sendMessageNoPrefix(getChatPrefix() + message);
-    }
-
-    @Override
     public String getLocale(String name, Object... args) {
         if (currentMap != null && currentMap.hasLocale(name)) return currentMap.getLocale(name, args);
         else return languageLookup.getLocale(name, args);
     }
 
     @Override
-    public void sendMessageNoPrefix(String message) {
-        for (User user : usersInGroup.values()) {
-            user.sendMessageNoPrefix(message);
-        }
-
-        game.getLogger().info(message);
+    public boolean hasLocale(String name) {
+        return (currentMap != null && currentMap.hasLocale(name) || languageLookup.hasLocale(name));
     }
 
-    public String getChatPrefix() {
-        return chatPrefix;
-    }
-
-    @Override
-    public void sendLocaleNoPrefix(String locale, Object... args) {
-        sendMessageNoPrefix(getLocale(locale, args));
+    public Game getGame() {
+        return game;
     }
 
     @Override
@@ -464,6 +410,9 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
 
     public int getUserCount() {
         return getUsers().size();
+    }    @Override
+    public LanguageLookup getLanguageLookup() {
+        return this;
     }
 
     public Kit getKit(String name) {
@@ -544,6 +493,16 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     @Override
     public void addKit(Kit kit) {
         kits.put(kit.getName(), kit);
+    }
+
+    @Override
+    public void addCommand(CommandConfig command) {
+        commandMap.put(command.getName(), command);
+        commandAliasesMap.put(command.getName(), command);
+
+        for (String alias : command.getAliases()) {
+            commandAliasesMap.put(alias.toLowerCase(), command);
+        }
     }
 
     public Map<String, CommandConfig> getCommands() {
@@ -643,4 +602,41 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
             }
         }
     }
+
+
+
+
+    @Override
+    public void sendLocale(String locale, Object... args) {
+        sendMessage(getLocale(locale, args));
+    }
+
+
+    @Override
+    public void sendMessage(String message) {
+        sendMessageNoPrefix(getChatPrefix() + message);
+    }
+
+
+    @Override
+    public void sendMessageNoPrefix(String message) {
+        for (User user : usersInGroup.values()) {
+            user.sendMessageNoPrefix(message);
+        }
+
+        game.getLogger().info(message);
+    }
+
+
+    public String getChatPrefix() {
+        return chatPrefix;
+    }
+
+
+    @Override
+    public void sendLocaleNoPrefix(String locale, Object... args) {
+        sendMessageNoPrefix(getLocale(locale, args));
+    }
+
+
 }

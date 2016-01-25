@@ -33,19 +33,19 @@ public class CustomItem implements Identifiable, Listener, Nameable {
 
     private static int customItemCount = 0;
 
-    private int customItemId = customItemCount++;
+    private final int customItemId = customItemCount++;
 
-    private List<Listener> rightClickActions = new ArrayList<>();
-    private List<Listener> leftClickActions = new ArrayList<>();
-    private List<Listener> timeoutActions = new ArrayList<>();
-    private List<Listener> attackActions = new ArrayList<>();
-    private List<Listener> allListeners = new ArrayList<>();
+    private final List<Listener> rightClickActions = new ArrayList<>();
+    private final List<Listener> leftClickActions = new ArrayList<>();
+    private final List<Listener> timeoutActions = new ArrayList<>();
+    private final List<Listener> attackActions = new ArrayList<>();
+    private final List<Listener> allListeners = new ArrayList<>();
 
-    private String name;
-    private String itemDisplayLocale;
-    private Material itemMaterial;
-    private int durability;
-    private boolean unbreakable;
+    private final String name;
+    private final String itemDisplayLocale;
+    private final Material itemMaterial;
+    private final int durability;
+    private final boolean unbreakable;
 
     private String rightClickCooldownFinishedLocale;
     private Calculator rightClickCooldown;
@@ -54,11 +54,11 @@ public class CustomItem implements Identifiable, Listener, Nameable {
     private String timeoutFinishedLocale;
     private Calculator timeoutCalculator;
     private String rightClickCooldownAbility;
-    private String descriptionLocale;
+    private final String descriptionLocale;
 
-    private boolean replaceOnUpgrade;
+    private final boolean replaceOnUpgrade;
 
-    private List<EnchantmentEffect> enchantmentEffects = new ArrayList<>();
+    private final List<EnchantmentEffect> enchantmentEffects = new ArrayList<>();
 
     public CustomItem(String name, ConfigurationSection config) {
         this.name = name;
@@ -260,8 +260,8 @@ public class CustomItem implements Identifiable, Listener, Nameable {
     }
 
     private static class EnchantmentEffect {
-        private Enchantment enchantment;
-        private Calculator levelCalculator;
+        private final Enchantment enchantment;
+        private final Calculator levelCalculator;
 
         public EnchantmentEffect(Enchantment enchantment, Calculator levelCalculator) {
             this.enchantment = enchantment;
