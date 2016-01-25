@@ -51,12 +51,23 @@ public class Command {
         }
     }
 
+    public boolean hasDoubleArg(int index) {
+        return hasArg(index) && defaultArgs.get(index) instanceof Number;
+    }
+
     public int getIntArg(int index, int def) {
         try {
             return ((Number) defaultArgs.get(index)).intValue();
         } catch (Exception e) {
             return def;
         }
+    }
+
+    public boolean hasIntArg(int index) {
+        if(!hasDoubleArg(index)) return false;
+
+        Number num = (Number) defaultArgs.get(index);
+        return num.intValue() == num.doubleValue();
     }
 
     public boolean getBooleanArg(int index, boolean def) {
@@ -67,11 +78,8 @@ public class Command {
         }
     }
 
-    public String getStringArg(int index, String def) {
-        if(index >= defaultArgs.size()) return def;
-        Object o = defaultArgs.get(index);
-
-        return o != null ? o.toString() : def;
+    public boolean hasBooleanArg(int index) {
+        return hasArg(index) && defaultArgs.get(index) instanceof Boolean;
     }
 
     public boolean hasParameter(String name) {
@@ -95,11 +103,11 @@ public class Command {
     }
 
     public Command subCommand() {
-        if(defaultArgs.size() < 1) return null;
+        if (defaultArgs.size() < 1) return null;
 
         List<Object> newArgs = new ArrayList<>();
 
-        for(int index = 1; index < defaultArgs.size(); ++index) newArgs.add(defaultArgs.get(index));
+        for (int index = 1; index < defaultArgs.size(); ++index) newArgs.add(defaultArgs.get(index));
 
         Map<String, Object> newParams = new HashMap<>(params);
         newParams.put("default", newArgs);
@@ -107,8 +115,15 @@ public class Command {
         return new Command(getStringArg(0, null), newParams, gameGroup, user, teamIdentifier, kit);
     }
 
+    public String getStringArg(int index, String def) {
+        if (index >= defaultArgs.size()) return def;
+        Object o = defaultArgs.get(index);
+
+        return o != null ? o.toString() : def;
+    }
+
     public boolean getBooleanParam(String name, boolean def) {
-        try{
+        try {
             return (Boolean) params.get(name);
         } catch (Exception e) {
             return def;
@@ -141,28 +156,28 @@ public class Command {
     }
 
     public boolean requireGameGroup(Messagable sender) {
-        if(gameGroup != null) return true;
+        if (gameGroup != null) return true;
 
         sender.sendLocale("command.requires.game_group");
         return false;
     }
 
     public boolean requireArgumentCount(Messagable sender, int minArgs) {
-        if(defaultArgs.size() >= minArgs) return true;
+        if (defaultArgs.size() >= minArgs) return true;
 
         sender.sendLocale("command.requires.arguments", minArgs);
         return false;
     }
 
     public boolean requireUser(Messagable sender) {
-        if(user != null) return true;
+        if (user != null) return true;
 
         sender.sendLocale("command.requires.user");
         return false;
     }
 
     public boolean requireTeamIdentifier(Messagable sender) {
-        if(teamIdentifier != null) return true;
+        if (teamIdentifier != null) return true;
 
         sender.sendLocale("command.requires.team_identifier");
         return false;
@@ -172,18 +187,18 @@ public class Command {
         User userSender = (sender instanceof User) ? (User) sender : null;
 
         boolean userCheck = (user != null) && (userSender != null) && (user != userSender);
-        boolean teamCheck = (teamIdentifier != null) && (userSender != null) && (!Objects.equals(teamIdentifier,
-                userSender.getTeamIdentifier()));
-        boolean gameGroupCheck = (gameGroup != null) && (userSender != null) && (!Objects.equals(gameGroup,
-                userSender.getGameGroup()));
+        boolean teamCheck = (teamIdentifier != null) && (userSender != null) &&
+                (!Objects.equals(teamIdentifier, userSender.getTeamIdentifier()));
+        boolean gameGroupCheck =
+                (gameGroup != null) && (userSender != null) && (!Objects.equals(gameGroup, userSender.getGameGroup()));
 
-        if(!userCheck && !teamCheck && !gameGroupCheck) return true;
+        if (!userCheck && !teamCheck && !gameGroupCheck) return true;
 
         return requirePermission(sender, permission);
     }
 
     public static boolean requirePermission(CommandSender sender, String permission) {
-        if(sender.hasPermission(permission)) return true;
+        if (sender.hasPermission(permission)) return true;
 
         sender.sendLocale("command.requires.permission", permission);
         return false;

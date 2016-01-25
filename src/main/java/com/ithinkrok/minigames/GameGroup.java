@@ -505,6 +505,10 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         }
     }
 
+    public CommandConfig getCommand(String name) {
+        return name != null ? commandAliasesMap.get(name.toLowerCase()) : null;
+    }
+
     public Map<String, CommandConfig> getCommands() {
         return commandMap;
     }

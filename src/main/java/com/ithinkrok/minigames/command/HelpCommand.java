@@ -13,21 +13,35 @@ public class HelpCommand implements Listener {
 
     @MinigamesEventHandler
     public void onCommand(CommandEvent event) {
-        if(!event.getCommand().requireGameGroup(event.getCommandSender())) return;
+        if (!event.getCommand().requireGameGroup(event.getCommandSender())) return;
 
-        //Commands are stored as a TreeMap so no need to sort
-        Map<String, CommandConfig> commands = event.getCommand().getGameGroup().getCommands();
 
         CommandSender sender = event.getCommandSender();
         sender.sendLocale("command.help.title");
 
-        for(CommandConfig command : commands.values()) {
-            String usage = command.getUsage();
-            usage = usage.replace("<command>", command.getName());
+        if (event.getCommand().hasArg(0)) {
+            String commandName = event.getCommand().getStringArg(0, "unspecified").toLowerCase();
+            CommandConfig commandConfig = event.getCommand().getGameGroup().getCommand(commandName);
 
-            sender.sendMessageNoPrefix(usage + ": " + command.getDescription());
+            if (commandConfig == null) {
+                sender.sendLocale("command.help.unknown", commandName);
+                return;
+            }
+
+            String usage = commandConfig.getUsage().replace("<command>", commandName);
+            String desc = commandConfig.getDescription();
+
+            sender.sendLocaleNoPrefix("command.help.usage", commandName, usage, desc);
+        } else {
+            //Commands are stored as a TreeMap so no need to sort
+            Map<String, CommandConfig> commands = event.getCommand().getGameGroup().getCommands();
+
+            for (CommandConfig command : commands.values()) {
+                sender.sendLocaleNoPrefix("command.help.line", command.getUsage(), command.getDescription());
+            }
         }
 
-        //TODO don't show usage unless requested. Split into pages, etc...
+
+        //TODO Split into pages
     }
 }
