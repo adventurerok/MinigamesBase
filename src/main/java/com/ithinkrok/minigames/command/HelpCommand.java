@@ -21,7 +21,7 @@ public class HelpCommand implements Listener {
         Command command = event.getCommand();
         CommandSender sender = event.getCommandSender();
 
-        if (event.getCommand().hasArg(0)) {
+        if (event.getCommand().hasArg(0) && !event.getCommand().hasIntArg(0)) {
             onUsageCommand(sender, command);
         } else {
             onListCommand(sender, command);
@@ -109,5 +109,9 @@ public class HelpCommand implements Listener {
         for (int index = (page - 1) * 8; index < maxIndexPlusOne && index < outputLines.size(); ++index) {
             sender.sendMessageNoPrefix(outputLines.get(index));
         }
+
+        if(page < maxPage) {
+            sender.sendLocale("command.help.next_page", page + 1);
+        } else sender.sendLocale("command.help.end");
     }
 }
