@@ -7,10 +7,7 @@ import org.bukkit.command.PluginCommand;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by paul on 25/01/16.
@@ -43,7 +40,7 @@ public class HelpCommand implements Listener {
         if (commandConfig == null) {
             PluginCommand pluginCommand = Bukkit.getPluginCommand(commandName);
 
-            if(pluginCommand == null) {
+            if (pluginCommand == null) {
                 sender.sendLocale("command.help.unknown", commandName);
                 return;
             }
@@ -65,22 +62,33 @@ public class HelpCommand implements Listener {
         //Commands are stored as a TreeMap so no need to sort
         Map<String, CommandConfig> commands = command.getGameGroup().getCommands();
 
+        Set<String> doneCommands = new HashSet<>();
         List<String> outputLines = new ArrayList<>();
 
         for (CommandConfig commandConfig : commands.values()) {
             if (!sender.hasPermission(commandConfig.getPermission())) continue;
 
+            if (!doneCommands.add(commandConfig.getName())) continue;
             outputLines.add(command.getGameGroup()
                     .getLocale("command.help.line", commandConfig.getName(), commandConfig.getDescription()));
         }
 
-        for (String commandName : Bukkit.getCommandAliases().keySet()) {
-            PluginCommand pluginCommand = Bukkit.getPluginCommand(commandName);
+        for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+            for (String commandName : plugin.getDescription().getCommands().keySet()) {
+                PluginCommand pluginCommand = Bukkit.getPluginCommand(commandName);
 
-            if (pluginCommand.getPermission() != null && !sender.hasPermission(pluginCommand.getPermission())) continue;
+                if (pluginCommand == null) {
+                    System.out.println("Null command: " + commandName);
+                    continue;
+                }
 
-            outputLines.add(command.getGameGroup()
-                    .getLocale("command.help.line", pluginCommand.getName(), pluginCommand.getDescription()));
+                if (pluginCommand.getPermission() != null && !sender.hasPermission(pluginCommand.getPermission()))
+                    continue;
+
+                if (!doneCommands.add(commandName)) continue;
+                outputLines.add(command.getGameGroup()
+                        .getLocale("command.help.line", pluginCommand.getName(), pluginCommand.getDescription()));
+            }
         }
 
         Collections.sort(outputLines);
