@@ -86,7 +86,7 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         this.plugin = plugin;
 
         configDirectory = new File(config.getString("directories.config"));
-        mapDirectory = new File(config.getString("directories.map"));
+        mapDirectory = new File(config.getString("directories.maps"));
         mapConfigDirectory = new File(config.getString("directories.map_config"));
 
         persistence = new Persistence(plugin);
