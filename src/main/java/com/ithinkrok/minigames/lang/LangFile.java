@@ -1,7 +1,6 @@
 package com.ithinkrok.minigames.lang;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -14,6 +13,10 @@ import java.util.Properties;
 public class LangFile implements LanguageLookup{
 
     private Map<Object, String> languageStrings = new HashMap<>();
+
+    public LangFile(File in) throws IOException {
+        this(new FileInputStream(in));
+    }
 
     public LangFile(InputStream in) throws IOException {
         this(loadProperties(in));

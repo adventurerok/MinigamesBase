@@ -36,6 +36,8 @@ import com.ithinkrok.minigames.util.io.FileLoader;
 import com.ithinkrok.minigames.util.io.ResourceHandler;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -51,6 +53,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.projectiles.ProjectileSource;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -73,10 +76,17 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     private final Persistence persistence;
     private GameGroup spawnGameGroup;
     private DisguiseController disguiseController;
-    private GameGroupConfig gameGroupConfig;
 
-    public Game(SpecificPlugin plugin) {
+    private final Map<String, String> gameGroupConfigMap = new HashMap<>();
+    private final String gameGroupConfig = "colony_wars";
+
+    private final File configDirectory, mapDirectory;
+
+    public Game(BasePlugin plugin, ConfigurationSection config) {
         this.plugin = plugin;
+
+        configDirectory = new File(config.getString("directories.config"));
+        mapDirectory = new File(config.getString("directories.map"));
 
         persistence = new Persistence(plugin);
 
@@ -85,6 +95,14 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         unloadDefaultWorlds();
 
         setupDisguiseController();
+    }
+
+    public File getConfigDirectory() {
+        return configDirectory;
+    }
+
+    public File getMapDirectory() {
+        return mapDirectory;
     }
 
     private void unloadDefaultWorlds() {
@@ -112,27 +130,26 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         plugin.getServer().getPluginManager().registerEvents(listener, plugin);
     }
 
+    public void registerGameGroupConfig(String name, String configFile) {
+        gameGroupConfigMap.put(name, configFile);
+    }
+
     public GameGroup getSpawnGameGroup() {
         return spawnGameGroup;
     }
 
     public void reloadConfig() {
-        plugin.reloadConfig();
-
         reloadMaps();
-
-        gameGroupConfig = new GameGroupConfig("gamegroup", "config.yml", plugin.getConfig());
     }
 
     private void reloadMaps() {
         maps.clear();
 
-        File mapsFolder = new File(plugin.getDataFolder(), GameMapInfo.MAPS_FOLDER);
-        if (!mapsFolder.exists() || mapsFolder.isFile()) {
+        if (!mapDirectory.exists() || mapDirectory.isFile()) {
             throw new RuntimeException("Maps directory does not exist!");
         }
 
-        String[] mapNames = mapsFolder.list((dir, name) -> name.endsWith(".yml"));
+        String[] mapNames = mapDirectory.list((dir, name) -> name.endsWith(".yml"));
 
         for (String mapNameWithYml : mapNames) {
             String mapNameWithoutYml = mapNameWithYml.substring(0, mapNameWithYml.length() - 4);
@@ -156,12 +173,18 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
 
     @Override
     public ConfigurationSection loadConfig(String path) {
-        return ResourceHandler.getConfigResource(plugin, path);
+        return YamlConfiguration.loadConfiguration(new File(configDirectory, path));
     }
 
     @Override
     public LangFile loadLangFile(String path) {
-        return new LangFile(ResourceHandler.getPropertiesResource(plugin, path));
+        try {
+            return new LangFile(new File(configDirectory, path));
+        } catch (IOException e) {
+            System.out.println("Failed to load lang file: " + path);
+            e.printStackTrace();
+            return new LangFile(new Properties());
+        }
     }
 
     @Override
@@ -174,8 +197,8 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         return usersInServer.get(uuid);
     }
 
-    private GameGroup createGameGroup() {
-        return new GameGroup(this, gameGroupConfig);
+    private GameGroup createGameGroup(String name) {
+        return new GameGroup(this, gameGroupConfigMap.get(name));
 
     }
 
@@ -268,7 +291,7 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
                 user.becomePlayer(player);
             } else {
                 if (spawnGameGroup == null) {
-                    spawnGameGroup = createGameGroup();
+                    spawnGameGroup = createGameGroup(gameGroupConfig);
                     gameGroups.add(spawnGameGroup);
                 }
 

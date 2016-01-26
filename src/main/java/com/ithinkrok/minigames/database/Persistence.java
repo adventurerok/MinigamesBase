@@ -16,7 +16,7 @@ public class Persistence extends Thread {
 
     private boolean stop = false;
 
-    private ConcurrentLinkedQueue<DatabaseTask> threadTasks = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<DatabaseTask> threadTasks = new ConcurrentLinkedQueue<>();
 
     public Persistence(Plugin plugin) {
         this.plugin = plugin;

@@ -84,23 +84,25 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     private List<Listener> defaultAndMapListeners = new ArrayList<>();
     private Countdown countdown;
 
-    public GameGroup(Game game, GameGroupConfig config) {
+    public GameGroup(Game game, String configFile) {
         this.game = game;
 
         gameGroupListener = new GameGroupListener();
         defaultAndMapListeners = createDefaultAndMapListeners();
 
-        chatPrefix = config.getBaseConfig().getString("chat_prefix").replace('&', '§');
+        ConfigurationSection baseConfig = game.loadConfig(configFile);
+        chatPrefix = baseConfig.getString("chat_prefix").replace('&', '§');
 
         addDefaultCommands();
-        ConfigParser.parseConfig(game, this, this, this, config.getConfigName(), config.getBaseConfig());
+        ConfigParser.parseConfig(game, this, this, this, configFile, baseConfig);
 
         if (currentMap != null) defaultAndMapListeners = createDefaultAndMapListeners(currentMap.getListenerMap());
         else defaultAndMapListeners = createDefaultAndMapListeners();
 
-        changeGameState(config.getStartGameStateName());
+        changeGameState(baseConfig.getString("start_game_state"));
 
-        if (config.getStartMapName() != null) changeMap(config.getStartMapName());
+        String startMap = baseConfig.getString("start_map");
+        if (startMap != null) changeMap(startMap);
     }
 
     @SuppressWarnings("unchecked")
