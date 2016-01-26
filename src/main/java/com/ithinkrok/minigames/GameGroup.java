@@ -120,7 +120,8 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
 
     private void addDefaultCommands() {
         CommandConfig help =
-                new CommandConfig("help", "mg.base.help", "Shows command help", "/<command>", new HelpCommand(), "?");
+                new CommandConfig("help", "mg.base.help", "Shows command help", "/<command>", new HelpCommand(), null,
+                        "?");
 
         addCommand(help);
     }
@@ -410,13 +411,13 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
 
     public int getUserCount() {
         return getUsers().size();
-    }    @Override
-    public LanguageLookup getLanguageLookup() {
-        return this;
     }
 
     public Kit getKit(String name) {
         return kits.get(name);
+    }    @Override
+    public LanguageLookup getLanguageLookup() {
+        return this;
     }
 
     @Override
@@ -568,6 +569,8 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
             event.setHandled(true);
 
             if (!Command.requirePermission(event.getCommandSender(), commandConfig.getPermission())) return;
+            if (commandConfig.hasOthersPermission() && !event.getCommand()
+                    .requireOthersPermission(event.getCommandSender(), commandConfig.getOthersPermission())) return;
 
             EventExecutor.executeEvent(event, commandConfig.getExecutor());
 

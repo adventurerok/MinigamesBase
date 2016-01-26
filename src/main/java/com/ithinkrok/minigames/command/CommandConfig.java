@@ -17,6 +17,7 @@ public class CommandConfig implements Nameable {
     private final String name;
     private final String formattedName;
     private final String permission;
+    private final String othersPermission;
 
     private final List<String> aliases;
 
@@ -27,17 +28,19 @@ public class CommandConfig implements Nameable {
     public CommandConfig(String name, ConfigurationSection config, Object creator) {
         this.name = name.toLowerCase();
 
-        if(config.contains("formatted_name")) formattedName = config.getString("formatted_name");
+        if (config.contains("formatted_name")) formattedName = config.getString("formatted_name");
         else formattedName = name;
 
         this.permission = config.getString("permission");
-        if(this.permission == null) throw new RuntimeException("All commands must have permissions");
+        if (this.permission == null) throw new RuntimeException("All commands must have permissions");
+
+        this.othersPermission = config.getString("others_permission");
 
         this.description = config.getString("description", "A minigames provided command");
         this.usage = config.getString("usage", "/<command>");
 
         List<String> aliases = config.getStringList("aliases");
-        if(aliases == null) aliases = new ArrayList<>();
+        if (aliases == null) aliases = new ArrayList<>();
         aliases.add(name);
 
         this.aliases = aliases;
@@ -55,15 +58,16 @@ public class CommandConfig implements Nameable {
     }
 
     public CommandConfig(String name, String permission, String description, String usage, Listener executor,
-                     String... aliases) {
-        this(name, name, permission, description, usage, executor, aliases);
+                         String othersPermission, String... aliases) {
+        this(name, name, permission, othersPermission, description, usage, executor, aliases);
     }
 
-    public CommandConfig(String name, String formattedName, String permission, String description, String usage,
-                         Listener executor, String... aliases) {
+    public CommandConfig(String name, String formattedName, String permission, String othersPermission,
+                         String description, String usage, Listener executor, String... aliases) {
         this.name = name;
         this.formattedName = formattedName;
         this.permission = permission;
+        this.othersPermission = othersPermission;
         this.aliases = Arrays.asList(aliases);
         this.description = description;
         this.usage = usage;
@@ -81,6 +85,14 @@ public class CommandConfig implements Nameable {
 
     public String getPermission() {
         return permission;
+    }
+
+    public String getOthersPermission() {
+        return othersPermission;
+    }
+
+    public boolean hasOthersPermission() {
+        return othersPermission != null;
     }
 
     public Listener getExecutor() {
