@@ -75,7 +75,7 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     private DisguiseController disguiseController;
     private GameGroupConfig gameGroupConfig;
 
-    public Game(MinigamesPlugin plugin) {
+    public Game(SpecificPlugin plugin) {
         this.plugin = plugin;
 
         persistence = new Persistence(plugin);

@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by paul on 17/01/16.
  */
-public class MinigamesPlugin extends JavaPlugin {
+public class SpecificPlugin extends JavaPlugin {
 
     @Override
     public List<Class<?>> getDatabaseClasses() {
