@@ -74,7 +74,11 @@ public class HelpCommand implements Listener {
         }
 
         for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
-            for (String commandName : plugin.getDescription().getCommands().keySet()) {
+
+            Map<String, Map<String, Object>> commandMap = plugin.getDescription().getCommands();
+            if(commandMap == null) continue;
+
+            for (String commandName : commandMap.keySet()) {
                 PluginCommand pluginCommand = Bukkit.getPluginCommand(commandName);
 
                 if (pluginCommand == null) {
