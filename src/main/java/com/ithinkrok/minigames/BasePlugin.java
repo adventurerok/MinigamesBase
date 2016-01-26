@@ -26,6 +26,15 @@ public class BasePlugin extends JavaPlugin {
         ConfigurationSection config = getConfig();
 
         game = new Game(this, config);
+
+        game.reloadConfig();
+        game.registerListeners();
+    }
+
+    @Override
+    public void onDisable() {
+        game.unload();
+        game = null;
     }
 
     @Override

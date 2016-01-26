@@ -16,6 +16,7 @@ bungee:
 # TODO Specify the config and maps directories
 directories:
   config: "/srv/minigames/config"
+  map_config: "/srv/minigames/config/maps"
   maps: "/srv/minigames/maps"
 
 # TODO Specifies if this server has a ramdisk

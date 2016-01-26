@@ -80,13 +80,14 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     private final Map<String, String> gameGroupConfigMap = new HashMap<>();
     private final String gameGroupConfig = "colony_wars";
 
-    private final File configDirectory, mapDirectory;
+    private final File configDirectory, mapDirectory, mapConfigDirectory;
 
     public Game(BasePlugin plugin, ConfigurationSection config) {
         this.plugin = plugin;
 
         configDirectory = new File(config.getString("directories.config"));
         mapDirectory = new File(config.getString("directories.map"));
+        mapConfigDirectory = new File(config.getString("directories.map_config"));
 
         persistence = new Persistence(plugin);
 
@@ -142,14 +143,14 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         reloadMaps();
     }
 
-    private void reloadMaps() {
+    public void reloadMaps() {
         maps.clear();
 
-        if (!mapDirectory.exists() || mapDirectory.isFile()) {
+        if (!mapConfigDirectory.exists() || mapConfigDirectory.isFile()) {
             throw new RuntimeException("Maps directory does not exist!");
         }
 
-        String[] mapNames = mapDirectory.list((dir, name) -> name.endsWith(".yml"));
+        String[] mapNames = mapConfigDirectory.list((dir, name) -> name.endsWith(".yml"));
 
         for (String mapNameWithYml : mapNames) {
             String mapNameWithoutYml = mapNameWithYml.substring(0, mapNameWithYml.length() - 4);
