@@ -82,6 +82,8 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
 
     private final File configDirectory, mapDirectory, mapConfigDirectory, assetsDirectory;
 
+    private final File ramdiskDirectory;
+
     public Game(BasePlugin plugin, ConfigurationSection config) {
         this.plugin = plugin;
 
@@ -90,6 +92,14 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         mapConfigDirectory = new File(config.getString("directories.map_config"));
         assetsDirectory = new File(config.getString("directories.assets"));
 
+        ramdiskDirectory = config.getBoolean("ramdisk.enable") ? new File(config.getString("ramdisk.directory")) : null;
+
+        if(ramdiskDirectory != null && !ramdiskDirectory.exists()) {
+            if(!ramdiskDirectory.mkdir()) {
+                System.out.println("Failed to create ramdisk directory");
+            }
+        }
+
         persistence = new Persistence(plugin);
 
         InvisiblePlayerAttacker.enablePlayerAttacker(this, plugin, ProtocolLibrary.getProtocolManager());
@@ -97,6 +107,10 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         unloadDefaultWorlds();
 
         setupDisguiseController();
+    }
+
+    public File getRamdiskDirectory() {
+        return ramdiskDirectory;
     }
 
     public File getConfigDirectory() {

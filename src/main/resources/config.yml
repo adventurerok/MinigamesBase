@@ -13,7 +13,7 @@ controller:
 bungee:
   name: "server1"
 
-# TODO Specify the config and maps directories
+# Specify the config and maps directories
 directories:
   config: "/srv/minigames/config"
   map_config: "/srv/minigames/config/maps"

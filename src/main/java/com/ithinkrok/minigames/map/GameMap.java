@@ -33,6 +33,7 @@ import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -70,15 +71,32 @@ public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.Bo
 
         String randomWorldName = getRandomWorldName(gameMapInfo.getName());
         Path copyFrom = new File(gameGroup.getGame().getMapDirectory(), gameMapInfo.getMapFolder()).toPath();
-        String copyTo = "./" + randomWorldName + "/";
+
+        boolean ramdisk = gameGroup.getGame().getRamdiskDirectory() != null;
+        Path copyTo;
+
+        if(ramdisk) {
+            copyTo = new File(gameGroup.getGame().getRamdiskDirectory(), randomWorldName).toPath();
+        } else {
+            copyTo = Paths.get("./" + randomWorldName + "/");
+        }
 
         try {
-            DirectoryUtils.copy(copyFrom, Paths.get(copyTo));
+            DirectoryUtils.copy(copyFrom, copyTo);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        File uid = new File(copyTo, "uid.dat");
+        if(ramdisk) {
+            try {
+                Files.createSymbolicLink(Paths.get("./" + randomWorldName + "/"), copyTo);
+            } catch (IOException e) {
+                System.out.println("Failed to create symbolic link for map: " + randomWorldName);
+                e.printStackTrace();
+            }
+        }
+
+        File uid = new File(copyTo.toFile(), "uid.dat");
         if (uid.exists()) {
             boolean deleted = uid.delete();
             if (!deleted) System.out.println("Could not delete uid.dat for world. This could cause errors");
