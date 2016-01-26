@@ -1,6 +1,6 @@
 name: "MinigamesBase"
 version: "${project.version}"
-main: "com.ithinkrok.minigames.MinigamesPlugin"
+main: "com.ithinkrok.minigames.BasePlugin"
 author: "ithinkrok"
 depend: ["HologramAPI", "ProtocolLib"]
 softdepend: ["DisguiseCraft"]
