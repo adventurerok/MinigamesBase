@@ -111,7 +111,7 @@ public class HelpCommand implements Listener {
         }
 
         if(page < maxPage) {
-            sender.sendLocale("command.help.next_page", page + 1);
-        } else sender.sendLocale("command.help.end");
+            sender.sendLocaleNoPrefix("command.help.next_page", page + 1);
+        } else sender.sendLocaleNoPrefix("command.help.end");
     }
 }
