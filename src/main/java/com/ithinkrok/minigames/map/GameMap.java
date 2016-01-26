@@ -58,6 +58,7 @@ public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.Bo
     private final HashMap<String, ConfigurationSection> sharedObjects = new HashMap<>();
 
     private final List<PastedSchematic> pastedSchematics = new ArrayList<>();
+    private Path ramdiskPath;
 
     public GameMap(GameGroup gameGroup, GameMapInfo gameMapInfo) {
         this.gameMapInfo = gameMapInfo;
@@ -76,7 +77,8 @@ public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.Bo
         Path copyTo;
 
         if(ramdisk) {
-            copyTo = new File(gameGroup.getGame().getRamdiskDirectory(), randomWorldName).toPath();
+            ramdiskPath = new File(gameGroup.getGame().getRamdiskDirectory(), randomWorldName).toPath();
+            copyTo = ramdiskPath;
         } else {
             copyTo = Paths.get("./" + randomWorldName + "/");
         }
@@ -163,6 +165,15 @@ public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.Bo
         }
 
         boolean success = Bukkit.unloadWorld(world, false);
+
+        if(ramdiskPath != null) {
+            try {
+                DirectoryUtils.delete(ramdiskPath);
+            } catch (IOException e) {
+                System.out.println("Failed to delete map on ramdisk.");
+                e.printStackTrace();
+            }
+        }
 
         try {
             DirectoryUtils.delete(world.getWorldFolder().toPath());
