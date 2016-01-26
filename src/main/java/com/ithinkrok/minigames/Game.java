@@ -80,7 +80,7 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     private final Map<String, String> gameGroupConfigMap = new HashMap<>();
     private final String gameGroupConfig = "colony_wars";
 
-    private final File configDirectory, mapDirectory, mapConfigDirectory;
+    private final File configDirectory, mapDirectory, mapConfigDirectory, assetsDirectory;
 
     public Game(BasePlugin plugin, ConfigurationSection config) {
         this.plugin = plugin;
@@ -88,6 +88,7 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         configDirectory = new File(config.getString("directories.config"));
         mapDirectory = new File(config.getString("directories.maps"));
         mapConfigDirectory = new File(config.getString("directories.map_config"));
+        assetsDirectory = new File(config.getString("directories.assets"));
 
         persistence = new Persistence(plugin);
 
@@ -189,8 +190,8 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     }
 
     @Override
-    public File getDataFolder() {
-        return plugin.getDataFolder();
+    public File getAssetFolder() {
+        return assetsDirectory;
     }
 
     @Override

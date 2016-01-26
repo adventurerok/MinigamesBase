@@ -12,5 +12,5 @@ public interface FileLoader {
 
     ConfigurationSection loadConfig(String name);
     LanguageLookup loadLangFile(String name);
-    File getDataFolder();
+    File getAssetFolder();
 }
