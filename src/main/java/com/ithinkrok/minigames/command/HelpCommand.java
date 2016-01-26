@@ -58,7 +58,6 @@ public class HelpCommand implements Listener {
     }
 
     private void onListCommand(CommandSender sender, Command command) {
-        sender.sendLocaleNoPrefix("command.help.title");
         //Commands are stored as a TreeMap so no need to sort
         Map<String, CommandConfig> commands = command.getGameGroup().getCommands();
 
@@ -97,8 +96,18 @@ public class HelpCommand implements Listener {
 
         Collections.sort(outputLines);
 
-        for (String line : outputLines) {
-            sender.sendMessageNoPrefix(line);
+        int page = command.getIntArg(0, 1);
+        int maxPage = (outputLines.size() + 7) / 8;
+        if(page < 1 || page > maxPage) {
+            sender.sendLocale("command.help.invalid_page", page);
+        }
+
+        sender.sendLocaleNoPrefix("command.help.title", page, maxPage);
+
+        int maxIndexPlusOne = page * 8;
+
+        for (int index = (page - 1) * 8; index < maxIndexPlusOne && index < outputLines.size(); ++index) {
+            sender.sendMessageNoPrefix(outputLines.get(index));
         }
     }
 }
