@@ -11,8 +11,8 @@ public class GameMapInfo {
 
     public static final String MAPS_FOLDER = "maps";
 
-    private String name;
-    private ConfigurationSection config;
+    private final String name;
+    private final ConfigurationSection config;
 
     public GameMapInfo(Game game, String name) {
         this.name = name;

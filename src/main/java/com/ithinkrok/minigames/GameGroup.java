@@ -302,8 +302,8 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     }
 
     @Override
-    public File getAssetFolder() {
-        return game.getAssetFolder();
+    public File getAssetDirectory() {
+        return game.getAssetDirectory();
     }
 
     public GameState getCurrentGameState() {

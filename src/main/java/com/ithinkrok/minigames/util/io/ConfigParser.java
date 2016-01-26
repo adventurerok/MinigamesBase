@@ -133,7 +133,7 @@ public class ConfigParser {
     private void loadSchematics(ConfigurationSection config) {
         for (String name : config.getKeys(false)) {
             ConfigurationSection schemConfig = config.getConfigurationSection(name);
-            Schematic schem = new Schematic(name, loader.getAssetFolder(), schemConfig);
+            Schematic schem = new Schematic(name, loader.getAssetDirectory(), schemConfig);
 
             holder.addSchematic(schem);
         }

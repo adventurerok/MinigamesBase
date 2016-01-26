@@ -190,7 +190,7 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     }
 
     @Override
-    public File getAssetFolder() {
+    public File getAssetDirectory() {
         return assetsDirectory;
     }
 

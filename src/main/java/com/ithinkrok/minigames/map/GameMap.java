@@ -33,6 +33,7 @@ import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,35 +45,35 @@ import java.util.Map;
  */
 public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.BoundsChecker {
 
-    private GameMapInfo gameMapInfo;
+    private final GameMapInfo gameMapInfo;
     private World world;
-    private MultipleLanguageLookup languageLookup = new MultipleLanguageLookup();
-    private List<Listener> listeners = new ArrayList<>();
-    private Map<String, Listener> listenerMap = new HashMap<>();
-    private Map<String, Schematic> schematicMap = new HashMap<>();
+    private final MultipleLanguageLookup languageLookup = new MultipleLanguageLookup();
+    private final List<Listener> listeners = new ArrayList<>();
+    private final Map<String, Listener> listenerMap = new HashMap<>();
+    private final Map<String, Schematic> schematicMap = new HashMap<>();
 
-    private TaskList mapTaskList = new TaskList();
-    private IdentifierMap<CustomItem> customItemIdentifierMap = new IdentifierMap<>();
-    private HashMap<String, ConfigurationSection> sharedObjects = new HashMap<>();
+    private final TaskList mapTaskList = new TaskList();
+    private final IdentifierMap<CustomItem> customItemIdentifierMap = new IdentifierMap<>();
+    private final HashMap<String, ConfigurationSection> sharedObjects = new HashMap<>();
 
-    private List<PastedSchematic> pastedSchematics = new ArrayList<>();
+    private final List<PastedSchematic> pastedSchematics = new ArrayList<>();
 
     public GameMap(GameGroup gameGroup, GameMapInfo gameMapInfo) {
         this.gameMapInfo = gameMapInfo;
 
-        loadMap();
+        loadMap(gameGroup);
         ConfigParser
                 .parseConfig(gameGroup, this, gameGroup, this, gameMapInfo.getConfigName(), gameMapInfo.getConfig());
     }
 
-    private void loadMap() {
+    private void loadMap(GameGroup gameGroup) {
 
         String randomWorldName = getRandomWorldName(gameMapInfo.getName());
-        String copyFrom = "./" + gameMapInfo.getMapFolder() + "/";
+        Path copyFrom = new File(gameGroup.getGame().getMapDirectory(), gameMapInfo.getMapFolder()).toPath();
         String copyTo = "./" + randomWorldName + "/";
 
         try {
-            DirectoryUtils.copy(Paths.get(copyFrom), Paths.get(copyTo));
+            DirectoryUtils.copy(copyFrom, Paths.get(copyTo));
         } catch (IOException e) {
             e.printStackTrace();
         }
