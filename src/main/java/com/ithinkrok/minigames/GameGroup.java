@@ -48,7 +48,7 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -302,7 +302,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     }
 
     @Override
-    public File getAssetDirectory() {
+    public Path getAssetDirectory() {
         return game.getAssetDirectory();
     }
 

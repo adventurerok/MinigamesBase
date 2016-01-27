@@ -71,13 +71,13 @@ public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.Bo
     private void loadMap(GameGroup gameGroup) {
 
         String randomWorldName = getRandomWorldName(gameMapInfo.getName());
-        Path copyFrom = new File(gameGroup.getGame().getMapDirectory(), gameMapInfo.getMapFolder()).toPath();
+        Path copyFrom = gameGroup.getGame().getMapDirectory().resolve(gameMapInfo.getMapFolder());
 
         boolean ramdisk = gameGroup.getGame().getRamdiskDirectory() != null;
         Path copyTo;
 
         if(ramdisk) {
-            ramdiskPath = new File(gameGroup.getGame().getRamdiskDirectory(), randomWorldName).toPath();
+            ramdiskPath = gameGroup.getGame().getRamdiskDirectory().resolve(randomWorldName);
             copyTo = ramdiskPath;
         } else {
             copyTo = Paths.get("./" + randomWorldName + "/");
@@ -98,10 +98,11 @@ public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.Bo
             }
         }
 
-        File uid = new File(copyTo.toFile(), "uid.dat");
-        if (uid.exists()) {
-            boolean deleted = uid.delete();
-            if (!deleted) System.out.println("Could not delete uid.dat for world. This could cause errors");
+        try{
+            Files.deleteIfExists(copyTo.resolve("uid.dat"));
+        } catch (IOException e) {
+            System.out.println("Could not delete uid.dat for world. This could cause errors");
+            e.printStackTrace();
         }
 
         WorldCreator creator = new WorldCreator(randomWorldName);

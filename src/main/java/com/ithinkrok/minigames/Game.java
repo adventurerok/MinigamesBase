@@ -33,10 +33,8 @@ import com.ithinkrok.minigames.util.disguise.DCDisguiseController;
 import com.ithinkrok.minigames.util.disguise.DisguiseController;
 import com.ithinkrok.minigames.util.disguise.MinigamesDisguiseController;
 import com.ithinkrok.minigames.util.io.FileLoader;
-import com.ithinkrok.minigames.util.io.ResourceHandler;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -52,8 +50,11 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.projectiles.ProjectileSource;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -74,29 +75,31 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     private final WeakHashMap<String, GameGroup> mapToGameGroup = new WeakHashMap<>();
     private final Map<String, GameMapInfo> maps = new HashMap<>();
     private final Persistence persistence;
-    private GameGroup spawnGameGroup;
-    private DisguiseController disguiseController;
-
     private final Map<String, String> gameGroupConfigMap = new HashMap<>();
     private final String gameGroupConfig = "colony_wars";
 
-    private final File configDirectory, mapDirectory, mapConfigDirectory, assetsDirectory;
-
-    private final File ramdiskDirectory;
+    private final Path configDirectory, mapDirectory, mapConfigDirectory, assetsDirectory;
+    private final Path ramdiskDirectory;
+    private GameGroup spawnGameGroup;
+    private DisguiseController disguiseController;
 
     public Game(BasePlugin plugin, ConfigurationSection config) {
         this.plugin = plugin;
 
-        configDirectory = new File(config.getString("directories.config"));
-        mapDirectory = new File(config.getString("directories.maps"));
-        mapConfigDirectory = new File(config.getString("directories.map_config"));
-        assetsDirectory = new File(config.getString("directories.assets"));
+        configDirectory = Paths.get(config.getString("directories.config"));
+        mapDirectory = Paths.get(config.getString("directories.maps"));
+        mapConfigDirectory = Paths.get(config.getString("directories.map_config"));
+        assetsDirectory = Paths.get(config.getString("directories.assets"));
 
-        ramdiskDirectory = config.getBoolean("ramdisk.enable") ? new File(config.getString("ramdisk.directory")) : null;
+        ramdiskDirectory =
+                config.getBoolean("ramdisk.enable") ? Paths.get(config.getString("ramdisk.directory")) : null;
 
-        if(ramdiskDirectory != null && !ramdiskDirectory.exists()) {
-            if(!ramdiskDirectory.mkdir()) {
+        if (ramdiskDirectory != null && !Files.exists(ramdiskDirectory)) {
+            try {
+                Files.createDirectory(ramdiskDirectory);
+            } catch (IOException e) {
                 System.out.println("Failed to create ramdisk directory");
+                e.printStackTrace();
             }
         }
 
@@ -107,18 +110,6 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         unloadDefaultWorlds();
 
         setupDisguiseController();
-    }
-
-    public File getRamdiskDirectory() {
-        return ramdiskDirectory;
-    }
-
-    public File getConfigDirectory() {
-        return configDirectory;
-    }
-
-    public File getMapDirectory() {
-        return mapDirectory;
     }
 
     private void unloadDefaultWorlds() {
@@ -141,6 +132,18 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         }
     }
 
+    public Path getRamdiskDirectory() {
+        return ramdiskDirectory;
+    }
+
+    public Path getConfigDirectory() {
+        return configDirectory;
+    }
+
+    public Path getMapDirectory() {
+        return mapDirectory;
+    }
+
     public void registerListeners() {
         Listener listener = new GameListener();
         plugin.getServer().getPluginManager().registerEvents(listener, plugin);
@@ -161,11 +164,20 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     public void reloadMaps() {
         maps.clear();
 
-        if (!mapConfigDirectory.exists() || mapConfigDirectory.isFile()) {
+        if (!Files.isDirectory(mapConfigDirectory)) {
             throw new RuntimeException("Maps directory does not exist!");
         }
 
-        String[] mapNames = mapConfigDirectory.list((dir, name) -> name.endsWith(".yml"));
+        List<String> mapNames = new ArrayList<>();
+        try(DirectoryStream<Path> stream = Files.newDirectoryStream(mapConfigDirectory)) {
+            for(Path path : stream) {
+                if(Files.isDirectory(path) || !path.endsWith(".yml")) continue;
+                mapNames.add(path.getFileName().toString());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
 
         for (String mapNameWithYml : mapNames) {
             String mapNameWithoutYml = mapNameWithYml.substring(0, mapNameWithYml.length() - 4);
@@ -189,13 +201,13 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
 
     @Override
     public ConfigurationSection loadConfig(String path) {
-        return YamlConfiguration.loadConfiguration(new File(configDirectory, path));
+        return YamlConfiguration.loadConfiguration(configDirectory.resolve(path).toFile());
     }
 
     @Override
     public LangFile loadLangFile(String path) {
         try {
-            return new LangFile(new File(configDirectory, path));
+            return new LangFile(configDirectory.resolve(path));
         } catch (IOException e) {
             System.out.println("Failed to load lang file: " + path);
             e.printStackTrace();
@@ -204,7 +216,7 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     }
 
     @Override
-    public File getAssetDirectory() {
+    public Path getAssetDirectory() {
         return assetsDirectory;
     }
 

@@ -10,6 +10,8 @@ import org.bukkit.util.Vector;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
@@ -34,7 +36,7 @@ public class Schematic implements Nameable {
 
     private final boolean allowOverlap;
 
-    public Schematic(String name, File dataFolder, ConfigurationSection config) {
+    public Schematic(String name, Path dataFolder, ConfigurationSection config) {
         this.name = name;
         this.formattedName = config.getString("formatted_name", name);
         this.config = config.getConfigurationSection("config");
@@ -51,9 +53,9 @@ public class Schematic implements Nameable {
 
         String schematicFile = config.getString("file");
 
-        File schemFile = new File(dataFolder, schematicFile);
+        Path schemFile = dataFolder.resolve(schematicFile);
 
-        try (NBTInputStream in = new NBTInputStream(new FileInputStream(schemFile))) {
+        try (NBTInputStream in = new NBTInputStream(Files.newInputStream(schemFile))) {
             CompoundMap nbt = ((CompoundTag) in.readTag()).getValue();
 
             short width = ((ShortTag) nbt.get("Width")).getValue();
