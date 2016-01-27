@@ -90,7 +90,10 @@ public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.Bo
 
         if(ramdisk) {
             try {
-                Files.createSymbolicLink(Paths.get("./" + randomWorldName + "/"), copyTo);
+                Path linkLocation = Paths.get("./" + randomWorldName + "/");
+                Files.deleteIfExists(linkLocation);
+
+                Files.createSymbolicLink(linkLocation, copyTo);
             } catch (IOException e) {
                 System.out.println("Failed to create symbolic link for map: " + randomWorldName);
                 e.printStackTrace();
