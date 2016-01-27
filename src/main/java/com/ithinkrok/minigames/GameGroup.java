@@ -535,6 +535,8 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
             if(user.isPlayer()) players.add(user.getPlayer());
         }
 
+        cancelAllTasks();
+
         game.removeGameGroup(this);
 
         for(Player player : players) {
@@ -542,6 +544,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         }
 
         currentMap.unloadMap();
+        currentMap = null;
     }
 
     @Override
