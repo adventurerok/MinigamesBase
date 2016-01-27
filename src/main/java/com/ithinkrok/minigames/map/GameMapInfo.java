@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.map;
 
-import com.ithinkrok.minigames.Game;
+import com.ithinkrok.minigames.util.io.FileLoader;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -9,14 +9,14 @@ import org.bukkit.configuration.ConfigurationSection;
  */
 public class GameMapInfo {
 
-    public static final String MAPS_FOLDER = "maps";
-
     private final String name;
+    private final String configPath;
     private final ConfigurationSection config;
 
-    public GameMapInfo(Game game, String name) {
+    public GameMapInfo(FileLoader fileLoader, String name, String configPath) {
         this.name = name;
-        this.config = game.loadConfig(getConfigName());
+        this.configPath = configPath;
+        this.config = fileLoader.loadConfig(getConfigName());
     }
 
     public String getName() {
@@ -24,7 +24,7 @@ public class GameMapInfo {
     }
 
     public String getConfigName() {
-        return MAPS_FOLDER + "/" + name + ".yml";
+        return configPath;
     }
 
     public String getDescription() {

@@ -73,7 +73,6 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
 
     private final Plugin plugin;
     private final WeakHashMap<String, GameGroup> mapToGameGroup = new WeakHashMap<>();
-    private final Map<String, GameMapInfo> maps = new HashMap<>();
     private final Persistence persistence;
     private final Map<String, String> gameGroupConfigMap = new HashMap<>();
     private final String gameGroupConfig = "colony_wars";
@@ -157,46 +156,8 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         return spawnGameGroup;
     }
 
-    public void reloadConfig() {
-        reloadMaps();
-    }
-
-    public void reloadMaps() {
-        maps.clear();
-
-        if (!Files.isDirectory(mapConfigDirectory)) {
-            throw new RuntimeException("Maps directory does not exist!");
-        }
-
-        List<String> mapNames = new ArrayList<>();
-        try(DirectoryStream<Path> stream = Files.newDirectoryStream(mapConfigDirectory)) {
-            for(Path path : stream) {
-                if(Files.isDirectory(path) || !path.endsWith(".yml")) continue;
-                mapNames.add(path.getFileName().toString());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-        for (String mapNameWithYml : mapNames) {
-            String mapNameWithoutYml = mapNameWithYml.substring(0, mapNameWithYml.length() - 4);
-
-            loadMapInfo(mapNameWithoutYml);
-        }
-
-    }
-
-    private void loadMapInfo(String mapName) {
-        maps.put(mapName, new GameMapInfo(this, mapName));
-    }
-
     public void removeUser(User user) {
         usersInServer.values().remove(user);
-    }
-
-    public GameMapInfo getMapInfo(String mapName) {
-        return maps.get(mapName);
     }
 
     @Override

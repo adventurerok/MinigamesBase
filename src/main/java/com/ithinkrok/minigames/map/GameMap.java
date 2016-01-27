@@ -263,6 +263,11 @@ public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.Bo
         //TODO custom CommandConfig support for maps
     }
 
+    @Override
+    public void addMapInfo(GameMapInfo mapInfo) {
+        //TODO custom GameMapInfo support for maps
+    }
+
     public Schematic getSchematic(String name) {
         return schematicMap.get(name);
     }

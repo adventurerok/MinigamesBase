@@ -4,6 +4,7 @@ import com.ithinkrok.minigames.GameState;
 import com.ithinkrok.minigames.Kit;
 import com.ithinkrok.minigames.command.CommandConfig;
 import com.ithinkrok.minigames.item.CustomItem;
+import com.ithinkrok.minigames.map.GameMapInfo;
 import com.ithinkrok.minigames.schematic.Schematic;
 import com.ithinkrok.minigames.team.TeamIdentifier;
 import org.bukkit.ChatColor;
@@ -55,17 +56,24 @@ public class ConfigParser {
         if (config.contains("kits")) loadKits(config.getConfigurationSection("kits"));
         if (config.contains("team_identifiers")) loadTeams(config.getConfigurationSection("team_identifiers"));
         if (config.contains("game_states")) loadGameStates(config.getConfigurationSection("game_states"));
+        if(config.contains("maps")) loadMaps(config.getConfigurationSection("maps"));
 
         if (config.contains("listeners")) loadListeners(config.getConfigurationSection("listeners"));
-        if(config.contains("commands")) loadCommands(config.getConfigurationSection("commands"));
+        if (config.contains("commands")) loadCommands(config.getConfigurationSection("commands"));
 
         if (config.contains("additional_configs")) loadAdditionalConfigs(config.getStringList("additional_configs"));
     }
 
+    private void loadMaps(ConfigurationSection maps) {
+        for(String name : maps.getKeys(false)) {
+            holder.addMapInfo(new GameMapInfo(loader, name, maps.getString(name)));
+        }
+    }
+
     private void loadCommands(ConfigurationSection config) {
-        for(String name : config.getKeys(false)) {
-            CommandConfig commandConfig = new CommandConfig(name, config.getConfigurationSection(name),
-                    listenerCreator);
+        for (String name : config.getKeys(false)) {
+            CommandConfig commandConfig =
+                    new CommandConfig(name, config.getConfigurationSection(name), listenerCreator);
 
             holder.addCommand(commandConfig);
         }

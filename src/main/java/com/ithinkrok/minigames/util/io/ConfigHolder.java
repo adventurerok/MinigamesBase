@@ -5,6 +5,7 @@ import com.ithinkrok.minigames.Kit;
 import com.ithinkrok.minigames.command.CommandConfig;
 import com.ithinkrok.minigames.item.CustomItem;
 import com.ithinkrok.minigames.lang.LanguageLookup;
+import com.ithinkrok.minigames.map.GameMapInfo;
 import com.ithinkrok.minigames.schematic.Schematic;
 import com.ithinkrok.minigames.team.TeamIdentifier;
 import org.bukkit.configuration.ConfigurationSection;
@@ -34,4 +35,6 @@ public interface ConfigHolder {
     void addKit(Kit kit);
 
     void addCommand(CommandConfig command);
+
+    void addMapInfo(GameMapInfo mapInfo);
 }

@@ -78,6 +78,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     private final Map<String, Kit> kits = new HashMap<>();
     private final Map<String, CommandConfig> commandMap = new TreeMap<>();
     private final Map<String, CommandConfig> commandAliasesMap = new HashMap<>();
+    private final Map<String, GameMapInfo> gameMapInfoMap = new HashMap<>();
     private final MultipleLanguageLookup languageLookup = new MultipleLanguageLookup();
     private GameState gameState;
     private GameMap currentMap;
@@ -136,7 +137,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     }
 
     public void changeMap(String mapName) {
-        GameMapInfo mapInfo = game.getMapInfo(mapName);
+        GameMapInfo mapInfo = gameMapInfoMap.get(mapName);
         Validate.notNull(mapInfo, "The map " + mapName + " does not exist");
 
         changeMap(mapInfo);
@@ -417,14 +418,14 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
 
     public Kit getKit(String name) {
         return kits.get(name);
-    }    @Override
-    public LanguageLookup getLanguageLookup() {
-        return this;
     }
 
     @Override
     public <B extends Metadata> B getMetadata(Class<? extends B> clazz) {
         return metadataMap.getInstance(clazz);
+    }    @Override
+    public LanguageLookup getLanguageLookup() {
+        return this;
     }
 
     @Override
@@ -506,6 +507,11 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         for (String alias : command.getAliases()) {
             commandAliasesMap.put(alias.toLowerCase(), command);
         }
+    }
+
+    @Override
+    public void addMapInfo(GameMapInfo mapInfo) {
+        gameMapInfoMap.put(mapInfo.getName(), mapInfo);
     }
 
     public CommandConfig getCommand(String name) {
