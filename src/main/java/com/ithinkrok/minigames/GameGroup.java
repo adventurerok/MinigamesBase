@@ -44,6 +44,7 @@ import com.ithinkrok.minigames.util.io.ConfigHolder;
 import com.ithinkrok.minigames.util.io.ConfigParser;
 import com.ithinkrok.minigames.util.io.FileLoader;
 import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
@@ -639,7 +640,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
             user.sendMessageNoPrefix(message);
         }
 
-        game.getLogger().info(message);
+        Bukkit.getConsoleSender().sendMessage(message);
     }
 
 
