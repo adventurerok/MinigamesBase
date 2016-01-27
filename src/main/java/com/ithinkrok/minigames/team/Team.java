@@ -188,6 +188,14 @@ public class Team implements Listener, Messagable, LanguageLookup, SharedObjectA
         getUsers().forEach(User::updateScoreboard);
     }
 
+    public void removeFromGameGroup() {
+        for(Metadata metadata : metadataMap.values()) {
+            metadata.removed();
+        }
+
+        metadataMap.clear();
+    }
+
     private class TeamListener implements Listener {
 
 

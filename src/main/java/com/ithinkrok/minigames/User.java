@@ -852,14 +852,14 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
 
         setInGame(false);
 
-        Iterator<UserMetadata> metadataIterator = metadataMap.values().iterator();
+        setTabListName(getName());
+        setDisplayName(getName());
 
-        while(metadataIterator.hasNext()) {
-            UserMetadata metadata = metadataIterator.next();
-
+        for(UserMetadata metadata : metadataMap.values()) {
             metadata.removed();
-            metadataIterator.remove();
         }
+
+        metadataMap.clear();
     }
 
     private class UserListener implements Listener {

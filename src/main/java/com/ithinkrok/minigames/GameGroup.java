@@ -535,6 +535,16 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
             if(user.isPlayer()) players.add(user.getPlayer());
         }
 
+        for(Team team : teamsInGroup.values()) {
+            team.removeFromGameGroup();
+        }
+
+        for(Metadata metadata : metadataMap.values()) {
+            metadata.removed();
+        }
+
+        metadataMap.clear();
+
         cancelAllTasks();
 
         game.removeGameGroup(this);
