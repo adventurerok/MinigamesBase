@@ -16,7 +16,6 @@ bungee:
 # Specify the config and maps directories
 directories:
   config: "/srv/minigames/config"
-  map_config: "/srv/minigames/config/maps"
   maps: "/srv/minigames/maps"
   assets: "/srv/minigames/assets"
 

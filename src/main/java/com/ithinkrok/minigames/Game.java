@@ -77,7 +77,9 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     private final Map<String, String> gameGroupConfigMap = new HashMap<>();
     private final String gameGroupConfig = "colony_wars";
 
-    private final Path configDirectory, mapDirectory, mapConfigDirectory, assetsDirectory;
+    private final Path configDirectory;
+    private final Path mapDirectory;
+    private final Path assetsDirectory;
     private final Path ramdiskDirectory;
     private GameGroup spawnGameGroup;
     private DisguiseController disguiseController;
@@ -87,7 +89,6 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
 
         configDirectory = Paths.get(config.getString("directories.config"));
         mapDirectory = Paths.get(config.getString("directories.maps"));
-        mapConfigDirectory = Paths.get(config.getString("directories.map_config"));
         assetsDirectory = Paths.get(config.getString("directories.assets"));
 
         ramdiskDirectory =
