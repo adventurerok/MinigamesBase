@@ -27,7 +27,6 @@ public class BasePlugin extends JavaPlugin {
 
         game = new Game(this, config);
 
-        game.reloadConfig();
         game.registerListeners();
     }
 
