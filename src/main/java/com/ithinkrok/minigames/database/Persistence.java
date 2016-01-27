@@ -97,6 +97,7 @@ public class Persistence extends Thread {
 
             for(Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
                 EbeanServer database = plugin.getDatabase();
+                if(database == null) continue;
 
                 try {
                     database.find(databaseClass);
