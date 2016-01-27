@@ -47,6 +47,7 @@ import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
 import java.nio.file.Path;
@@ -60,6 +61,8 @@ import java.util.concurrent.ConcurrentMap;
 public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, FileLoader, SharedObjectAccessor,
         MetadataHolder<Metadata>, SchematicResolver, TeamUserResolver, DatabaseTaskRunner, ConfigHolder {
 
+    private final String name;
+
     private final ConcurrentMap<UUID, User> usersInGroup = new ConcurrentHashMap<>();
 
     private final Map<TeamIdentifier, Team> teamsInGroup = new HashMap<>();
@@ -70,6 +73,13 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     private final List<Listener> gameStateListeners = new ArrayList<>();
     private final ClassToInstanceMap<Metadata> metadataMap = MutableClassToInstanceMap.create();
     private final String chatPrefix;
+
+    private GameState gameState;
+    private GameMap currentMap;
+    private List<Listener> defaultAndMapListeners = new ArrayList<>();
+    private Countdown countdown;
+
+    //Loaded from config
     private final HashMap<String, Listener> defaultListeners = new HashMap<>();
     private final IdentifierMap<CustomItem> customItemIdentifierMap = new IdentifierMap<>();
     private final Map<String, ConfigurationSection> sharedObjectMap = new HashMap<>();
@@ -81,13 +91,11 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     private final Map<String, CommandConfig> commandAliasesMap = new HashMap<>();
     private final Map<String, GameMapInfo> gameMapInfoMap = new HashMap<>();
     private final MultipleLanguageLookup languageLookup = new MultipleLanguageLookup();
-    private GameState gameState;
-    private GameMap currentMap;
-    private List<Listener> defaultAndMapListeners = new ArrayList<>();
-    private Countdown countdown;
 
-    public GameGroup(Game game, String configFile) {
+    public GameGroup(Game game, String name, String configFile) {
         this.game = game;
+
+        this.name = name;
 
         gameGroupListener = new GameGroupListener();
         defaultAndMapListeners = createDefaultAndMapListeners();
@@ -105,6 +113,10 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
 
         String startMap = baseConfig.getString("start_map");
         if (startMap != null) changeMap(startMap);
+    }
+
+    public String getName() {
+        return name;
     }
 
     @SuppressWarnings("unchecked")
@@ -424,9 +436,6 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     @Override
     public <B extends Metadata> B getMetadata(Class<? extends B> clazz) {
         return metadataMap.getInstance(clazz);
-    }    @Override
-    public LanguageLookup getLanguageLookup() {
-        return this;
     }
 
     @Override
@@ -437,6 +446,9 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
             oldMetadata.cancelAllTasks();
             oldMetadata.removed();
         }
+    }    @Override
+    public LanguageLookup getLanguageLookup() {
+        return this;
     }
 
     @Override
@@ -508,6 +520,28 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         for (String alias : command.getAliases()) {
             commandAliasesMap.put(alias.toLowerCase(), command);
         }
+    }
+
+    public void kill() {
+        List<User> users = new ArrayList<>(getUsers());
+
+        List<Player> players = new ArrayList<>();
+
+        for(User user : users) {
+            user.removeFromGameGroup();
+
+            game.removeUser(user);
+
+            if(user.isPlayer()) players.add(user.getPlayer());
+        }
+
+        game.removeGameGroup(this);
+
+        for(Player player : players) {
+            game.rejoinPlayer(player);
+        }
+
+        currentMap.unloadMap();
     }
 
     @Override

@@ -847,6 +847,21 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
         entity.setVelocity(velocity);
     }
 
+    public void removeFromGameGroup() {
+        setScoreboardHandler(null);
+
+        setInGame(false);
+
+        Iterator<UserMetadata> metadataIterator = metadataMap.values().iterator();
+
+        while(metadataIterator.hasNext()) {
+            UserMetadata metadata = metadataIterator.next();
+
+            metadata.removed();
+            metadataIterator.remove();
+        }
+    }
+
     private class UserListener implements Listener {
 
         @MinigamesEventHandler(priority = MinigamesEventHandler.INTERNAL_FIRST)

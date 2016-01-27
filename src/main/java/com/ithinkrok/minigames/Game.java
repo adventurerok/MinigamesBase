@@ -1,6 +1,7 @@
 package com.ithinkrok.minigames;
 
 import com.comphenix.protocol.ProtocolLibrary;
+import com.google.common.collect.MapMaker;
 import com.ithinkrok.minigames.command.Command;
 import com.ithinkrok.minigames.command.GameCommandHandler;
 import com.ithinkrok.minigames.database.DatabaseTask;
@@ -66,26 +67,31 @@ import java.util.logging.Logger;
  * In future: Will be a TaskScheduler, UserResolver, FileLoader and DatabaseTaskRunner only
  */
 @SuppressWarnings("unchecked")
-public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTaskRunner {
+public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTaskRunner, Nameable {
+
+    private final String name;
 
     private final ConcurrentMap<UUID, User> usersInServer = new ConcurrentHashMap<>();
-    private final List<GameGroup> gameGroups = new ArrayList<>();
 
     private final Plugin plugin;
-    private final WeakHashMap<String, GameGroup> mapToGameGroup = new WeakHashMap<>();
     private final Persistence persistence;
     private final Map<String, String> gameGroupConfigMap = new HashMap<>();
     private final String gameGroupConfig = "colony_wars";
+
+    private final Map<String, GameGroup> mapToGameGroup = new MapMaker().weakValues().makeMap();
+    private final Map<String, GameGroup> nameToGameGroup = new MapMaker().weakValues().makeMap();
 
     private final Path configDirectory;
     private final Path mapDirectory;
     private final Path assetsDirectory;
     private final Path ramdiskDirectory;
-    private GameGroup spawnGameGroup;
+
     private DisguiseController disguiseController;
 
     public Game(BasePlugin plugin, ConfigurationSection config) {
         this.plugin = plugin;
+
+        this.name = config.getString("bungee.name");
 
         configDirectory = Paths.get(config.getString("directories.config"));
         mapDirectory = Paths.get(config.getString("directories.maps"));
@@ -110,6 +116,27 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         unloadDefaultWorlds();
 
         setupDisguiseController();
+    }
+
+    private String nextGameGroupName(String configName) {
+        String result;
+        int counter = 0;
+
+        do{
+            result = name + "_" + configName + "_" + counter;
+            ++counter;
+        } while(nameToGameGroup.containsKey(result));
+
+        return result;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getFormattedName() {
+        return name;
     }
 
     private void unloadDefaultWorlds() {
@@ -154,7 +181,9 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     }
 
     public GameGroup getSpawnGameGroup() {
-        return spawnGameGroup;
+        if(nameToGameGroup.isEmpty()) return null;
+
+        return nameToGameGroup.values().iterator().next();
     }
 
     public void removeUser(User user) {
@@ -187,9 +216,16 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         return usersInServer.get(uuid);
     }
 
-    private GameGroup createGameGroup(String name) {
-        return new GameGroup(this, gameGroupConfigMap.get(name));
+    public GameGroup createGameGroup(String configName) {
+        GameGroup gameGroup = new GameGroup(this, nextGameGroupName(configName), gameGroupConfigMap.get(configName));
 
+        nameToGameGroup.put(gameGroup.getName(), gameGroup);
+
+        return gameGroup;
+    }
+
+    public GameGroup getGameGroup(String ggName) {
+        return nameToGameGroup.get(ggName);
     }
 
     private User createUser(GameGroup gameGroup, Team team, UUID uuid, LivingEntity entity) {
@@ -200,9 +236,13 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     }
 
     public void unload() {
-        gameGroups.forEach(GameGroup::unload);
+        nameToGameGroup.values().forEach(GameGroup::unload);
 
         persistence.onPluginDisabled();
+    }
+
+    public void removeGameGroup(GameGroup gameGroup) {
+        nameToGameGroup.values().remove(gameGroup);
     }
 
     @Override
@@ -265,31 +305,32 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         return plugin.getLogger();
     }
 
+    public void rejoinPlayer(Player player) {
+        User user = getUser(player.getUniqueId());
+        GameGroup gameGroup;
+
+        if (user != null) {
+            gameGroup = user.getGameGroup();
+            user.becomePlayer(player);
+        } else {
+            if (nameToGameGroup.isEmpty()) {
+                createGameGroup(gameGroupConfig);
+            }
+
+            gameGroup = getSpawnGameGroup();
+            user = createUser(gameGroup, null, player.getUniqueId(), player);
+        }
+
+        gameGroup.userEvent(new UserJoinEvent(user, UserJoinEvent.JoinReason.JOINED_SERVER));
+    }
+
     private class GameListener implements Listener {
 
         @EventHandler
         public void eventPlayerJoined(PlayerJoinEvent event) {
             event.setJoinMessage(null);
 
-            Player player = event.getPlayer();
-
-            User user = getUser(player.getUniqueId());
-            GameGroup gameGroup;
-
-            if (user != null) {
-                gameGroup = user.getGameGroup();
-                user.becomePlayer(player);
-            } else {
-                if (spawnGameGroup == null) {
-                    spawnGameGroup = createGameGroup(gameGroupConfig);
-                    gameGroups.add(spawnGameGroup);
-                }
-
-                gameGroup = spawnGameGroup;
-                user = createUser(gameGroup, null, player.getUniqueId(), player);
-            }
-
-            gameGroup.userEvent(new UserJoinEvent(user, UserJoinEvent.JoinReason.JOINED_SERVER));
+            rejoinPlayer(event.getPlayer());
         }
 
         @EventHandler
