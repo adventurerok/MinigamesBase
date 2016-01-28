@@ -74,7 +74,7 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     private final Plugin plugin;
     private final Persistence persistence;
     private final Map<String, String> gameGroupConfigMap = new HashMap<>();
-    private final String gameGroupConfig = "colony_wars";
+    private final String fallbackConfig;
 
     private final Map<String, GameGroup> mapToGameGroup = new MapMaker().weakValues().makeMap();
     private final Map<String, GameGroup> nameToGameGroup = new MapMaker().weakValues().makeMap();
@@ -89,7 +89,9 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     public Game(BasePlugin plugin, ConfigurationSection config) {
         this.plugin = plugin;
 
-        this.name = config.getString("bungee.name");
+        name = config.getString("bungee.name");
+
+        fallbackConfig = config.getString("fallback_config");
 
         configDirectory = Paths.get(config.getString("directories.config"));
         mapDirectory = Paths.get(config.getString("directories.maps"));
@@ -312,7 +314,7 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
             user.becomePlayer(player);
         } else {
             if (nameToGameGroup.isEmpty()) {
-                createGameGroup(gameGroupConfig);
+                createGameGroup(fallbackConfig);
             }
 
             gameGroup = getSpawnGameGroup();
