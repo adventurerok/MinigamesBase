@@ -91,7 +91,7 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
 
         name = config.getString("bungee.name");
 
-        fallbackConfig = config.getString("fallback_config");
+        fallbackConfig = config.getString("fallback_gamegroup");
 
         configDirectory = Paths.get(config.getString("directories.config"));
         mapDirectory = Paths.get(config.getString("directories.maps"));
