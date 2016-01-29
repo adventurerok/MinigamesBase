@@ -592,7 +592,11 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
 
                 //GameGroup only referenced by its users. If there are none left we must unload.
                 if(usersInGroup.size() == 0) {
-                    currentMap.unloadMap();
+                    cancelAllTasks();
+                    //Use a task as there is still a player in the map until the end of the disconnect event.
+                    game.doInFuture(task -> currentMap.unloadMap());
+
+                    game.removeGameGroup(GameGroup.this);
                 }
             }
         }
