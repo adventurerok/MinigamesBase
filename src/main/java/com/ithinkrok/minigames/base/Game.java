@@ -221,6 +221,8 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
 
         nameToGameGroup.put(gameGroup.getName(), gameGroup);
 
+        getLogger().info("Created " + configName + " gamegroup: " + gameGroup.getName());
+
         return gameGroup;
     }
 

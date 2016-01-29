@@ -589,6 +589,11 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
 
                 event.getUser().cancelAllTasks();
                 game.removeUser(event.getUser());
+
+                //GameGroup only referenced by its users. If there are none left we must unload.
+                if(usersInGroup.size() == 0) {
+                    currentMap.unloadMap();
+                }
             }
         }
 
