@@ -553,8 +553,11 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
             game.rejoinPlayer(player);
         }
 
-        doInFuture(task -> currentMap.unloadMap());
-        currentMap = null;
+        doInFuture(task -> {
+            currentMap.unloadMap();
+            currentMap = null;
+        });
+
     }
 
     @Override
