@@ -553,7 +553,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
             game.rejoinPlayer(player);
         }
 
-        currentMap.unloadMap();
+        doInFuture(task -> currentMap.unloadMap());
         currentMap = null;
     }
 
@@ -591,13 +591,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
                 game.removeUser(event.getUser());
 
                 //GameGroup only referenced by its users. If there are none left we must unload.
-                if(usersInGroup.size() == 0) {
-                    cancelAllTasks();
-                    //Use a task as there is still a player in the map until the end of the disconnect event.
-                    game.doInFuture(task -> currentMap.unloadMap());
-
-                    game.removeGameGroup(GameGroup.this);
-                }
+                if(usersInGroup.size() == 0) kill();
             }
         }
 
