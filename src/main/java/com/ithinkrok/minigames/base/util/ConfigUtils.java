@@ -42,6 +42,21 @@ public class ConfigUtils {
         return new Vector(config.getDouble(path + "x"), config.getDouble(path + "y"), config.getDouble(path + "z"));
     }
 
+    public static CountdownConfig getCountdown(ConfigurationSection config, String path) {
+        return getCountdown(config, path, null, 0, null);
+    }
+
+    public static CountdownConfig getCountdown(ConfigurationSection config, String path, String defaultName,
+                                               int defaultSeconds, String defaultStub) {
+        return new CountdownConfig(getConfigOrEmpty(config, path), defaultName, defaultSeconds, defaultStub);
+    }
+
+    public static ConfigurationSection getConfigOrEmpty(ConfigurationSection base, String path) {
+        ConfigurationSection config = base.getConfigurationSection(path);
+
+        return config != null ? config : EMPTY_CONFIG;
+    }
+
     @SuppressWarnings("unchecked")
     public static List<ConfigurationSection> getConfigList(ConfigurationSection config, String path) {
         List<Map<?, ?>> list = config.getMapList(path);
@@ -74,7 +89,7 @@ public class ConfigUtils {
         if (config.isString(path)) return InventoryUtils.parseItem(config.getString(path));
         if (!config.isConfigurationSection(path)) return null;
 
-        if(!path.isEmpty()) config = config.getConfigurationSection(path);
+        if (!path.isEmpty()) config = config.getConfigurationSection(path);
 
         Material mat = Material.matchMaterial(config.getString("type"));
         int amount = config.getInt("amount", 1);

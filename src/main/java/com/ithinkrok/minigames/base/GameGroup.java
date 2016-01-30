@@ -14,6 +14,7 @@ import com.ithinkrok.minigames.base.task.GameRunnable;
 import com.ithinkrok.minigames.base.task.GameTask;
 import com.ithinkrok.minigames.base.team.Team;
 import com.ithinkrok.minigames.base.util.ConfigUtils;
+import com.ithinkrok.minigames.base.util.CountdownConfig;
 import com.ithinkrok.minigames.base.util.io.ConfigHolder;
 import com.ithinkrok.minigames.base.util.io.ConfigParser;
 import com.ithinkrok.minigames.base.util.io.FileLoader;
@@ -349,6 +350,10 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
 
     public GameState getCurrentGameState() {
         return gameState;
+    }
+
+    public void startCountdown(CountdownConfig countdownConfig) {
+        startCountdown(countdownConfig.getName(), countdownConfig.getLocaleStub(), countdownConfig.getSeconds());
     }
 
     public void startCountdown(String name, String localeStub, int seconds) {
