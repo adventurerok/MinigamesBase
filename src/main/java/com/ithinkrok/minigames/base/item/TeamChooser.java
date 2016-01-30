@@ -1,9 +1,11 @@
-package com.ithinkrok.minigames.base.inventory;
+package com.ithinkrok.minigames.base.item;
 
 import com.ithinkrok.minigames.base.User;
 import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.base.event.MinigamesEventHandler;
 import com.ithinkrok.minigames.base.event.user.world.UserInteractEvent;
+import com.ithinkrok.minigames.base.inventory.ClickableInventory;
+import com.ithinkrok.minigames.base.inventory.ClickableItem;
 import com.ithinkrok.minigames.base.inventory.event.UserClickItemEvent;
 import com.ithinkrok.minigames.base.team.Team;
 import com.ithinkrok.minigames.base.team.TeamIdentifier;
