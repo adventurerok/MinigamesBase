@@ -52,6 +52,8 @@ public class ConfigUtils {
     }
 
     public static ConfigurationSection getConfigOrEmpty(ConfigurationSection base, String path) {
+        if(path == null || path.isEmpty()) return base;
+
         ConfigurationSection config = base.getConfigurationSection(path);
 
         return config != null ? config : EMPTY_CONFIG;

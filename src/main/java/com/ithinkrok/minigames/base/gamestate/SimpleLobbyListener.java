@@ -18,6 +18,8 @@ import com.ithinkrok.minigames.base.event.user.state.UserFoodLevelChangeEvent;
 import com.ithinkrok.minigames.base.event.user.world.*;
 import com.ithinkrok.minigames.base.listener.GiveCustomItemsOnJoin;
 import com.ithinkrok.minigames.base.scoreboard.MapScoreboardHandler;
+import com.ithinkrok.minigames.base.util.ConfigUtils;
+import com.ithinkrok.minigames.base.util.CountdownConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -37,9 +39,8 @@ public class SimpleLobbyListener implements Listener {
 
     protected GameState gameState;
 
-    private String startCountdownName;
-    private String startCountdownLocaleStub;
-    private int startCountdownSeconds;
+    private CountdownConfig startCountdown;
+
     private String needsMorePlayersLocale;
     private int minPlayersToStartGame;
 
@@ -75,9 +76,7 @@ public class SimpleLobbyListener implements Listener {
 
 
     private void configureCountdown(ConfigurationSection config) {
-        startCountdownName = config.getString("name");
-        startCountdownLocaleStub = config.getString("locale_stub");
-        startCountdownSeconds = config.getInt("seconds");
+        startCountdown = ConfigUtils.getCountdown(config, "");
         minPlayersToStartGame = config.getInt("min_players");
         needsMorePlayersLocale = config.getString("needs_more_players_locale");
     }
@@ -160,7 +159,7 @@ public class SimpleLobbyListener implements Listener {
 
     @MinigamesEventHandler
     public void onCountdownFinished(CountdownFinishedEvent event) {
-        if(!event.getCountdown().getName().equals(startCountdownName)) return;
+        if(!event.getCountdown().getName().equals(startCountdown.getName())) return;
 
         int userCount = event.getGameGroup().getUserCount();
         if(userCount < 1) return;
@@ -175,7 +174,7 @@ public class SimpleLobbyListener implements Listener {
 
 
     private void resetCountdown(GameGroup gameGroup) {
-        gameGroup.startCountdown(startCountdownName, startCountdownLocaleStub, startCountdownSeconds);
+        gameGroup.startCountdown(startCountdown);
     }
 
     @MinigamesEventHandler
