@@ -2,6 +2,7 @@ package com.ithinkrok.minigames.base.command;
 
 import com.ithinkrok.minigames.base.GameGroup;
 import com.ithinkrok.minigames.base.lang.LanguageLookup;
+import com.ithinkrok.minigames.base.util.math.ExpressionCalculator;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
@@ -97,7 +98,7 @@ public class GameCommandHandler {
         String key = null;
 
         for (String arg : correctedArgs) {
-            if (arg.startsWith("-") && arg.length() > 1) {
+            if (arg.startsWith("-") && arg.length() > 1 && !ExpressionCalculator.isNumber(arg)) {
                 key = arg.substring(1);
             } else {
                 if (key != null) arguments.put(key, parse(arg));
