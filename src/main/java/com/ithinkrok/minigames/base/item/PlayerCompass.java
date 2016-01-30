@@ -35,7 +35,7 @@ public class PlayerCompass implements Listener {
 
         target = PlayerCompassTarget.valueOf(config.getString("target", "enemies").toUpperCase());
 
-        locatingTime = config.getInt("locating_time", 3) * 20;
+        locatingTime = (int) (config.getDouble("locating_time", 3) * 20);
     }
 
     @MinigamesEventHandler
