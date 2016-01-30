@@ -8,8 +8,7 @@ import com.ithinkrok.minigames.base.event.user.world.*;
 import com.ithinkrok.minigames.base.map.GameMap;
 import com.ithinkrok.minigames.base.team.Team;
 import com.ithinkrok.minigames.base.util.InvisiblePlayerAttacker;
-import com.ithinkrok.minigames.base.util.disguise.LDDisguiseController;
-import com.ithinkrok.minigames.base.util.disguise.MinigamesDisguiseController;
+import com.ithinkrok.minigames.base.util.disguise.*;
 import com.ithinkrok.minigames.base.util.io.FileLoader;
 import com.ithinkrok.minigames.base.command.Command;
 import com.ithinkrok.minigames.base.command.GameCommandHandler;
@@ -32,8 +31,6 @@ import com.ithinkrok.minigames.base.team.TeamIdentifier;
 import com.ithinkrok.minigames.base.user.UserResolver;
 import com.ithinkrok.minigames.base.util.EntityUtils;
 import com.ithinkrok.minigames.base.util.InventoryUtils;
-import com.ithinkrok.minigames.base.util.disguise.DCDisguiseController;
-import com.ithinkrok.minigames.base.util.disguise.DisguiseController;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -260,6 +257,10 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
 
     public void disguiseUser(User user, EntityType type) {
         disguiseController.disguise(user, type);
+    }
+
+    public void disguiseUser(User user, Disguise disguise) {
+        disguiseController.disguise(user, disguise);
     }
 
     public void unDisguiseUser(User user) {

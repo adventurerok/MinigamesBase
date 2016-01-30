@@ -12,7 +12,12 @@ import pgDev.bukkit.DisguiseCraft.disguise.DisguiseType;
  */
 public class DCDisguiseController implements DisguiseController {
 
-    private DisguiseCraftAPI dcAPI = DisguiseCraft.getAPI();
+    private final DisguiseCraftAPI dcAPI = DisguiseCraft.getAPI();
+
+    @Override
+    public void disguise(User user, com.ithinkrok.minigames.base.util.disguise.Disguise disguise) {
+        disguise(user, disguise.getEntityType());
+    }
 
     @Override
     public void disguise(User user, EntityType type) {

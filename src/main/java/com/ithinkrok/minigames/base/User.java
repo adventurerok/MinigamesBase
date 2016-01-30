@@ -30,6 +30,7 @@ import com.ithinkrok.minigames.base.util.ConfigUtils;
 import com.ithinkrok.minigames.base.util.EventExecutor;
 import com.ithinkrok.minigames.base.util.InventoryUtils;
 import com.ithinkrok.minigames.base.util.SoundEffect;
+import com.ithinkrok.minigames.base.util.disguise.Disguise;
 import com.ithinkrok.minigames.base.util.playerstate.PlayerState;
 import com.ithinkrok.minigames.base.inventory.ClickableInventory;
 import com.ithinkrok.minigames.base.metadata.MetadataHolder;
@@ -246,6 +247,10 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
 
     public void disguise(EntityType type) {
         gameGroup.getGame().disguiseUser(this, type);
+    }
+
+    public void disguise(Disguise disguise) {
+        gameGroup.getGame().disguiseUser(this, disguise);
     }
 
     public void unDisguise() {

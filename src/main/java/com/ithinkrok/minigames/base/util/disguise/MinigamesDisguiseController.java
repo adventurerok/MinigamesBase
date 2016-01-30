@@ -10,8 +10,13 @@ public class MinigamesDisguiseController implements DisguiseController {
 
 
     @Override
+    public void disguise(User user, Disguise disguise) {
+
+    }
+
+    @Override
     public void disguise(User user, EntityType type) {
-        //we do nothing. Only DisguiseCraft is support at the moment.
+        //Just use LibsDisguises if you want disguise support. This is to prevent NPEs
     }
 
     @Override

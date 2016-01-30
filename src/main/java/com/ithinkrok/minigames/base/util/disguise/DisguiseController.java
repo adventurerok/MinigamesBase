@@ -8,6 +8,7 @@ import org.bukkit.entity.EntityType;
  */
 public interface DisguiseController {
 
+    void disguise(User user, Disguise disguise);
     void disguise(User user, EntityType type);
     void unDisguise(User user);
 }
