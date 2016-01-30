@@ -2,8 +2,8 @@ package com.ithinkrok.minigames.base.util.disguise;
 
 import com.ithinkrok.minigames.base.User;
 import me.libraryaddict.disguise.DisguiseAPI;
-import me.libraryaddict.disguise.disguisetypes.*;
 import me.libraryaddict.disguise.disguisetypes.Disguise;
+import me.libraryaddict.disguise.disguisetypes.*;
 import org.bukkit.entity.EntityType;
 
 /**
@@ -21,6 +21,10 @@ public class LDDisguiseController implements DisguiseController {
             libsDisguise = new PlayerDisguise(disguise.getPlayerName(), disguise.getPlayerSkin());
         } else if (disguiseType.isMob()) {
             libsDisguise = new MobDisguise(disguiseType);
+
+            if(disguise.isShowUserNameAboveEntity()) {
+                libsDisguise.getWatcher().setCustomName(user.getName());
+            }
         } else if (disguiseType.isMisc()) {
             libsDisguise = new MiscDisguise(disguiseType);
         } else throw new RuntimeException("Unsupported disguise: " + disguiseType);
@@ -30,6 +34,7 @@ public class LDDisguiseController implements DisguiseController {
         libsDisguise.setReplaceSounds(disguise.isReplaceSounds());
 
         libsDisguise.setShowName(disguise.isShowName());
+
 
         DisguiseAPI.disguiseEntity(user.getEntity(), libsDisguise);
     }

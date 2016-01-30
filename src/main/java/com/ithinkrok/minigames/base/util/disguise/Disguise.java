@@ -16,6 +16,7 @@ public class Disguise {
     private boolean modifyBoundingBox = false;
     private boolean replaceSounds = true;
 
+    private boolean showUserNameAboveEntity = false;
     private boolean showName = false;
 
     public Disguise(EntityType entityType) {
@@ -32,12 +33,20 @@ public class Disguise {
         this.playerSkin = playerSkin;
     }
 
-    public void setShowName(boolean showName) {
-        this.showName = showName;
+    public boolean isShowUserNameAboveEntity() {
+        return showUserNameAboveEntity;
+    }
+
+    public void setShowUserNameAboveEntity(boolean showUserNameAboveEntity) {
+        this.showUserNameAboveEntity = showUserNameAboveEntity;
     }
 
     public boolean isShowName() {
         return showName;
+    }
+
+    public void setShowName(boolean showName) {
+        this.showName = showName;
     }
 
     public EntityType getEntityType() {
