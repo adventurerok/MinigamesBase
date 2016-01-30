@@ -7,9 +7,30 @@ softdepend: ["DisguiseCraft"]
 database: true
 
 permissions:
+
+  mg.base.admin:
+    description: "Gives all admin commands"
+    default: "op"
+    children:
+      mg.base.mg: true
+      mg.base.gamestate: true
+      mg.base.countdown: true
+
+  mg.base.user:
+    description: "Gives all user commands"
+    default: true
+
   mg.base.mg:
     description: "Allows use of /mg"
-    default: "op"
+    default: false
+
+  mg.base.gamestate:
+    description: "Allows use of /gamestate"
+    default: false
+
+  mg.base.countdown:
+    description: "Allows use of /countdown"
+    default: false
 
 commands:
   minigames:

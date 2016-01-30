@@ -2,7 +2,7 @@ package com.ithinkrok.minigames.base;
 
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.MutableClassToInstanceMap;
-import com.ithinkrok.minigames.base.command.CommandConfig;
+import com.ithinkrok.minigames.base.command.*;
 import com.ithinkrok.minigames.base.event.MinigamesEvent;
 import com.ithinkrok.minigames.base.event.game.MapChangedEvent;
 import com.ithinkrok.minigames.base.event.map.MapBlockBreakNaturallyEvent;
@@ -17,8 +17,6 @@ import com.ithinkrok.minigames.base.util.ConfigUtils;
 import com.ithinkrok.minigames.base.util.io.ConfigHolder;
 import com.ithinkrok.minigames.base.util.io.ConfigParser;
 import com.ithinkrok.minigames.base.util.io.FileLoader;
-import com.ithinkrok.minigames.base.command.Command;
-import com.ithinkrok.minigames.base.command.HelpCommand;
 import com.ithinkrok.minigames.base.database.DatabaseTask;
 import com.ithinkrok.minigames.base.database.DatabaseTaskRunner;
 import com.ithinkrok.minigames.base.event.CommandEvent;
@@ -74,12 +72,6 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     private final List<Listener> gameStateListeners = new ArrayList<>();
     private final ClassToInstanceMap<Metadata> metadataMap = MutableClassToInstanceMap.create();
     private final String chatPrefix;
-
-    private GameState gameState;
-    private GameMap currentMap;
-    private List<Listener> defaultAndMapListeners = new ArrayList<>();
-    private Countdown countdown;
-
     //Loaded from config
     private final HashMap<String, Listener> defaultListeners = new HashMap<>();
     private final IdentifierMap<CustomItem> customItemIdentifierMap = new IdentifierMap<>();
@@ -92,6 +84,10 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     private final Map<String, CommandConfig> commandAliasesMap = new HashMap<>();
     private final Map<String, GameMapInfo> gameMapInfoMap = new HashMap<>();
     private final MultipleLanguageLookup languageLookup = new MultipleLanguageLookup();
+    private GameState gameState;
+    private GameMap currentMap;
+    private List<Listener> defaultAndMapListeners = new ArrayList<>();
+    private Countdown countdown;
 
     public GameGroup(Game game, String name, String configFile) {
         this.game = game;
@@ -116,10 +112,6 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         if (startMap != null) changeMap(startMap);
     }
 
-    public String getName() {
-        return name;
-    }
-
     @SuppressWarnings("unchecked")
     @SafeVarargs
     private final List<Listener> createDefaultAndMapListeners(Map<String, Listener>... extra) {
@@ -141,6 +133,20 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
                         "?");
 
         addCommand(help);
+
+        CommandConfig gs =
+                new CommandConfig("gamestate", "mg.base.gamestate", "Changes the GameState of the current GameGroup",
+                        "/<command> <gamestate>", new GameStateCommand(), null, "gs", "gstate");
+
+        addCommand(gs);
+
+        CommandConfig cd = new CommandConfig("countdown", "mg.base.countdown", "Modifies countdowns",
+                "/<command> add/set <amount>\n" +
+                        "/<command> finish/cancel\n" +
+                        "/<command> start <name> <seconds> <localestub>", new CountdownCommand(), null, "cd", "cdown",
+                "cdwn");
+
+        addCommand(cd);
     }
 
     public void changeGameState(String gameStateName) {
@@ -239,6 +245,10 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         return usersInGroup.values();
     }
 
+    public String getName() {
+        return name;
+    }
+
     public void prepareStart() {
         createDefaultAndMapListeners();
     }
@@ -253,6 +263,11 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     }
 
     @Override
+    public boolean hasSharedObject(String name) {
+        return getSharedObject(name) != null;
+    }
+
+    @Override
     public ConfigurationSection getSharedObject(String name) {
         ConfigurationSection result = null;
         if (currentMap != null) result = currentMap.getSharedObject(name);
@@ -264,15 +279,10 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         ConfigurationSection result = null;
 
         if (currentMap != null) result = currentMap.getSharedObject(name);
-        if(result != null) return result;
+        if (result != null) return result;
 
         result = sharedObjectMap.get(name);
         return result != null ? result : ConfigUtils.EMPTY_CONFIG;
-    }
-
-    @Override
-    public boolean hasSharedObject(String name) {
-        return getSharedObject(name) != null;
     }
 
     @Override
@@ -405,35 +415,6 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         return game;
     }
 
-    @Override
-    public GameTask doInFuture(GameRunnable task) {
-        GameTask gameTask = game.doInFuture(task);
-
-        gameGroupTaskList.addTask(gameTask);
-        return gameTask;
-    }
-
-    @Override
-    public GameTask doInFuture(GameRunnable task, int delay) {
-        GameTask gameTask = game.doInFuture(task, delay);
-
-        gameGroupTaskList.addTask(gameTask);
-        return gameTask;
-    }
-
-    @Override
-    public GameTask repeatInFuture(GameRunnable task, int delay, int period) {
-        GameTask gameTask = game.repeatInFuture(task, delay, period);
-
-        gameGroupTaskList.addTask(gameTask);
-        return gameTask;
-    }
-
-    @Override
-    public void cancelAllTasks() {
-        gameGroupTaskList.cancelAllTasks();
-    }
-
     public boolean hasActiveCountdown() {
         return countdown != null;
     }
@@ -463,9 +444,6 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
             oldMetadata.cancelAllTasks();
             oldMetadata.removed();
         }
-    }    @Override
-    public LanguageLookup getLanguageLookup() {
-        return this;
     }
 
     @Override
@@ -501,6 +479,9 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     @Override
     public void addSharedObject(String name, ConfigurationSection config) {
         sharedObjectMap.put(name, config);
+    }    @Override
+    public LanguageLookup getLanguageLookup() {
+        return this;
     }
 
     @Override
@@ -539,24 +520,29 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         }
     }
 
+    @Override
+    public void addMapInfo(GameMapInfo mapInfo) {
+        gameMapInfoMap.put(mapInfo.getName(), mapInfo);
+    }
+
     public void kill() {
         List<User> users = new ArrayList<>(getUsers());
 
         List<Player> players = new ArrayList<>();
 
-        for(User user : users) {
+        for (User user : users) {
             user.removeFromGameGroup();
 
             game.removeUser(user);
 
-            if(user.isPlayer()) players.add(user.getPlayer());
+            if (user.isPlayer()) players.add(user.getPlayer());
         }
 
-        for(Team team : teamsInGroup.values()) {
+        for (Team team : teamsInGroup.values()) {
             team.removeFromGameGroup();
         }
 
-        for(Metadata metadata : metadataMap.values()) {
+        for (Metadata metadata : metadataMap.values()) {
             metadata.removed();
         }
 
@@ -566,7 +552,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
 
         game.removeGameGroup(this);
 
-        for(Player player : players) {
+        for (Player player : players) {
             game.rejoinPlayer(player);
         }
 
@@ -578,8 +564,32 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     }
 
     @Override
-    public void addMapInfo(GameMapInfo mapInfo) {
-        gameMapInfoMap.put(mapInfo.getName(), mapInfo);
+    public GameTask doInFuture(GameRunnable task) {
+        GameTask gameTask = game.doInFuture(task);
+
+        gameGroupTaskList.addTask(gameTask);
+        return gameTask;
+    }
+
+    @Override
+    public GameTask doInFuture(GameRunnable task, int delay) {
+        GameTask gameTask = game.doInFuture(task, delay);
+
+        gameGroupTaskList.addTask(gameTask);
+        return gameTask;
+    }
+
+    @Override
+    public GameTask repeatInFuture(GameRunnable task, int delay, int period) {
+        GameTask gameTask = game.repeatInFuture(task, delay, period);
+
+        gameGroupTaskList.addTask(gameTask);
+        return gameTask;
+    }
+
+    @Override
+    public void cancelAllTasks() {
+        gameGroupTaskList.cancelAllTasks();
     }
 
     public CommandConfig getCommand(String name) {
@@ -611,7 +621,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
                 game.removeUser(event.getUser());
 
                 //GameGroup only referenced by its users. If there are none left we must unload.
-                if(usersInGroup.size() == 0) kill();
+                if (usersInGroup.size() == 0) kill();
             }
         }
 
