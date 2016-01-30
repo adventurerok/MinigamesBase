@@ -78,6 +78,12 @@ public class SimpleGameStartListener implements Listener {
 
         GameGroup gameGroup = event.getGameGroup();
         gameGroup.getUsers().forEach(this::setupUser);
+
+        postGameSetup();
+    }
+
+    protected void postGameSetup() {
+
     }
 
     protected void setupUser(User user) {
@@ -100,6 +106,8 @@ public class SimpleGameStartListener implements Listener {
         }
 
         user.setInGame(true);
+        user.resetUserStats(true);
+        user.setCollidesWithEntities(true);
 
         customItemGiver.giveToUser(user);
     }
