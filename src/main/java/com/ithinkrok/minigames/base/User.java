@@ -80,6 +80,7 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
     private Kit kit;
     private LivingEntity entity;
     private PlayerState playerState;
+    private Disguise disguise;
     private boolean cloaked = false;
     private boolean showCloakedPlayers = false;
     private ScoreboardDisplay scoreboardDisplay;
@@ -168,6 +169,8 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
         gameGroup.getGame().makeEntityActualUser(this, entity);
 
         entity.setRemoveWhenFarAway(true);
+
+        if(disguise != null) disguise(disguise);
     }
 
     public Location getLocation() {
@@ -203,6 +206,8 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
 
         scoreboardDisplay = new ScoreboardDisplay(this, player);
         updateScoreboard();
+
+        if(disguise != null) disguise(disguise);
     }
 
     public boolean isCloaked() {
@@ -246,14 +251,16 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
     }
 
     public void disguise(EntityType type) {
-        gameGroup.getGame().disguiseUser(this, type);
+        disguise(new Disguise(type));
     }
 
     public void disguise(Disguise disguise) {
+        this.disguise = disguise;
         gameGroup.getGame().disguiseUser(this, disguise);
     }
 
     public void unDisguise() {
+        this.disguise = null;
         gameGroup.getGame().unDisguiseUser(this);
     }
 
@@ -1037,6 +1044,8 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
     public void setDisplayName(String displayName) {
         if (!isPlayer()) entity.setCustomName(displayName);
         else getPlayer().setDisplayName(displayName);
+
+        if(disguise != null && disguise.isShowUserNameAboveEntity()) disguise(disguise);
     }
 
 
