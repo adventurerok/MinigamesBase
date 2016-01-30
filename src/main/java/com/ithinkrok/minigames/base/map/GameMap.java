@@ -28,6 +28,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Weather;
 import org.bukkit.event.Listener;
 import org.bukkit.util.Vector;
 
@@ -114,6 +115,44 @@ public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.Bo
         world = creator.createWorld();
         world.setAutoSave(false);
 
+        configureWorld();
+    }
+
+    private void configureWorld() {
+        ConfigurationSection config = gameMapInfo.getConfig();
+
+        if(config.contains("start_time")) {
+            world.setTime(config.getLong("start_time"));
+        }
+
+        if(config.contains("start_weather")) {
+            switch(config.getString("start_weather").toLowerCase()) {
+                case "clear":
+                case "sun":
+                    world.setStorm(false);
+                    world.setThundering(false);
+                case "rain":
+                    world.setThundering(false);
+                    world.setStorm(true);
+                case "thunder":
+                case "storm":
+                    world.setStorm(true);
+                    world.setThundering(true);
+                default:
+                    throw new RuntimeException("Invalid weather condition: " + config.getString("start_weather"));
+            }
+        }
+
+        if(config.contains("enable_time")) {
+            world.setGameRuleValue("doDaylightCycle", Boolean.toString(config.getBoolean("enable_time")));
+        }
+
+        if(config.contains("game_rules")) {
+            ConfigurationSection gameRules = config.getConfigurationSection("game_rules");
+            for(String rule : gameRules.getKeys(false)) {
+                world.setGameRuleValue(rule, gameRules.getString("rule"));
+            }
+        }
     }
 
     private String getRandomWorldName(String mapName) {
