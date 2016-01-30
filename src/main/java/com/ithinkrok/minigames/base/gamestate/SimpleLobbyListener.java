@@ -18,7 +18,6 @@ import com.ithinkrok.minigames.base.event.user.state.UserFoodLevelChangeEvent;
 import com.ithinkrok.minigames.base.event.user.world.*;
 import com.ithinkrok.minigames.base.listener.GiveCustomItemsOnJoin;
 import com.ithinkrok.minigames.base.scoreboard.MapScoreboardHandler;
-import com.ithinkrok.minigames.base.util.InventoryUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -178,18 +177,13 @@ public class SimpleLobbyListener implements Listener {
     }
 
     @MinigamesEventHandler
-    public void eventUserDropItem(UserDropItemEvent event) {
-        event.setCancelled(true);
+    public void onUserPickupItem(UserPickupItemEvent event) {
+        if(config.getBoolean("simple_lobby.deny_pickup_items", true)) event.setCancelled(true);
     }
 
     @MinigamesEventHandler
-    public void eventUserPickupItem(UserPickupItemEvent event) {
-        event.setCancelled(true);
-    }
-
-    @MinigamesEventHandler
-    public void eventUserDamaged(UserDamagedEvent event) {
-        event.setCancelled(true);
+    public void onUserDamaged(UserDamagedEvent event) {
+        if(config.getBoolean("simple_lobby.deny_damage", true)) event.setCancelled(true);
     }
 
     @MinigamesEventHandler
@@ -204,7 +198,7 @@ public class SimpleLobbyListener implements Listener {
 
     @MinigamesEventHandler
     public void eventUserFoodLevelChange(UserFoodLevelChangeEvent event) {
-        event.setFoodLevel(20);
+        if(config.getBoolean("simple_lobby.deny_hunger_loss", true)) event.setFoodLevel(20);
     }
 
     private static boolean isRedstoneControl(Material type) {
@@ -227,7 +221,6 @@ public class SimpleLobbyListener implements Listener {
     @MinigamesEventHandler
     public void onUserDropItem(UserDropItemEvent event) {
         if(!config.getBoolean("simple_lobby.deny_drop_items", true)) return;
-        if (InventoryUtils.getIdentifier(event.getItem().getItemStack()) == -1) return;
 
         event.setCancelled(true);
     }
