@@ -17,7 +17,7 @@ public class UserMoney extends Money {
 
         ConfigurationSection config = user.getGameGroup().getSharedObject("user_money_metadata");
 
-        loadValues(config);
+        loadValues(config, "user");
     }
 
     public void setMessageLevel(int messageLevel) {

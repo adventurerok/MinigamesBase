@@ -16,7 +16,7 @@ public class TeamMoney extends Money {
 
         ConfigurationSection config = team.getGameGroup().getSharedObject("team_money_metadata");
 
-        loadValues(config);
+        loadValues(config, "team");
     }
 
     @Override
