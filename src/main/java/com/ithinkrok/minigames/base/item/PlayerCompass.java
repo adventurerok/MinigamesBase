@@ -10,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Objects;
 
@@ -70,8 +71,12 @@ public class PlayerCompass implements Listener {
             if (closest != null) event.getUser().setCompassTarget(closest);
             else closestName = lookup.getLocale(noPlayerLocale);
 
-            InventoryUtils.setItemNameAndLore(event.getItem(), lookup.getLocale(nameLocale),
+            ItemStack item = event.getItem().clone();
+
+            InventoryUtils.setItemNameAndLore(item, lookup.getLocale(nameLocale),
                     lookup.getLocale(orientedLocale, closestName));
+
+            InventoryUtils.replaceItem(event.getUser().getInventory(), item);
         }, locatingTime);
 
         event.setStartCooldownAfterAction(true);

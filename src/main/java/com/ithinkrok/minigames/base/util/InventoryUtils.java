@@ -169,10 +169,14 @@ public class InventoryUtils {
     }
 
     public static void replaceItem(Inventory inventory, ItemStack stack) {
-        int first = inventory.first(stack.getType());
+        int id = getIdentifier(stack);
+        if(id == -1) throw new RuntimeException("replaceItem() can only be used on items with identifiers");
 
-        if (first == -1) inventory.addItem(stack);
-        else inventory.setItem(first, stack);
+        for(int index = 0; index < inventory.getSize(); ++index) {
+            if(getIdentifier(inventory.getItem(index)) != id) continue;
+
+            inventory.setItem(index, stack);
+        }
     }
 
     public static ItemStack removeIdentifier(ItemStack item) {
