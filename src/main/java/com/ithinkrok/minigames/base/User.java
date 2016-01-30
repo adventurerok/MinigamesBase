@@ -45,6 +45,9 @@ import org.bukkit.util.Vector;
 
 import java.util.*;
 
+import static com.ithinkrok.minigames.base.util.InventoryUtils.createLeatherArmorItem;
+import static com.ithinkrok.minigames.base.util.InventoryUtils.setUnbreakable;
+
 /**
  * Created by paul on 31/12/15.
  */
@@ -261,7 +264,7 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
 
     public void resetUserStats(boolean removePotionEffects) {
         ConfigurationSection defaultStats = getSharedObjectOrEmpty("user").getConfigurationSection("default_stats");
-        if(defaultStats == null) defaultStats = ConfigUtils.EMPTY_CONFIG;
+        if (defaultStats == null) defaultStats = ConfigUtils.EMPTY_CONFIG;
 
         setMaxHealth(defaultStats.getDouble("max_health", 10) * 2);
         setHealth(defaultStats.getDouble("health", 10) * 2);
@@ -671,6 +674,11 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
     }
 
     @Override
+    public boolean hasSharedObject(String name) {
+        return gameGroup.hasSharedObject(name);
+    }
+
+    @Override
     public ConfigurationSection getSharedObject(String name) {
         return gameGroup.getSharedObject(name);
     }
@@ -680,23 +688,27 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
         return gameGroup.getSharedObjectOrEmpty(name);
     }
 
-    @Override
-    public boolean hasSharedObject(String name) {
-        return gameGroup.hasSharedObject(name);
+    public void giveColoredArmor(Color color, boolean unbreakable) {
+        giveColoredArmor(color, unbreakable, true, true, true, true);
     }
 
-    public void giveColoredArmor(Color color, boolean unbreakable) {
+    public void giveColoredArmor(Color color, boolean unbreakable, boolean helmet, boolean chestplate, boolean leggings,
+                                 boolean boots) {
         PlayerInventory inv = getInventory();
-        if (color == null) clearArmor();
+        if (color == null) clearArmor(helmet, chestplate, leggings, boots);
         else {
-            inv.setHelmet(InventoryUtils
-                    .setUnbreakable(InventoryUtils.createLeatherArmorItem(Material.LEATHER_HELMET, color), unbreakable));
-            inv.setChestplate(InventoryUtils
-                    .setUnbreakable(InventoryUtils.createLeatherArmorItem(Material.LEATHER_CHESTPLATE, color), unbreakable));
-            inv.setLeggings(InventoryUtils
-                    .setUnbreakable(InventoryUtils.createLeatherArmorItem(Material.LEATHER_LEGGINGS, color), unbreakable));
-            inv.setBoots(InventoryUtils
-                    .setUnbreakable(InventoryUtils.createLeatherArmorItem(Material.LEATHER_BOOTS, color), unbreakable));
+            if (helmet) {
+                inv.setHelmet(createLeatherArmorItem(Material.LEATHER_HELMET, color, unbreakable));
+            }
+            if (chestplate) {
+                inv.setChestplate(createLeatherArmorItem(Material.LEATHER_CHESTPLATE, color, unbreakable));
+            }
+            if (leggings) {
+                inv.setLeggings(createLeatherArmorItem(Material.LEATHER_LEGGINGS, color, unbreakable));
+            }
+            if (boots) {
+                inv.setBoots(createLeatherArmorItem(Material.LEATHER_BOOTS, color, unbreakable));
+            }
         }
     }
 
@@ -704,13 +716,17 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
         return isPlayer() ? getPlayer().getInventory() : playerState.getInventory();
     }
 
-    public void clearArmor() {
+    public void clearArmor(boolean helmet, boolean chestplate, boolean leggings, boolean boots) {
         EntityEquipment equipment = entity.getEquipment();
 
-        equipment.setHelmet(null);
-        equipment.setChestplate(null);
-        equipment.setLeggings(null);
-        equipment.setBoots(null);
+        if (helmet) equipment.setHelmet(null);
+        if (chestplate) equipment.setChestplate(null);
+        if (leggings) equipment.setLeggings(null);
+        if (boots) equipment.setBoots(null);
+    }
+
+    public void clearArmor() {
+        clearArmor(true, true, true, true);
     }
 
     public String getKitName() {
@@ -789,9 +805,6 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
 
     public boolean isFlying() {
         return isPlayer() && getPlayer().isFlying();
-    }    @Override
-    public void sendLocale(String locale, Object... args) {
-        sendMessage(gameGroup.getLocale(locale, args));
     }
 
     public void setFlying(boolean flying) {
@@ -868,11 +881,14 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
         setTabListName(getName());
         setDisplayName(getName());
 
-        for(UserMetadata metadata : metadataMap.values()) {
+        for (UserMetadata metadata : metadataMap.values()) {
             metadata.removed();
         }
 
         metadataMap.clear();
+    }    @Override
+    public void sendLocale(String locale, Object... args) {
+        sendMessage(gameGroup.getLocale(locale, args));
     }
 
     private class UserListener implements Listener {

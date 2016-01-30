@@ -28,6 +28,10 @@ public class InventoryUtils {
         return setLeatherArmorColor(new ItemStack(material), armorColor);
     }
 
+    public static ItemStack createLeatherArmorItem(Material material, Color armorColor, boolean unbreakable) {
+        return setUnbreakable(setLeatherArmorColor(new ItemStack(material), armorColor), unbreakable);
+    }
+
     public static ItemStack setLeatherArmorColor(ItemStack armor, Color armorColor) {
         LeatherArmorMeta meta = (LeatherArmorMeta) armor.getItemMeta();
 
