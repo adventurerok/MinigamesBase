@@ -7,10 +7,10 @@ import com.ithinkrok.minigames.base.User;
 import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.base.event.MinigamesEventHandler;
 import com.ithinkrok.minigames.base.event.game.GameStateChangedEvent;
-import com.ithinkrok.minigames.base.listener.GiveCustomItemsOnJoin;
 import com.ithinkrok.minigames.base.metadata.MapVote;
 import com.ithinkrok.minigames.base.team.Team;
 import com.ithinkrok.minigames.base.util.ConfigUtils;
+import com.ithinkrok.minigames.base.util.CustomItemGiver;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
 
@@ -34,7 +34,7 @@ public class SimpleGameStartListener implements Listener {
 
     private String teamInfoLocale, kitInfoLocale;
 
-    private GiveCustomItemsOnJoin.CustomItemGiver customItemGiver;
+    private CustomItemGiver customItemGiver;
 
     protected GameState gameState;
 
@@ -51,7 +51,7 @@ public class SimpleGameStartListener implements Listener {
 
         configureMapVoting(config.getConfigurationSection("map_voting"));
 
-        customItemGiver = new GiveCustomItemsOnJoin.CustomItemGiver(config.getConfigurationSection("start_items"));
+        customItemGiver = new CustomItemGiver(config.getConfigurationSection("start_items"));
 
         teamInfoLocale = config.getString("team_info_locale", "start_info.team");
         kitInfoLocale = config.getString("kit_info_locale", "start_info.kit");

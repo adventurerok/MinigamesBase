@@ -16,10 +16,10 @@ import com.ithinkrok.minigames.base.event.user.inventory.UserInventoryClickEvent
 import com.ithinkrok.minigames.base.event.user.state.UserDamagedEvent;
 import com.ithinkrok.minigames.base.event.user.state.UserFoodLevelChangeEvent;
 import com.ithinkrok.minigames.base.event.user.world.*;
-import com.ithinkrok.minigames.base.listener.GiveCustomItemsOnJoin;
 import com.ithinkrok.minigames.base.scoreboard.MapScoreboardHandler;
 import com.ithinkrok.minigames.base.util.ConfigUtils;
 import com.ithinkrok.minigames.base.util.CountdownConfig;
+import com.ithinkrok.minigames.base.util.CustomItemGiver;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -50,7 +50,7 @@ public class SimpleLobbyListener implements Listener {
 
     private String joinLobbyLocaleStub;
 
-    private GiveCustomItemsOnJoin.CustomItemGiver giveOnJoin;
+    private CustomItemGiver giveOnJoin;
     private ConfigurationSection config;
 
     @MinigamesEventHandler
@@ -65,7 +65,7 @@ public class SimpleLobbyListener implements Listener {
 
         lobbyMapName = config.getString("lobby_map");
 
-        giveOnJoin = new GiveCustomItemsOnJoin.CustomItemGiver(config.getConfigurationSection("give_on_join"));
+        giveOnJoin = new CustomItemGiver(config.getConfigurationSection("give_on_join"));
 
         joinLobbyLocaleStub = config.getString("join_lobby_locale_stub", "lobby.info");
 
