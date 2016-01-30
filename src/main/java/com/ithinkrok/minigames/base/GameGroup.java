@@ -13,6 +13,7 @@ import com.ithinkrok.minigames.base.map.GameMap;
 import com.ithinkrok.minigames.base.task.GameRunnable;
 import com.ithinkrok.minigames.base.task.GameTask;
 import com.ithinkrok.minigames.base.team.Team;
+import com.ithinkrok.minigames.base.util.ConfigUtils;
 import com.ithinkrok.minigames.base.util.io.ConfigHolder;
 import com.ithinkrok.minigames.base.util.io.ConfigParser;
 import com.ithinkrok.minigames.base.util.io.FileLoader;
@@ -266,7 +267,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         if(result != null) return result;
 
         result = sharedObjectMap.get(name);
-        return result != null ? result : SharedObjectAccessor.EMPTY_CONFIG;
+        return result != null ? result : ConfigUtils.EMPTY_CONFIG;
     }
 
     @Override

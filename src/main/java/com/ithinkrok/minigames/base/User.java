@@ -26,6 +26,7 @@ import com.ithinkrok.minigames.base.user.UpgradeHandler;
 import com.ithinkrok.minigames.base.user.UserResolver;
 import com.ithinkrok.minigames.base.user.scoreboard.ScoreboardDisplay;
 import com.ithinkrok.minigames.base.user.scoreboard.ScoreboardHandler;
+import com.ithinkrok.minigames.base.util.ConfigUtils;
 import com.ithinkrok.minigames.base.util.EventExecutor;
 import com.ithinkrok.minigames.base.util.InventoryUtils;
 import com.ithinkrok.minigames.base.util.SoundEffect;
@@ -35,7 +36,6 @@ import com.ithinkrok.minigames.base.metadata.MetadataHolder;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.entity.*;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.*;
@@ -261,7 +261,7 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
 
     public void resetUserStats(boolean removePotionEffects) {
         ConfigurationSection defaultStats = getSharedObjectOrEmpty("user").getConfigurationSection("default_stats");
-        if(defaultStats == null) defaultStats = SharedObjectAccessor.EMPTY_CONFIG;
+        if(defaultStats == null) defaultStats = ConfigUtils.EMPTY_CONFIG;
 
         setMaxHealth(defaultStats.getDouble("max_health", 10) * 2);
         setHealth(defaultStats.getDouble("health", 10) * 2);

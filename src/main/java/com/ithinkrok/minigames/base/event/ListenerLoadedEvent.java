@@ -1,7 +1,7 @@
 package com.ithinkrok.minigames.base.event;
 
+import com.ithinkrok.minigames.base.util.ConfigUtils;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.MemoryConfiguration;
 
 /**
  * Created by paul on 02/01/16.
@@ -9,8 +9,6 @@ import org.bukkit.configuration.MemoryConfiguration;
  * Called on a listener when it is enabled (but not necessarily before it starts receiving events)
  */
 public class ListenerLoadedEvent<C, R> implements MinigamesEvent {
-
-    private final MemoryConfiguration EMPTY_CONFIG = new MemoryConfiguration();
 
     private final C creator;
     private final R representing;
@@ -39,6 +37,6 @@ public class ListenerLoadedEvent<C, R> implements MinigamesEvent {
     }
 
     public ConfigurationSection getConfigOrEmpty() {
-        return config != null ? config : EMPTY_CONFIG;
+        return config != null ? config : ConfigUtils.EMPTY_CONFIG;
     }
 }

@@ -17,6 +17,8 @@ import java.util.Map;
  */
 public class ConfigUtils {
 
+    public static final MemoryConfiguration EMPTY_CONFIG = new MemoryConfiguration();
+
     public static Location getLocation(ConfigurationSection config, World world, String path) {
         if (!path.isEmpty()) path = path + ".";
 
