@@ -150,6 +150,16 @@ public class Team implements Listener, Messagable, LanguageLookup, SharedObjectA
     }
 
     @Override
+    public ConfigurationSection getSharedObjectOrEmpty(String name) {
+        return gameGroup.getSharedObjectOrEmpty(name);
+    }
+
+    @Override
+    public boolean hasSharedObject(String name) {
+        return gameGroup.hasSharedObject(name);
+    }
+
+    @Override
     public GameTask doInFuture(GameRunnable task) {
         GameTask gameTask = gameGroup.doInFuture(task);
 

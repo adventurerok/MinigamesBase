@@ -35,6 +35,7 @@ import com.ithinkrok.minigames.base.metadata.MetadataHolder;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.entity.*;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.*;
@@ -259,14 +260,15 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
     }
 
     public void resetUserStats(boolean removePotionEffects) {
-        ConfigurationSection defaultStats = gameGroup.getSharedObject("user").getConfigurationSection("default_stats");
+        ConfigurationSection defaultStats = getSharedObjectOrEmpty("user").getConfigurationSection("default_stats");
+        if(defaultStats == null) defaultStats = SharedObjectAccessor.EMPTY_CONFIG;
 
         setMaxHealth(defaultStats.getDouble("max_health", 10) * 2);
         setHealth(defaultStats.getDouble("health", 10) * 2);
         setFoodLevel((int) (defaultStats.getDouble("food_level", 10) * 2));
         setSaturation(defaultStats.getDouble("saturation", 5.0));
         setFlySpeed(defaultStats.getDouble("fly_speed", 0.1));
-        setWalkSpeed(defaultStats.getDouble("walk_speed", 0.1));
+        setWalkSpeed(defaultStats.getDouble("walk_speed", 0.2));
 
         if (removePotionEffects) removePotionEffects();
     }
@@ -671,6 +673,16 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
     @Override
     public ConfigurationSection getSharedObject(String name) {
         return gameGroup.getSharedObject(name);
+    }
+
+    @Override
+    public ConfigurationSection getSharedObjectOrEmpty(String name) {
+        return gameGroup.getSharedObjectOrEmpty(name);
+    }
+
+    @Override
+    public boolean hasSharedObject(String name) {
+        return gameGroup.hasSharedObject(name);
     }
 
     public void giveColoredArmor(Color color, boolean unbreakable) {

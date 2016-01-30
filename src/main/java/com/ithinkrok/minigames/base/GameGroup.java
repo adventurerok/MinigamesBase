@@ -259,6 +259,22 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     }
 
     @Override
+    public ConfigurationSection getSharedObjectOrEmpty(String name) {
+        ConfigurationSection result = null;
+
+        if (currentMap != null) result = currentMap.getSharedObject(name);
+        if(result != null) return result;
+
+        result = sharedObjectMap.get(name);
+        return result != null ? result : SharedObjectAccessor.EMPTY_CONFIG;
+    }
+
+    @Override
+    public boolean hasSharedObject(String name) {
+        return getSharedObject(name) != null;
+    }
+
+    @Override
     public Team getTeam(String name) {
         return getTeam(getTeamIdentifier(name));
     }

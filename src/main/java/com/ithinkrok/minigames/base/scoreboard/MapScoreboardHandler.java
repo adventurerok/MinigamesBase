@@ -20,7 +20,7 @@ public class MapScoreboardHandler implements ScoreboardHandler {
     public MapScoreboardHandler(User user) {
         ConfigurationSection config = user.getSharedObject("map_scoreboard");
 
-        String displayNameLocale = config.getString("title");
+        String displayNameLocale = config.getString("title", "map_scoreboard.title");
         displayName = user.getLanguageLookup().getLocale(displayNameLocale);
 
         votableMaps = config.getStringList("votable_maps");
