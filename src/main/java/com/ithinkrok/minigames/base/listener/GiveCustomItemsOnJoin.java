@@ -37,8 +37,8 @@ public class GiveCustomItemsOnJoin implements Listener {
 
     private static class CustomItemInfo {
         private Variables customVariables;
-        private String customItem;
-        private int slot = -1;
+        private final String customItem;
+        private final int slot;
 
         public CustomItemInfo(ConfigurationSection config) {
             customItem = config.getString("name");
@@ -52,12 +52,15 @@ public class GiveCustomItemsOnJoin implements Listener {
     public static class CustomItemGiver {
         private boolean clearInventory = false;
 
-        private List<CustomItemInfo> items = new ArrayList<>();
+        private final List<CustomItemInfo> items = new ArrayList<>();
 
         public CustomItemGiver(ConfigurationSection config) {
+            if(config == null) config = ConfigUtils.EMPTY_CONFIG;
             clearInventory = config.getBoolean("clear_inventory");
 
             List<ConfigurationSection> itemConfigs = ConfigUtils.getConfigList(config, "items");
+            if(itemConfigs == null) return;
+
             items.addAll(itemConfigs.stream().map(CustomItemInfo::new).collect(Collectors.toList()));
         }
 
