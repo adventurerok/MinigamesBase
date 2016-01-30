@@ -8,6 +8,7 @@ import com.ithinkrok.minigames.base.event.user.world.*;
 import com.ithinkrok.minigames.base.map.GameMap;
 import com.ithinkrok.minigames.base.team.Team;
 import com.ithinkrok.minigames.base.util.InvisiblePlayerAttacker;
+import com.ithinkrok.minigames.base.util.disguise.LDDisguiseController;
 import com.ithinkrok.minigames.base.util.disguise.MinigamesDisguiseController;
 import com.ithinkrok.minigames.base.util.io.FileLoader;
 import com.ithinkrok.minigames.base.command.Command;
@@ -118,27 +119,6 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         setupDisguiseController();
     }
 
-    private String nextGameGroupName(String configName) {
-        String result;
-        int counter = 0;
-
-        do{
-            result = name + "_" + configName + "_" + counter;
-            ++counter;
-        } while(nameToGameGroup.containsKey(result));
-
-        return result;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getFormattedName() {
-        return name;
-    }
-
     private void unloadDefaultWorlds() {
         if (Bukkit.getWorlds().size() != 1) System.out.println("You should disable the nether/end worlds to save RAM!");
 
@@ -152,11 +132,22 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     }
 
     private void setupDisguiseController() {
-        if (Bukkit.getPluginManager().getPlugin("DisguiseCraft") != null) {
+        if (Bukkit.getPluginManager().getPlugin("LibsDisguises") != null) {
+            disguiseController = new LDDisguiseController();
+        } else if (Bukkit.getPluginManager().getPlugin("DisguiseCraft") != null) {
             disguiseController = new DCDisguiseController();
         } else {
             disguiseController = new MinigamesDisguiseController();
         }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getFormattedName() {
+        return name;
     }
 
     public Path getRamdiskDirectory() {
@@ -178,12 +169,6 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
 
     public void registerGameGroupConfig(String name, String configFile) {
         gameGroupConfigMap.put(name, configFile);
-    }
-
-    public GameGroup getSpawnGameGroup() {
-        if(nameToGameGroup.isEmpty()) return null;
-
-        return nameToGameGroup.values().iterator().next();
     }
 
     public void removeUser(User user) {
@@ -211,30 +196,8 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         return assetsDirectory;
     }
 
-    @Override
-    public User getUser(UUID uuid) {
-        return usersInServer.get(uuid);
-    }
-
-    public GameGroup createGameGroup(String configName) {
-        GameGroup gameGroup = new GameGroup(this, nextGameGroupName(configName), gameGroupConfigMap.get(configName));
-
-        nameToGameGroup.put(gameGroup.getName(), gameGroup);
-
-        getLogger().info("Created " + configName + " gamegroup: " + gameGroup.getName());
-
-        return gameGroup;
-    }
-
     public GameGroup getGameGroup(String ggName) {
         return nameToGameGroup.get(ggName);
-    }
-
-    private User createUser(GameGroup gameGroup, Team team, UUID uuid, LivingEntity entity) {
-        User user = new User(gameGroup, team, uuid, entity);
-
-        usersInServer.put(user.getUuid(), user);
-        return user;
     }
 
     public void unload() {
@@ -303,10 +266,6 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         disguiseController.unDisguise(user);
     }
 
-    public Logger getLogger() {
-        return plugin.getLogger();
-    }
-
     public void rejoinPlayer(Player player) {
         User user = getUser(player.getUniqueId());
         GameGroup gameGroup;
@@ -324,6 +283,50 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         }
 
         gameGroup.userEvent(new UserJoinEvent(user, UserJoinEvent.JoinReason.JOINED_SERVER));
+    }
+
+    @Override
+    public User getUser(UUID uuid) {
+        return usersInServer.get(uuid);
+    }
+
+    public GameGroup createGameGroup(String configName) {
+        GameGroup gameGroup = new GameGroup(this, nextGameGroupName(configName), gameGroupConfigMap.get(configName));
+
+        nameToGameGroup.put(gameGroup.getName(), gameGroup);
+
+        getLogger().info("Created " + configName + " gamegroup: " + gameGroup.getName());
+
+        return gameGroup;
+    }
+
+    public GameGroup getSpawnGameGroup() {
+        if (nameToGameGroup.isEmpty()) return null;
+
+        return nameToGameGroup.values().iterator().next();
+    }
+
+    private User createUser(GameGroup gameGroup, Team team, UUID uuid, LivingEntity entity) {
+        User user = new User(gameGroup, team, uuid, entity);
+
+        usersInServer.put(user.getUuid(), user);
+        return user;
+    }
+
+    private String nextGameGroupName(String configName) {
+        String result;
+        int counter = 0;
+
+        do {
+            result = name + "_" + configName + "_" + counter;
+            ++counter;
+        } while (nameToGameGroup.containsKey(result));
+
+        return result;
+    }
+
+    public Logger getLogger() {
+        return plugin.getLogger();
     }
 
     private class GameListener implements Listener {

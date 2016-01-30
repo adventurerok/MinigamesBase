@@ -3,7 +3,7 @@ version: "${project.version}"
 main: "com.ithinkrok.minigames.base.BasePlugin"
 author: "ithinkrok"
 depend: ["HologramAPI", "ProtocolLib"]
-softdepend: ["DisguiseCraft"]
+softdepend: ["DisguiseCraft", "LibsDisguises"]
 database: true
 
 permissions:

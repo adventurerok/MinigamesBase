@@ -35,8 +35,8 @@
             <url>http://repo.dmulloy2.net/content/groups/public/</url>
         </repository>
         <repository>
-            <id>DisguiseCraft Repo</id>
-            <url>http://build.yu8.me:8080/plugin/repository/everything/</url>
+            <id>libs-disguises-repo</id>
+            <url>http://server.o2gaming.com/repo/</url>
         </repository>
     </repositories>
 
@@ -82,6 +82,12 @@
             <groupId>pgDev</groupId>
             <artifactId>DisguiseCraft</artifactId>
             <version>5.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>LibsDisguises</groupId>
+            <artifactId>LibsDisguises</artifactId>
+            <version>8.6.7-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
