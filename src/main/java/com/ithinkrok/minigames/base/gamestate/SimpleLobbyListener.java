@@ -54,6 +54,8 @@ public class SimpleLobbyListener implements Listener {
 
     @MinigamesEventHandler
     public void onListenerLoaded(ListenerLoadedEvent<GameGroup, GameState> event) {
+        gameState = event.getRepresenting();
+
         config = event.getConfig();
 
         nextGameState = config.getString("next_gamestate");
@@ -81,12 +83,12 @@ public class SimpleLobbyListener implements Listener {
     }
 
     @MinigamesEventHandler
-    public void eventBlockBreak(UserBreakBlockEvent event) {
+    public void onUserBreakBlock(UserBreakBlockEvent event) {
         if(config.getBoolean("simple_lobby.deny_block_break", true)) event.setCancelled(true);
     }
 
     @MinigamesEventHandler
-    public void eventBlockPlace(UserPlaceBlockEvent event) {
+    public void onUserPlaceBlock(UserPlaceBlockEvent event) {
         if(config.getBoolean("simple_lobby.deny_block_place", true)) event.setCancelled(true);
     }
 
@@ -100,7 +102,7 @@ public class SimpleLobbyListener implements Listener {
     }
 
     @MinigamesEventHandler
-    public void eventUserInventoryClick(UserInventoryClickEvent event) {
+    public void onUserInventoryClick(UserInventoryClickEvent event) {
         if(config.getBoolean("simple_lobby.deny_inventory_move", true)) event.setCancelled(true);
     }
 
@@ -144,7 +146,7 @@ public class SimpleLobbyListener implements Listener {
     }
 
     @MinigamesEventHandler
-    public void eventGameStateChanged(GameStateChangedEvent event) {
+    public void onGameStateChanged(GameStateChangedEvent event) {
         if(!Objects.equals(event.getNewGameState(), gameState)) return;
 
         event.getGameGroup().changeMap(lobbyMapName);
@@ -157,7 +159,7 @@ public class SimpleLobbyListener implements Listener {
     }
 
     @MinigamesEventHandler
-    public void eventCountdownFinished(CountdownFinishedEvent event) {
+    public void onCountdownFinished(CountdownFinishedEvent event) {
         if(!event.getCountdown().getName().equals(startCountdownName)) return;
 
         int userCount = event.getGameGroup().getUserCount();
@@ -187,7 +189,7 @@ public class SimpleLobbyListener implements Listener {
     }
 
     @MinigamesEventHandler
-    public void eventUserInteract(UserInteractEvent event) {
+    public void onUserInteract(UserInteractEvent event) {
         if(event.getInteractType() == UserInteractEvent.InteractType.REPRESENTING) return;
         if(event.hasItem() && event.getItem().getType() == Material.WRITTEN_BOOK) return;
 
@@ -197,7 +199,7 @@ public class SimpleLobbyListener implements Listener {
     }
 
     @MinigamesEventHandler
-    public void eventUserFoodLevelChange(UserFoodLevelChangeEvent event) {
+    public void onUserFoodLevelChange(UserFoodLevelChangeEvent event) {
         if(config.getBoolean("simple_lobby.deny_hunger_loss", true)) event.setFoodLevel(20);
     }
 
