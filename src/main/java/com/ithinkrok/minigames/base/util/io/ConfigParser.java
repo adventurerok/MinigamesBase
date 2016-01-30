@@ -106,7 +106,7 @@ public class ConfigParser {
             String armorColorString = teamConfig.getString("armor_color", null);
             Color armorColor = null;
             if (armorColorString != null) {
-                armorColor = Color.fromRGB(Integer.parseInt(armorColorString.replace("#", "")));
+                armorColor = Color.fromRGB(Integer.parseInt(armorColorString.replace("#", ""), 16));
             }
             String chatColorString = teamConfig.getString("chat_color", null);
             ChatColor chatColor = null;
