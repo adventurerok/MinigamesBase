@@ -109,6 +109,7 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
             scoreboardDisplay = new ScoreboardDisplay(this, getPlayer());
         }
 
+        unDisguise();
         fixCloakedUsers();
 
         repeatInFuture(task -> decrementAttackerTimers(), 20, 20);
@@ -119,10 +120,18 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
             if(this == u) continue;
 
             if(u.isCloaked()) hidePlayer(u);
-            else showPlayer(u);
+            else{
+                hidePlayer(u);
+
+                doInFuture(task -> showPlayer(u));
+            }
 
             if(isCloaked()) u.hidePlayer(this);
-            else u.showPlayer(this);
+            else {
+                u.hidePlayer(this);
+
+                doInFuture(task -> u.showPlayer(User.this));
+            }
         }
     }
 
