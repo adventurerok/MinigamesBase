@@ -108,6 +108,7 @@ public class SimpleGameStartListener implements Listener {
         user.setInGame(true);
         user.resetUserStats(true);
         user.setCollidesWithEntities(true);
+        user.setScoreboardHandler(null);
 
         customItemGiver.giveToUser(user);
     }
