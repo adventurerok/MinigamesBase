@@ -40,6 +40,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.*;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.*;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -57,6 +58,7 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
         SharedObjectAccessor, Nameable {
 
     private static final HashSet<Material> SEE_THROUGH = new HashSet<>();
+    private static final Random random = new Random();
 
     static {
         SEE_THROUGH.add(Material.AIR);
@@ -186,6 +188,21 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
         oldEntity.remove();
 
         return true;
+    }
+
+    public void launchVictoryFirework() {
+        Location loc = getLocation();
+
+        Firework firework = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
+
+        Color color = Color.fromRGB(random.nextInt(255), random.nextInt(255), random.nextInt(255));
+        Color fade = Color.fromRGB(random.nextInt(255), random.nextInt(255), random.nextInt(255));
+
+        firework.setVelocity(new Vector(0, 0.5f, 0));
+        FireworkMeta meta = firework.getFireworkMeta();
+        meta.addEffect(FireworkEffect.builder().with(FireworkEffect.Type.BURST).trail(true).withColor(color)
+                .withFade(fade).build());
+        firework.setFireworkMeta(meta);
     }
 
     public void becomePlayer(Player player) {
