@@ -5,12 +5,10 @@ RECODE BUGS:
  - Class descriptions
  - Handbook
  - Priest not getting stuff (but other priest in team did)
- - Invisible peeps in lobby
  - please don't spam other players
 
 LOW PRIORITY / INVESTIGATE:
  - Zombie tab list names
-
 
 == New Idea ==
 Minigames Plugin:
