@@ -109,15 +109,21 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
             scoreboardDisplay = new ScoreboardDisplay(this, getPlayer());
         }
 
+        fixCloakedUsers();
+
+        repeatInFuture(task -> decrementAttackerTimers(), 20, 20);
+    }
+
+    public void fixCloakedUsers() {
         for(User u : gameGroup.getUsers()) {
+            if(this == u) continue;
+
             if(u.isCloaked()) hidePlayer(u);
             else showPlayer(u);
 
             if(isCloaked()) u.hidePlayer(this);
             else u.showPlayer(this);
         }
-
-        repeatInFuture(task -> decrementAttackerTimers(), 20, 20);
     }
 
     public boolean isPlayer() {
@@ -593,6 +599,8 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
 
         if (event.isCancelled()) return false;
         boolean success = entity.teleport(event.getTo());
+
+        fixCloakedUsers();
 
         return revalidateNonPlayer(event.getTo()) || success;
     }
