@@ -13,6 +13,7 @@ public class InvisibleUserToggle implements Listener {
     public void onUserInteract(UserInteractEvent event) {
         event.getUser().setShowCloakedUsers(!event.getUser().showCloakedUsers());
 
+        event.setCancelled(true);
         event.setStartCooldownAfterAction(true);
     }
 }
