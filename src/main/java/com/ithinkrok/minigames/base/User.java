@@ -109,6 +109,14 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
             scoreboardDisplay = new ScoreboardDisplay(this, getPlayer());
         }
 
+        for(User u : gameGroup.getUsers()) {
+            if(u.isCloaked()) hidePlayer(u);
+            else showPlayer(u);
+
+            if(isCloaked()) u.hidePlayer(this);
+            else u.showPlayer(this);
+        }
+
         repeatInFuture(task -> decrementAttackerTimers(), 20, 20);
     }
 

@@ -5,7 +5,6 @@ RECODE BUGS:
  - Class descriptions
  - Handbook
  - Priest not getting stuff (but other priest in team did)
- - Parkour doesn't give rewards
  - Invisible peeps in lobby
  - please don't spam other players
 
