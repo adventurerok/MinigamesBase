@@ -4,10 +4,8 @@ import com.ithinkrok.minigames.base.User;
 import com.ithinkrok.minigames.base.team.Team;
 import com.ithinkrok.minigames.base.team.TeamUserResolver;
 import com.ithinkrok.minigames.base.user.UserResolver;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.Tameable;
+import org.bukkit.Sound;
+import org.bukkit.entity.*;
 import org.bukkit.metadata.MetadataValue;
 
 import java.util.List;
@@ -76,6 +74,59 @@ public class EntityUtils {
 
     private static User getUserFromPlayer(UserResolver resolver, Player player) {
         return resolver.getUser(player.getUniqueId());
+    }
+
+    public static Sound getDeathSound(EntityType entityType) {
+        switch(entityType) {
+            case BAT:
+                return Sound.BAT_DEATH;
+            case BLAZE:
+                return Sound.BLAZE_DEATH;
+            case OCELOT:
+                return Sound.CAT_HIT;
+            case CHICKEN:
+                return Sound.CHICKEN_HURT;
+            case COW:
+                return Sound.COW_HURT;
+            case CREEPER:
+                return Sound.CREEPER_DEATH;
+            case ENDER_DRAGON:
+                return Sound.ENDERDRAGON_DEATH;
+            case ENDERMAN:
+                return Sound.ENDERDRAGON_DEATH;
+            case GHAST:
+                return Sound.GHAST_DEATH;
+            case IRON_GOLEM:
+                return Sound.IRONGOLEM_DEATH;
+            case MAGMA_CUBE:
+                return Sound.MAGMACUBE_JUMP;
+            case PIG:
+                return Sound.PIG_DEATH;
+            case SHEEP:
+                return Sound.SHEEP_IDLE;
+            case SILVERFISH:
+                return Sound.SILVERFISH_KILL;
+            case SKELETON:
+                return Sound.SKELETON_DEATH;
+            case SLIME:
+                return Sound.SLIME_ATTACK;
+            case SPIDER:
+                return Sound.SPIDER_DEATH;
+            case WITHER:
+                return Sound.WITHER_DEATH;
+            case WOLF:
+                return Sound.WOLF_DEATH;
+            case ZOMBIE:
+                return Sound.ZOMBIE_DEATH;
+            case PIG_ZOMBIE:
+                return Sound.ZOMBIE_PIG_DEATH;
+            case HORSE:
+                return Sound.HORSE_DEATH;
+            case VILLAGER:
+                return Sound.VILLAGER_DEATH;
+            default:
+                return Sound.HURT_FLESH;
+        }
     }
 
 }

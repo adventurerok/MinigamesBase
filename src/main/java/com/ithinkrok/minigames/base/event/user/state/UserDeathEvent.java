@@ -16,6 +16,8 @@ public class UserDeathEvent extends UserEvent implements Cancellable {
     private final EntityDamageEvent event;
     private final User killer, assist;
 
+    private boolean playDeathSound = true;
+
     public UserDeathEvent(User user, EntityDamageEvent event, User killer, User assist) {
         super(user);
         this.event = event;
@@ -47,6 +49,14 @@ public class UserDeathEvent extends UserEvent implements Cancellable {
 
     public boolean hasAssistUser() {
         return getAssistUser() != null;
+    }
+
+    public void setPlayDeathSound(boolean playDeathSound) {
+        this.playDeathSound = playDeathSound;
+    }
+
+    public boolean getPlayDeathSound() {
+        return playDeathSound;
     }
 
     public ItemStack getWeapon() {

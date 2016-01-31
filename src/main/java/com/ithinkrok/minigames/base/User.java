@@ -1007,7 +1007,10 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
         }
     }
 
-
+    public EntityType getVisibleEntityType() {
+        if(disguise != null) return disguise.getEntityType();
+        else return entity.getType();
+    }
 
 
     @Override

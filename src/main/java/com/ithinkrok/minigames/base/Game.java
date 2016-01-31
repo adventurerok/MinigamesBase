@@ -590,12 +590,13 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
                 attacked.getGameGroup().userEvent(new UserDamagedEvent(attacked, event));
             }
 
-            if (attacked.isCloaked()) {
-                attacked.getLocation().getWorld().playSound(attacked.getLocation(), Sound.HURT_FLESH, 1.0f, 1.0f);
-            }
-
             if (attacked.getHeath() - event.getFinalDamage() > 0) {
                 if (attacker != null) attacked.setLastAttacker(attacker);
+
+                if (attacked.isCloaked()) {
+                    attacked.getLocation().getWorld().playSound(attacked.getLocation(), Sound.HURT_FLESH, 1.0f, 1.0f);
+                }
+
                 return;
             }
             if (attacked.isPlayer()) event.setCancelled(true);
@@ -622,7 +623,15 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
                 creature.setTarget(null);
             }
 
-            attacked.getGameGroup().userEvent(new UserDeathEvent(attacked, event, attacker, assist));
+
+            UserDeathEvent deathEvent = new UserDeathEvent(attacked, event, attacker, assist);
+            attacked.getGameGroup().userEvent(deathEvent);
+
+            if (!deathEvent.getPlayDeathSound()) return;
+
+            attacked.getLocation().getWorld()
+                    .playSound(attacked.getLocation(), EntityUtils.getDeathSound(attacked.getVisibleEntityType()), 1.0f,
+                            1.0f);
         }
 
         @EventHandler
