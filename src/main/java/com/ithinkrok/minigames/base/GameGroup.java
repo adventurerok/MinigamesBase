@@ -101,7 +101,6 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         ConfigurationSection baseConfig = game.loadConfig(configFile);
         chatPrefix = baseConfig.getString("chat_prefix").replace('&', '§');
 
-        addDefaultCommands();
         ConfigParser.parseConfig(game, this, this, this, configFile, baseConfig);
 
         if (currentMap != null) defaultAndMapListeners = createDefaultAndMapListeners(currentMap.getListenerMap());
@@ -126,28 +125,6 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         result.add(gameGroupListener);
 
         return result;
-    }
-
-    private void addDefaultCommands() {
-        CommandConfig help =
-                new CommandConfig("help", "mg.base.help", "Shows command help", "/<command>", new HelpCommand(), null,
-                        "?");
-
-        addCommand(help);
-
-        CommandConfig gs =
-                new CommandConfig("gamestate", "mg.base.gamestate", "Changes the GameState of the current GameGroup",
-                        "/<command> <gamestate>", new GameStateCommand(), null, "gs", "gstate");
-
-        addCommand(gs);
-
-        CommandConfig cd = new CommandConfig("countdown", "mg.base.countdown", "Modifies countdowns",
-                "/<command> add/set <amount>\n" +
-                        "/<command> finish/cancel\n" +
-                        "/<command> start <name> <seconds> <localestub>", new CountdownCommand(), null, "cd", "cdown",
-                "cdwn");
-
-        addCommand(cd);
     }
 
     public void changeGameState(String gameStateName) {
