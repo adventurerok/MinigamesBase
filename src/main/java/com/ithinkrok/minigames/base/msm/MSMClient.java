@@ -27,6 +27,8 @@ public class MSMClient extends ChannelInboundHandlerAdapter {
     }
 
     public void start() {
+        System.out.println("Connecting to MSM server: " + address);
+
         EventLoopGroup workerGroup = createNioEventLoopGroup();
 
         Bootstrap b = createBootstrap();
@@ -49,7 +51,7 @@ public class MSMClient extends ChannelInboundHandlerAdapter {
     }
 
     void startRequest() {
-        System.out.println("Connected successfully and sending request");
+        System.out.println("Connected successfully and sending test packet");
 
         Packet test = new Packet((byte) 0, new MemoryConfiguration());
 
