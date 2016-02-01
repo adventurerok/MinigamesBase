@@ -1,7 +1,7 @@
 
 # TODO Specify the details of the minigames controller you connect to
 controller:
-  hostname: "minigames-controller.com"
+  hostname: "localhost"
   port: 30824
   private_key: "my_private_key_file.key"
 

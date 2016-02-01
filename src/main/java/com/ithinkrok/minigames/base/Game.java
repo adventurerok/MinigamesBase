@@ -2,10 +2,12 @@ package com.ithinkrok.minigames.base;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.google.common.collect.MapMaker;
+import com.google.common.net.HostAndPort;
 import com.ithinkrok.minigames.base.event.map.*;
 import com.ithinkrok.minigames.base.event.user.game.UserQuitEvent;
 import com.ithinkrok.minigames.base.event.user.world.*;
 import com.ithinkrok.minigames.base.map.GameMap;
+import com.ithinkrok.minigames.base.msm.MSMClient;
 import com.ithinkrok.minigames.base.team.Team;
 import com.ithinkrok.minigames.base.util.InvisiblePlayerAttacker;
 import com.ithinkrok.minigames.base.util.disguise.*;
@@ -82,6 +84,8 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     private final Path assetsDirectory;
     private final Path ramdiskDirectory;
 
+    private final MSMClient msmClient;
+
     private DisguiseController disguiseController;
 
     public Game(BasePlugin plugin, ConfigurationSection config) {
@@ -114,7 +118,16 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         unloadDefaultWorlds();
 
         setupDisguiseController();
+
+        String msmHost = config.getString("controller.hostname");
+        int msmPort = config.getInt("controller.port", 30824);
+
+        msmClient = new MSMClient(HostAndPort.fromParts(msmHost, msmPort));
+
+        msmClient.start();
     }
+
+
 
     private void unloadDefaultWorlds() {
         if (Bukkit.getWorlds().size() != 1) System.out.println("You should disable the nether/end worlds to save RAM!");
