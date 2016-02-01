@@ -1,4 +1,4 @@
-== Bugs/Ideas ==
+== ColonyWars Bugs/Ideas ==
 RECODE BUGS:
  - Quitting with only zombies on the server
  - Force showdown timers
@@ -9,6 +9,9 @@ RECODE BUGS:
 
 LOW PRIORITY / INVESTIGATE:
  - Zombie tab list names
+
+== Infected Bugs/Ideas ==
+BUGS/IDEAS:
 
 == New Idea ==
 Minigames Plugin:
@@ -21,15 +24,3 @@ Minigames controller:
  - Provides stats for all minigames (num players, etc...)
  - Manipulates bungee servers
  - Records minigame errors
-
-
- [18:15:48 WARN]: java.nio.file.FileAlreadyExistsException: ./lobby-0000
- [18:15:48 WARN]: 	at sun.nio.fs.UnixException.translateToIOException(UnixException.java:88)
- [18:15:48 WARN]: 	at sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:102)
- [18:15:48 WARN]: 	at sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:107)
- [18:15:48 WARN]: 	at sun.nio.fs.UnixFileSystemProvider.createSymbolicLink(UnixFileSystemProvider.java:457)
- [18:15:48 WARN]: 	at java.nio.file.Files.createSymbolicLink(Files.java:1043)
- [18:15:48 WARN]: 	at GameMap.loadMap(GameMap.java:93)
- [18:15:48 WARN]: 	at GameMap.<init>(GameMap.java:65)
- [18:15:48 WARN]: 	at GameGroup.changeMap(GameGroup.java:166)
- [18:15:48 WARN]: 	at GameGroup.changeMap(GameGroup.java:143)
