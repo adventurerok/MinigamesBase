@@ -1,18 +1,3 @@
-== ColonyWars Bugs/Ideas ==
-RECODE BUGS:
- - Quitting with only zombies on the server
- - Force showdown timers
- - Class descriptions
- - Handbook
- - Priest not getting stuff (but other priest in team did)
- - please don't spam other players
-
-LOW PRIORITY / INVESTIGATE:
- - Zombie tab list names
-
-== Infected Bugs/Ideas ==
-BUGS/IDEAS:
-
 == New Idea ==
 Minigames Plugin:
  - One specific command lets console execute commands
