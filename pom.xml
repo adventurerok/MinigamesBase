@@ -43,8 +43,8 @@
     <dependencies>
 
         <dependency>
-            <groupId>com.ithinkrok.minigames</groupId>
-            <artifactId>MinigamesCommon</artifactId>
+            <groupId>com.ithinkrok</groupId>
+            <artifactId>MSMCommon</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
