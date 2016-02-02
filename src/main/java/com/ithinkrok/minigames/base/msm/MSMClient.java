@@ -1,11 +1,11 @@
 package com.ithinkrok.minigames.base.msm;
 
 import com.google.common.net.HostAndPort;
-import com.ithinkrok.minigames.common.Packet;
-import com.ithinkrok.minigames.common.handler.MSMFrameDecoder;
-import com.ithinkrok.minigames.common.handler.MSMFrameEncoder;
-import com.ithinkrok.minigames.common.handler.MSMPacketDecoder;
-import com.ithinkrok.minigames.common.handler.MSMPacketEncoder;
+import com.ithinkrok.msm.common.Packet;
+import com.ithinkrok.msm.common.handler.MSMFrameDecoder;
+import com.ithinkrok.msm.common.handler.MSMFrameEncoder;
+import com.ithinkrok.msm.common.handler.MSMPacketDecoder;
+import com.ithinkrok.msm.common.handler.MSMPacketEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
