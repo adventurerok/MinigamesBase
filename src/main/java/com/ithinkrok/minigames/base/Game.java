@@ -2,37 +2,35 @@ package com.ithinkrok.minigames.base;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.google.common.collect.MapMaker;
-import com.google.common.net.HostAndPort;
-import com.ithinkrok.minigames.base.event.map.*;
-import com.ithinkrok.minigames.base.event.user.game.UserQuitEvent;
-import com.ithinkrok.minigames.base.event.user.world.*;
-import com.ithinkrok.minigames.base.map.GameMap;
-import com.ithinkrok.minigames.base.team.Team;
-import com.ithinkrok.minigames.base.util.InvisiblePlayerAttacker;
-import com.ithinkrok.minigames.base.util.disguise.*;
-import com.ithinkrok.minigames.base.util.io.FileLoader;
 import com.ithinkrok.minigames.base.command.Command;
 import com.ithinkrok.minigames.base.command.GameCommandHandler;
 import com.ithinkrok.minigames.base.database.DatabaseTask;
 import com.ithinkrok.minigames.base.database.DatabaseTaskRunner;
 import com.ithinkrok.minigames.base.database.Persistence;
+import com.ithinkrok.minigames.base.event.map.*;
 import com.ithinkrok.minigames.base.event.user.game.UserCommandEvent;
 import com.ithinkrok.minigames.base.event.user.game.UserJoinEvent;
+import com.ithinkrok.minigames.base.event.user.game.UserQuitEvent;
 import com.ithinkrok.minigames.base.event.user.inventory.UserInventoryClickEvent;
 import com.ithinkrok.minigames.base.event.user.inventory.UserInventoryCloseEvent;
 import com.ithinkrok.minigames.base.event.user.state.UserAttackedEvent;
 import com.ithinkrok.minigames.base.event.user.state.UserDamagedEvent;
 import com.ithinkrok.minigames.base.event.user.state.UserDeathEvent;
 import com.ithinkrok.minigames.base.event.user.state.UserFoodLevelChangeEvent;
+import com.ithinkrok.minigames.base.event.user.world.*;
 import com.ithinkrok.minigames.base.lang.LangFile;
+import com.ithinkrok.minigames.base.map.GameMap;
 import com.ithinkrok.minigames.base.task.GameRunnable;
 import com.ithinkrok.minigames.base.task.GameTask;
 import com.ithinkrok.minigames.base.task.TaskScheduler;
+import com.ithinkrok.minigames.base.team.Team;
 import com.ithinkrok.minigames.base.team.TeamIdentifier;
 import com.ithinkrok.minigames.base.user.UserResolver;
 import com.ithinkrok.minigames.base.util.EntityUtils;
 import com.ithinkrok.minigames.base.util.InventoryUtils;
-import com.ithinkrok.msm.bukkit.MSMClient;
+import com.ithinkrok.minigames.base.util.InvisiblePlayerAttacker;
+import com.ithinkrok.minigames.base.util.disguise.*;
+import com.ithinkrok.minigames.base.util.io.FileLoader;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -84,8 +82,6 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     private final Path assetsDirectory;
     private final Path ramdiskDirectory;
 
-    private final MSMClient msmClient;
-
     private DisguiseController disguiseController;
 
     public Game(BasePlugin plugin, ConfigurationSection config) {
@@ -118,13 +114,6 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         unloadDefaultWorlds();
 
         setupDisguiseController();
-
-        String msmHost = config.getString("controller.hostname");
-        int msmPort = config.getInt("controller.port", 30824);
-
-        msmClient = new MSMClient(HostAndPort.fromParts(msmHost, msmPort));
-
-        msmClient.start();
     }
 
 
