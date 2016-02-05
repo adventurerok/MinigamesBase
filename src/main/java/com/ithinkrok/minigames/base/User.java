@@ -26,7 +26,7 @@ import com.ithinkrok.minigames.base.user.UpgradeHandler;
 import com.ithinkrok.minigames.base.user.UserResolver;
 import com.ithinkrok.minigames.base.user.scoreboard.ScoreboardDisplay;
 import com.ithinkrok.minigames.base.user.scoreboard.ScoreboardHandler;
-import com.ithinkrok.minigames.base.util.ConfigUtils;
+import com.ithinkrok.msm.common.util.ConfigUtils;
 import com.ithinkrok.minigames.base.util.EventExecutor;
 import com.ithinkrok.minigames.base.util.InventoryUtils;
 import com.ithinkrok.minigames.base.util.SoundEffect;
@@ -48,7 +48,6 @@ import org.bukkit.util.Vector;
 import java.util.*;
 
 import static com.ithinkrok.minigames.base.util.InventoryUtils.createLeatherArmorItem;
-import static com.ithinkrok.minigames.base.util.InventoryUtils.setUnbreakable;
 
 /**
  * Created by paul on 31/12/15.

@@ -9,7 +9,7 @@ import com.ithinkrok.minigames.base.event.MinigamesEventHandler;
 import com.ithinkrok.minigames.base.event.game.GameStateChangedEvent;
 import com.ithinkrok.minigames.base.metadata.MapVote;
 import com.ithinkrok.minigames.base.team.Team;
-import com.ithinkrok.minigames.base.util.ConfigUtils;
+import com.ithinkrok.msm.common.util.ConfigUtils;
 import com.ithinkrok.minigames.base.util.CustomItemGiver;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;

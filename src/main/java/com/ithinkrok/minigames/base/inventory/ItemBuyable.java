@@ -4,7 +4,8 @@ import com.ithinkrok.minigames.base.User;
 import com.ithinkrok.minigames.base.inventory.event.CalculateItemForUserEvent;
 import com.ithinkrok.minigames.base.inventory.event.BuyablePurchaseEvent;
 import com.ithinkrok.minigames.base.item.CustomItem;
-import com.ithinkrok.minigames.base.util.ConfigUtils;
+import com.ithinkrok.minigames.base.util.MinigamesConfigs;
+import com.ithinkrok.msm.common.util.ConfigUtils;
 import com.ithinkrok.minigames.base.util.InventoryUtils;
 import com.ithinkrok.minigames.base.util.math.Calculator;
 import com.ithinkrok.minigames.base.util.math.ExpressionCalculator;
@@ -33,7 +34,7 @@ public class ItemBuyable extends Buyable {
     public void configure(ConfigurationSection config) {
         super.configure(config);
 
-        ItemStack purchase = ConfigUtils.getItemStack(config, "item");
+        ItemStack purchase = MinigamesConfigs.getItemStack(config, "item");
 
         if (purchase == null && config.contains("custom_item")) {
             customItem = config.getString("custom_item");

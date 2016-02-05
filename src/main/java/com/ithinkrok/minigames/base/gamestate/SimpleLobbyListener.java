@@ -17,7 +17,8 @@ import com.ithinkrok.minigames.base.event.user.state.UserDamagedEvent;
 import com.ithinkrok.minigames.base.event.user.state.UserFoodLevelChangeEvent;
 import com.ithinkrok.minigames.base.event.user.world.*;
 import com.ithinkrok.minigames.base.scoreboard.MapScoreboardHandler;
-import com.ithinkrok.minigames.base.util.ConfigUtils;
+import com.ithinkrok.minigames.base.util.MinigamesConfigs;
+import com.ithinkrok.msm.common.util.ConfigUtils;
 import com.ithinkrok.minigames.base.util.CountdownConfig;
 import com.ithinkrok.minigames.base.util.CustomItemGiver;
 import org.bukkit.Bukkit;
@@ -74,39 +75,33 @@ public class SimpleLobbyListener implements Listener {
     }
 
 
-
     private void configureCountdown(ConfigurationSection config) {
-        startCountdown = ConfigUtils.getCountdown(config, "");
+        startCountdown = MinigamesConfigs.getCountdown(config, "");
         minPlayersToStartGame = config.getInt("min_players");
         needsMorePlayersLocale = config.getString("needs_more_players_locale");
     }
 
     @MinigamesEventHandler
     public void onUserBreakBlock(UserBreakBlockEvent event) {
-        if(config.getBoolean("simple_lobby.deny_block_break", true)) event.setCancelled(true);
+        if (config.getBoolean("simple_lobby.deny_block_break", true)) event.setCancelled(true);
     }
 
     @MinigamesEventHandler
     public void onUserPlaceBlock(UserPlaceBlockEvent event) {
-        if(config.getBoolean("simple_lobby.deny_block_place", true)) event.setCancelled(true);
+        if (config.getBoolean("simple_lobby.deny_block_place", true)) event.setCancelled(true);
     }
 
     @MinigamesEventHandler(priority = MinigamesEventHandler.LOW)
     public void eventUserJoin(UserJoinEvent event) {
         userJoinLobby(event.getUser());
 
-        if(event.getUserGameGroup().hasActiveCountdown()) return;
+        if (event.getUserGameGroup().hasActiveCountdown()) return;
 
         resetCountdown(event.getUserGameGroup());
     }
 
-    @MinigamesEventHandler
-    public void onUserInventoryClick(UserInventoryClickEvent event) {
-        if(config.getBoolean("simple_lobby.deny_inventory_move", true)) event.setCancelled(true);
-    }
-
     private void userJoinLobby(User user) {
-        if(!user.isPlayer()) {
+        if (!user.isPlayer()) {
             user.removeNonPlayer();
             return;
         }
@@ -114,7 +109,7 @@ public class SimpleLobbyListener implements Listener {
         user.unDisguise();
 
         user.setInGame(false);
-        if(!user.isPlayer()) return;
+        if (!user.isPlayer()) return;
 
         user.setGameMode(GameMode.ADVENTURE);
         user.setSpectator(false);
@@ -132,9 +127,9 @@ public class SimpleLobbyListener implements Listener {
 
         String message;
 
-        for(int counter = 0; ; ++counter) {
+        for (int counter = 0; ; ++counter) {
             message = user.getGameGroup().getLocale(joinLobbyLocaleStub + "." + counter);
-            if(message == null) break;
+            if (message == null) break;
 
             user.sendMessage(message);
 
@@ -144,26 +139,35 @@ public class SimpleLobbyListener implements Listener {
         user.updateScoreboard();
     }
 
+    private void resetCountdown(GameGroup gameGroup) {
+        gameGroup.startCountdown(startCountdown);
+    }
+
+    @MinigamesEventHandler
+    public void onUserInventoryClick(UserInventoryClickEvent event) {
+        if (config.getBoolean("simple_lobby.deny_inventory_move", true)) event.setCancelled(true);
+    }
+
     @MinigamesEventHandler
     public void onGameStateChanged(GameStateChangedEvent event) {
-        if(!Objects.equals(event.getNewGameState(), gameState)) return;
+        if (!Objects.equals(event.getNewGameState(), gameState)) return;
 
         event.getGameGroup().changeMap(lobbyMapName);
 
         resetCountdown(event.getGameGroup());
 
-        for(User user : event.getGameGroup().getUsers()) {
+        for (User user : event.getGameGroup().getUsers()) {
             userJoinLobby(user);
         }
     }
 
     @MinigamesEventHandler
     public void onCountdownFinished(CountdownFinishedEvent event) {
-        if(!event.getCountdown().getName().equals(startCountdown.getName())) return;
+        if (!event.getCountdown().getName().equals(startCountdown.getName())) return;
 
         int userCount = event.getGameGroup().getUserCount();
-        if(userCount < 1) return;
-        if(userCount < minPlayersToStartGame) {
+        if (userCount < 1) return;
+        if (userCount < minPlayersToStartGame) {
             event.getGameGroup().sendLocale(needsMorePlayersLocale);
             resetCountdown(event.getGameGroup());
             return;
@@ -172,34 +176,24 @@ public class SimpleLobbyListener implements Listener {
         event.getGameGroup().changeGameState(nextGameState);
     }
 
-
-    private void resetCountdown(GameGroup gameGroup) {
-        gameGroup.startCountdown(startCountdown);
-    }
-
     @MinigamesEventHandler
     public void onUserPickupItem(UserPickupItemEvent event) {
-        if(config.getBoolean("simple_lobby.deny_pickup_items", true)) event.setCancelled(true);
+        if (config.getBoolean("simple_lobby.deny_pickup_items", true)) event.setCancelled(true);
     }
 
     @MinigamesEventHandler
     public void onUserDamaged(UserDamagedEvent event) {
-        if(config.getBoolean("simple_lobby.deny_damage", true)) event.setCancelled(true);
+        if (config.getBoolean("simple_lobby.deny_damage", true)) event.setCancelled(true);
     }
 
     @MinigamesEventHandler
     public void onUserInteract(UserInteractEvent event) {
-        if(event.getInteractType() == UserInteractEvent.InteractType.REPRESENTING) return;
-        if(event.hasItem() && event.getItem().getType() == Material.WRITTEN_BOOK) return;
+        if (event.getInteractType() == UserInteractEvent.InteractType.REPRESENTING) return;
+        if (event.hasItem() && event.getItem().getType() == Material.WRITTEN_BOOK) return;
 
-        if(!event.hasBlock() || !isRedstoneControl(event.getClickedBlock().getType())) {
+        if (!event.hasBlock() || !isRedstoneControl(event.getClickedBlock().getType())) {
             event.setCancelled(true);
         }
-    }
-
-    @MinigamesEventHandler
-    public void onUserFoodLevelChange(UserFoodLevelChangeEvent event) {
-        if(config.getBoolean("simple_lobby.deny_hunger_loss", true)) event.setFoodLevel(20);
     }
 
     private static boolean isRedstoneControl(Material type) {
@@ -220,15 +214,20 @@ public class SimpleLobbyListener implements Listener {
     }
 
     @MinigamesEventHandler
+    public void onUserFoodLevelChange(UserFoodLevelChangeEvent event) {
+        if (config.getBoolean("simple_lobby.deny_hunger_loss", true)) event.setFoodLevel(20);
+    }
+
+    @MinigamesEventHandler
     public void onUserDropItem(UserDropItemEvent event) {
-        if(!config.getBoolean("simple_lobby.deny_drop_items", true)) return;
+        if (!config.getBoolean("simple_lobby.deny_drop_items", true)) return;
 
         event.setCancelled(true);
     }
 
     @MinigamesEventHandler
     public void onCommand(CommandEvent event) {
-        if(!config.getBoolean("simple_lobby.deny_kill_command", true)) return;
+        if (!config.getBoolean("simple_lobby.deny_kill_command", true)) return;
         switch (event.getCommand().getCommand().toLowerCase()) {
             case "kill":
             case "suicide":
@@ -238,7 +237,7 @@ public class SimpleLobbyListener implements Listener {
 
     @MinigamesEventHandler
     public void onCreatureSpawn(MapCreatureSpawnEvent event) {
-        if(!config.getBoolean("simply_lobby.deny_creature_spawn", true)) return;
+        if (!config.getBoolean("simply_lobby.deny_creature_spawn", true)) return;
         if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.CUSTOM) return;
 
         event.setCancelled(true);
@@ -246,7 +245,7 @@ public class SimpleLobbyListener implements Listener {
 
     @MinigamesEventHandler
     public void onItemSpawn(MapItemSpawnEvent event) {
-        if(!config.getBoolean("simple_lobby.deny_item_spawn", true)) return;
+        if (!config.getBoolean("simple_lobby.deny_item_spawn", true)) return;
         event.setCancelled(true);
     }
 

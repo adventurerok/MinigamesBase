@@ -8,7 +8,8 @@ import com.ithinkrok.minigames.base.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.base.inventory.ClickableInventory;
 import com.ithinkrok.minigames.base.inventory.ClickableItem;
 import com.ithinkrok.minigames.base.inventory.event.UserClickItemEvent;
-import com.ithinkrok.minigames.base.util.ConfigUtils;
+import com.ithinkrok.minigames.base.util.MinigamesConfigs;
+import com.ithinkrok.msm.common.util.ConfigUtils;
 import com.ithinkrok.minigames.base.util.InventoryUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
@@ -22,7 +23,7 @@ import java.util.Map;
  */
 public class KitChooser implements Listener {
 
-    private Map<String, ItemStack> choosableKits = new LinkedHashMap<>();
+    private final Map<String, ItemStack> choosableKits = new LinkedHashMap<>();
 
     private String chosenLocale, alreadyLocale, titleLocale;
 
@@ -32,8 +33,8 @@ public class KitChooser implements Listener {
 
         ConfigurationSection kits = config.getConfigurationSection("choosable_kits");
 
-        for(String kitName : kits.getKeys(false)) {
-            choosableKits.put(kitName, ConfigUtils.getItemStack(kits, kitName));
+        for (String kitName : kits.getKeys(false)) {
+            choosableKits.put(kitName, MinigamesConfigs.getItemStack(kits, kitName));
         }
 
         chosenLocale = config.getString("chosen_locale", "kit_chooser.choose.chosen");
@@ -43,7 +44,7 @@ public class KitChooser implements Listener {
 
     @MinigamesEventHandler
     public void onRightClick(UserInteractEvent event) {
-        if(event.getInteractType() != UserInteractEvent.InteractType.RIGHT_CLICK) return;
+        if (event.getInteractType() != UserInteractEvent.InteractType.RIGHT_CLICK) return;
         event.setCancelled(true);
 
         User user = event.getUser();
@@ -51,17 +52,17 @@ public class KitChooser implements Listener {
         ClickableInventory inventory = new ClickableInventory(user.getLanguageLookup().getLocale(titleLocale));
 
 
-        for(String kitName : choosableKits.keySet()) {
+        for (String kitName : choosableKits.keySet()) {
             Kit kit = event.getUserGameGroup().getKit(kitName);
             ItemStack display = choosableKits.get(kitName);
-            if(InventoryUtils.getDisplayName(display) == null) {
+            if (InventoryUtils.getDisplayName(display) == null) {
                 InventoryUtils.setItemNameAndLore(display, kit.getFormattedName());
             }
 
             ClickableItem item = new ClickableItem(display.clone()) {
                 @Override
                 public void onClick(UserClickItemEvent event) {
-                    if(kitName.equals(event.getUser().getKitName())) {
+                    if (kitName.equals(event.getUser().getKitName())) {
                         event.getUser().sendLocale(alreadyLocale, kit.getFormattedName());
                         return;
                     }

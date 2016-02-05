@@ -3,7 +3,7 @@ package com.ithinkrok.minigames.base.schematic;
 import com.flowpowered.nbt.*;
 import com.flowpowered.nbt.stream.NBTInputStream;
 import com.ithinkrok.minigames.base.Nameable;
-import com.ithinkrok.minigames.base.util.ConfigUtils;
+import com.ithinkrok.msm.common.util.ConfigUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.util.Vector;
 

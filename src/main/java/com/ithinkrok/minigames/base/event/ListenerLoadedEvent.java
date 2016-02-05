@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.base.event;
 
-import com.ithinkrok.minigames.base.util.ConfigUtils;
+import com.ithinkrok.msm.common.util.ConfigUtils;
 import org.bukkit.configuration.ConfigurationSection;
 
 /**

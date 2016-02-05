@@ -4,7 +4,8 @@ import com.ithinkrok.minigames.base.User;
 import com.ithinkrok.minigames.base.event.user.inventory.UserInventoryClickEvent;
 import com.ithinkrok.minigames.base.inventory.event.CalculateItemForUserEvent;
 import com.ithinkrok.minigames.base.inventory.event.UserClickItemEvent;
-import com.ithinkrok.minigames.base.util.ConfigUtils;
+import com.ithinkrok.minigames.base.util.MinigamesConfigs;
+import com.ithinkrok.msm.common.util.ConfigUtils;
 import com.ithinkrok.minigames.base.util.InventoryUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.Inventory;
@@ -32,9 +33,9 @@ public class ClickableInventory {
 
     @SuppressWarnings("unchecked")
     public void loadFromConfig(List<ConfigurationSection> items) {
-        for(ConfigurationSection config : items) {
+        for (ConfigurationSection config : items) {
             String className = config.getString("class");
-            ItemStack display = ConfigUtils.getItemStack(config, "display");
+            ItemStack display = MinigamesConfigs.getItemStack(config, "display");
             try {
                 Class<? extends ClickableItem> itemClass = (Class<? extends ClickableItem>) Class.forName(className);
 
@@ -42,7 +43,7 @@ public class ClickableInventory {
                 ClickableItem item = constructor.newInstance(display);
 
                 ConfigurationSection itemConfig = config.getConfigurationSection("config");
-                if(itemConfig != null) item.configure(itemConfig);
+                if (itemConfig != null) item.configure(itemConfig);
 
                 addItem(item);
             } catch (ReflectiveOperationException | ClassCastException e) {
@@ -51,12 +52,12 @@ public class ClickableInventory {
         }
     }
 
-    public ClickableInventory(String title) {
-        this.title = title;
-    }
-
     public void addItem(ClickableItem item) {
         items.put(item.getIdentifier(), item);
+    }
+
+    public ClickableInventory(String title) {
+        this.title = title;
     }
 
     public Inventory createInventory(User user) {
@@ -66,12 +67,12 @@ public class ClickableInventory {
     }
 
     public Inventory populateInventory(Inventory inventory, User user) {
-        for(ClickableItem item : items.values()) {
+        for (ClickableItem item : items.values()) {
             CalculateItemForUserEvent event = new CalculateItemForUserEvent(user, this, item);
 
             item.onCalculateItem(event);
-            if(event.getDisplay() == null) continue;
-            if(InventoryUtils.getIdentifier(event.getDisplay()) == -1) {
+            if (event.getDisplay() == null) continue;
+            if (InventoryUtils.getIdentifier(event.getDisplay()) == -1) {
                 event.setDisplay(InventoryUtils.addIdentifier(event.getDisplay().clone(), item.getIdentifier()));
             }
 
@@ -84,11 +85,11 @@ public class ClickableInventory {
     public void inventoryClick(UserInventoryClickEvent event) {
         event.setCancelled(true);
 
-        if(InventoryUtils.isEmpty(event.getItemInSlot())) return;
+        if (InventoryUtils.isEmpty(event.getItemInSlot())) return;
         int identifier = InventoryUtils.getIdentifier(event.getItemInSlot());
 
         ClickableItem item = items.get(identifier);
-        if(item == null) return;
+        if (item == null) return;
 
         item.onClick(new UserClickItemEvent(event.getUser(), this, item, event.getClickType()));
     }
