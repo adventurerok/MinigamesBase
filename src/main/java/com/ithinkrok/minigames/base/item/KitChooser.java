@@ -10,8 +10,8 @@ import com.ithinkrok.minigames.base.inventory.event.UserClickItemEvent;
 import com.ithinkrok.minigames.base.util.InventoryUtils;
 import com.ithinkrok.minigames.base.util.MinigamesConfigs;
 import com.ithinkrok.util.event.CustomEventHandler;
+import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.LinkedHashMap;
@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * Created by paul on 11/01/16.
  */
-public class KitChooser implements Listener {
+public class KitChooser implements CustomListener {
 
     private final Map<String, ItemStack> choosableKits = new LinkedHashMap<>();
 

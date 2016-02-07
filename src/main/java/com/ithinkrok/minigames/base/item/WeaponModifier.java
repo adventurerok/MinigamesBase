@@ -8,9 +8,9 @@ import com.ithinkrok.minigames.base.lang.LanguageLookup;
 import com.ithinkrok.minigames.base.util.math.Calculator;
 import com.ithinkrok.minigames.base.util.math.ExpressionCalculator;
 import com.ithinkrok.util.event.CustomEventHandler;
+import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * Created by paul on 03/01/16.
  */
-public class WeaponModifier implements Listener {
+public class WeaponModifier implements CustomListener {
 
     private static final double HEALTH_PER_HEART = 2;
     private static final double TICKS_PER_SECOND = 20;
@@ -33,11 +33,11 @@ public class WeaponModifier implements Listener {
 
     private Calculator fireCalculator;
 
-    private List<EffectModifier> enemyEffects = new ArrayList<>();
-    private List<EffectModifier> selfEffects = new ArrayList<>();
+    private final List<EffectModifier> enemyEffects = new ArrayList<>();
+    private final List<EffectModifier> selfEffects = new ArrayList<>();
 
     @CustomEventHandler
-    public void onListenerEnable(ListenerLoadedEvent event) {
+    public void onListenerEnable(ListenerLoadedEvent<?, ?> event) {
         if (!event.hasConfig()) throw new RuntimeException("A WeaponModifier requires a config");
 
         load(event.getConfig());
@@ -115,10 +115,10 @@ public class WeaponModifier implements Listener {
     }
 
     private class EffectModifier {
-        private PotionEffectType effectType;
-        private Calculator durationCalculator;
-        private Calculator levelCalculator;
-        private Calculator showInLore;
+        private final PotionEffectType effectType;
+        private final Calculator durationCalculator;
+        private final Calculator levelCalculator;
+        private final Calculator showInLore;
 
         public EffectModifier(PotionEffectType effectType, ConfigurationSection config) {
             this.effectType = effectType;

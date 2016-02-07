@@ -8,10 +8,10 @@ import com.ithinkrok.minigames.base.inventory.ClickableItem;
 import com.ithinkrok.minigames.base.inventory.event.UserClickItemEvent;
 import com.ithinkrok.minigames.base.util.InventoryUtils;
 import com.ithinkrok.util.event.CustomEventHandler;
+import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
-import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
@@ -20,12 +20,12 @@ import java.util.UUID;
 /**
  * Created by paul on 17/01/16.
  */
-public class SpectateChooser implements Listener {
+public class SpectateChooser implements CustomListener {
 
     private String titleLocale;
 
     @CustomEventHandler
-    public void onListenerLoaded(ListenerLoadedEvent event) {
+    public void onListenerLoaded(ListenerLoadedEvent<?, ?> event) {
         ConfigurationSection config = event.getConfig();
         if(config == null) config = new MemoryConfiguration();
 

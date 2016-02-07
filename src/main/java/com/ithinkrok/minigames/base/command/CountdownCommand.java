@@ -3,12 +3,12 @@ package com.ithinkrok.minigames.base.command;
 import com.ithinkrok.minigames.base.Countdown;
 import com.ithinkrok.minigames.base.event.CommandEvent;
 import com.ithinkrok.util.event.CustomEventHandler;
-import org.bukkit.event.Listener;
+import com.ithinkrok.util.event.CustomListener;
 
 /**
  * Created by paul on 19/01/16.
  */
-public class CountdownCommand implements Listener{
+public class CountdownCommand implements CustomListener {
 
 
     @CustomEventHandler

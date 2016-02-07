@@ -10,9 +10,9 @@ import com.ithinkrok.minigames.base.team.Team;
 import com.ithinkrok.minigames.base.team.TeamIdentifier;
 import com.ithinkrok.minigames.base.util.InventoryUtils;
 import com.ithinkrok.util.event.CustomEventHandler;
+import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Created by paul on 07/01/16.
  */
-public class TeamChooser implements Listener {
+public class TeamChooser implements CustomListener {
 
     private List<String> choosable;
     private Material chooserMaterial;

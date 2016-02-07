@@ -20,11 +20,11 @@ import com.ithinkrok.minigames.base.util.CountdownConfig;
 import com.ithinkrok.minigames.base.util.CustomItemGiver;
 import com.ithinkrok.minigames.base.util.MinigamesConfigs;
 import com.ithinkrok.util.event.CustomEventHandler;
+import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.util.Objects;
@@ -32,7 +32,7 @@ import java.util.Objects;
 /**
  * Created by paul on 30/01/16.
  */
-public class SimpleLobbyListener implements Listener {
+public class SimpleLobbyListener implements CustomListener {
 
     protected String quitLocale;
     protected String joinLocale;

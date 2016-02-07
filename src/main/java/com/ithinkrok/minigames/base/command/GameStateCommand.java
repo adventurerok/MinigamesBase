@@ -3,12 +3,12 @@ package com.ithinkrok.minigames.base.command;
 import com.ithinkrok.minigames.base.GameState;
 import com.ithinkrok.minigames.base.event.CommandEvent;
 import com.ithinkrok.util.event.CustomEventHandler;
-import org.bukkit.event.Listener;
+import com.ithinkrok.util.event.CustomListener;
 
 /**
  * Created by paul on 13/01/16.
  */
-public class GameStateCommand implements Listener {
+public class GameStateCommand implements CustomListener {
 
 
     @CustomEventHandler

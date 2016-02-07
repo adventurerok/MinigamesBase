@@ -9,9 +9,9 @@ import com.ithinkrok.minigames.base.inventory.event.UserClickItemEvent;
 import com.ithinkrok.minigames.base.metadata.MapVote;
 import com.ithinkrok.minigames.base.util.InventoryUtils;
 import com.ithinkrok.util.event.CustomEventHandler;
+import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -19,14 +19,14 @@ import java.util.List;
 /**
  * Created by paul on 04/01/16.
  */
-public class MapVoter implements Listener {
+public class MapVoter implements CustomListener {
 
     private List<String> votable;
     private Material mapMaterial;
     private String voteLocale, transferLocale, alreadyLocale;
 
     @CustomEventHandler
-    public void onListenerEnabled(ListenerLoadedEvent event) {
+    public void onListenerEnabled(ListenerLoadedEvent<?, ?> event) {
         ConfigurationSection config = event.getConfig();
 
         votable = config.getStringList("votable_maps");

@@ -2,12 +2,12 @@ package com.ithinkrok.minigames.base.item;
 
 import com.ithinkrok.minigames.base.event.user.world.UserInteractEvent;
 import com.ithinkrok.util.event.CustomEventHandler;
-import org.bukkit.event.Listener;
+import com.ithinkrok.util.event.CustomListener;
 
 /**
  * Created by paul on 17/01/16.
  */
-public class InvisibleUserToggle implements Listener {
+public class InvisibleUserToggle implements CustomListener {
 
     @CustomEventHandler
     public void onUserInteract(UserInteractEvent event) {

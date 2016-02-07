@@ -11,8 +11,8 @@ import com.ithinkrok.minigames.base.team.Team;
 import com.ithinkrok.minigames.base.util.CustomItemGiver;
 import com.ithinkrok.msm.common.util.ConfigUtils;
 import com.ithinkrok.util.event.CustomEventHandler;
+import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,7 @@ import java.util.Random;
 /**
  * Created by paul on 30/01/16.
  */
-public class SimpleGameStartListener implements Listener {
+public class SimpleGameStartListener implements CustomListener {
 
     protected final Random random = new Random();
 

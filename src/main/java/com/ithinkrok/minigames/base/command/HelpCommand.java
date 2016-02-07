@@ -2,9 +2,9 @@ package com.ithinkrok.minigames.base.command;
 
 import com.ithinkrok.minigames.base.event.CommandEvent;
 import com.ithinkrok.util.event.CustomEventHandler;
+import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
 import java.util.*;
@@ -12,7 +12,7 @@ import java.util.*;
 /**
  * Created by paul on 25/01/16.
  */
-public class HelpCommand implements Listener {
+public class HelpCommand implements CustomListener {
 
     @CustomEventHandler
     public void onCommand(CommandEvent event) {

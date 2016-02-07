@@ -7,13 +7,13 @@ import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.base.event.user.game.UserJoinEvent;
 import com.ithinkrok.minigames.base.util.CustomItemGiver;
 import com.ithinkrok.util.event.CustomEventHandler;
+import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.event.Listener;
 
 /**
  * Created by paul on 31/01/16.
  */
-public class SimpleInGameListener implements Listener {
+public class SimpleInGameListener implements CustomListener {
 
     protected CustomItemGiver spectatorItems;
 
