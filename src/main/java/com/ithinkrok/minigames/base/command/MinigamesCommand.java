@@ -5,17 +5,15 @@ import com.ithinkrok.minigames.base.Kit;
 import com.ithinkrok.minigames.base.User;
 import com.ithinkrok.minigames.base.lang.Messagable;
 import com.ithinkrok.minigames.base.team.TeamIdentifier;
+import com.ithinkrok.util.command.CustomCommand;
 
 import java.util.*;
 
 /**
  * Created by paul on 12/01/16.
  */
-public class MinigamesCommand {
+public class MinigamesCommand extends CustomCommand {
 
-    private final String command;
-    private final Map<String, Object> params;
-    private final List<Object> defaultArgs;
 
     private final GameGroup gameGroup;
     private final User user;
@@ -25,119 +23,30 @@ public class MinigamesCommand {
     @SuppressWarnings("unchecked")
     public MinigamesCommand(String command, Map<String, Object> params, GameGroup gameGroup, User user,
                             TeamIdentifier teamIdentifier, Kit kit) {
-        this.command = command;
-        this.params = params;
+        super(command, params, (List<Object>) params.get("default"));
+
         this.gameGroup = gameGroup;
         this.user = user;
         this.teamIdentifier = teamIdentifier;
         this.kit = kit;
-
-        this.defaultArgs = (List<Object>) params.get("default");
     }
 
-    public List<Object> getDefaultArgs() {
-        return defaultArgs;
-    }
 
-    public boolean hasArg(int index) {
-        return defaultArgs.size() > index;
-    }
-
-    public double getDoubleArg(int index, double def) {
-        try {
-            return ((Number) defaultArgs.get(index)).doubleValue();
-        } catch (Exception e) {
-            return def;
-        }
-    }
-
-    public boolean hasDoubleArg(int index) {
-        return hasArg(index) && defaultArgs.get(index) instanceof Number;
-    }
-
-    public int getIntArg(int index, int def) {
-        try {
-            return ((Number) defaultArgs.get(index)).intValue();
-        } catch (Exception e) {
-            return def;
-        }
-    }
-
-    public boolean hasIntArg(int index) {
-        if(!hasDoubleArg(index)) return false;
-
-        Number num = (Number) defaultArgs.get(index);
-        return num.intValue() == num.doubleValue();
-    }
-
-    public boolean getBooleanArg(int index, boolean def) {
-        try {
-            return ((Boolean) defaultArgs.get(index));
-        } catch (Exception e) {
-            return def;
-        }
-    }
-
-    public boolean hasBooleanArg(int index) {
-        return hasArg(index) && defaultArgs.get(index) instanceof Boolean;
-    }
-
-    public boolean hasParameter(String name) {
-        return params.containsKey(name);
-    }
-
-    public double getDoubleParam(String name, double def) {
-        try {
-            return ((Number) params.get(name)).doubleValue();
-        } catch (Exception e) {
-            return def;
-        }
-    }
-
-    public int getIntParam(String name, int def) {
-        try {
-            return ((Number) params.get(name)).intValue();
-        } catch (Exception e) {
-            return def;
-        }
-    }
-
+    @Override
     public MinigamesCommand subCommand() {
-        if (defaultArgs.size() < 1) return null;
+        if (getArgumentCount() < 1) return null;
+
 
         List<Object> newArgs = new ArrayList<>();
 
-        for (int index = 1; index < defaultArgs.size(); ++index) newArgs.add(defaultArgs.get(index));
+        for (int index = 1; index < getArgumentCount(); ++index) newArgs.add(getArg(index, null));
 
-        Map<String, Object> newParams = new HashMap<>(params);
+        Map<String, Object> newParams = new HashMap<>(getParameters());
         newParams.put("default", newArgs);
 
         return new MinigamesCommand(getStringArg(0, null), newParams, gameGroup, user, teamIdentifier, kit);
     }
 
-    public String getStringArg(int index, String def) {
-        if (index >= defaultArgs.size()) return def;
-        Object o = defaultArgs.get(index);
-
-        return o != null ? o.toString() : def;
-    }
-
-    public boolean getBooleanParam(String name, boolean def) {
-        try {
-            return (Boolean) params.get(name);
-        } catch (Exception e) {
-            return def;
-        }
-    }
-
-    public String getStringParam(String name, String def) {
-        Object o = params.get(name);
-        return o != null ? o.toString() : def;
-    }
-
-    public String getCommand() {
-        return command;
-    }
 
     public GameGroup getGameGroup() {
         return gameGroup;
@@ -163,7 +72,7 @@ public class MinigamesCommand {
     }
 
     public boolean requireArgumentCount(Messagable sender, int minArgs) {
-        if (defaultArgs.size() >= minArgs) return true;
+        if (getArgumentCount() >= minArgs) return true;
 
         sender.sendLocale("command.requires.arguments", minArgs);
         return false;
