@@ -1,9 +1,9 @@
 package com.ithinkrok.minigames.base.metadata;
 
+import com.ithinkrok.minigames.base.event.game.GameStateChangedEvent;
 import com.ithinkrok.minigames.base.event.game.MapChangedEvent;
 import com.ithinkrok.minigames.base.task.GameTask;
 import com.ithinkrok.minigames.base.task.TaskList;
-import com.ithinkrok.minigames.base.event.game.GameStateChangedEvent;
 
 /**
  * Created by paul on 04/01/16.

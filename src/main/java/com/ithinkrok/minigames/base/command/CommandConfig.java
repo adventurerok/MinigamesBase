@@ -4,7 +4,6 @@ import com.ithinkrok.minigames.base.Nameable;
 import com.ithinkrok.minigames.base.util.io.ListenerLoader;
 import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
 import java.util.Arrays;

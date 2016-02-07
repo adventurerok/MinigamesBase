@@ -10,7 +10,6 @@ import com.ithinkrok.minigames.base.schematic.Schematic;
 import com.ithinkrok.minigames.base.team.TeamIdentifier;
 import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.event.Listener;
 
 /**
  * Created by paul on 04/01/16.

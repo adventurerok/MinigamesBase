@@ -12,7 +12,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
 import java.util.Collection;

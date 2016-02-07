@@ -1,8 +1,8 @@
 package com.ithinkrok.minigames.base.event.map;
 
 import com.ithinkrok.minigames.base.GameGroup;
-import com.ithinkrok.minigames.base.map.GameMap;
 import com.ithinkrok.minigames.base.event.game.GameEvent;
+import com.ithinkrok.minigames.base.map.GameMap;
 
 /**
  * Created by paul on 05/01/16.

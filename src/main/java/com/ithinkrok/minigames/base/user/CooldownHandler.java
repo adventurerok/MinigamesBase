@@ -1,10 +1,10 @@
 package com.ithinkrok.minigames.base.user;
 
 import com.ithinkrok.minigames.base.User;
+import com.ithinkrok.minigames.base.event.user.game.UserAbilityCooldownEvent;
 import com.ithinkrok.minigames.base.task.GameTask;
 import com.ithinkrok.minigames.base.task.TaskList;
 import com.ithinkrok.minigames.base.util.SoundEffect;
-import com.ithinkrok.minigames.base.event.user.game.UserAbilityCooldownEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 

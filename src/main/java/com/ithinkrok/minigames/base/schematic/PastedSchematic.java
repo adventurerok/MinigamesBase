@@ -2,8 +2,8 @@ package com.ithinkrok.minigames.base.schematic;
 
 import com.ithinkrok.minigames.base.map.GameMap;
 import com.ithinkrok.minigames.base.schematic.event.SchematicDestroyedEvent;
-import com.ithinkrok.minigames.base.task.GameTask;
 import com.ithinkrok.minigames.base.schematic.event.SchematicFinishedEvent;
+import com.ithinkrok.minigames.base.task.GameTask;
 import com.ithinkrok.minigames.base.util.BoundingBox;
 import com.ithinkrok.util.event.CustomEventExecutor;
 import com.ithinkrok.util.event.CustomListener;
@@ -16,7 +16,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.FallingBlock;
-import org.bukkit.event.Listener;
 import org.bukkit.util.Vector;
 
 import java.util.*;

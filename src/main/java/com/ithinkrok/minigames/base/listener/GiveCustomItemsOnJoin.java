@@ -1,9 +1,9 @@
 package com.ithinkrok.minigames.base.listener;
 
 import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
-import com.ithinkrok.util.event.CustomEventHandler;
-import com.ithinkrok.minigames.base.util.CustomItemGiver;
 import com.ithinkrok.minigames.base.event.user.game.UserJoinEvent;
+import com.ithinkrok.minigames.base.util.CustomItemGiver;
+import com.ithinkrok.util.event.CustomEventHandler;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
 

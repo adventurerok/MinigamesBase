@@ -4,7 +4,6 @@ import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
 import com.ithinkrok.util.event.CustomEventExecutor;
 import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.event.Listener;
 
 /**
  * Created by paul on 04/01/16.

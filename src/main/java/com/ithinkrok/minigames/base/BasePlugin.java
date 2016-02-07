@@ -1,9 +1,9 @@
 package com.ithinkrok.minigames.base;
 
+import com.ithinkrok.minigames.base.database.BooleanUserValue;
 import com.ithinkrok.minigames.base.database.DoubleUserValue;
 import com.ithinkrok.minigames.base.database.IntUserValue;
 import com.ithinkrok.minigames.base.database.StringUserValue;
-import com.ithinkrok.minigames.base.database.BooleanUserValue;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
 
