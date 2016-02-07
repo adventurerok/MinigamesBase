@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.base.event;
 
-import com.ithinkrok.minigames.base.command.Command;
+import com.ithinkrok.minigames.base.command.MinigamesCommand;
 import com.ithinkrok.minigames.base.command.CommandSender;
 
 /**
@@ -8,7 +8,7 @@ import com.ithinkrok.minigames.base.command.CommandSender;
  */
 public interface CommandEvent extends MinigamesEvent {
 
-    Command getCommand();
+    MinigamesCommand getCommand();
     CommandSender getCommandSender();
 
     boolean isHandled();

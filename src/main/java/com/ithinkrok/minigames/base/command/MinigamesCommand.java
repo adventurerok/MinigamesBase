@@ -11,7 +11,7 @@ import java.util.*;
 /**
  * Created by paul on 12/01/16.
  */
-public class Command {
+public class MinigamesCommand {
 
     private final String command;
     private final Map<String, Object> params;
@@ -23,8 +23,8 @@ public class Command {
     private final Kit kit;
 
     @SuppressWarnings("unchecked")
-    public Command(String command, Map<String, Object> params, GameGroup gameGroup, User user,
-                   TeamIdentifier teamIdentifier, Kit kit) {
+    public MinigamesCommand(String command, Map<String, Object> params, GameGroup gameGroup, User user,
+                            TeamIdentifier teamIdentifier, Kit kit) {
         this.command = command;
         this.params = params;
         this.gameGroup = gameGroup;
@@ -102,7 +102,7 @@ public class Command {
         }
     }
 
-    public Command subCommand() {
+    public MinigamesCommand subCommand() {
         if (defaultArgs.size() < 1) return null;
 
         List<Object> newArgs = new ArrayList<>();
@@ -112,7 +112,7 @@ public class Command {
         Map<String, Object> newParams = new HashMap<>(params);
         newParams.put("default", newArgs);
 
-        return new Command(getStringArg(0, null), newParams, gameGroup, user, teamIdentifier, kit);
+        return new MinigamesCommand(getStringArg(0, null), newParams, gameGroup, user, teamIdentifier, kit);
     }
 
     public String getStringArg(int index, String def) {

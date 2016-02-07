@@ -18,7 +18,7 @@ public class HelpCommand implements CustomListener {
     public void onCommand(CommandEvent event) {
         if (!event.getCommand().requireGameGroup(event.getCommandSender())) return;
 
-        Command command = event.getCommand();
+        MinigamesCommand command = event.getCommand();
         CommandSender sender = event.getCommandSender();
 
         if (event.getCommand().hasArg(0) && !event.getCommand().hasIntArg(0)) {
@@ -31,7 +31,7 @@ public class HelpCommand implements CustomListener {
         //TODO Split into pages
     }
 
-    private void onUsageCommand(CommandSender sender, Command command) {
+    private void onUsageCommand(CommandSender sender, MinigamesCommand command) {
         String commandName = command.getStringArg(0, "unspecified").toLowerCase();
         CommandConfig commandConfig = command.getGameGroup().getCommand(commandName);
 
@@ -57,7 +57,7 @@ public class HelpCommand implements CustomListener {
         sender.sendLocaleNoPrefix("command.help.usage", commandName, usage, desc);
     }
 
-    private void onListCommand(CommandSender sender, Command command) {
+    private void onListCommand(CommandSender sender, MinigamesCommand command) {
         //Commands are stored as a TreeMap so no need to sort
         Map<String, CommandConfig> commands = command.getGameGroup().getCommands();
 

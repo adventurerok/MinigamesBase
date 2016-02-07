@@ -14,7 +14,7 @@ public class CountdownCommand implements CustomListener {
     @CustomEventHandler
     public void onCommand(CommandEvent event) {
         CommandSender sender = event.getCommandSender();
-        Command command = event.getCommand();
+        MinigamesCommand command = event.getCommand();
 
         if(!command.requireGameGroup(sender)) return;
         if(!command.requireArgumentCount(sender, 1)){

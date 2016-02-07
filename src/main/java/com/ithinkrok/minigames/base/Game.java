@@ -2,7 +2,7 @@ package com.ithinkrok.minigames.base;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.google.common.collect.MapMaker;
-import com.ithinkrok.minigames.base.command.Command;
+import com.ithinkrok.minigames.base.command.MinigamesCommand;
 import com.ithinkrok.minigames.base.command.GameCommandHandler;
 import com.ithinkrok.minigames.base.database.DatabaseTask;
 import com.ithinkrok.minigames.base.database.DatabaseTaskRunner;
@@ -529,7 +529,7 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
                 kit = sender.getGameGroup().getKit(arguments.get("k").toString());
             }
 
-            Command gameCommand = new Command(commandName, arguments, sender.getGameGroup(), user, teamIdentifier, kit);
+            MinigamesCommand gameCommand = new MinigamesCommand(commandName, arguments, sender.getGameGroup(), user, teamIdentifier, kit);
 
             UserCommandEvent commandEvent = new UserCommandEvent(sender, gameCommand);
 

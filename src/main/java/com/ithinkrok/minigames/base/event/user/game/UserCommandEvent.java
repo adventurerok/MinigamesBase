@@ -1,7 +1,7 @@
 package com.ithinkrok.minigames.base.event.user.game;
 
 import com.ithinkrok.minigames.base.User;
-import com.ithinkrok.minigames.base.command.Command;
+import com.ithinkrok.minigames.base.command.MinigamesCommand;
 import com.ithinkrok.minigames.base.event.CommandEvent;
 import com.ithinkrok.minigames.base.event.user.UserEvent;
 
@@ -10,7 +10,7 @@ import com.ithinkrok.minigames.base.event.user.UserEvent;
  */
 public class UserCommandEvent extends UserEvent implements CommandEvent {
 
-    private final Command command;
+    private final MinigamesCommand command;
 
     /**
      * This is true by default if there is a CommandConfig for this command.
@@ -22,13 +22,13 @@ public class UserCommandEvent extends UserEvent implements CommandEvent {
      */
     private boolean validCommand = true;
 
-    public UserCommandEvent(User user, Command command) {
+    public UserCommandEvent(User user, MinigamesCommand command) {
         super(user);
         this.command = command;
     }
 
     @Override
-    public Command getCommand() {
+    public MinigamesCommand getCommand() {
         return command;
     }
 

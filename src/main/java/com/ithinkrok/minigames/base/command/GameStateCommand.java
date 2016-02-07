@@ -14,7 +14,7 @@ public class GameStateCommand implements CustomListener {
     @CustomEventHandler
     public void onCommand(CommandEvent event) {
         CommandSender sender = event.getCommandSender();
-        Command command = event.getCommand();
+        MinigamesCommand command = event.getCommand();
 
         if(!command.requireGameGroup(sender) || !command.requireArgumentCount(sender, 1)){
             event.setValidCommand(false);

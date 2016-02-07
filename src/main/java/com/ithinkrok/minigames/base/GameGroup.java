@@ -2,7 +2,7 @@ package com.ithinkrok.minigames.base;
 
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.MutableClassToInstanceMap;
-import com.ithinkrok.minigames.base.command.Command;
+import com.ithinkrok.minigames.base.command.MinigamesCommand;
 import com.ithinkrok.minigames.base.command.CommandConfig;
 import com.ithinkrok.minigames.base.database.DatabaseTask;
 import com.ithinkrok.minigames.base.database.DatabaseTaskRunner;
@@ -640,7 +640,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
             if (commandConfig == null) return;
             event.setHandled(true);
 
-            if (!Command.requirePermission(event.getCommandSender(), commandConfig.getPermission())) return;
+            if (!MinigamesCommand.requirePermission(event.getCommandSender(), commandConfig.getPermission())) return;
             if (commandConfig.hasOthersPermission() && !event.getCommand()
                     .requireOthersPermission(event.getCommandSender(), commandConfig.getOthersPermission())) return;
 
