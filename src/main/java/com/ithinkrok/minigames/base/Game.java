@@ -3,7 +3,7 @@ package com.ithinkrok.minigames.base;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.google.common.collect.MapMaker;
 import com.ithinkrok.minigames.base.command.MinigamesCommand;
-import com.ithinkrok.minigames.base.command.GameCommandHandler;
+import com.ithinkrok.util.command.CommandUtils;
 import com.ithinkrok.minigames.base.database.DatabaseTask;
 import com.ithinkrok.minigames.base.database.DatabaseTaskRunner;
 import com.ithinkrok.minigames.base.database.Persistence;
@@ -500,11 +500,11 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         public void eventCommandPreprocess(PlayerCommandPreprocessEvent event) {
             User sender = getUser(event.getPlayer().getUniqueId());
 
-            List<String> correctedArgs = GameCommandHandler.splitStringIntoArguments(event.getMessage());
+            List<String> correctedArgs = CommandUtils.splitStringIntoArguments(event.getMessage());
             String commandName = correctedArgs.get(0).toLowerCase();
             correctedArgs.remove(0);
 
-            Map<String, Object> arguments = GameCommandHandler.parseArgumentListToMap(correctedArgs);
+            Map<String, Object> arguments = CommandUtils.parseArgumentListToMap(correctedArgs);
 
             User user = sender;
             TeamIdentifier teamIdentifier;
