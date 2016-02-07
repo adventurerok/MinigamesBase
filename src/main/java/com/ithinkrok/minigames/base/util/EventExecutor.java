@@ -20,7 +20,7 @@ public class EventExecutor {
         executeListeners(event, getMethodExecutorMap(event, listeners));
     }
 
-    private static void executeListeners(MinigamesEvent event, SortedMap<MethodExecutor, Listener> map) {
+    private static void executeListeners(MinigamesEvent event, Map<MethodExecutor, Listener> map) {
         for (Map.Entry<MethodExecutor, Listener> entry : map.entrySet()) {
             try {
                 entry.getKey().execute(entry.getValue(), event);
@@ -31,8 +31,8 @@ public class EventExecutor {
         }
     }
 
-    private static SortedMap<MethodExecutor, Listener> getMethodExecutorMap(MinigamesEvent event,
-                                                                            Listener... listeners) {
+    private static Map<MethodExecutor, Listener> getMethodExecutorMap(MinigamesEvent event,
+                                                                      Listener... listeners) {
         SortedMap<MethodExecutor, Listener> map = new TreeMap<>();
 
         for (Listener listener : listeners) {
@@ -45,7 +45,7 @@ public class EventExecutor {
         return map;
     }
 
-    private static Collection<MethodExecutor> getMethodExecutors(Listener listener, MinigamesEvent event) {
+    private static Iterable<MethodExecutor> getMethodExecutors(Listener listener, MinigamesEvent event) {
         ListenerHandler handler = listenerHandlerMap.get(listener.getClass());
 
         if (handler == null) {
@@ -62,8 +62,8 @@ public class EventExecutor {
     }
 
     @SafeVarargs
-    private static SortedMap<MethodExecutor, Listener> getMethodExecutorMap(MinigamesEvent event,
-                                                                            Collection<Listener>... listeners) {
+    private static Map<MethodExecutor, Listener> getMethodExecutorMap(MinigamesEvent event,
+                                                                      Collection<Listener>... listeners) {
         SortedMap<MethodExecutor, Listener> map = new TreeMap<>();
 
         for (Collection<Listener> listenerGroup : listeners) {
@@ -73,7 +73,7 @@ public class EventExecutor {
         return map;
     }
 
-    private static void addToMethodExecutorMap(MinigamesEvent event, Collection<Listener> listenerGroup,
+    private static void addToMethodExecutorMap(MinigamesEvent event, Iterable<Listener> listenerGroup,
                                                SortedMap<MethodExecutor, Listener> map) {
         for (Listener listener : listenerGroup) {
             if (listener == null) continue;
@@ -83,12 +83,12 @@ public class EventExecutor {
         }
     }
 
-    public static void executeEvent(MinigamesEvent event, Collection<Collection<Listener>> listeners) {
+    public static void executeEvent(MinigamesEvent event, Iterable<Collection<Listener>> listeners) {
         executeListeners(event, getMethodExecutorMap(event, listeners));
     }
 
-    private static SortedMap<MethodExecutor, Listener> getMethodExecutorMap(MinigamesEvent event,
-                                                                            Collection<Collection<Listener>> listeners) {
+    private static Map<MethodExecutor, Listener> getMethodExecutorMap(MinigamesEvent event,
+                                                                      Iterable<Collection<Listener>> listeners) {
         SortedMap<MethodExecutor, Listener> map = new TreeMap<>();
 
         for (Collection<Listener> listenerGroup : listeners) {
