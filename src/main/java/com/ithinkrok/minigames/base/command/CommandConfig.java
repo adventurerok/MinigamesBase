@@ -2,6 +2,7 @@ package com.ithinkrok.minigames.base.command;
 
 import com.ithinkrok.minigames.base.Nameable;
 import com.ithinkrok.minigames.base.util.io.ListenerLoader;
+import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
 
@@ -23,7 +24,7 @@ public class CommandConfig implements Nameable {
 
     private final String description, usage;
 
-    private final Listener executor;
+    private final CustomListener executor;
 
     public CommandConfig(String name, ConfigurationSection config, Object creator) {
         this.name = name.toLowerCase();
@@ -45,7 +46,7 @@ public class CommandConfig implements Nameable {
 
         this.aliases = aliases;
 
-        Listener executor = null;
+        CustomListener executor = null;
 
         try {
             executor = ListenerLoader.loadListener(creator, this, config);
@@ -57,13 +58,13 @@ public class CommandConfig implements Nameable {
         this.executor = executor;
     }
 
-    public CommandConfig(String name, String permission, String description, String usage, Listener executor,
+    public CommandConfig(String name, String permission, String description, String usage, CustomListener executor,
                          String othersPermission, String... aliases) {
         this(name, name, permission, othersPermission, description, usage, executor, aliases);
     }
 
     public CommandConfig(String name, String formattedName, String permission, String othersPermission,
-                         String description, String usage, Listener executor, String... aliases) {
+                         String description, String usage, CustomListener executor, String... aliases) {
         this.name = name;
         this.formattedName = formattedName;
         this.permission = permission;
@@ -95,7 +96,7 @@ public class CommandConfig implements Nameable {
         return othersPermission != null;
     }
 
-    public Listener getExecutor() {
+    public CustomListener getExecutor() {
         return executor;
     }
 

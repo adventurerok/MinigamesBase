@@ -2,7 +2,7 @@ package com.ithinkrok.minigames.base.item;
 
 import com.ithinkrok.minigames.base.Nameable;
 import com.ithinkrok.minigames.base.User;
-import com.ithinkrok.minigames.base.event.MinigamesEventHandler;
+import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.minigames.base.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.base.item.event.CustomItemLoreCalculateEvent;
 import com.ithinkrok.minigames.base.util.InventoryUtils;
@@ -11,9 +11,10 @@ import com.ithinkrok.minigames.base.util.math.Variables;
 import com.ithinkrok.minigames.base.event.user.game.UserAbilityCooldownEvent;
 import com.ithinkrok.minigames.base.event.user.world.UserAttackEvent;
 import com.ithinkrok.minigames.base.lang.LanguageLookup;
-import com.ithinkrok.minigames.base.util.EventExecutor;
+import com.ithinkrok.util.event.CustomEventExecutor;
 import com.ithinkrok.minigames.base.util.math.Calculator;
 import com.ithinkrok.minigames.base.util.math.ExpressionCalculator;
+import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
@@ -29,17 +30,17 @@ import java.util.UUID;
  * <p>
  * An item with custom use or inventory click listeners
  */
-public class CustomItem implements Identifiable, Listener, Nameable {
+public class CustomItem implements Identifiable, CustomListener, Nameable {
 
     private static int customItemCount = 0;
 
     private final int customItemId = customItemCount++;
 
-    private final List<Listener> rightClickActions = new ArrayList<>();
-    private final List<Listener> leftClickActions = new ArrayList<>();
-    private final List<Listener> timeoutActions = new ArrayList<>();
-    private final List<Listener> attackActions = new ArrayList<>();
-    private final List<Listener> allListeners = new ArrayList<>();
+    private final List<CustomListener> rightClickActions = new ArrayList<>();
+    private final List<CustomListener> leftClickActions = new ArrayList<>();
+    private final List<CustomListener> timeoutActions = new ArrayList<>();
+    private final List<CustomListener> attackActions = new ArrayList<>();
+    private final List<CustomListener> allListeners = new ArrayList<>();
 
     private final String name;
     private final String itemDisplayLocale;
@@ -102,7 +103,7 @@ public class CustomItem implements Identifiable, Listener, Nameable {
         for (String name : config.getKeys(false)) {
             ConfigurationSection listenerInfo = config.getConfigurationSection(name);
             try {
-                Listener listener = ListenerLoader.loadListener(this, this, listenerInfo);
+                CustomListener listener = ListenerLoader.loadListener(this, this, listenerInfo);
 
                 List<String> events = null;
                 if (listenerInfo.contains("events")) events = listenerInfo.getStringList("events");
@@ -120,20 +121,20 @@ public class CustomItem implements Identifiable, Listener, Nameable {
         }
     }
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onUserAttack(UserAttackEvent event) {
-        EventExecutor.executeEvent(event, attackActions);
+        CustomEventExecutor.executeEvent(event, attackActions);
     }
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onAbilityCooldown(UserAbilityCooldownEvent event) {
         if(!event.getAbility().equals(timeoutAbility)) return;
 
-        EventExecutor.executeEvent(event, timeoutActions);
+        CustomEventExecutor.executeEvent(event, timeoutActions);
         startRightClickCooldown(event.getUser());
     }
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onInteract(UserInteractEvent event) {
         switch(event.getInteractType()) {
             case PHYSICAL:
@@ -142,7 +143,7 @@ public class CustomItem implements Identifiable, Listener, Nameable {
         }
 
         if(event.getInteractType() == UserInteractEvent.InteractType.LEFT_CLICK) {
-            EventExecutor.executeEvent(event, leftClickActions);
+            CustomEventExecutor.executeEvent(event, leftClickActions);
             return;
         }
 
@@ -155,7 +156,7 @@ public class CustomItem implements Identifiable, Listener, Nameable {
             return;
         }
 
-        EventExecutor.executeEvent(event, rightClickActions);
+        CustomEventExecutor.executeEvent(event, rightClickActions);
         if(!event.getStartCooldownAfterAction()) return;
 
         if(timeoutCalculator != null) {
@@ -209,7 +210,7 @@ public class CustomItem implements Identifiable, Listener, Nameable {
 
         CustomItemLoreCalculateEvent event = new CustomItemLoreCalculateEvent(this, lore, languageLookup, variables);
 
-        EventExecutor.executeEvent(event, allListeners);
+        CustomEventExecutor.executeEvent(event, allListeners);
 
         if (rightClickCooldown != null) {
             double seconds = rightClickCooldown.calculate(variables);

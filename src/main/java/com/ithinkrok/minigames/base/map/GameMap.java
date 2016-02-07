@@ -19,6 +19,7 @@ import com.ithinkrok.minigames.base.team.TeamIdentifier;
 import com.ithinkrok.minigames.base.util.BoundingBox;
 import com.ithinkrok.minigames.base.util.io.ConfigHolder;
 import com.ithinkrok.minigames.base.util.io.DirectoryUtils;
+import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -49,8 +50,8 @@ public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.Bo
     private final GameMapInfo gameMapInfo;
     private World world;
     private final MultipleLanguageLookup languageLookup = new MultipleLanguageLookup();
-    private final List<Listener> listeners = new ArrayList<>();
-    private final Map<String, Listener> listenerMap = new HashMap<>();
+    private final List<CustomListener> listeners = new ArrayList<>();
+    private final Map<String, CustomListener> listenerMap = new HashMap<>();
     private final Map<String, Schematic> schematicMap = new HashMap<>();
 
     private final TaskList mapTaskList = new TaskList();
@@ -251,17 +252,17 @@ public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.Bo
         return languageLookup.hasLocale(name);
     }
 
-    public List<Listener> getListeners() {
+    public List<CustomListener> getListeners() {
         return listeners;
     }
 
     @Override
-    public void addListener(String name, Listener listener) {
+    public void addListener(String name, CustomListener listener) {
         listeners.add(listener);
         listenerMap.put(name, listener);
     }
 
-    public Map<String, Listener> getListenerMap() {
+    public Map<String, CustomListener> getListenerMap() {
         return listenerMap;
     }
 

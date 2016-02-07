@@ -5,7 +5,8 @@ import com.ithinkrok.minigames.base.schematic.event.SchematicDestroyedEvent;
 import com.ithinkrok.minigames.base.task.GameTask;
 import com.ithinkrok.minigames.base.schematic.event.SchematicFinishedEvent;
 import com.ithinkrok.minigames.base.util.BoundingBox;
-import com.ithinkrok.minigames.base.util.EventExecutor;
+import com.ithinkrok.util.event.CustomEventExecutor;
+import com.ithinkrok.util.event.CustomListener;
 import de.inventivegames.hologram.Hologram;
 import de.inventivegames.hologram.HologramAPI;
 import org.bukkit.Location;
@@ -27,28 +28,28 @@ public class PastedSchematic implements SchematicPaster.BoundsChecker {
 
     private static long nextIdentifier = 0;
 
-    private static Random random = new Random();
+    private static final Random random = new Random();
 
     private final long identifier = nextIdentifier++;
 
-    private String name;
-    private List<Location> buildingBlocks;
-    private Map<Location, BlockState> oldBlocks;
-    private Location centerBlock;
-    private BoundingBox bounds;
+    private final String name;
+    private final List<Location> buildingBlocks;
+    private final Map<Location, BlockState> oldBlocks;
+    private final Location centerBlock;
+    private final BoundingBox bounds;
     private boolean finished;
     private boolean removed;
-    private int rotation;
+    private final int rotation;
 
-    private GameMap map;
+    private final GameMap map;
 
-    private List<Listener> listeners = new ArrayList<>();
-    private List<Hologram> holograms = new ArrayList<>();
+    private final List<CustomListener> listeners = new ArrayList<>();
+    private final List<Hologram> holograms = new ArrayList<>();
     private GameTask buildTask;
 
     private boolean allowOverlap = false;
 
-    private Schematic schematic;
+    private final Schematic schematic;
 
     public PastedSchematic(String name, Schematic schematic, GameMap map, Location centerBlock, BoundingBox bounds,
                            int rotation, boolean allowOverlap, List<Location> buildingBlocks,
@@ -90,7 +91,7 @@ public class PastedSchematic implements SchematicPaster.BoundsChecker {
         return rotation;
     }
 
-    public void addListeners(Collection<Listener> listeners) {
+    public void addListeners(Collection<? extends CustomListener> listeners) {
         this.listeners.addAll(listeners);
     }
 
@@ -98,7 +99,7 @@ public class PastedSchematic implements SchematicPaster.BoundsChecker {
         this.finished = true;
 
         SchematicFinishedEvent destroyedEvent = new SchematicFinishedEvent(this);
-        EventExecutor.executeEvent(destroyedEvent, listeners);
+        CustomEventExecutor.executeEvent(destroyedEvent, listeners);
     }
 
     public List<Location> getBuildingBlocks() {
@@ -151,7 +152,7 @@ public class PastedSchematic implements SchematicPaster.BoundsChecker {
         }
 
         SchematicDestroyedEvent destroyedEvent = new SchematicDestroyedEvent(this);
-        EventExecutor.executeEvent(destroyedEvent, listeners);
+        CustomEventExecutor.executeEvent(destroyedEvent, listeners);
     }
 
     public void removed() {
@@ -178,7 +179,7 @@ public class PastedSchematic implements SchematicPaster.BoundsChecker {
         }
 
         SchematicDestroyedEvent destroyedEvent = new SchematicDestroyedEvent(this);
-        EventExecutor.executeEvent(destroyedEvent, listeners);
+        CustomEventExecutor.executeEvent(destroyedEvent, listeners);
         if (centerBlock != null) oldBlocks.get(centerBlock).update(true, false);
     }
 

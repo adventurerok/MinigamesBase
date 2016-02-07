@@ -2,7 +2,7 @@ package com.ithinkrok.minigames.base.item;
 
 import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.base.item.event.CustomItemLoreCalculateEvent;
-import com.ithinkrok.minigames.base.event.MinigamesEventHandler;
+import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.minigames.base.event.user.world.UserAttackEvent;
 import com.ithinkrok.minigames.base.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.base.lang.LanguageLookup;
@@ -36,7 +36,7 @@ public class WeaponModifier implements Listener {
     private List<EffectModifier> enemyEffects = new ArrayList<>();
     private List<EffectModifier> selfEffects = new ArrayList<>();
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onListenerEnable(ListenerLoadedEvent event) {
         if (!event.hasConfig()) throw new RuntimeException("A WeaponModifier requires a config");
 
@@ -63,7 +63,7 @@ public class WeaponModifier implements Listener {
         }
     }
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onLoreItemsCalculate(CustomItemLoreCalculateEvent event) {
         LanguageLookup lang = event.getLanguageLookup();
         List<String> lore = event.getLore();
@@ -87,7 +87,7 @@ public class WeaponModifier implements Listener {
     }
 
     @SuppressWarnings("unchecked")
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onUserAttack(UserAttackEvent attack) {
         if (attack.getInteractType() == UserInteractEvent.InteractType.REPRESENTING) return;
         if (attack.getDamageCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;

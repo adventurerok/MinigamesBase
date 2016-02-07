@@ -1,5 +1,6 @@
 package com.ithinkrok.minigames.base.schematic;
 
+import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -21,7 +22,7 @@ public class SchematicOptions {
 
     private Map<Material, Material> replaceMaterials = new HashMap<>();
     private DyeColor overrideDyeColor;
-    private List<Listener> defaultListeners = new ArrayList<>();
+    private List<CustomListener> defaultListeners = new ArrayList<>();
 
     public SchematicOptions() {
 
@@ -107,12 +108,12 @@ public class SchematicOptions {
         return this;
     }
 
-    public SchematicOptions withDefaultListener(Listener defaultListener) {
+    public SchematicOptions withDefaultListener(CustomListener defaultListener) {
         this.defaultListeners.add(defaultListener);
         return this;
     }
 
-    public List<Listener> getDefaultListeners() {
+    public List<CustomListener> getDefaultListeners() {
         return defaultListeners;
     }
 }

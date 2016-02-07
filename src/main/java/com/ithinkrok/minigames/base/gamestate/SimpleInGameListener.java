@@ -4,7 +4,7 @@ import com.ithinkrok.minigames.base.GameGroup;
 import com.ithinkrok.minigames.base.GameState;
 import com.ithinkrok.minigames.base.User;
 import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
-import com.ithinkrok.minigames.base.event.MinigamesEventHandler;
+import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.minigames.base.event.user.game.UserJoinEvent;
 import com.ithinkrok.minigames.base.util.CustomItemGiver;
 import org.bukkit.configuration.ConfigurationSection;
@@ -21,7 +21,7 @@ public class SimpleInGameListener implements Listener {
 
     protected GameState gameState;
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent<GameGroup, GameState> event) {
         gameState = event.getRepresenting();
 
@@ -31,7 +31,7 @@ public class SimpleInGameListener implements Listener {
         spectatorJoinLocaleStub = config.getString("spectator_join_locale_stub", "spectator.join");
     }
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onUserJoined(UserJoinEvent event) {
         if(event.getUser().isInGame()) return;
 

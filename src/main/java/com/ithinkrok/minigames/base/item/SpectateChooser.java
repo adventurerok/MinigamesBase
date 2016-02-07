@@ -2,7 +2,7 @@ package com.ithinkrok.minigames.base.item;
 
 import com.ithinkrok.minigames.base.User;
 import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
-import com.ithinkrok.minigames.base.event.MinigamesEventHandler;
+import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.minigames.base.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.base.inventory.ClickableInventory;
 import com.ithinkrok.minigames.base.inventory.ClickableItem;
@@ -24,7 +24,7 @@ public class SpectateChooser implements Listener {
 
     private String titleLocale;
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent event) {
         ConfigurationSection config = event.getConfig();
         if(config == null) config = new MemoryConfiguration();
@@ -32,7 +32,7 @@ public class SpectateChooser implements Listener {
         titleLocale = config.getString("title_locale", "spectate_chooser.title");
     }
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onUserInteract(UserInteractEvent event) {
 
         ClickableInventory inv = new ClickableInventory(event.getUserGameGroup().getLocale(titleLocale));

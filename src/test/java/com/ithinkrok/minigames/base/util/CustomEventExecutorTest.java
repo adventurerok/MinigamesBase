@@ -1,7 +1,9 @@
 package com.ithinkrok.minigames.base.util;
 
 import com.ithinkrok.minigames.base.event.MinigamesEvent;
-import com.ithinkrok.minigames.base.event.MinigamesEventHandler;
+import com.ithinkrok.util.event.CustomEventHandler;
+import com.ithinkrok.util.event.CustomEventExecutor;
+import com.ithinkrok.util.event.CustomListener;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
 import org.bukkit.event.Listener;
 import org.junit.Before;
@@ -16,7 +18,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
  * Created by paul on 20/01/16.
  */
 @RunWith(DataProviderRunner.class)
-public class EventExecutorTest {
+public class CustomEventExecutorTest {
 
     @Mock MinigamesEvent event;
 
@@ -30,40 +32,40 @@ public class EventExecutorTest {
     public void shouldExecuteAllEventsInTheCorrectOrder() {
         OrderListener listener = new OrderListener();
 
-        EventExecutor.executeEvent(event, listener);
+        CustomEventExecutor.executeEvent(event, listener);
 
         assertThat(listener.doneFirst && listener.doneLow && listener.doneHigh && listener.doneLast).isTrue();
     }
 
-    private static class OrderListener implements Listener {
+    private static class OrderListener implements CustomListener {
 
         private boolean doneFirst = false;
         private boolean doneLow = false;
         private boolean doneHigh = false;
         private boolean doneLast = false;
 
-        @MinigamesEventHandler(priority = MinigamesEventHandler.INTERNAL_FIRST)
+        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
         public void internalFirstFirst(MinigamesEvent event) {
             assertThat(doneFirst || doneLow || doneHigh || doneLast).isFalse();
 
             doneFirst = true;
         }
 
-        @MinigamesEventHandler(priority = MinigamesEventHandler.LOW)
+        @CustomEventHandler(priority = CustomEventHandler.LOW)
         public void lowSecond(MinigamesEvent event) {
             assertThat(doneFirst && !(doneLow || doneHigh || doneLast)).isTrue();
 
             doneLow = true;
         }
 
-        @MinigamesEventHandler(priority = MinigamesEventHandler.HIGH)
+        @CustomEventHandler(priority = CustomEventHandler.HIGH)
         public void highThird(MinigamesEvent event) {
             assertThat((doneFirst && doneLow) && !(doneHigh || doneLast)).isTrue();
 
             doneHigh = true;
         }
 
-        @MinigamesEventHandler(priority = MinigamesEventHandler.HIGH)
+        @CustomEventHandler(priority = CustomEventHandler.HIGH)
         public void internalLastLast(MinigamesEvent event) {
             assertThat((doneFirst && doneLow && doneHigh) && !doneLast).isTrue();
 

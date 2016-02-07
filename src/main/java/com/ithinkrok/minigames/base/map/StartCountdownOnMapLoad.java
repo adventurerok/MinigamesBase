@@ -2,7 +2,7 @@ package com.ithinkrok.minigames.base.map;
 
 import com.ithinkrok.minigames.base.GameGroup;
 import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
-import com.ithinkrok.minigames.base.event.MinigamesEventHandler;
+import com.ithinkrok.util.event.CustomEventHandler;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
 
@@ -11,7 +11,7 @@ import org.bukkit.event.Listener;
  */
 public class StartCountdownOnMapLoad implements Listener {
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onListenerEnabled(ListenerLoadedEvent<GameGroup, GameMap> event) {
         ConfigurationSection config = event.getConfig();
 

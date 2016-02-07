@@ -6,7 +6,7 @@ import com.ithinkrok.minigames.base.GameGroup;
 import com.ithinkrok.minigames.base.Nameable;
 import com.ithinkrok.minigames.base.SharedObjectAccessor;
 import com.ithinkrok.minigames.base.User;
-import com.ithinkrok.minigames.base.event.MinigamesEventHandler;
+import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.minigames.base.event.game.GameStateChangedEvent;
 import com.ithinkrok.minigames.base.event.game.MapChangedEvent;
 import com.ithinkrok.minigames.base.lang.LanguageLookup;
@@ -18,6 +18,7 @@ import com.ithinkrok.minigames.base.task.GameTask;
 import com.ithinkrok.minigames.base.task.TaskList;
 import com.ithinkrok.minigames.base.task.TaskScheduler;
 import com.ithinkrok.minigames.base.user.UserResolver;
+import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
@@ -46,7 +47,7 @@ public class Team implements Listener, Messagable, LanguageLookup, SharedObjectA
 
     private final TaskList teamTaskList = new TaskList();
 
-    private final Collection<Listener> listeners = new ArrayList<>();
+    private final Collection<CustomListener> listeners = new ArrayList<>();
 
     public Team(TeamIdentifier teamIdentifier, GameGroup gameGroup) {
         this.teamIdentifier = teamIdentifier;
@@ -59,7 +60,7 @@ public class Team implements Listener, Messagable, LanguageLookup, SharedObjectA
         gameGroup.getGame().makeEntityRepresentTeam(this, entity);
     }
 
-    public Collection<Listener> getListeners() {
+    public Collection<CustomListener> getListeners() {
         return listeners;
     }
 
@@ -206,10 +207,10 @@ public class Team implements Listener, Messagable, LanguageLookup, SharedObjectA
         metadataMap.clear();
     }
 
-    private class TeamListener implements Listener {
+    private class TeamListener implements CustomListener {
 
 
-        @MinigamesEventHandler(priority = MinigamesEventHandler.INTERNAL_FIRST)
+        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
         public void eventGameStateChange(GameStateChangedEvent event) {
             Iterator<Metadata> iterator = metadataMap.values().iterator();
 
@@ -224,7 +225,7 @@ public class Team implements Listener, Messagable, LanguageLookup, SharedObjectA
             }
         }
 
-        @MinigamesEventHandler(priority = MinigamesEventHandler.INTERNAL_FIRST)
+        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
         public void eventMapChange(MapChangedEvent event) {
             Iterator<Metadata> iterator = metadataMap.values().iterator();
 

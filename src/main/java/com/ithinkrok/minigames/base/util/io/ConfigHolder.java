@@ -8,6 +8,7 @@ import com.ithinkrok.minigames.base.lang.LanguageLookup;
 import com.ithinkrok.minigames.base.map.GameMapInfo;
 import com.ithinkrok.minigames.base.schematic.Schematic;
 import com.ithinkrok.minigames.base.team.TeamIdentifier;
+import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
 
@@ -18,7 +19,7 @@ import org.bukkit.event.Listener;
  */
 public interface ConfigHolder {
 
-    void addListener(String name, Listener listener);
+    void addListener(String name, CustomListener listener);
 
     void addCustomItem(CustomItem customItem);
 

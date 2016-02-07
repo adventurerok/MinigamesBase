@@ -7,6 +7,7 @@ import com.ithinkrok.minigames.base.item.CustomItem;
 import com.ithinkrok.minigames.base.map.GameMapInfo;
 import com.ithinkrok.minigames.base.schematic.Schematic;
 import com.ithinkrok.minigames.base.team.TeamIdentifier;
+import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
@@ -56,7 +57,7 @@ public class ConfigParser {
         if (config.contains("kits")) loadKits(config.getConfigurationSection("kits"));
         if (config.contains("team_identifiers")) loadTeams(config.getConfigurationSection("team_identifiers"));
         if (config.contains("game_states")) loadGameStates(config.getConfigurationSection("game_states"));
-        if(config.contains("maps")) loadMaps(config.getConfigurationSection("maps"));
+        if (config.contains("maps")) loadMaps(config.getConfigurationSection("maps"));
 
         if (config.contains("listeners")) loadListeners(config.getConfigurationSection("listeners"));
         if (config.contains("commands")) loadCommands(config.getConfigurationSection("commands"));
@@ -65,7 +66,7 @@ public class ConfigParser {
     }
 
     private void loadMaps(ConfigurationSection maps) {
-        for(String name : maps.getKeys(false)) {
+        for (String name : maps.getKeys(false)) {
             holder.addMapInfo(new GameMapInfo(loader, name, maps.getString(name)));
         }
     }
@@ -158,7 +159,8 @@ public class ConfigParser {
             ConfigurationSection listenerConfig = config.getConfigurationSection(name);
 
             try {
-                Listener listener = ListenerLoader.loadListener(listenerCreator, listenerRepresenting, listenerConfig);
+                CustomListener listener =
+                        ListenerLoader.loadListener(listenerCreator, listenerRepresenting, listenerConfig);
                 holder.addListener(name, listener);
             } catch (Exception e) {
                 System.out.println("Failed to load listener: " + name);

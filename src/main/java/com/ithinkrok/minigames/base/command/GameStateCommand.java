@@ -1,10 +1,8 @@
 package com.ithinkrok.minigames.base.command;
 
 import com.ithinkrok.minigames.base.GameState;
-import com.ithinkrok.minigames.base.command.Command;
-import com.ithinkrok.minigames.base.command.CommandSender;
 import com.ithinkrok.minigames.base.event.CommandEvent;
-import com.ithinkrok.minigames.base.event.MinigamesEventHandler;
+import com.ithinkrok.util.event.CustomEventHandler;
 import org.bukkit.event.Listener;
 
 /**
@@ -13,7 +11,7 @@ import org.bukkit.event.Listener;
 public class GameStateCommand implements Listener {
 
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onCommand(CommandEvent event) {
         CommandSender sender = event.getCommandSender();
         Command command = event.getCommand();

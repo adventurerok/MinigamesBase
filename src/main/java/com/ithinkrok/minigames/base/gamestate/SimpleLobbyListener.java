@@ -5,7 +5,7 @@ import com.ithinkrok.minigames.base.GameState;
 import com.ithinkrok.minigames.base.User;
 import com.ithinkrok.minigames.base.event.CommandEvent;
 import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
-import com.ithinkrok.minigames.base.event.MinigamesEventHandler;
+import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.minigames.base.event.game.CountdownFinishedEvent;
 import com.ithinkrok.minigames.base.event.game.GameStateChangedEvent;
 import com.ithinkrok.minigames.base.event.map.MapCreatureSpawnEvent;
@@ -18,7 +18,6 @@ import com.ithinkrok.minigames.base.event.user.state.UserFoodLevelChangeEvent;
 import com.ithinkrok.minigames.base.event.user.world.*;
 import com.ithinkrok.minigames.base.scoreboard.MapScoreboardHandler;
 import com.ithinkrok.minigames.base.util.MinigamesConfigs;
-import com.ithinkrok.msm.common.util.ConfigUtils;
 import com.ithinkrok.minigames.base.util.CountdownConfig;
 import com.ithinkrok.minigames.base.util.CustomItemGiver;
 import org.bukkit.Bukkit;
@@ -54,7 +53,7 @@ public class SimpleLobbyListener implements Listener {
     private CustomItemGiver giveOnJoin;
     private ConfigurationSection config;
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent<GameGroup, GameState> event) {
         gameState = event.getRepresenting();
 
@@ -81,17 +80,17 @@ public class SimpleLobbyListener implements Listener {
         needsMorePlayersLocale = config.getString("needs_more_players_locale");
     }
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onUserBreakBlock(UserBreakBlockEvent event) {
         if (config.getBoolean("simple_lobby.deny_block_break", true)) event.setCancelled(true);
     }
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onUserPlaceBlock(UserPlaceBlockEvent event) {
         if (config.getBoolean("simple_lobby.deny_block_place", true)) event.setCancelled(true);
     }
 
-    @MinigamesEventHandler(priority = MinigamesEventHandler.LOW)
+    @CustomEventHandler(priority = CustomEventHandler.LOW)
     public void eventUserJoin(UserJoinEvent event) {
         userJoinLobby(event.getUser());
 
@@ -143,12 +142,12 @@ public class SimpleLobbyListener implements Listener {
         gameGroup.startCountdown(startCountdown);
     }
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onUserInventoryClick(UserInventoryClickEvent event) {
         if (config.getBoolean("simple_lobby.deny_inventory_move", true)) event.setCancelled(true);
     }
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onGameStateChanged(GameStateChangedEvent event) {
         if (!Objects.equals(event.getNewGameState(), gameState)) return;
 
@@ -161,7 +160,7 @@ public class SimpleLobbyListener implements Listener {
         }
     }
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onCountdownFinished(CountdownFinishedEvent event) {
         if (!event.getCountdown().getName().equals(startCountdown.getName())) return;
 
@@ -176,17 +175,17 @@ public class SimpleLobbyListener implements Listener {
         event.getGameGroup().changeGameState(nextGameState);
     }
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onUserPickupItem(UserPickupItemEvent event) {
         if (config.getBoolean("simple_lobby.deny_pickup_items", true)) event.setCancelled(true);
     }
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onUserDamaged(UserDamagedEvent event) {
         if (config.getBoolean("simple_lobby.deny_damage", true)) event.setCancelled(true);
     }
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onUserInteract(UserInteractEvent event) {
         if (event.getInteractType() == UserInteractEvent.InteractType.REPRESENTING) return;
         if (event.hasItem() && event.getItem().getType() == Material.WRITTEN_BOOK) return;
@@ -213,19 +212,19 @@ public class SimpleLobbyListener implements Listener {
         }
     }
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onUserFoodLevelChange(UserFoodLevelChangeEvent event) {
         if (config.getBoolean("simple_lobby.deny_hunger_loss", true)) event.setFoodLevel(20);
     }
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onUserDropItem(UserDropItemEvent event) {
         if (!config.getBoolean("simple_lobby.deny_drop_items", true)) return;
 
         event.setCancelled(true);
     }
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onCommand(CommandEvent event) {
         if (!config.getBoolean("simple_lobby.deny_kill_command", true)) return;
         switch (event.getCommand().getCommand().toLowerCase()) {
@@ -235,7 +234,7 @@ public class SimpleLobbyListener implements Listener {
         }
     }
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onCreatureSpawn(MapCreatureSpawnEvent event) {
         if (!config.getBoolean("simply_lobby.deny_creature_spawn", true)) return;
         if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.CUSTOM) return;
@@ -243,13 +242,13 @@ public class SimpleLobbyListener implements Listener {
         event.setCancelled(true);
     }
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onItemSpawn(MapItemSpawnEvent event) {
         if (!config.getBoolean("simple_lobby.deny_item_spawn", true)) return;
         event.setCancelled(true);
     }
 
-    @MinigamesEventHandler(priority = MinigamesEventHandler.MONITOR)
+    @CustomEventHandler(priority = CustomEventHandler.MONITOR)
     public void sendQuitMessageOnUserQuit(UserQuitEvent event) {
         String name = event.getUser().getFormattedName();
         int currentPlayers = event.getUserGameGroup().getUserCount() - 1;
@@ -258,7 +257,7 @@ public class SimpleLobbyListener implements Listener {
         event.getUserGameGroup().sendLocale(quitLocale, name, currentPlayers, maxPlayers);
     }
 
-    @MinigamesEventHandler(priority = MinigamesEventHandler.FIRST)
+    @CustomEventHandler(priority = CustomEventHandler.FIRST)
     public void sendJoinMessageOnUserJoin(UserJoinEvent event) {
         String name = event.getUser().getFormattedName();
         int currentPlayers = event.getUserGameGroup().getUserCount();

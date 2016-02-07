@@ -1,7 +1,7 @@
 package com.ithinkrok.minigames.base.listener;
 
 import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
-import com.ithinkrok.minigames.base.event.MinigamesEventHandler;
+import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.minigames.base.util.CustomItemGiver;
 import com.ithinkrok.minigames.base.event.user.game.UserJoinEvent;
 import org.bukkit.configuration.ConfigurationSection;
@@ -14,14 +14,14 @@ public class GiveCustomItemsOnJoin implements Listener {
 
     private CustomItemGiver customItemGiver;
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onListenerEnabled(ListenerLoadedEvent event) {
         ConfigurationSection config = event.getConfig();
 
         customItemGiver = new CustomItemGiver(config);
     }
 
-    @MinigamesEventHandler(priority = MinigamesEventHandler.LOW)
+    @CustomEventHandler(priority = CustomEventHandler.LOW)
     public void onUserJoin(UserJoinEvent event) {
         customItemGiver.giveToUser(event.getUser());
     }

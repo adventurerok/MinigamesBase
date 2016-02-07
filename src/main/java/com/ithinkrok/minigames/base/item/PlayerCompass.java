@@ -2,7 +2,7 @@ package com.ithinkrok.minigames.base.item;
 
 import com.ithinkrok.minigames.base.User;
 import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
-import com.ithinkrok.minigames.base.event.MinigamesEventHandler;
+import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.minigames.base.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.base.lang.LanguageLookup;
 import com.ithinkrok.minigames.base.util.InventoryUtils;
@@ -23,7 +23,7 @@ public class PlayerCompass implements Listener {
     private PlayerCompassTarget target;
     private int locatingTime;
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent event) {
         ConfigurationSection config;
         if (event.hasConfig()) config = event.getConfig();
@@ -39,7 +39,7 @@ public class PlayerCompass implements Listener {
         locatingTime = (int) (config.getDouble("locating_time", 3) * 20);
     }
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onInteract(UserInteractEvent event) {
         InventoryUtils.setItemName(event.getItem(), event.getUser().getLanguageLookup().getLocale(locatingLocale));
 

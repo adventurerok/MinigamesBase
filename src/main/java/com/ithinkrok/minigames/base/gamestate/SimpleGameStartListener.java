@@ -5,7 +5,7 @@ import com.ithinkrok.minigames.base.GameState;
 import com.ithinkrok.minigames.base.Kit;
 import com.ithinkrok.minigames.base.User;
 import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
-import com.ithinkrok.minigames.base.event.MinigamesEventHandler;
+import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.minigames.base.event.game.GameStateChangedEvent;
 import com.ithinkrok.minigames.base.metadata.MapVote;
 import com.ithinkrok.minigames.base.team.Team;
@@ -38,7 +38,7 @@ public class SimpleGameStartListener implements Listener {
 
     protected GameState gameState;
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent<GameGroup, GameState> event) {
         gameState = event.getRepresenting();
 
@@ -68,7 +68,7 @@ public class SimpleGameStartListener implements Listener {
         if(mapList.size() < 1) throw new RuntimeException("The game requires at least one map!");
     }
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onGameStateChange(GameStateChangedEvent event) {
         if(!Objects.equals(event.getNewGameState(), gameState)) return;
 

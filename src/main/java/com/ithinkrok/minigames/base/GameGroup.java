@@ -21,7 +21,7 @@ import com.ithinkrok.minigames.base.util.io.FileLoader;
 import com.ithinkrok.minigames.base.database.DatabaseTask;
 import com.ithinkrok.minigames.base.database.DatabaseTaskRunner;
 import com.ithinkrok.minigames.base.event.CommandEvent;
-import com.ithinkrok.minigames.base.event.MinigamesEventHandler;
+import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.minigames.base.event.game.CountdownFinishedEvent;
 import com.ithinkrok.minigames.base.event.game.GameEvent;
 import com.ithinkrok.minigames.base.event.game.GameStateChangedEvent;
@@ -42,7 +42,8 @@ import com.ithinkrok.minigames.base.task.TaskList;
 import com.ithinkrok.minigames.base.task.TaskScheduler;
 import com.ithinkrok.minigames.base.team.TeamIdentifier;
 import com.ithinkrok.minigames.base.team.TeamUserResolver;
-import com.ithinkrok.minigames.base.util.EventExecutor;
+import com.ithinkrok.util.event.CustomEventExecutor;
+import com.ithinkrok.util.event.CustomListener;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -69,12 +70,12 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     private final Game game;
     private final TaskList gameGroupTaskList = new TaskList();
     private final TaskList gameStateTaskList = new TaskList();
-    private final Listener gameGroupListener;
-    private final List<Listener> gameStateListeners = new ArrayList<>();
+    private final CustomListener gameGroupListener;
+    private final List<CustomListener> gameStateListeners = new ArrayList<>();
     private final ClassToInstanceMap<Metadata> metadataMap = MutableClassToInstanceMap.create();
     private final String chatPrefix;
     //Loaded from config
-    private final HashMap<String, Listener> defaultListeners = new HashMap<>();
+    private final HashMap<String, CustomListener> defaultListeners = new HashMap<>();
     private final IdentifierMap<CustomItem> customItemIdentifierMap = new IdentifierMap<>();
     private final Map<String, ConfigurationSection> sharedObjectMap = new HashMap<>();
     private final Map<String, Schematic> schematicMap = new HashMap<>();
@@ -87,7 +88,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     private final MultipleLanguageLookup languageLookup = new MultipleLanguageLookup();
     private GameState gameState;
     private GameMap currentMap;
-    private List<Listener> defaultAndMapListeners = new ArrayList<>();
+    private List<CustomListener> defaultAndMapListeners = new ArrayList<>();
     private Countdown countdown;
 
     public GameGroup(Game game, String name, String configFile) {
@@ -114,14 +115,14 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
 
     @SuppressWarnings("unchecked")
     @SafeVarargs
-    private final List<Listener> createDefaultAndMapListeners(Map<String, Listener>... extra) {
-        HashMap<String, Listener> clone = (HashMap<String, Listener>) defaultListeners.clone();
+    private final List<CustomListener> createDefaultAndMapListeners(Map<String, CustomListener>... extra) {
+        HashMap<String, CustomListener> clone = (HashMap<String, CustomListener>) defaultListeners.clone();
 
-        for (Map<String, Listener> map : extra) {
+        for (Map<String, CustomListener> map : extra) {
             clone.putAll(map);
         }
 
-        List<Listener> result = new ArrayList<>(clone.values());
+        List<CustomListener> result = new ArrayList<>(clone.values());
         result.add(gameGroupListener);
 
         return result;
@@ -149,14 +150,14 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         GameState oldState = this.gameState;
         GameState newState = this.gameState = gameState;
 
-        List<Listener> oldListeners = new ArrayList<>(gameStateListeners);
+        List<CustomListener> oldListeners = new ArrayList<>(gameStateListeners);
         gameStateListeners.clear();
         gameStateListeners.addAll(newState.createListeners(this));
 
         gameStateTaskList.cancelAllTasks();
 
         MinigamesEvent event = new GameStateChangedEvent(this, oldState, newState);
-        EventExecutor.executeEvent(event, getListeners(getAllUserListeners(), getAllTeamListeners(), oldListeners));
+        CustomEventExecutor.executeEvent(event, getListeners(getAllUserListeners(), getAllTeamListeners(), oldListeners));
     }
 
     public void changeMap(GameMapInfo mapInfo) {
@@ -171,7 +172,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
 
         MinigamesEvent event = new MapChangedEvent(this, oldMap, newMap);
 
-        EventExecutor
+        CustomEventExecutor
                 .executeEvent(event, getListeners(getAllUserListeners(), getAllTeamListeners(), newMap.getListeners()));
 
         defaultAndMapListeners = createDefaultAndMapListeners(newMap.getListenerMap());
@@ -190,8 +191,8 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     }
 
     @SafeVarargs
-    private final Collection<Collection<Listener>> getListeners(Collection<Listener>... extras) {
-        Collection<Collection<Listener>> listeners = new ArrayList<>(4);
+    private final Collection<Collection<CustomListener>> getListeners(Collection<CustomListener>... extras) {
+        Collection<Collection<CustomListener>> listeners = new ArrayList<>(4);
         if (gameState != null) listeners.add(gameStateListeners);
         listeners.add(defaultAndMapListeners);
         Collections.addAll(listeners, extras);
@@ -199,8 +200,8 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         return listeners;
     }
 
-    private Collection<Listener> getAllUserListeners() {
-        ArrayList<Listener> result = new ArrayList<>(usersInGroup.size());
+    private Collection<CustomListener> getAllUserListeners() {
+        ArrayList<CustomListener> result = new ArrayList<>(usersInGroup.size());
 
         for (User user : usersInGroup.values()) {
             result.addAll(user.getListeners());
@@ -209,8 +210,8 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         return result;
     }
 
-    private Collection<Listener> getAllTeamListeners() {
-        ArrayList<Listener> result = new ArrayList<>(teamsInGroup.size());
+    private Collection<CustomListener> getAllTeamListeners() {
+        ArrayList<CustomListener> result = new ArrayList<>(teamsInGroup.size());
 
         for (Team team : teamsInGroup.values()) {
             result.addAll(team.getListeners());
@@ -289,19 +290,19 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
 
     public void userEvent(UserEvent event) {
         if (event.getUser().getTeam() != null) {
-            EventExecutor.executeEvent(event,
+            CustomEventExecutor.executeEvent(event,
                     getListeners(event.getUser().getListeners(), event.getUser().getTeam().getListeners()));
         } else {
-            EventExecutor.executeEvent(event, getListeners(event.getUser().getListeners()));
+            CustomEventExecutor.executeEvent(event, getListeners(event.getUser().getListeners()));
         }
     }
 
     public void teamEvent(TeamEvent event) {
-        EventExecutor.executeEvent(event, event.getTeam().getListeners(), getAllUsersInTeamListeners(event.getTeam()));
+        CustomEventExecutor.executeEvent(event, event.getTeam().getListeners(), getAllUsersInTeamListeners(event.getTeam()));
     }
 
-    private Collection<Listener> getAllUsersInTeamListeners(Team team) {
-        ArrayList<Listener> result = new ArrayList<>(team.getUsers().size());
+    private Collection<CustomListener> getAllUsersInTeamListeners(Team team) {
+        ArrayList<CustomListener> result = new ArrayList<>(team.getUsers().size());
 
         for (User user : team.getUsers()) {
             result.addAll(user.getListeners());
@@ -360,7 +361,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     }
 
     public void gameEvent(GameEvent event) {
-        EventExecutor.executeEvent(event, getListeners(getAllUserListeners(), getAllTeamListeners()));
+        CustomEventExecutor.executeEvent(event, getListeners(getAllUserListeners(), getAllTeamListeners()));
     }
 
     public void unload() {
@@ -442,7 +443,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     }
 
     @Override
-    public void addListener(String name, Listener listener) {
+    public void addListener(String name, CustomListener listener) {
         defaultListeners.put(name, listener);
 
         createDefaultAndMapListeners();
@@ -582,9 +583,9 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         return commandMap;
     }
 
-    private class GameGroupListener implements Listener {
+    private class GameGroupListener implements CustomListener {
 
-        @MinigamesEventHandler(priority = MinigamesEventHandler.INTERNAL_FIRST)
+        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
         public void eventUserJoin(UserJoinEvent event) {
             if (event.getReason() != UserJoinEvent.JoinReason.JOINED_SERVER) return;
 
@@ -593,7 +594,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
             currentMap.teleportUser(event.getUser());
         }
 
-        @MinigamesEventHandler(priority = MinigamesEventHandler.INTERNAL_LAST)
+        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_LAST)
         public void eventUserQuit(UserQuitEvent event) {
             if (event.getRemoveUser()) {
                 event.getUser().setTeam(null);
@@ -607,7 +608,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
             }
         }
 
-        @MinigamesEventHandler(priority = MinigamesEventHandler.INTERNAL_LAST)
+        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_LAST)
         public void eventCountdownFinished(CountdownFinishedEvent event) {
             if (event.getCountdown().getSecondsRemaining() > 0) return;
             if (event.getCountdown() != countdown) return;
@@ -615,7 +616,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
             countdown = null;
         }
 
-        @MinigamesEventHandler
+        @CustomEventHandler
         public void eventBlockBreakNaturally(MapBlockBreakNaturallyEvent event) {
             checkInventoryTethers(event.getBlock().getLocation());
         }
@@ -627,12 +628,12 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
             }
         }
 
-        @MinigamesEventHandler
+        @CustomEventHandler
         public void eventUserBreakBlock(UserBreakBlockEvent event) {
             checkInventoryTethers(event.getBlock().getLocation());
         }
 
-        @MinigamesEventHandler
+        @CustomEventHandler
         public void eventCommand(CommandEvent event) {
             CommandConfig commandConfig = commandAliasesMap.get(event.getCommand().getCommand().toLowerCase());
 
@@ -643,14 +644,14 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
             if (commandConfig.hasOthersPermission() && !event.getCommand()
                     .requireOthersPermission(event.getCommandSender(), commandConfig.getOthersPermission())) return;
 
-            EventExecutor.executeEvent(event, commandConfig.getExecutor());
+            CustomEventExecutor.executeEvent(event, commandConfig.getExecutor());
 
             if (event.isValidCommand()) return;
 
             event.getCommandSender().sendMessage(commandConfig.getUsage());
         }
 
-        @MinigamesEventHandler(priority = MinigamesEventHandler.INTERNAL_FIRST)
+        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
         public void eventGameStateChange(GameStateChangedEvent event) {
             Iterator<Metadata> iterator = metadataMap.values().iterator();
 
@@ -665,7 +666,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
             }
         }
 
-        @MinigamesEventHandler(priority = MinigamesEventHandler.INTERNAL_FIRST)
+        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
         public void eventMapChange(MapChangedEvent event) {
             Iterator<Metadata> iterator = metadataMap.values().iterator();
 

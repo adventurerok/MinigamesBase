@@ -1,7 +1,7 @@
 package com.ithinkrok.minigames.base.command;
 
 import com.ithinkrok.minigames.base.event.CommandEvent;
-import com.ithinkrok.minigames.base.event.MinigamesEventHandler;
+import com.ithinkrok.util.event.CustomEventHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.event.Listener;
@@ -14,7 +14,7 @@ import java.util.*;
  */
 public class HelpCommand implements Listener {
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onCommand(CommandEvent event) {
         if (!event.getCommand().requireGameGroup(event.getCommandSender())) return;
 

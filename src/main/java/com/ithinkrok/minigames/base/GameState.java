@@ -1,6 +1,7 @@
 package com.ithinkrok.minigames.base;
 
 import com.ithinkrok.minigames.base.util.io.ListenerLoader;
+import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
 
@@ -40,8 +41,8 @@ public class GameState implements Nameable {
         return listeners;
     }
 
-    public Collection<Listener> createListeners(GameGroup gameGroup) {
-        Collection<Listener> result = new ArrayList<>();
+    public Collection<CustomListener> createListeners(GameGroup gameGroup) {
+        Collection<CustomListener> result = new ArrayList<>();
 
         for (ConfigurationSection listenerConfig : listeners) {
             try {

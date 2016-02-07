@@ -3,13 +3,12 @@ package com.ithinkrok.minigames.base.item;
 import com.ithinkrok.minigames.base.Kit;
 import com.ithinkrok.minigames.base.User;
 import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
-import com.ithinkrok.minigames.base.event.MinigamesEventHandler;
+import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.minigames.base.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.base.inventory.ClickableInventory;
 import com.ithinkrok.minigames.base.inventory.ClickableItem;
 import com.ithinkrok.minigames.base.inventory.event.UserClickItemEvent;
 import com.ithinkrok.minigames.base.util.MinigamesConfigs;
-import com.ithinkrok.msm.common.util.ConfigUtils;
 import com.ithinkrok.minigames.base.util.InventoryUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
@@ -27,7 +26,7 @@ public class KitChooser implements Listener {
 
     private String chosenLocale, alreadyLocale, titleLocale;
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent<?, ?> event) {
         ConfigurationSection config = event.getConfig();
 
@@ -42,7 +41,7 @@ public class KitChooser implements Listener {
         titleLocale = config.getString("title_locale", "kit_chooser.choose.title");
     }
 
-    @MinigamesEventHandler
+    @CustomEventHandler
     public void onRightClick(UserInteractEvent event) {
         if (event.getInteractType() != UserInteractEvent.InteractType.RIGHT_CLICK) return;
         event.setCancelled(true);

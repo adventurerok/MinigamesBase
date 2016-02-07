@@ -3,7 +3,7 @@ package com.ithinkrok.minigames.base;
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.MutableClassToInstanceMap;
 import com.ithinkrok.minigames.base.command.CommandSender;
-import com.ithinkrok.minigames.base.event.MinigamesEventHandler;
+import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.minigames.base.event.game.GameStateChangedEvent;
 import com.ithinkrok.minigames.base.event.game.MapChangedEvent;
 import com.ithinkrok.minigames.base.event.user.game.*;
@@ -27,13 +27,14 @@ import com.ithinkrok.minigames.base.user.UserResolver;
 import com.ithinkrok.minigames.base.user.scoreboard.ScoreboardDisplay;
 import com.ithinkrok.minigames.base.user.scoreboard.ScoreboardHandler;
 import com.ithinkrok.msm.common.util.ConfigUtils;
-import com.ithinkrok.minigames.base.util.EventExecutor;
+import com.ithinkrok.util.event.CustomEventExecutor;
 import com.ithinkrok.minigames.base.util.InventoryUtils;
 import com.ithinkrok.minigames.base.util.SoundEffect;
 import com.ithinkrok.minigames.base.util.disguise.Disguise;
 import com.ithinkrok.minigames.base.util.playerstate.PlayerState;
 import com.ithinkrok.minigames.base.inventory.ClickableInventory;
 import com.ithinkrok.minigames.base.metadata.MetadataHolder;
+import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
@@ -76,7 +77,7 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
     private final String name;
     private final TaskList userTaskList = new TaskList();
     private final TaskList inGameTaskList = new TaskList();
-    private final Collection<Listener> listeners = new ArrayList<>();
+    private final Collection<CustomListener> listeners = new ArrayList<>();
     private Team team;
     private Kit kit;
     private LivingEntity entity;
@@ -88,7 +89,7 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
     private ScoreboardHandler scoreboardHandler;
     private boolean isInGame = false;
     private ClickableInventory openInventory;
-    private Collection<Listener> kitListeners = new ArrayList<>();
+    private Collection<CustomListener> kitListeners = new ArrayList<>();
 
     private Vector inventoryTether;
     private boolean spectator;
@@ -424,7 +425,7 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
         return team != null ? team.getTeamIdentifier() : null;
     }
 
-    public Collection<Listener> getListeners() {
+    public Collection<CustomListener> getListeners() {
         return listeners;
     }
 
@@ -944,9 +945,9 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
         sendMessage(gameGroup.getLocale(locale, args));
     }
 
-    private class UserListener implements Listener {
+    private class UserListener implements CustomListener {
 
-        @MinigamesEventHandler(priority = MinigamesEventHandler.INTERNAL_FIRST)
+        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
         public void eventInGameChange(UserInGameChangeEvent event) {
             Iterator<UserMetadata> iterator = metadataMap.values().iterator();
 
@@ -957,7 +958,7 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
             }
         }
 
-        @MinigamesEventHandler(priority = MinigamesEventHandler.INTERNAL_FIRST)
+        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
         public void eventGameStateChange(GameStateChangedEvent event) {
             Iterator<UserMetadata> iterator = metadataMap.values().iterator();
 
@@ -972,7 +973,7 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
             }
         }
 
-        @MinigamesEventHandler(priority = MinigamesEventHandler.INTERNAL_FIRST)
+        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
         public void eventMapChange(MapChangedEvent event) {
             Iterator<UserMetadata> iterator = metadataMap.values().iterator();
 
@@ -987,14 +988,14 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
             }
         }
 
-        @MinigamesEventHandler
+        @CustomEventHandler
         public void eventInventoryClick(UserInventoryClickEvent event) {
             if (!isViewingClickableInventory()) return;
 
             getClickableInventory().inventoryClick(event);
         }
 
-        @MinigamesEventHandler
+        @CustomEventHandler
         public void eventUpgrade(UserUpgradeEvent event) {
             PlayerInventory inv = getInventory();
 
@@ -1016,14 +1017,14 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
             }
         }
 
-        @MinigamesEventHandler(priority = MinigamesEventHandler.INTERNAL_FIRST)
+        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
         public void eventInventoryClose(UserInventoryCloseEvent event) {
             if (!isViewingClickableInventory()) return;
 
             openInventory = null;
         }
 
-        @MinigamesEventHandler(priority = MinigamesEventHandler.HIGH)
+        @CustomEventHandler(priority = CustomEventHandler.HIGH)
         public void eventInteract(UserInteractEvent event) {
             ItemStack item = getInventory().getItemInHand();
             int identifier = InventoryUtils.getIdentifier(item);
@@ -1032,10 +1033,10 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
             CustomItem customItem = gameGroup.getCustomItem(identifier);
 
             //If event is a UserAttackEvent this will call both event handler methods in CustomItem
-            EventExecutor.executeEvent(event, customItem);
+            CustomEventExecutor.executeEvent(event, customItem);
         }
 
-        @MinigamesEventHandler
+        @CustomEventHandler
         public void eventAbilityCooldown(UserAbilityCooldownEvent event) {
             for (ItemStack item : getInventory()) {
                 int identifier = InventoryUtils.getIdentifier(item);
@@ -1043,7 +1044,7 @@ public class User implements CommandSender, TaskScheduler, Listener, UserResolve
 
                 CustomItem customItem = gameGroup.getCustomItem(identifier);
 
-                EventExecutor.executeEvent(event, customItem);
+                CustomEventExecutor.executeEvent(event, customItem);
             }
         }
     }
