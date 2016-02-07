@@ -2,7 +2,7 @@ package com.ithinkrok.minigames.base;
 
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.MutableClassToInstanceMap;
-import com.ithinkrok.minigames.base.command.CommandSender;
+import com.ithinkrok.minigames.base.command.MinigamesCommandSender;
 import com.ithinkrok.minigames.base.event.game.GameStateChangedEvent;
 import com.ithinkrok.minigames.base.event.game.MapChangedEvent;
 import com.ithinkrok.minigames.base.event.user.game.*;
@@ -54,7 +54,7 @@ import static com.ithinkrok.minigames.base.util.InventoryUtils.createLeatherArmo
  * Created by paul on 31/12/15.
  */
 @SuppressWarnings("unchecked")
-public class User implements CommandSender, TaskScheduler, Listener, UserResolver, MetadataHolder<UserMetadata>,
+public class User implements MinigamesCommandSender, TaskScheduler, Listener, UserResolver, MetadataHolder<UserMetadata>,
         SharedObjectAccessor, Nameable {
 
     private static final HashSet<Material> SEE_THROUGH = new HashSet<>();

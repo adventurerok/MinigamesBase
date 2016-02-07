@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.base.command;
 
-import com.ithinkrok.minigames.base.event.CommandEvent;
+import com.ithinkrok.minigames.base.event.MinigamesCommandEvent;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.Bukkit;
@@ -15,11 +15,11 @@ import java.util.*;
 public class HelpCommand implements CustomListener {
 
     @CustomEventHandler
-    public void onCommand(CommandEvent event) {
+    public void onCommand(MinigamesCommandEvent event) {
         if (!event.getCommand().requireGameGroup(event.getCommandSender())) return;
 
         MinigamesCommand command = event.getCommand();
-        CommandSender sender = event.getCommandSender();
+        MinigamesCommandSender sender = event.getCommandSender();
 
         if (event.getCommand().hasArg(0) && !event.getCommand().hasIntArg(0)) {
             onUsageCommand(sender, command);
@@ -31,7 +31,7 @@ public class HelpCommand implements CustomListener {
         //TODO Split into pages
     }
 
-    private void onUsageCommand(CommandSender sender, MinigamesCommand command) {
+    private void onUsageCommand(MinigamesCommandSender sender, MinigamesCommand command) {
         String commandName = command.getStringArg(0, "unspecified").toLowerCase();
         CommandConfig commandConfig = command.getGameGroup().getCommand(commandName);
 
@@ -57,7 +57,7 @@ public class HelpCommand implements CustomListener {
         sender.sendLocaleNoPrefix("command.help.usage", commandName, usage, desc);
     }
 
-    private void onListCommand(CommandSender sender, MinigamesCommand command) {
+    private void onListCommand(MinigamesCommandSender sender, MinigamesCommand command) {
         //Commands are stored as a TreeMap so no need to sort
         Map<String, CommandConfig> commands = command.getGameGroup().getCommands();
 

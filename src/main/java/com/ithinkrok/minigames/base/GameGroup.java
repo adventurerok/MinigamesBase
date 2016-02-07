@@ -6,7 +6,7 @@ import com.ithinkrok.minigames.base.command.MinigamesCommand;
 import com.ithinkrok.minigames.base.command.CommandConfig;
 import com.ithinkrok.minigames.base.database.DatabaseTask;
 import com.ithinkrok.minigames.base.database.DatabaseTaskRunner;
-import com.ithinkrok.minigames.base.event.CommandEvent;
+import com.ithinkrok.minigames.base.event.MinigamesCommandEvent;
 import com.ithinkrok.minigames.base.event.MinigamesEvent;
 import com.ithinkrok.minigames.base.event.game.CountdownFinishedEvent;
 import com.ithinkrok.minigames.base.event.game.GameEvent;
@@ -634,7 +634,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         }
 
         @CustomEventHandler
-        public void eventCommand(CommandEvent event) {
+        public void eventCommand(MinigamesCommandEvent event) {
             CommandConfig commandConfig = commandAliasesMap.get(event.getCommand().getCommand().toLowerCase());
 
             if (commandConfig == null) return;

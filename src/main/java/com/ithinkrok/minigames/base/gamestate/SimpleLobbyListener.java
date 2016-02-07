@@ -3,7 +3,7 @@ package com.ithinkrok.minigames.base.gamestate;
 import com.ithinkrok.minigames.base.GameGroup;
 import com.ithinkrok.minigames.base.GameState;
 import com.ithinkrok.minigames.base.User;
-import com.ithinkrok.minigames.base.event.CommandEvent;
+import com.ithinkrok.minigames.base.event.MinigamesCommandEvent;
 import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.base.event.game.CountdownFinishedEvent;
 import com.ithinkrok.minigames.base.event.game.GameStateChangedEvent;
@@ -225,7 +225,7 @@ public class SimpleLobbyListener implements CustomListener {
     }
 
     @CustomEventHandler
-    public void onCommand(CommandEvent event) {
+    public void onCommand(MinigamesCommandEvent event) {
         if (!config.getBoolean("simple_lobby.deny_kill_command", true)) return;
         switch (event.getCommand().getCommand().toLowerCase()) {
             case "kill":

@@ -1,7 +1,7 @@
 package com.ithinkrok.minigames.base.command;
 
 import com.ithinkrok.minigames.base.Countdown;
-import com.ithinkrok.minigames.base.event.CommandEvent;
+import com.ithinkrok.minigames.base.event.MinigamesCommandEvent;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
 
@@ -12,8 +12,8 @@ public class CountdownCommand implements CustomListener {
 
 
     @CustomEventHandler
-    public void onCommand(CommandEvent event) {
-        CommandSender sender = event.getCommandSender();
+    public void onCommand(MinigamesCommandEvent event) {
+        MinigamesCommandSender sender = event.getCommandSender();
         MinigamesCommand command = event.getCommand();
 
         if(!command.requireGameGroup(sender)) return;

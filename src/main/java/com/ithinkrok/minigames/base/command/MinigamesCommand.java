@@ -92,7 +92,7 @@ public class MinigamesCommand extends CustomCommand {
         return false;
     }
 
-    public boolean requireOthersPermission(CommandSender sender, String permission) {
+    public boolean requireOthersPermission(MinigamesCommandSender sender, String permission) {
         User userSender = (sender instanceof User) ? (User) sender : null;
 
         boolean userCheck = (user != null) && (userSender != null) && (user != userSender);
@@ -106,7 +106,7 @@ public class MinigamesCommand extends CustomCommand {
         return requirePermission(sender, permission);
     }
 
-    public static boolean requirePermission(CommandSender sender, String permission) {
+    public static boolean requirePermission(MinigamesCommandSender sender, String permission) {
         if (sender.hasPermission(permission)) return true;
 
         sender.sendLocale("command.requires.permission", permission);

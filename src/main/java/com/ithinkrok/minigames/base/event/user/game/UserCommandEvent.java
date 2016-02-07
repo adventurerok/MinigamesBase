@@ -2,13 +2,13 @@ package com.ithinkrok.minigames.base.event.user.game;
 
 import com.ithinkrok.minigames.base.User;
 import com.ithinkrok.minigames.base.command.MinigamesCommand;
-import com.ithinkrok.minigames.base.event.CommandEvent;
+import com.ithinkrok.minigames.base.event.MinigamesCommandEvent;
 import com.ithinkrok.minigames.base.event.user.UserEvent;
 
 /**
  * Created by paul on 24/01/16.
  */
-public class UserCommandEvent extends UserEvent implements CommandEvent {
+public class UserCommandEvent extends UserEvent implements MinigamesCommandEvent {
 
     private final MinigamesCommand command;
 
