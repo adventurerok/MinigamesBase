@@ -123,14 +123,22 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
             else{
                 hidePlayer(u);
 
-                doInFuture(task -> showPlayer(u));
+                doInFuture(task -> {
+                    if(!u.isCloaked()) {
+                        showPlayer(u);
+                    }
+                });
             }
 
             if(isCloaked()) u.hidePlayer(this);
             else {
                 u.hidePlayer(this);
 
-                doInFuture(task -> u.showPlayer(User.this));
+                doInFuture(task -> {
+                    if(!isCloaked()) {
+                        u.showPlayer(this);
+                    }
+                });
             }
         }
     }
