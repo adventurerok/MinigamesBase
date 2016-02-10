@@ -8,8 +8,8 @@ import com.ithinkrok.minigames.base.lang.LanguageLookup;
 import com.ithinkrok.minigames.base.map.GameMapInfo;
 import com.ithinkrok.minigames.base.schematic.Schematic;
 import com.ithinkrok.minigames.base.team.TeamIdentifier;
+import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomListener;
-import org.bukkit.configuration.ConfigurationSection;
 
 /**
  * Created by paul on 04/01/16.
@@ -24,7 +24,7 @@ public interface ConfigHolder {
 
     void addLanguageLookup(LanguageLookup languageLookup);
 
-    void addSharedObject(String name, ConfigurationSection config);
+    void addSharedObject(String name, Config config);
 
     void addSchematic(Schematic schematic);
 

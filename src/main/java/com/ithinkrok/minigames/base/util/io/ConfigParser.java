@@ -7,11 +7,11 @@ import com.ithinkrok.minigames.base.item.CustomItem;
 import com.ithinkrok.minigames.base.map.GameMapInfo;
 import com.ithinkrok.minigames.base.schematic.Schematic;
 import com.ithinkrok.minigames.base.team.TeamIdentifier;
+import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
-import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Created by paul on 04/01/16.
  */
-public class ConfigParser {
+public final class ConfigParser {
 
     private final FileLoader loader;
     private final ConfigHolder holder;
@@ -36,58 +36,58 @@ public class ConfigParser {
     }
 
     public static void parseConfig(FileLoader loader, ConfigHolder holder, Object listenerCreator,
-                                   Object listenerRepresenting, String name, ConfigurationSection config) {
+                                   Object listenerRepresenting, String name, Config config) {
         ConfigParser parser = new ConfigParser(loader, holder, listenerCreator, listenerRepresenting);
 
         parser.load(name, config);
     }
 
-    private void load(String name, ConfigurationSection config) {
+    private void load(String name, Config config) {
         if (loaded.contains(name)) return;
 
         loaded.add(name);
 
         if (config.contains("lang_files")) loadLangFiles(config.getStringList("lang_files"));
-        if (config.contains("shared_objects")) loadSharedObjects(config.getConfigurationSection("shared_objects"));
+        if (config.contains("shared_objects")) loadSharedObjects(config.getConfigOrNull("shared_objects"));
 
-        if (config.contains("custom_items")) loadCustomItems(config.getConfigurationSection("custom_items"));
-        if (config.contains("schematics")) loadSchematics(config.getConfigurationSection("schematics"));
+        if (config.contains("custom_items")) loadCustomItems(config.getConfigOrNull("custom_items"));
+        if (config.contains("schematics")) loadSchematics(config.getConfigOrNull("schematics"));
 
-        if (config.contains("kits")) loadKits(config.getConfigurationSection("kits"));
-        if (config.contains("team_identifiers")) loadTeams(config.getConfigurationSection("team_identifiers"));
-        if (config.contains("game_states")) loadGameStates(config.getConfigurationSection("game_states"));
-        if (config.contains("maps")) loadMaps(config.getConfigurationSection("maps"));
+        if (config.contains("kits")) loadKits(config.getConfigOrNull("kits"));
+        if (config.contains("team_identifiers")) loadTeams(config.getConfigOrNull("team_identifiers"));
+        if (config.contains("game_states")) loadGameStates(config.getConfigOrNull("game_states"));
+        if (config.contains("maps")) loadMaps(config.getConfigOrNull("maps"));
 
-        if (config.contains("listeners")) loadListeners(config.getConfigurationSection("listeners"));
-        if (config.contains("commands")) loadCommands(config.getConfigurationSection("commands"));
+        if (config.contains("listeners")) loadListeners(config.getConfigOrNull("listeners"));
+        if (config.contains("commands")) loadCommands(config.getConfigOrNull("commands"));
 
         if (config.contains("additional_configs")) loadAdditionalConfigs(config.getStringList("additional_configs"));
     }
 
-    private void loadMaps(ConfigurationSection maps) {
+    private void loadMaps(Config maps) {
         for (String name : maps.getKeys(false)) {
             holder.addMapInfo(new GameMapInfo(loader, name, maps.getString(name)));
         }
     }
 
-    private void loadCommands(ConfigurationSection config) {
+    private void loadCommands(Config config) {
         for (String name : config.getKeys(false)) {
             CommandConfig commandConfig =
-                    new CommandConfig(name, config.getConfigurationSection(name), listenerCreator);
+                    new CommandConfig(name, config.getConfigOrNull(name), listenerCreator);
 
             holder.addCommand(commandConfig);
         }
     }
 
-    private void loadGameStates(ConfigurationSection config) {
+    private void loadGameStates(Config config) {
         for (String name : config.getKeys(false)) {
-            ConfigurationSection gameStateConfig = config.getConfigurationSection(name);
-            List<ConfigurationSection> listeners = new ArrayList<>();
+            Config gameStateConfig = config.getConfigOrNull(name);
+            List<Config> listeners = new ArrayList<>();
 
-            ConfigurationSection listenersConfig = gameStateConfig.getConfigurationSection("listeners");
+            Config listenersConfig = gameStateConfig.getConfigOrNull("listeners");
 
             for (String listenerName : listenersConfig.getKeys(false)) {
-                ConfigurationSection listenerConfig = listenersConfig.getConfigurationSection(listenerName);
+                Config listenerConfig = listenersConfig.getConfigOrNull(listenerName);
 
                 listeners.add(listenerConfig);
             }
@@ -95,9 +95,9 @@ public class ConfigParser {
         }
     }
 
-    private void loadTeams(ConfigurationSection config) {
+    private void loadTeams(Config config) {
         for (String name : config.getKeys(false)) {
-            ConfigurationSection teamConfig = config.getConfigurationSection(name);
+            Config teamConfig = config.getConfigOrNull(name);
 
             DyeColor dyeColor = DyeColor.valueOf(teamConfig.getString("dye_color").toUpperCase());
 
@@ -118,18 +118,18 @@ public class ConfigParser {
         }
     }
 
-    private void loadKits(ConfigurationSection config) {
+    private void loadKits(Config config) {
         for (String name : config.getKeys(false)) {
-            ConfigurationSection kitConfig = config.getConfigurationSection(name);
+            Config kitConfig = config.getConfigOrNull(name);
 
             String formattedName = kitConfig.getString("formatted_name", null);
 
-            ConfigurationSection listenersConfig = kitConfig.getConfigurationSection("listeners");
+            Config listenersConfig = kitConfig.getConfigOrNull("listeners");
 
-            Collection<ConfigurationSection> listeners = new ArrayList<>();
+            Collection<Config> listeners = new ArrayList<>();
 
             for (String listenerName : listenersConfig.getKeys(false)) {
-                ConfigurationSection listenerConfig = listenersConfig.getConfigurationSection(listenerName);
+                Config listenerConfig = listenersConfig.getConfigOrNull(listenerName);
 
                 listeners.add(listenerConfig);
             }
@@ -138,24 +138,24 @@ public class ConfigParser {
         }
     }
 
-    private void loadSchematics(ConfigurationSection config) {
+    private void loadSchematics(Config config) {
         for (String name : config.getKeys(false)) {
-            ConfigurationSection schemConfig = config.getConfigurationSection(name);
+            Config schemConfig = config.getConfigOrNull(name);
             Schematic schem = new Schematic(name, loader.getAssetDirectory(), schemConfig);
 
             holder.addSchematic(schem);
         }
     }
 
-    private void loadSharedObjects(ConfigurationSection config) {
+    private void loadSharedObjects(Config config) {
         for (String name : config.getKeys(false)) {
-            holder.addSharedObject(name, config.getConfigurationSection(name));
+            holder.addSharedObject(name, config.getConfigOrNull(name));
         }
     }
 
-    private void loadListeners(ConfigurationSection config) {
+    private void loadListeners(Config config) {
         for (String name : config.getKeys(false)) {
-            ConfigurationSection listenerConfig = config.getConfigurationSection(name);
+            Config listenerConfig = config.getConfigOrNull(name);
 
             try {
                 CustomListener listener =
@@ -168,9 +168,9 @@ public class ConfigParser {
         }
     }
 
-    private void loadCustomItems(ConfigurationSection config) {
+    private void loadCustomItems(Config config) {
         for (String name : config.getKeys(false)) {
-            ConfigurationSection itemConfig = config.getConfigurationSection(name);
+            Config itemConfig = config.getConfigOrNull(name);
 
             CustomItem item = new CustomItem(name, itemConfig);
             holder.addCustomItem(item);

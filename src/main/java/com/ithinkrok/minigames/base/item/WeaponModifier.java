@@ -7,9 +7,9 @@ import com.ithinkrok.minigames.base.item.event.CustomItemLoreCalculateEvent;
 import com.ithinkrok.minigames.base.lang.LanguageLookup;
 import com.ithinkrok.minigames.base.util.math.Calculator;
 import com.ithinkrok.minigames.base.util.math.ExpressionCalculator;
+import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
@@ -43,23 +43,23 @@ public class WeaponModifier implements CustomListener {
         load(event.getConfig());
     }
 
-    private void load(ConfigurationSection config) {
+    private void load(Config config) {
         if (config.contains("damage")) damageCalculator = new ExpressionCalculator(config.getString("damage"));
         if (config.contains("fire")) fireCalculator = new ExpressionCalculator(config.getString("fire"));
 
         if (config.contains("effects")) {
-            configureEffects(config.getConfigurationSection("effects"), enemyEffects);
+            configureEffects(config.getConfigOrNull("effects"), enemyEffects);
         }
 
         if (config.contains("self_effects")) {
-            configureEffects(config.getConfigurationSection("self_effects"), selfEffects);
+            configureEffects(config.getConfigOrNull("self_effects"), selfEffects);
         }
     }
 
-    private void configureEffects(ConfigurationSection effects, List<EffectModifier> list) {
+    private void configureEffects(Config effects, List<EffectModifier> list) {
         for (String effectName : effects.getKeys(false)) {
             PotionEffectType effectType = PotionEffectType.getByName(effectName);
-            list.add(new EffectModifier(effectType, effects.getConfigurationSection(effectName)));
+            list.add(new EffectModifier(effectType, effects.getConfigOrNull(effectName)));
         }
     }
 
@@ -120,7 +120,7 @@ public class WeaponModifier implements CustomListener {
         private final Calculator levelCalculator;
         private final Calculator showInLore;
 
-        public EffectModifier(PotionEffectType effectType, ConfigurationSection config) {
+        public EffectModifier(PotionEffectType effectType, Config config) {
             this.effectType = effectType;
             durationCalculator = new ExpressionCalculator(config.getString("duration"));
 

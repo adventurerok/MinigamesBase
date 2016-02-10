@@ -5,8 +5,7 @@ import com.ithinkrok.minigames.base.event.game.GameStateChangedEvent;
 import com.ithinkrok.minigames.base.event.game.MapChangedEvent;
 import com.ithinkrok.minigames.base.event.user.game.UserInGameChangeEvent;
 import com.ithinkrok.minigames.base.team.Team;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.MemoryConfiguration;
+import com.ithinkrok.util.config.Config;
 
 /**
  * Created by paul on 05/01/16.
@@ -35,9 +34,7 @@ public abstract class Money extends UserMetadata {
         return money;
     }
 
-    protected void loadValues(ConfigurationSection config, String type) {
-        if(config == null) config = new MemoryConfiguration();
-
+    protected void loadValues(Config config, String type) {
         removeGameState = config.getString("remove_gamestate", null);
         addMoneyLocale = config.getString("add_locale", "money.balance." + type + ".add");
         subtractMoneyLocale = config.getString("subtract_locale", "money.balance." + type + ".subtract");

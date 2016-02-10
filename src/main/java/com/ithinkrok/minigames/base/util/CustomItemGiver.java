@@ -5,7 +5,7 @@ import com.ithinkrok.minigames.base.item.CustomItem;
 import com.ithinkrok.minigames.base.util.math.MapVariables;
 import com.ithinkrok.minigames.base.util.math.Variables;
 import com.ithinkrok.msm.common.util.ConfigUtils;
-import org.bukkit.configuration.ConfigurationSection;
+import com.ithinkrok.util.config.Config;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -20,11 +20,11 @@ public class CustomItemGiver {
     private final List<CustomItemInfo> items = new ArrayList<>();
     private boolean clearInventory = false;
 
-    public CustomItemGiver(ConfigurationSection config) {
+    public CustomItemGiver(Config config) {
         if (config == null) config = ConfigUtils.EMPTY_CONFIG;
         clearInventory = config.getBoolean("clear_inventory");
 
-        List<ConfigurationSection> itemConfigs = ConfigUtils.getConfigList(config, "items");
+        List<Config> itemConfigs = config.getConfigList("items");
         if (itemConfigs == null) return;
 
         items.addAll(itemConfigs.stream().map(CustomItemInfo::new).collect(Collectors.toList()));
@@ -51,12 +51,12 @@ public class CustomItemGiver {
         private final int slot;
         private Variables customVariables;
 
-        public CustomItemInfo(ConfigurationSection config) {
+        public CustomItemInfo(Config config) {
             customItem = config.getString("name");
             slot = config.getInt("slot", -1);
 
             if (!config.contains("custom_variables")) return;
-            customVariables = new MapVariables(config.getConfigurationSection("custom_variables"));
+            customVariables = new MapVariables(config.getConfigOrEmpty("custom_variables"));
         }
     }
 }

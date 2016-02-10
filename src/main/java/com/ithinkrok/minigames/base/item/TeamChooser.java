@@ -9,10 +9,10 @@ import com.ithinkrok.minigames.base.inventory.event.UserClickItemEvent;
 import com.ithinkrok.minigames.base.team.Team;
 import com.ithinkrok.minigames.base.team.TeamIdentifier;
 import com.ithinkrok.minigames.base.util.InventoryUtils;
+import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public class TeamChooser implements CustomListener {
 
     @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent<?, ?> event) {
-        ConfigurationSection config = event.getConfig();
+        Config config = event.getConfig();
 
         choosable = config.getStringList("choosable_teams");
         chooserMaterial = Material.matchMaterial(config.getString("chooser_material", "WOOL"));

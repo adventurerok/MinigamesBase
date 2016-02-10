@@ -10,9 +10,9 @@ import com.ithinkrok.minigames.base.util.InventoryUtils;
 import com.ithinkrok.minigames.base.util.SoundEffect;
 import com.ithinkrok.minigames.base.util.math.Calculator;
 import com.ithinkrok.minigames.base.util.math.ExpressionCalculator;
+import com.ithinkrok.util.config.Config;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
@@ -34,14 +34,14 @@ public abstract class Buyable extends ClickableItem {
 
     private Calculator canBuy;
 
-    private Map<String, Calculator> upgradeOnBuy = new HashMap<>();
+    private final Map<String, Calculator> upgradeOnBuy = new HashMap<>();
 
     public Buyable(ItemStack baseDisplay) {
         super(baseDisplay);
     }
 
     @Override
-    public void configure(ConfigurationSection config) {
+    public void configure(Config config) {
         cost = new ExpressionCalculator(config.getString("cost"));
         team = new ExpressionCalculator(config.getString("team", "false"));
         canBuy = new ExpressionCalculator(config.getString("can_buy", "true"));
@@ -53,10 +53,10 @@ public abstract class Buyable extends ClickableItem {
         teamDescriptionLocale = config.getString("team_description_locale", "buyable.team.description");
         userDescriptionLocale = config.getString("user_description_locale", "buyable.user.description");
 
-        if(config.contains("upgrade_on_buy")) configureUpgradeOnBuy(config.getConfigurationSection("upgrade_on_buy"));
+        if(config.contains("upgrade_on_buy")) configureUpgradeOnBuy(config.getConfigOrNull("upgrade_on_buy"));
     }
 
-    private void configureUpgradeOnBuy(ConfigurationSection config) {
+    private void configureUpgradeOnBuy(Config config) {
         for(String upgrade : config.getKeys(false)) {
             upgradeOnBuy.put(upgrade, new ExpressionCalculator(config.getString(upgrade)));
         }

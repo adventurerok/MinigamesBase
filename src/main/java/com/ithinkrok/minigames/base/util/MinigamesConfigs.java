@@ -1,8 +1,8 @@
 package com.ithinkrok.minigames.base.util;
 
 import com.ithinkrok.msm.common.util.ConfigUtils;
+import com.ithinkrok.util.config.Config;
 import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
@@ -11,7 +11,7 @@ import org.bukkit.util.Vector;
  */
 public class MinigamesConfigs {
 
-    public static BoundingBox getBounds(ConfigurationSection config, String path) {
+    public static BoundingBox getBounds(Config config, String path) {
         if (!path.isEmpty()) path = path + ".";
 
         Vector min = ConfigUtils.getVector(config, path + "min");
@@ -20,21 +20,21 @@ public class MinigamesConfigs {
         return new BoundingBox(min, max);
     }
 
-    public static CountdownConfig getCountdown(ConfigurationSection config, String path) {
+    public static CountdownConfig getCountdown(Config config, String path) {
         return getCountdown(config, path, null, 0, null);
     }
 
-    public static CountdownConfig getCountdown(ConfigurationSection config, String path, String defaultName,
+    public static CountdownConfig getCountdown(Config config, String path, String defaultName,
                                                int defaultSeconds, String defaultStub) {
-        return new CountdownConfig(ConfigUtils.getConfigOrEmpty(config, path), defaultName, defaultSeconds,
+        return new CountdownConfig(config.getConfigOrEmpty(path), defaultName, defaultSeconds,
                 defaultStub);
     }
 
-    public static ItemStack getItemStack(ConfigurationSection config, String path) {
+    public static ItemStack getItemStack(Config config, String path) {
         if (config.isString(path)) return InventoryUtils.parseItem(config.getString(path));
-        if (!config.isConfigurationSection(path)) return null;
+        if (!config.isConfig(path)) return null;
 
-        if (!path.isEmpty()) config = config.getConfigurationSection(path);
+        if (!path.isEmpty()) config = config.getConfigOrNull(path);
 
         Material mat = Material.matchMaterial(config.getString("type"));
         int amount = config.getInt("amount", 1);
@@ -47,9 +47,9 @@ public class MinigamesConfigs {
         return InventoryUtils.createItemWithNameAndLore(mat, amount, damage, name);
     }
 
-    public static SoundEffect getSoundEffect(ConfigurationSection config, String path) {
+    public static SoundEffect getSoundEffect(Config config, String path) {
         if (config.isString(path)) return new SoundEffect(config.getString(path));
-        else if (config.isConfigurationSection(path)) return new SoundEffect(config.getConfigurationSection(path));
+        else if (config.isConfig(path)) return new SoundEffect(config.getConfigOrNull(path));
         else return null;
     }
 }

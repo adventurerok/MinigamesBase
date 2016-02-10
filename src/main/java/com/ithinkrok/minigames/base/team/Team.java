@@ -17,12 +17,12 @@ import com.ithinkrok.minigames.base.task.GameTask;
 import com.ithinkrok.minigames.base.task.TaskList;
 import com.ithinkrok.minigames.base.task.TaskScheduler;
 import com.ithinkrok.minigames.base.user.UserResolver;
+import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Listener;
 
@@ -146,12 +146,12 @@ public class Team implements Listener, Messagable, LanguageLookup, SharedObjectA
     }
 
     @Override
-    public ConfigurationSection getSharedObject(String name) {
+    public Config getSharedObject(String name) {
         return gameGroup.getSharedObject(name);
     }
 
     @Override
-    public ConfigurationSection getSharedObjectOrEmpty(String name) {
+    public Config getSharedObjectOrEmpty(String name) {
         return gameGroup.getSharedObjectOrEmpty(name);
     }
 

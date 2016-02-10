@@ -3,7 +3,6 @@ package com.ithinkrok.minigames.base;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.google.common.collect.MapMaker;
 import com.ithinkrok.minigames.base.command.MinigamesCommand;
-import com.ithinkrok.util.command.CommandUtils;
 import com.ithinkrok.minigames.base.database.DatabaseTask;
 import com.ithinkrok.minigames.base.database.DatabaseTaskRunner;
 import com.ithinkrok.minigames.base.database.Persistence;
@@ -31,8 +30,10 @@ import com.ithinkrok.minigames.base.util.InventoryUtils;
 import com.ithinkrok.minigames.base.util.InvisiblePlayerAttacker;
 import com.ithinkrok.minigames.base.util.disguise.*;
 import com.ithinkrok.minigames.base.util.io.FileLoader;
+import com.ithinkrok.util.command.CommandUtils;
+import com.ithinkrok.util.config.BukkitConfig;
+import com.ithinkrok.util.config.Config;
 import org.bukkit.*;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -84,7 +85,7 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
 
     private DisguiseController disguiseController;
 
-    public Game(BasePlugin plugin, ConfigurationSection config) {
+    public Game(BasePlugin plugin, Config config) {
         this.plugin = plugin;
 
         name = config.getString("bungee.name");
@@ -175,8 +176,8 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     }
 
     @Override
-    public ConfigurationSection loadConfig(String path) {
-        return YamlConfiguration.loadConfiguration(configDirectory.resolve(path).toFile());
+    public Config loadConfig(String path) {
+        return new BukkitConfig(YamlConfiguration.loadConfiguration(configDirectory.resolve(path).toFile()));
     }
 
     @Override

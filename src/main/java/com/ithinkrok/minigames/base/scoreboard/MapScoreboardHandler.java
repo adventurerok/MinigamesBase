@@ -4,7 +4,7 @@ import com.ithinkrok.minigames.base.User;
 import com.ithinkrok.minigames.base.metadata.MapVote;
 import com.ithinkrok.minigames.base.user.scoreboard.ScoreboardDisplay;
 import com.ithinkrok.minigames.base.user.scoreboard.ScoreboardHandler;
-import org.bukkit.configuration.ConfigurationSection;
+import com.ithinkrok.util.config.Config;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ public class MapScoreboardHandler implements ScoreboardHandler {
     private final List<String> votableMaps;
 
     public MapScoreboardHandler(User user) {
-        ConfigurationSection config = user.getSharedObject("map_scoreboard");
+        Config config = user.getSharedObject("map_scoreboard");
 
         String displayNameLocale = config.getString("title", "map_scoreboard.title");
         displayName = user.getLanguageLookup().getLocale(displayNameLocale);

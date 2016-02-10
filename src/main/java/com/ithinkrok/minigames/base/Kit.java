@@ -1,8 +1,8 @@
 package com.ithinkrok.minigames.base;
 
 import com.ithinkrok.minigames.base.util.io.ListenerLoader;
+import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomListener;
-import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,9 +14,9 @@ public class Kit implements Nameable {
 
     private final String name;
     private final String formattedName;
-    private final Collection<ConfigurationSection> listeners;
+    private final Collection<Config> listeners;
 
-    public Kit(String name, String formattedName, Collection<ConfigurationSection> listeners) {
+    public Kit(String name, String formattedName, Collection<Config> listeners) {
         this.name = name;
         this.formattedName = (formattedName != null) ? formattedName : name;
         this.listeners = listeners;
@@ -35,7 +35,7 @@ public class Kit implements Nameable {
     public Collection<CustomListener> createListeners(User user) {
         Collection<CustomListener> result = new ArrayList<>();
 
-        for(ConfigurationSection listenerConfig : listeners) {
+        for(Config listenerConfig : listeners) {
             try {
                 result.add(ListenerLoader.loadListener(user, this, listenerConfig));
             } catch (Exception e) {

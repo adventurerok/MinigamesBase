@@ -4,7 +4,7 @@ import com.ithinkrok.minigames.base.inventory.event.CalculateItemForUserEvent;
 import com.ithinkrok.minigames.base.inventory.event.UserClickItemEvent;
 import com.ithinkrok.minigames.base.item.Identifiable;
 import com.ithinkrok.minigames.base.util.InventoryUtils;
-import org.bukkit.configuration.ConfigurationSection;
+import com.ithinkrok.util.config.Config;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -15,13 +15,13 @@ public abstract class ClickableItem implements Identifiable {
     private static int clickableItemCount = 0;
 
     protected ItemStack baseDisplay;
-    private int identifier = clickableItemCount++;
+    private final int identifier = clickableItemCount++;
 
     public ClickableItem(ItemStack baseDisplay) {
         if(baseDisplay != null) this.baseDisplay = InventoryUtils.addIdentifier(baseDisplay.clone(), identifier);
     }
 
-    public void configure(ConfigurationSection config) {}
+    public void configure(Config config) {}
 
     public int getIdentifier() {
         return identifier;

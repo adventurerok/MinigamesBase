@@ -6,9 +6,9 @@ import com.ithinkrok.minigames.base.User;
 import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.base.event.user.game.UserJoinEvent;
 import com.ithinkrok.minigames.base.util.CustomItemGiver;
+import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
-import org.bukkit.configuration.ConfigurationSection;
 
 /**
  * Created by paul on 31/01/16.
@@ -25,9 +25,9 @@ public class SimpleInGameListener implements CustomListener {
     public void onListenerLoaded(ListenerLoadedEvent<GameGroup, GameState> event) {
         gameState = event.getRepresenting();
 
-        ConfigurationSection config = event.getConfigOrEmpty();
+        Config config = event.getConfigOrEmpty();
 
-        spectatorItems = new CustomItemGiver(config.getConfigurationSection("spectator_items"));
+        spectatorItems = new CustomItemGiver(config.getConfigOrNull("spectator_items"));
         spectatorJoinLocaleStub = config.getString("spectator_join_locale_stub", "spectator.join");
     }
 

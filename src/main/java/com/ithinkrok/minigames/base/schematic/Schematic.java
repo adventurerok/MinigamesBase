@@ -4,7 +4,7 @@ import com.flowpowered.nbt.*;
 import com.flowpowered.nbt.stream.NBTInputStream;
 import com.ithinkrok.minigames.base.Nameable;
 import com.ithinkrok.msm.common.util.ConfigUtils;
-import org.bukkit.configuration.ConfigurationSection;
+import com.ithinkrok.util.config.Config;
 import org.bukkit.util.Vector;
 
 import java.io.IOException;
@@ -28,16 +28,16 @@ public class Schematic implements Nameable {
     private final byte[] blocks;
     private final byte[] data;
 
-    private final ConfigurationSection config;
+    private final Config config;
 
     private final List<String> upgradesTo;
 
     private final boolean allowOverlap;
 
-    public Schematic(String name, Path dataFolder, ConfigurationSection config) {
+    public Schematic(String name, Path dataFolder, Config config) {
         this.name = name;
         this.formattedName = config.getString("formatted_name", name);
-        this.config = config.getConfigurationSection("config");
+        this.config = config.getConfigOrEmpty("config");
         this.baseRotation = config.getInt("rotation", 0);
 
         this.allowOverlap = config.getBoolean("allow_overlap");
@@ -118,7 +118,7 @@ public class Schematic implements Nameable {
         return size;
     }
 
-    public ConfigurationSection getConfig() {
+    public Config getConfig() {
         return config;
     }
 }

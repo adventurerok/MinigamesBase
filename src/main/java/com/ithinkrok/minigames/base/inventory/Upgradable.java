@@ -5,7 +5,7 @@ import com.ithinkrok.minigames.base.inventory.event.CalculateItemForUserEvent;
 import com.ithinkrok.minigames.base.item.CustomItem;
 import com.ithinkrok.minigames.base.util.InventoryUtils;
 import com.ithinkrok.minigames.base.util.math.MapVariables;
-import org.bukkit.configuration.ConfigurationSection;
+import com.ithinkrok.util.config.Config;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -24,7 +24,7 @@ public class Upgradable extends Buyable {
     }
 
     @Override
-    public void configure(ConfigurationSection config) {
+    public void configure(Config config) {
         super.configure(config);
         upgradeName = config.getString("upgrade_name");
         upgradeDisplayLang = config.getString("upgrade_display_locale");

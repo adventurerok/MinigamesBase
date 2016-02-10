@@ -2,7 +2,7 @@ package com.ithinkrok.minigames.base.metadata;
 
 import com.ithinkrok.minigames.base.User;
 import com.ithinkrok.minigames.base.team.Team;
-import org.bukkit.configuration.ConfigurationSection;
+import com.ithinkrok.util.config.Config;
 
 /**
  * Created by paul on 07/01/16.
@@ -14,7 +14,7 @@ public class TeamMoney extends Money {
     public TeamMoney(Team team) {
         this.team = team;
 
-        ConfigurationSection config = team.getGameGroup().getSharedObject("team_money_metadata");
+        Config config = team.getGameGroup().getSharedObjectOrEmpty("team_money_metadata");
 
         loadValues(config, "team");
     }

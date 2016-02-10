@@ -1,7 +1,7 @@
 package com.ithinkrok.minigames.base.util;
 
+import com.ithinkrok.util.config.Config;
 import org.bukkit.Sound;
-import org.bukkit.configuration.ConfigurationSection;
 
 /**
  * Created by paul on 03/01/16.
@@ -12,7 +12,7 @@ public class SoundEffect {
     private final float volume;
     private final float pitch;
 
-    public SoundEffect(ConfigurationSection config) {
+    public SoundEffect(Config config) {
         this.sound = Sound.valueOf(config.getString("sound").toUpperCase());
         volume = (float) config.getDouble("volume", 1.0);
         pitch = (float) config.getDouble("pitch", 1.0);

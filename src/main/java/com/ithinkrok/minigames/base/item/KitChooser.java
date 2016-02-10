@@ -9,9 +9,9 @@ import com.ithinkrok.minigames.base.inventory.ClickableItem;
 import com.ithinkrok.minigames.base.inventory.event.UserClickItemEvent;
 import com.ithinkrok.minigames.base.util.InventoryUtils;
 import com.ithinkrok.minigames.base.util.MinigamesConfigs;
+import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.LinkedHashMap;
@@ -28,9 +28,9 @@ public class KitChooser implements CustomListener {
 
     @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent<?, ?> event) {
-        ConfigurationSection config = event.getConfig();
+        Config config = event.getConfig();
 
-        ConfigurationSection kits = config.getConfigurationSection("choosable_kits");
+        Config kits = config.getConfigOrNull("choosable_kits");
 
         for (String kitName : kits.getKeys(false)) {
             choosableKits.put(kitName, MinigamesConfigs.getItemStack(kits, kitName));

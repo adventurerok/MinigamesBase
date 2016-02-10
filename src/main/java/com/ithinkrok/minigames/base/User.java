@@ -31,13 +31,12 @@ import com.ithinkrok.minigames.base.util.InventoryUtils;
 import com.ithinkrok.minigames.base.util.SoundEffect;
 import com.ithinkrok.minigames.base.util.disguise.Disguise;
 import com.ithinkrok.minigames.base.util.playerstate.PlayerState;
-import com.ithinkrok.msm.common.util.ConfigUtils;
+import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventExecutor;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.*;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.*;
@@ -323,8 +322,7 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
     }
 
     public void resetUserStats(boolean removePotionEffects) {
-        ConfigurationSection defaultStats = getSharedObjectOrEmpty("user").getConfigurationSection("default_stats");
-        if (defaultStats == null) defaultStats = ConfigUtils.EMPTY_CONFIG;
+        Config defaultStats = getSharedObjectOrEmpty("user").getConfigOrEmpty("default_stats");
 
         setMaxHealth(defaultStats.getDouble("max_health", 10) * 2);
         setHealth(defaultStats.getDouble("health", 10) * 2);
@@ -741,12 +739,12 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
     }
 
     @Override
-    public ConfigurationSection getSharedObject(String name) {
+    public Config getSharedObject(String name) {
         return gameGroup.getSharedObject(name);
     }
 
     @Override
-    public ConfigurationSection getSharedObjectOrEmpty(String name) {
+    public Config getSharedObjectOrEmpty(String name) {
         return gameGroup.getSharedObjectOrEmpty(name);
     }
 

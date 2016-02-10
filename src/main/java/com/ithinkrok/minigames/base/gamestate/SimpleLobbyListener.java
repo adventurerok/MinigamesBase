@@ -3,8 +3,8 @@ package com.ithinkrok.minigames.base.gamestate;
 import com.ithinkrok.minigames.base.GameGroup;
 import com.ithinkrok.minigames.base.GameState;
 import com.ithinkrok.minigames.base.User;
-import com.ithinkrok.minigames.base.event.MinigamesCommandEvent;
 import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
+import com.ithinkrok.minigames.base.event.MinigamesCommandEvent;
 import com.ithinkrok.minigames.base.event.game.CountdownFinishedEvent;
 import com.ithinkrok.minigames.base.event.game.GameStateChangedEvent;
 import com.ithinkrok.minigames.base.event.map.MapCreatureSpawnEvent;
@@ -19,12 +19,12 @@ import com.ithinkrok.minigames.base.scoreboard.MapScoreboardHandler;
 import com.ithinkrok.minigames.base.util.CountdownConfig;
 import com.ithinkrok.minigames.base.util.CustomItemGiver;
 import com.ithinkrok.minigames.base.util.MinigamesConfigs;
+import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.util.Objects;
@@ -51,7 +51,7 @@ public class SimpleLobbyListener implements CustomListener {
     private String joinLobbyLocaleStub;
 
     private CustomItemGiver giveOnJoin;
-    private ConfigurationSection config;
+    private Config config;
 
     @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent<GameGroup, GameState> event) {
@@ -61,11 +61,11 @@ public class SimpleLobbyListener implements CustomListener {
 
         nextGameState = config.getString("next_gamestate");
 
-        configureCountdown(config.getConfigurationSection("start_countdown"));
+        configureCountdown(config.getConfigOrEmpty("start_countdown"));
 
         lobbyMapName = config.getString("lobby_map");
 
-        giveOnJoin = new CustomItemGiver(config.getConfigurationSection("give_on_join"));
+        giveOnJoin = new CustomItemGiver(config.getConfigOrEmpty("give_on_join"));
 
         joinLobbyLocaleStub = config.getString("join_lobby_locale_stub", "lobby.info");
 
@@ -74,7 +74,7 @@ public class SimpleLobbyListener implements CustomListener {
     }
 
 
-    private void configureCountdown(ConfigurationSection config) {
+    private void configureCountdown(Config config) {
         startCountdown = MinigamesConfigs.getCountdown(config, "");
         minPlayersToStartGame = config.getInt("min_players");
         needsMorePlayersLocale = config.getString("needs_more_players_locale");

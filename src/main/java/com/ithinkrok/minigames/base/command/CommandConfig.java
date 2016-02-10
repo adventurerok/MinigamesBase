@@ -2,8 +2,8 @@ package com.ithinkrok.minigames.base.command;
 
 import com.ithinkrok.minigames.base.Nameable;
 import com.ithinkrok.minigames.base.util.io.ListenerLoader;
+import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomListener;
-import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,7 +25,7 @@ public class CommandConfig implements Nameable {
 
     private final CustomListener executor;
 
-    public CommandConfig(String name, ConfigurationSection config, Object creator) {
+    public CommandConfig(String name, Config config, Object creator) {
         this.name = name.toLowerCase();
 
         if (config.contains("formatted_name")) formattedName = config.getString("formatted_name");

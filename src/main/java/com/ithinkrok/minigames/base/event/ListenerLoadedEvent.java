@@ -1,7 +1,7 @@
 package com.ithinkrok.minigames.base.event;
 
 import com.ithinkrok.msm.common.util.ConfigUtils;
-import org.bukkit.configuration.ConfigurationSection;
+import com.ithinkrok.util.config.Config;
 
 /**
  * Created by paul on 02/01/16.
@@ -12,9 +12,9 @@ public class ListenerLoadedEvent<C, R> implements MinigamesEvent {
 
     private final C creator;
     private final R representing;
-    private final ConfigurationSection config;
+    private final Config config;
 
-    public ListenerLoadedEvent(C creator, R representing, ConfigurationSection config) {
+    public ListenerLoadedEvent(C creator, R representing, Config config) {
         this.creator = creator;
         this.representing = representing;
         this.config = config;
@@ -28,7 +28,7 @@ public class ListenerLoadedEvent<C, R> implements MinigamesEvent {
         return representing;
     }
 
-    public ConfigurationSection getConfig() {
+    public Config getConfig() {
         return config;
     }
 
@@ -36,7 +36,7 @@ public class ListenerLoadedEvent<C, R> implements MinigamesEvent {
         return getConfig() != null;
     }
 
-    public ConfigurationSection getConfigOrEmpty() {
+    public Config getConfigOrEmpty() {
         return config != null ? config : ConfigUtils.EMPTY_CONFIG;
     }
 }

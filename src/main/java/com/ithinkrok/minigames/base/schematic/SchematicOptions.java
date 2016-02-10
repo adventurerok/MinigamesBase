@@ -1,9 +1,9 @@
 package com.ithinkrok.minigames.base.schematic;
 
+import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,15 +19,15 @@ public class SchematicOptions {
     private boolean doMapBoundsCheck = true;
     private int buildSpeed = 2;
 
-    private Map<Material, Material> replaceMaterials = new HashMap<>();
+    private final Map<Material, Material> replaceMaterials = new HashMap<>();
     private DyeColor overrideDyeColor;
-    private List<CustomListener> defaultListeners = new ArrayList<>();
+    private final List<CustomListener> defaultListeners = new ArrayList<>();
 
     public SchematicOptions() {
 
     }
 
-    public SchematicOptions(ConfigurationSection config) {
+    public SchematicOptions(Config config) {
         progressHologram = config.getBoolean("progress_hologram");
         doMapBoundsCheck = config.getBoolean("do_map_bounds_check", true);
         buildSpeed = config.getInt("build_speed");
@@ -37,7 +37,7 @@ public class SchematicOptions {
         }
 
         if(config.contains("replace_materials")) {
-            ConfigurationSection repMatSection = config.getConfigurationSection("replace_materials");
+            Config repMatSection = config.getConfigOrNull("replace_materials");
             for(String oldMatName : repMatSection.getKeys(false)) {
                 Material oldMat = Material.matchMaterial(oldMatName);
                 Material newMat = Material.matchMaterial(repMatSection.getString(oldMatName));

@@ -9,10 +9,9 @@ import com.ithinkrok.minigames.base.event.game.GameStateChangedEvent;
 import com.ithinkrok.minigames.base.metadata.MapVote;
 import com.ithinkrok.minigames.base.team.Team;
 import com.ithinkrok.minigames.base.util.CustomItemGiver;
-import com.ithinkrok.msm.common.util.ConfigUtils;
+import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
-import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,24 +41,22 @@ public class SimpleGameStartListener implements CustomListener {
     public void onListenerLoaded(ListenerLoadedEvent<GameGroup, GameState> event) {
         gameState = event.getRepresenting();
 
-        ConfigurationSection config = event.getConfigOrEmpty();
+        Config config = event.getConfigOrEmpty();
 
         lobbyGameState = config.getString("lobby_gamestate", "lobby");
 
         teamList = config.getStringList("choosable_teams");
         kitList = config.getStringList("choosable_kits");
 
-        configureMapVoting(config.getConfigurationSection("map_voting"));
+        configureMapVoting(config.getConfigOrEmpty("map_voting"));
 
-        customItemGiver = new CustomItemGiver(config.getConfigurationSection("start_items"));
+        customItemGiver = new CustomItemGiver(config.getConfigOrNull("start_items"));
 
         teamInfoLocale = config.getString("team_info_locale", "start_info.team");
         kitInfoLocale = config.getString("kit_info_locale", "start_info.kit");
     }
 
-    private void configureMapVoting(ConfigurationSection config) {
-        if(config == null) config = ConfigUtils.EMPTY_CONFIG;
-
+    private void configureMapVoting(Config config) {
         randomMapName = config.getString("random_map", "random");
 
         mapList = new ArrayList<>(config.getStringList("map_list"));

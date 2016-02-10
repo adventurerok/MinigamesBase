@@ -1,8 +1,8 @@
 package com.ithinkrok.minigames.base.map;
 
 import com.ithinkrok.minigames.base.util.io.FileLoader;
+import com.ithinkrok.util.config.Config;
 import org.bukkit.World;
-import org.bukkit.configuration.ConfigurationSection;
 
 /**
  * Created by paul on 01/01/16.
@@ -11,7 +11,7 @@ public class GameMapInfo {
 
     private final String name;
     private final String configPath;
-    private final ConfigurationSection config;
+    private final Config config;
 
     public GameMapInfo(FileLoader fileLoader, String name, String configPath) {
         this.name = name;
@@ -35,7 +35,7 @@ public class GameMapInfo {
         return config.getBoolean("enable_weather", true);
     }
 
-    public ConfigurationSection getConfig() {
+    public Config getConfig() {
         return config;
     }
 

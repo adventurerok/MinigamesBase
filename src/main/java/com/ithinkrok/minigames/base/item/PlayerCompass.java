@@ -5,11 +5,10 @@ import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.base.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.base.lang.LanguageLookup;
 import com.ithinkrok.minigames.base.util.InventoryUtils;
+import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.Location;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Objects;
@@ -25,9 +24,7 @@ public class PlayerCompass implements CustomListener {
 
     @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent<?, ?> event) {
-        ConfigurationSection config;
-        if (event.hasConfig()) config = event.getConfig();
-        else config = new MemoryConfiguration();
+        Config config = event.getConfigOrEmpty();
 
         nameLocale = config.getString("display_name_locale", "player_compass.name");
         locatingLocale = config.getString("locating_locale", "player_compass.locating");

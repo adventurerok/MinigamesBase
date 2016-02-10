@@ -6,8 +6,7 @@ import com.ithinkrok.minigames.base.inventory.event.CalculateItemForUserEvent;
 import com.ithinkrok.minigames.base.inventory.event.UserClickItemEvent;
 import com.ithinkrok.minigames.base.util.InventoryUtils;
 import com.ithinkrok.minigames.base.util.MinigamesConfigs;
-import com.ithinkrok.msm.common.util.ConfigUtils;
-import org.bukkit.configuration.ConfigurationSection;
+import com.ithinkrok.util.config.Config;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -23,17 +22,17 @@ public class ClickableInventory {
 
 
     private final String title;
-    private Map<Integer, ClickableItem> items = new LinkedHashMap<>();
+    private final Map<Integer, ClickableItem> items = new LinkedHashMap<>();
 
-    public ClickableInventory(ConfigurationSection config) {
+    public ClickableInventory(Config config) {
         this.title = config.getString("title", "Missing Inv Title");
 
-        loadFromConfig(ConfigUtils.getConfigList(config, "items"));
+        loadFromConfig(config.getConfigList("items"));
     }
 
     @SuppressWarnings("unchecked")
-    public void loadFromConfig(List<ConfigurationSection> items) {
-        for (ConfigurationSection config : items) {
+    public void loadFromConfig(List<Config> items) {
+        for (Config config : items) {
             String className = config.getString("class");
             ItemStack display = MinigamesConfigs.getItemStack(config, "display");
             try {
@@ -42,7 +41,7 @@ public class ClickableInventory {
                 Constructor<? extends ClickableItem> constructor = itemClass.getConstructor(ItemStack.class);
                 ClickableItem item = constructor.newInstance(display);
 
-                ConfigurationSection itemConfig = config.getConfigurationSection("config");
+                Config itemConfig = config.getConfigOrNull("config");
                 if (itemConfig != null) item.configure(itemConfig);
 
                 addItem(item);

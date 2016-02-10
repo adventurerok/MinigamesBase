@@ -4,7 +4,8 @@ import com.ithinkrok.minigames.base.database.BooleanUserValue;
 import com.ithinkrok.minigames.base.database.DoubleUserValue;
 import com.ithinkrok.minigames.base.database.IntUserValue;
 import com.ithinkrok.minigames.base.database.StringUserValue;
-import org.bukkit.configuration.ConfigurationSection;
+import com.ithinkrok.util.config.BukkitConfig;
+import com.ithinkrok.util.config.Config;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ public class BasePlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        ConfigurationSection config = getConfig();
+        Config config = new BukkitConfig(getConfig());
 
         game = new Game(this, config);
 

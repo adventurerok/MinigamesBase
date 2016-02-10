@@ -2,8 +2,8 @@ package com.ithinkrok.minigames.base;
 
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.MutableClassToInstanceMap;
-import com.ithinkrok.minigames.base.command.MinigamesCommand;
 import com.ithinkrok.minigames.base.command.CommandConfig;
+import com.ithinkrok.minigames.base.command.MinigamesCommand;
 import com.ithinkrok.minigames.base.database.DatabaseTask;
 import com.ithinkrok.minigames.base.database.DatabaseTaskRunner;
 import com.ithinkrok.minigames.base.event.MinigamesCommandEvent;
@@ -42,13 +42,13 @@ import com.ithinkrok.minigames.base.util.io.ConfigHolder;
 import com.ithinkrok.minigames.base.util.io.ConfigParser;
 import com.ithinkrok.minigames.base.util.io.FileLoader;
 import com.ithinkrok.msm.common.util.ConfigUtils;
+import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventExecutor;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import java.nio.file.Path;
@@ -77,7 +77,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     //Loaded from config
     private final HashMap<String, CustomListener> defaultListeners = new HashMap<>();
     private final IdentifierMap<CustomItem> customItemIdentifierMap = new IdentifierMap<>();
-    private final Map<String, ConfigurationSection> sharedObjectMap = new HashMap<>();
+    private final Map<String, Config> sharedObjectMap = new HashMap<>();
     private final Map<String, Schematic> schematicMap = new HashMap<>();
     private final Map<String, TeamIdentifier> teamIdentifiers = new HashMap<>();
     private final Map<String, GameState> gameStates = new HashMap<>();
@@ -99,7 +99,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         gameGroupListener = new GameGroupListener();
         defaultAndMapListeners = createDefaultAndMapListeners();
 
-        ConfigurationSection baseConfig = game.loadConfig(configFile);
+        Config baseConfig = game.loadConfig(configFile);
         chatPrefix = baseConfig.getString("chat_prefix").replace('&', '§');
 
         ConfigParser.parseConfig(game, this, this, this, configFile, baseConfig);
@@ -247,15 +247,15 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     }
 
     @Override
-    public ConfigurationSection getSharedObject(String name) {
-        ConfigurationSection result = null;
+    public Config getSharedObject(String name) {
+        Config result = null;
         if (currentMap != null) result = currentMap.getSharedObject(name);
         return result != null ? result : sharedObjectMap.get(name);
     }
 
     @Override
-    public ConfigurationSection getSharedObjectOrEmpty(String name) {
-        ConfigurationSection result = null;
+    public Config getSharedObjectOrEmpty(String name) {
+        Config result = null;
 
         if (currentMap != null) result = currentMap.getSharedObject(name);
         if (result != null) return result;
@@ -312,7 +312,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     }
 
     @Override
-    public ConfigurationSection loadConfig(String name) {
+    public Config loadConfig(String name) {
         return game.loadConfig(name);
     }
 
@@ -460,7 +460,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     }
 
     @Override
-    public void addSharedObject(String name, ConfigurationSection config) {
+    public void addSharedObject(String name, Config config) {
         sharedObjectMap.put(name, config);
     }    @Override
     public LanguageLookup getLanguageLookup() {

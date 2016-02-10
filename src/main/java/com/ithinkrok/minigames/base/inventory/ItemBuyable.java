@@ -8,7 +8,7 @@ import com.ithinkrok.minigames.base.util.InventoryUtils;
 import com.ithinkrok.minigames.base.util.MinigamesConfigs;
 import com.ithinkrok.minigames.base.util.math.Calculator;
 import com.ithinkrok.minigames.base.util.math.ExpressionCalculator;
-import org.bukkit.configuration.ConfigurationSection;
+import com.ithinkrok.util.config.Config;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -30,7 +30,7 @@ public class ItemBuyable extends Buyable {
     }
 
     @Override
-    public void configure(ConfigurationSection config) {
+    public void configure(Config config) {
         super.configure(config);
 
         ItemStack purchase = MinigamesConfigs.getItemStack(config, "item");

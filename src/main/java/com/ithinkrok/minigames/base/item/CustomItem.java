@@ -12,11 +12,11 @@ import com.ithinkrok.minigames.base.util.io.ListenerLoader;
 import com.ithinkrok.minigames.base.util.math.Calculator;
 import com.ithinkrok.minigames.base.util.math.ExpressionCalculator;
 import com.ithinkrok.minigames.base.util.math.Variables;
+import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventExecutor;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
@@ -60,7 +60,7 @@ public class CustomItem implements Identifiable, CustomListener, Nameable {
 
     private final List<EnchantmentEffect> enchantmentEffects = new ArrayList<>();
 
-    public CustomItem(String name, ConfigurationSection config) {
+    public CustomItem(String name, Config config) {
         this.name = name;
 
         this.itemDisplayLocale = config.getString("display_name_locale", null);
@@ -70,13 +70,13 @@ public class CustomItem implements Identifiable, CustomListener, Nameable {
         this.unbreakable = config.getBoolean("unbreakable", itemMaterial.getMaxDurability() != 0);
         this.replaceOnUpgrade = config.getBoolean("upgradable", false);
 
-        if (config.contains("right_cooldown")) configureCooldown(config.getConfigurationSection("right_cooldown"));
-        if (config.contains("right_timeout")) configureTimeout(config.getConfigurationSection("right_timeout"));
-        if( config.contains("enchantments")) configureEnchantments(config.getConfigurationSection("enchantments"));
-        if (config.contains("listeners")) configureListeners(config.getConfigurationSection("listeners"));
+        if (config.contains("right_cooldown")) configureCooldown(config.getConfigOrNull("right_cooldown"));
+        if (config.contains("right_timeout")) configureTimeout(config.getConfigOrNull("right_timeout"));
+        if( config.contains("enchantments")) configureEnchantments(config.getConfigOrNull("enchantments"));
+        if (config.contains("listeners")) configureListeners(config.getConfigOrNull("listeners"));
     }
 
-    private void configureEnchantments(ConfigurationSection enchantments) {
+    private void configureEnchantments(Config enchantments) {
         for(String enchantmentName : enchantments.getKeys(false)) {
             Enchantment enchantment = Enchantment.getByName(enchantmentName);
             Calculator calc = new ExpressionCalculator(enchantments.getString(enchantmentName));
@@ -85,22 +85,22 @@ public class CustomItem implements Identifiable, CustomListener, Nameable {
         }
     }
 
-    private void configureCooldown(ConfigurationSection config) {
+    private void configureCooldown(Config config) {
         rightClickCooldown = new ExpressionCalculator(config.getString("timer"));
         rightClickCooldownAbility = config.getString("ability", UUID.randomUUID().toString());
         rightClickCooldownFinishedLocale = config.getString("finished_locale");
     }
 
-    private void configureTimeout(ConfigurationSection config) {
+    private void configureTimeout(Config config) {
         timeoutCalculator = new ExpressionCalculator(config.getString("timer"));
         timeoutAbility = config.getString("ability", UUID.randomUUID().toString());
         timeoutDescriptionLocale = config.getString("description_locale");
         timeoutFinishedLocale = config.getString("finished_locale");
     }
 
-    private void configureListeners(ConfigurationSection config) {
+    private void configureListeners(Config config) {
         for (String name : config.getKeys(false)) {
-            ConfigurationSection listenerInfo = config.getConfigurationSection(name);
+            Config listenerInfo = config.getConfigOrNull(name);
             try {
                 CustomListener listener = ListenerLoader.loadListener(this, this, listenerInfo);
 

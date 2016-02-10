@@ -1,7 +1,7 @@
 package com.ithinkrok.minigames.base.util.io;
 
 import com.ithinkrok.minigames.base.lang.LanguageLookup;
-import org.bukkit.configuration.ConfigurationSection;
+import com.ithinkrok.util.config.Config;
 
 import java.nio.file.Path;
 
@@ -10,7 +10,7 @@ import java.nio.file.Path;
  */
 public interface FileLoader {
 
-    ConfigurationSection loadConfig(String name);
+    Config loadConfig(String name);
     LanguageLookup loadLangFile(String name);
     Path getAssetDirectory();
 }

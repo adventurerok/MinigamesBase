@@ -1,9 +1,6 @@
 package com.ithinkrok.minigames.base.map;
 
-import com.ithinkrok.minigames.base.GameGroup;
-import com.ithinkrok.minigames.base.GameState;
-import com.ithinkrok.minigames.base.Kit;
-import com.ithinkrok.minigames.base.User;
+import com.ithinkrok.minigames.base.*;
 import com.ithinkrok.minigames.base.command.CommandConfig;
 import com.ithinkrok.minigames.base.item.CustomItem;
 import com.ithinkrok.minigames.base.item.IdentifierMap;
@@ -19,13 +16,14 @@ import com.ithinkrok.minigames.base.util.BoundingBox;
 import com.ithinkrok.minigames.base.util.io.ConfigHolder;
 import com.ithinkrok.minigames.base.util.io.ConfigParser;
 import com.ithinkrok.minigames.base.util.io.DirectoryUtils;
+import com.ithinkrok.msm.common.util.ConfigUtils;
+import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.block.Block;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -43,20 +41,18 @@ import java.util.Map;
 /**
  * Created by paul on 01/01/16.
  */
-public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.BoundsChecker {
+public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.BoundsChecker, SharedObjectAccessor {
 
     private final GameMapInfo gameMapInfo;
-    private World world;
     private final MultipleLanguageLookup languageLookup = new MultipleLanguageLookup();
     private final List<CustomListener> listeners = new ArrayList<>();
     private final Map<String, CustomListener> listenerMap = new HashMap<>();
     private final Map<String, Schematic> schematicMap = new HashMap<>();
-
     private final TaskList mapTaskList = new TaskList();
     private final IdentifierMap<CustomItem> customItemIdentifierMap = new IdentifierMap<>();
-    private final HashMap<String, ConfigurationSection> sharedObjects = new HashMap<>();
-
+    private final HashMap<String, Config> sharedObjects = new HashMap<>();
     private final List<PastedSchematic> pastedSchematics = new ArrayList<>();
+    private World world;
     private Path ramdiskPath;
 
     public GameMap(GameGroup gameGroup, GameMapInfo gameMapInfo) {
@@ -75,7 +71,7 @@ public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.Bo
         boolean ramdisk = gameGroup.getGame().getRamdiskDirectory() != null;
         Path copyTo;
 
-        if(ramdisk) {
+        if (ramdisk) {
             ramdiskPath = gameGroup.getGame().getRamdiskDirectory().resolve(randomWorldName);
             copyTo = ramdiskPath;
         } else {
@@ -88,7 +84,7 @@ public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.Bo
             e.printStackTrace();
         }
 
-        if(ramdisk) {
+        if (ramdisk) {
             try {
                 Path linkLocation = Paths.get("./" + randomWorldName + "/");
                 Files.deleteIfExists(linkLocation);
@@ -100,7 +96,7 @@ public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.Bo
             }
         }
 
-        try{
+        try {
             Files.deleteIfExists(copyTo.resolve("uid.dat"));
         } catch (IOException e) {
             System.out.println("Could not delete uid.dat for world. This could cause errors");
@@ -117,15 +113,25 @@ public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.Bo
         configureWorld();
     }
 
-    private void configureWorld() {
-        ConfigurationSection config = gameMapInfo.getConfig();
+    private String getRandomWorldName(String mapName) {
+        int count = 0;
+        String randomWorldName;
+        do {
+            randomWorldName = mapName + "-" + String.format("%04X", count++);
+        } while (Bukkit.getWorld(randomWorldName) != null);
 
-        if(config.contains("start_time")) {
+        return randomWorldName;
+    }
+
+    private void configureWorld() {
+        Config config = gameMapInfo.getConfig();
+
+        if (config.contains("start_time")) {
             world.setTime(config.getLong("start_time"));
         }
 
-        if(config.contains("start_weather")) {
-            switch(config.getString("start_weather").toLowerCase()) {
+        if (config.contains("start_weather")) {
+            switch (config.getString("start_weather").toLowerCase()) {
                 case "clear":
                 case "sun":
                     world.setStorm(false);
@@ -142,26 +148,16 @@ public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.Bo
             }
         }
 
-        if(config.contains("enable_time")) {
+        if (config.contains("enable_time")) {
             world.setGameRuleValue("doDaylightCycle", Boolean.toString(config.getBoolean("enable_time")));
         }
 
-        if(config.contains("game_rules")) {
-            ConfigurationSection gameRules = config.getConfigurationSection("game_rules");
-            for(String rule : gameRules.getKeys(false)) {
+        if (config.contains("game_rules")) {
+            Config gameRules = config.getConfigOrNull("game_rules");
+            for (String rule : gameRules.getKeys(false)) {
                 world.setGameRuleValue(rule, gameRules.getString("rule"));
             }
         }
-    }
-
-    private String getRandomWorldName(String mapName) {
-        int count = 0;
-        String randomWorldName;
-        do {
-            randomWorldName = mapName + "-" + String.format("%04X", count++);
-        } while (Bukkit.getWorld(randomWorldName) != null);
-
-        return randomWorldName;
     }
 
     public World getWorld() {
@@ -207,7 +203,7 @@ public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.Bo
 
         boolean success = Bukkit.unloadWorld(world, false);
 
-        if(ramdiskPath != null) {
+        if (ramdiskPath != null) {
             try {
                 DirectoryUtils.delete(ramdiskPath);
             } catch (IOException e) {
@@ -226,8 +222,21 @@ public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.Bo
 
     }
 
-    public ConfigurationSection getSharedObject(String name) {
+    @Override
+    public boolean hasSharedObject(String name) {
+        return sharedObjects.containsKey(name);
+    }
+
+    @Override
+    public Config getSharedObject(String name) {
         return sharedObjects.get(name);
+    }
+
+    @Override
+    public Config getSharedObjectOrEmpty(String name) {
+        Config sharedObject = getSharedObject(name);
+
+        return sharedObject != null ? sharedObject : ConfigUtils.EMPTY_CONFIG;
     }
 
     public void teleportUser(User user) {
@@ -260,10 +269,6 @@ public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.Bo
         listenerMap.put(name, listener);
     }
 
-    public Map<String, CustomListener> getListenerMap() {
-        return listenerMap;
-    }
-
     @Override
     public void addCustomItem(CustomItem item) {
         customItemIdentifierMap.put(item.getName(), item);
@@ -275,7 +280,7 @@ public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.Bo
     }
 
     @Override
-    public void addSharedObject(String name, ConfigurationSection config) {
+    public void addSharedObject(String name, Config config) {
         sharedObjects.put(name, config);
     }
 
@@ -307,6 +312,10 @@ public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.Bo
     @Override
     public void addMapInfo(GameMapInfo mapInfo) {
         //TODO custom GameMapInfo support for maps
+    }
+
+    public Map<String, CustomListener> getListenerMap() {
+        return listenerMap;
     }
 
     public Schematic getSchematic(String name) {

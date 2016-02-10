@@ -5,6 +5,7 @@ import com.ithinkrok.minigames.base.schematic.event.SchematicDestroyedEvent;
 import com.ithinkrok.minigames.base.schematic.event.SchematicFinishedEvent;
 import com.ithinkrok.minigames.base.task.GameTask;
 import com.ithinkrok.minigames.base.util.BoundingBox;
+import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventExecutor;
 import com.ithinkrok.util.event.CustomListener;
 import de.inventivegames.hologram.Hologram;
@@ -14,7 +15,6 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.util.Vector;
 
@@ -70,7 +70,7 @@ public class PastedSchematic implements SchematicPaster.BoundsChecker {
         return schematic;
     }
 
-    public ConfigurationSection getConfig() {
+    public Config getConfig() {
         return schematic.getConfig();
     }
 

@@ -1,7 +1,7 @@
 package com.ithinkrok.minigames.base.metadata;
 
 import com.ithinkrok.minigames.base.User;
-import org.bukkit.configuration.ConfigurationSection;
+import com.ithinkrok.util.config.Config;
 
 /**
  * Created by paul on 06/01/16.
@@ -15,7 +15,7 @@ public class UserMoney extends Money {
     public UserMoney(User user) {
         this.user = user;
 
-        ConfigurationSection config = user.getGameGroup().getSharedObject("user_money_metadata");
+        Config config = user.getGameGroup().getSharedObjectOrEmpty("user_money_metadata");
 
         loadValues(config, "user");
     }
