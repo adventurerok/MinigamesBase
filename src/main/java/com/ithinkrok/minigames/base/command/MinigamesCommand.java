@@ -23,7 +23,7 @@ public class MinigamesCommand extends CustomCommand {
     @SuppressWarnings("unchecked")
     public MinigamesCommand(String command, Map<String, Object> params, GameGroup gameGroup, User user,
                             TeamIdentifier teamIdentifier, Kit kit) {
-        super(command, params, (List<Object>) params.get("default"));
+        super(command, params, (List<String>) params.get("default"));
 
         this.gameGroup = gameGroup;
         this.user = user;
