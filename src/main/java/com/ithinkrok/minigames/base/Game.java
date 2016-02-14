@@ -76,7 +76,9 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     private final Persistence persistence;
 
     /**
-     * Maps game group names to their config locations
+     * Maps game group type names to their config locations
+     *
+     * e.g. colony_wars -> colony_wars/colony_wars.yml
      */
     private final Map<String, String> gameGroupConfigMap = new HashMap<>();
     private final String fallbackConfig;
@@ -129,6 +131,10 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         MSMClient.addProtocol("Minigames", protocol);
     }
 
+
+    public Collection<String> getAvailableGameGroupTypes() {
+        return gameGroupConfigMap.keySet();
+    }
 
     /**
      * Unloads all chunks in all worlds
