@@ -1,7 +1,7 @@
 package com.ithinkrok.minigames.base;
 
 import com.ithinkrok.minigames.base.event.game.CountdownFinishedEvent;
-import com.ithinkrok.minigames.base.lang.LanguageLookup;
+import com.ithinkrok.util.lang.LanguageLookup;
 import com.ithinkrok.minigames.base.lang.Messagable;
 import com.ithinkrok.minigames.base.task.GameTask;
 

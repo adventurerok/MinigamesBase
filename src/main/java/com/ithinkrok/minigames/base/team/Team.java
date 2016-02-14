@@ -8,7 +8,7 @@ import com.ithinkrok.minigames.base.SharedObjectAccessor;
 import com.ithinkrok.minigames.base.User;
 import com.ithinkrok.minigames.base.event.game.GameStateChangedEvent;
 import com.ithinkrok.minigames.base.event.game.MapChangedEvent;
-import com.ithinkrok.minigames.base.lang.LanguageLookup;
+import com.ithinkrok.util.lang.LanguageLookup;
 import com.ithinkrok.minigames.base.lang.Messagable;
 import com.ithinkrok.minigames.base.metadata.Metadata;
 import com.ithinkrok.minigames.base.metadata.MetadataHolder;

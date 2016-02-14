@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.base.util.io;
 
-import com.ithinkrok.minigames.base.lang.LanguageLookup;
+import com.ithinkrok.util.lang.LanguageLookup;
 import com.ithinkrok.util.config.Config;
 
 import java.nio.file.Path;

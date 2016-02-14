@@ -1,5 +1,7 @@
 package com.ithinkrok.minigames.base.lang;
 
+import com.ithinkrok.util.lang.LanguageLookup;
+
 /**
  * Created by paul on 02/01/16.
  */

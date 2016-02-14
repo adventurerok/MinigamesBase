@@ -17,7 +17,7 @@ import com.ithinkrok.minigames.base.event.user.state.UserDamagedEvent;
 import com.ithinkrok.minigames.base.event.user.state.UserDeathEvent;
 import com.ithinkrok.minigames.base.event.user.state.UserFoodLevelChangeEvent;
 import com.ithinkrok.minigames.base.event.user.world.*;
-import com.ithinkrok.minigames.base.lang.LangFile;
+import com.ithinkrok.util.lang.LangFile;
 import com.ithinkrok.minigames.base.map.GameMap;
 import com.ithinkrok.minigames.base.task.GameRunnable;
 import com.ithinkrok.minigames.base.task.GameTask;

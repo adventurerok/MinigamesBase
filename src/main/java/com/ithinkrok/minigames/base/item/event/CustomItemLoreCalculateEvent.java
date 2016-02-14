@@ -2,7 +2,7 @@ package com.ithinkrok.minigames.base.item.event;
 
 import com.ithinkrok.minigames.base.event.MinigamesEvent;
 import com.ithinkrok.minigames.base.item.CustomItem;
-import com.ithinkrok.minigames.base.lang.LanguageLookup;
+import com.ithinkrok.util.lang.LanguageLookup;
 import com.ithinkrok.minigames.base.util.math.Variables;
 
 import java.util.List;
