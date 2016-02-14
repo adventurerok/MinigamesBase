@@ -74,6 +74,10 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
 
     private final Plugin plugin;
     private final Persistence persistence;
+
+    /**
+     * Maps game group names to their config locations
+     */
     private final Map<String, String> gameGroupConfigMap = new HashMap<>();
     private final String fallbackConfig;
 
@@ -126,7 +130,9 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     }
 
 
-
+    /**
+     * Unloads all chunks in all worlds
+     */
     private void unloadDefaultWorlds() {
         if (Bukkit.getWorlds().size() != 1) System.out.println("You should disable the nether/end worlds to save RAM!");
 
