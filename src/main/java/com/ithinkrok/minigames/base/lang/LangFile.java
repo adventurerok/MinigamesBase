@@ -17,7 +17,7 @@ import java.util.Properties;
  */
 public class LangFile implements LanguageLookup{
 
-    private Map<Object, String> languageStrings = new HashMap<>();
+    private final Map<Object, String> languageStrings = new HashMap<>();
 
     public LangFile(File in) throws IOException {
         this(new FileInputStream(in));

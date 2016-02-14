@@ -8,7 +8,7 @@ import java.util.List;
  */
 public class MultipleLanguageLookup implements LanguageLookup {
 
-    private List<LanguageLookup> languageLookupList;
+    private final List<LanguageLookup> languageLookupList;
 
     public MultipleLanguageLookup() {
         this(new ArrayList<>());
