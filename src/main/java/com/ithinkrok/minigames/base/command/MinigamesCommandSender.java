@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.base.command;
 
-import com.ithinkrok.minigames.base.lang.Messagable;
+import com.ithinkrok.util.lang.Messagable;
 import com.ithinkrok.util.command.CustomCommandSender;
 
 /**

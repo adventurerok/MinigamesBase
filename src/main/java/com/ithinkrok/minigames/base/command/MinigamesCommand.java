@@ -3,7 +3,7 @@ package com.ithinkrok.minigames.base.command;
 import com.ithinkrok.minigames.base.GameGroup;
 import com.ithinkrok.minigames.base.Kit;
 import com.ithinkrok.minigames.base.User;
-import com.ithinkrok.minigames.base.lang.Messagable;
+import com.ithinkrok.util.lang.Messagable;
 import com.ithinkrok.minigames.base.team.TeamIdentifier;
 import com.ithinkrok.util.command.CustomCommand;
 

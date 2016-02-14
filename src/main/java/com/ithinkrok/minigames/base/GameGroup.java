@@ -22,7 +22,7 @@ import com.ithinkrok.minigames.base.item.CustomItem;
 import com.ithinkrok.minigames.base.item.IdentifierMap;
 import com.ithinkrok.util.lang.LangFile;
 import com.ithinkrok.util.lang.LanguageLookup;
-import com.ithinkrok.minigames.base.lang.Messagable;
+import com.ithinkrok.util.lang.Messagable;
 import com.ithinkrok.util.lang.MultipleLanguageLookup;
 import com.ithinkrok.minigames.base.map.GameMap;
 import com.ithinkrok.minigames.base.map.GameMapInfo;
