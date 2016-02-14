@@ -17,6 +17,8 @@ import com.ithinkrok.minigames.base.event.user.state.UserDamagedEvent;
 import com.ithinkrok.minigames.base.event.user.state.UserDeathEvent;
 import com.ithinkrok.minigames.base.event.user.state.UserFoodLevelChangeEvent;
 import com.ithinkrok.minigames.base.event.user.world.*;
+import com.ithinkrok.minigames.base.protocol.ClientMinigamesProtocol;
+import com.ithinkrok.msm.client.impl.MSMClient;
 import com.ithinkrok.util.lang.LangFile;
 import com.ithinkrok.minigames.base.map.GameMap;
 import com.ithinkrok.minigames.base.task.GameRunnable;
@@ -83,6 +85,8 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     private final Path assetsDirectory;
     private final Path ramdiskDirectory;
 
+    private final ClientMinigamesProtocol protocol;
+
     private DisguiseController disguiseController;
 
     public Game(BasePlugin plugin, Config config) {
@@ -115,6 +119,10 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         unloadDefaultWorlds();
 
         setupDisguiseController();
+
+        protocol = new ClientMinigamesProtocol(this);
+
+        MSMClient.addProtocol("Minigames", protocol);
     }
 
 
