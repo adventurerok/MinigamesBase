@@ -131,6 +131,10 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         return result;
     }
 
+    public String getType() {
+        return type;
+    }
+
     public void changeGameState(String gameStateName) {
         GameState gameState = gameStates.get(gameStateName);
         if (gameState == null) throw new IllegalArgumentException("Unknown game state name: " + gameStateName);

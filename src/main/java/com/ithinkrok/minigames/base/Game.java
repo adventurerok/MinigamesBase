@@ -77,7 +77,7 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
 
     /**
      * Maps game group type names to their config locations
-     *
+     * <p>
      * e.g. colony_wars -> colony_wars/colony_wars.yml
      */
     private final Map<String, String> gameGroupConfigMap = new HashMap<>();
@@ -85,6 +85,16 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
 
     private final Map<String, GameGroup> mapToGameGroup = new MapMaker().weakValues().makeMap();
     private final Map<String, GameGroup> nameToGameGroup = new MapMaker().weakValues().makeMap();
+
+    /**
+     * Maps player UUID to game group type
+     */
+    private final Map<UUID, String> playersJoiningGameGroupTypes = new ConcurrentHashMap<>();
+
+    /**
+     * Maps player UUID to game group name
+     */
+    private final Map<UUID, String> playersJoinGameGroups = new ConcurrentHashMap<>();
 
     private final Path configDirectory;
     private final Path mapDirectory;
@@ -131,11 +141,6 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         MSMClient.addProtocol("Minigames", protocol);
     }
 
-
-    public Collection<String> getAvailableGameGroupTypes() {
-        return gameGroupConfigMap.keySet();
-    }
-
     /**
      * Unloads all chunks in all worlds
      */
@@ -151,10 +156,6 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         }
     }
 
-    public Collection<GameGroup> getGameGroups() {
-        return nameToGameGroup.values();
-    }
-
     private void setupDisguiseController() {
         if (Bukkit.getPluginManager().getPlugin("LibsDisguises") != null) {
             disguiseController = new LDDisguiseController();
@@ -163,6 +164,14 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         } else {
             disguiseController = new MinigamesDisguiseController();
         }
+    }
+
+    public Collection<String> getAvailableGameGroupTypes() {
+        return gameGroupConfigMap.keySet();
+    }
+
+    public Collection<GameGroup> getGameGroups() {
+        return nameToGameGroup.values();
     }
 
     public String getName() {
@@ -197,6 +206,9 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
 
     public void removeUser(User user) {
         usersInServer.values().remove(user);
+
+        user.removeFromGameGroup();
+        user.cancelAllTasks();
     }
 
     @Override
@@ -241,32 +253,6 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         persistence.doTask(task);
     }
 
-    @Override
-    public GameTask doInFuture(GameRunnable task) {
-        return doInFuture(task, 1);
-    }
-
-    @Override
-    public GameTask doInFuture(GameRunnable task, int delay) {
-        GameTask gameTask = new GameTask(task);
-
-        gameTask.schedule(plugin, delay);
-        return gameTask;
-    }
-
-    @Override
-    public GameTask repeatInFuture(GameRunnable task, int delay, int period) {
-        GameTask gameTask = new GameTask(task);
-
-        gameTask.schedule(plugin, delay, period);
-        return gameTask;
-    }
-
-    @Override
-    public void cancelAllTasks() {
-        throw new RuntimeException("You cannot cancel all game tasks");
-    }
-
     public void makeEntityRepresentUser(User user, Entity entity) {
         entity.setMetadata("rep", new FixedMetadataValue(plugin, user.getUuid()));
     }
@@ -298,21 +284,58 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
 
     public void rejoinPlayer(Player player) {
         User user = getUser(player.getUniqueId());
-        GameGroup gameGroup;
+        GameGroup gameGroup = getGameGroupForJoining(player.getUniqueId());
 
         if (user != null) {
-            gameGroup = user.getGameGroup();
-            user.becomePlayer(player);
+            GameGroup oldGameGroup = user.getGameGroup();
+
+            if(oldGameGroup == gameGroup || gameGroup == null) {
+                user.becomePlayer(player);
+                gameGroup = oldGameGroup;
+            } else {
+                UserQuitEvent quitEvent = new UserQuitEvent(user, UserQuitEvent.QuitReason.CHANGED_GAMEGROUP);
+
+                oldGameGroup.userEvent(quitEvent);
+
+                removeUser(user);
+
+                user = createUser(gameGroup, null, player.getUniqueId(), player);
+            }
         } else {
-            if (nameToGameGroup.isEmpty()) {
-                createGameGroup(fallbackConfig);
+            if(gameGroup == null) {
+                if (nameToGameGroup.isEmpty()) {
+                    createGameGroup(fallbackConfig);
+                }
+
+                gameGroup = getSpawnGameGroup();
             }
 
-            gameGroup = getSpawnGameGroup();
             user = createUser(gameGroup, null, player.getUniqueId(), player);
         }
 
         gameGroup.userEvent(new UserJoinEvent(user, UserJoinEvent.JoinReason.JOINED_SERVER));
+    }
+
+    private GameGroup getGameGroupForJoining(UUID uniqueId) {
+        String gameGroupName = playersJoinGameGroups.get(uniqueId);
+
+        if(gameGroupName != null && nameToGameGroup.containsKey(gameGroupName)) {
+            return nameToGameGroup.get(gameGroupName);
+        }
+
+        String gameGroupType = playersJoiningGameGroupTypes.get(uniqueId);
+
+        if(gameGroupType != null) {
+            for(GameGroup gameGroup : getGameGroups()) {
+                if(!gameGroup.getType().equals(gameGroupType)) continue;
+
+                return gameGroup;
+            }
+
+            return createGameGroup(gameGroupType);
+        }
+
+        return null;
     }
 
     @Override
@@ -320,13 +343,13 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         return usersInServer.get(uuid);
     }
 
-    public GameGroup createGameGroup(String configName) {
-        GameGroup gameGroup = new GameGroup(this, nextGameGroupName(configName), configName, gameGroupConfigMap.get
-                (configName));
+    public GameGroup createGameGroup(String type) {
+        GameGroup gameGroup =
+                new GameGroup(this, nextGameGroupName(type), type, gameGroupConfigMap.get(type));
 
         nameToGameGroup.put(gameGroup.getName(), gameGroup);
 
-        getLogger().info("Created " + configName + " gamegroup: " + gameGroup.getName());
+        getLogger().info("Created " + type + " gamegroup: " + gameGroup.getName());
 
         protocol.sendGameGroupSpawnedPayload(gameGroup);
 
@@ -360,6 +383,48 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
 
     public Logger getLogger() {
         return plugin.getLogger();
+    }
+
+    public void preJoinGameGroup(UUID playerUUID, String type, String name) {
+        doInFuture(task -> {
+            playersJoiningGameGroupTypes.put(playerUUID, type);
+            if(name != null) playersJoinGameGroups.put(playerUUID, name);
+
+            User user = getUser(playerUUID);
+
+            if(user != null) {
+                if (!user.isPlayer()) return;
+
+                rejoinPlayer(user.getPlayer());
+            }
+
+        });
+    }
+
+    @Override
+    public GameTask doInFuture(GameRunnable task) {
+        return doInFuture(task, 1);
+    }
+
+    @Override
+    public GameTask doInFuture(GameRunnable task, int delay) {
+        GameTask gameTask = new GameTask(task);
+
+        gameTask.schedule(plugin, delay);
+        return gameTask;
+    }
+
+    @Override
+    public GameTask repeatInFuture(GameRunnable task, int delay, int period) {
+        GameTask gameTask = new GameTask(task);
+
+        gameTask.schedule(plugin, delay, period);
+        return gameTask;
+    }
+
+    @Override
+    public void cancelAllTasks() {
+        throw new RuntimeException("You cannot cancel all game tasks");
     }
 
     private class GameListener implements Listener {
@@ -559,7 +624,8 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
                 kit = sender.getGameGroup().getKit(arguments.get("k").toString());
             }
 
-            MinigamesCommand gameCommand = new MinigamesCommand(commandName, arguments, sender.getGameGroup(), user, teamIdentifier, kit);
+            MinigamesCommand gameCommand =
+                    new MinigamesCommand(commandName, arguments, sender.getGameGroup(), user, teamIdentifier, kit);
 
             UserCommandEvent commandEvent = new UserCommandEvent(sender, gameCommand);
 

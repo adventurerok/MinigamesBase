@@ -11,6 +11,7 @@ import com.ithinkrok.util.config.MemoryConfig;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by paul on 14/02/16.
@@ -75,6 +76,21 @@ public class ClientMinigamesProtocol implements ClientListener {
 
     @Override
     public void packetRecieved(Client client, Channel channel, Config payload) {
+        String mode = payload.getString("mode");
+        if(mode == null) return;
 
+        switch(mode) {
+            case "JoinGameGroup":
+                handleJoinGameGroup(payload);
+        }
+    }
+
+    private void handleJoinGameGroup(Config payload) {
+        String type = payload.getString("type");
+        String name = payload.getString("name"); //This can be null
+
+        UUID playerUUID = UUID.fromString(payload.getString("player"));
+
+        game.preJoinGameGroup(playerUUID, type, name);
     }
 }
