@@ -151,6 +151,10 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         }
     }
 
+    public Collection<GameGroup> getGameGroups() {
+        return nameToGameGroup.values();
+    }
+
     private void setupDisguiseController() {
         if (Bukkit.getPluginManager().getPlugin("LibsDisguises") != null) {
             disguiseController = new LDDisguiseController();
@@ -315,7 +319,8 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     }
 
     public GameGroup createGameGroup(String configName) {
-        GameGroup gameGroup = new GameGroup(this, nextGameGroupName(configName), gameGroupConfigMap.get(configName));
+        GameGroup gameGroup = new GameGroup(this, nextGameGroupName(configName), configName, gameGroupConfigMap.get
+                (configName));
 
         nameToGameGroup.put(gameGroup.getName(), gameGroup);
 

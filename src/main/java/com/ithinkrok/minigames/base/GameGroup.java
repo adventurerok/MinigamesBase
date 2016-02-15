@@ -20,10 +20,6 @@ import com.ithinkrok.minigames.base.event.user.game.UserQuitEvent;
 import com.ithinkrok.minigames.base.event.user.world.UserBreakBlockEvent;
 import com.ithinkrok.minigames.base.item.CustomItem;
 import com.ithinkrok.minigames.base.item.IdentifierMap;
-import com.ithinkrok.util.lang.LangFile;
-import com.ithinkrok.util.lang.LanguageLookup;
-import com.ithinkrok.util.lang.Messagable;
-import com.ithinkrok.util.lang.MultipleLanguageLookup;
 import com.ithinkrok.minigames.base.map.GameMap;
 import com.ithinkrok.minigames.base.map.GameMapInfo;
 import com.ithinkrok.minigames.base.metadata.Metadata;
@@ -43,9 +39,14 @@ import com.ithinkrok.minigames.base.util.io.ConfigParser;
 import com.ithinkrok.minigames.base.util.io.FileLoader;
 import com.ithinkrok.msm.common.util.ConfigUtils;
 import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.config.MemoryConfig;
 import com.ithinkrok.util.event.CustomEventExecutor;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
+import com.ithinkrok.util.lang.LangFile;
+import com.ithinkrok.util.lang.LanguageLookup;
+import com.ithinkrok.util.lang.Messagable;
+import com.ithinkrok.util.lang.MultipleLanguageLookup;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -63,6 +64,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         MetadataHolder<Metadata>, SchematicResolver, TeamUserResolver, DatabaseTaskRunner, ConfigHolder {
 
     private final String name;
+    private final String type;
 
     private final ConcurrentMap<UUID, User> usersInGroup = new ConcurrentHashMap<>();
 
@@ -91,10 +93,11 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     private List<CustomListener> defaultAndMapListeners = new ArrayList<>();
     private Countdown countdown;
 
-    public GameGroup(Game game, String name, String configFile) {
-        this.game = game;
 
+    public GameGroup(Game game, String name, String type, String configFile) {
+        this.game = game;
         this.name = name;
+        this.type = type;
 
         gameGroupListener = new GameGroupListener();
         defaultAndMapListeners = createDefaultAndMapListeners();
@@ -157,7 +160,8 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         gameStateTaskList.cancelAllTasks();
 
         MinigamesEvent event = new GameStateChangedEvent(this, oldState, newState);
-        CustomEventExecutor.executeEvent(event, getListeners(getAllUserListeners(), getAllTeamListeners(), oldListeners));
+        CustomEventExecutor
+                .executeEvent(event, getListeners(getAllUserListeners(), getAllTeamListeners(), oldListeners));
     }
 
     public void changeMap(GameMapInfo mapInfo) {
@@ -222,6 +226,25 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
 
     public Collection<User> getUsers() {
         return usersInGroup.values();
+    }
+
+    public Config toConfig() {
+        Config config = new MemoryConfig();
+
+        config.set("name", name);
+        config.set("type", type);
+        config.set("accepting", true); //TODO support for disabling accepting
+
+        List<String> users = new ArrayList<>();
+
+        for(User user : getUsers()) {
+            if(!user.isPlayer()) continue;
+            users.add(user.getUuid().toString());
+        }
+
+        config.set("players", users);
+
+        return config;
     }
 
     public String getName() {
@@ -298,7 +321,8 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     }
 
     public void teamEvent(TeamEvent event) {
-        CustomEventExecutor.executeEvent(event, event.getTeam().getListeners(), getAllUsersInTeamListeners(event.getTeam()));
+        CustomEventExecutor
+                .executeEvent(event, event.getTeam().getListeners(), getAllUsersInTeamListeners(event.getTeam()));
     }
 
     private Collection<CustomListener> getAllUsersInTeamListeners(Team team) {
@@ -462,14 +486,14 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     @Override
     public void addSharedObject(String name, Config config) {
         sharedObjectMap.put(name, config);
-    }    @Override
-    public LanguageLookup getLanguageLookup() {
-        return this;
     }
 
     @Override
     public void addSchematic(Schematic schematic) {
         schematicMap.put(schematic.getName(), schematic);
+    }    @Override
+    public LanguageLookup getLanguageLookup() {
+        return this;
     }
 
     @Override
