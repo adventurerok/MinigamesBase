@@ -19,12 +19,15 @@ public class ClientMinigamesProtocol implements ClientListener {
 
     private final Game game;
 
+    private Channel channel;
+
     public ClientMinigamesProtocol(Game game) {
         this.game = game;
     }
 
     @Override
     public void connectionOpened(Client client, Channel channel) {
+        this.channel = channel;
 
         Config payload = new MemoryConfig();
 
@@ -44,9 +47,30 @@ public class ClientMinigamesProtocol implements ClientListener {
         channel.write(payload);
     }
 
+    public void sendGameGroupSpawnedPayload(GameGroup gameGroup) {
+        if(channel == null) return;
+
+        Config payload = gameGroup.toConfig();
+
+        payload.set("mode", "GameGroupSpawned");
+
+        channel.write(payload);
+    }
+
+    public void sendGameGroupKilledPayload(GameGroup gameGroup) {
+        if(channel == null) return;
+
+        Config payload = new MemoryConfig();
+
+        payload.set("name", gameGroup.getName());
+        payload.set("mode", "GameGroupKilled");
+
+        channel.write(payload);
+    }
+
     @Override
     public void connectionClosed(Client client) {
-
+        this.channel = null;
     }
 
     @Override

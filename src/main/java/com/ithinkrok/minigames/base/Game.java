@@ -232,6 +232,8 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
 
     public void removeGameGroup(GameGroup gameGroup) {
         nameToGameGroup.values().remove(gameGroup);
+
+        protocol.sendGameGroupKilledPayload(gameGroup);
     }
 
     @Override
@@ -325,6 +327,8 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         nameToGameGroup.put(gameGroup.getName(), gameGroup);
 
         getLogger().info("Created " + configName + " gamegroup: " + gameGroup.getName());
+
+        protocol.sendGameGroupSpawnedPayload(gameGroup);
 
         return gameGroup;
     }
