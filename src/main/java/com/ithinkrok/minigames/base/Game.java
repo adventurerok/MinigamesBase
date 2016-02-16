@@ -321,13 +321,13 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     }
 
     private GameGroup getGameGroupForJoining(UUID uniqueId) {
-        String gameGroupName = playersJoinGameGroups.get(uniqueId);
+        String gameGroupName = playersJoinGameGroups.remove(uniqueId);
 
         if(gameGroupName != null && nameToGameGroup.containsKey(gameGroupName)) {
             return nameToGameGroup.get(gameGroupName);
         }
 
-        String gameGroupType = playersJoiningGameGroupTypes.get(uniqueId);
+        String gameGroupType = playersJoiningGameGroupTypes.remove(uniqueId);
 
         if(gameGroupType != null) {
             for(GameGroup gameGroup : getGameGroups()) {
