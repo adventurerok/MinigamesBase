@@ -332,6 +332,7 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         if(gameGroupType != null) {
             for(GameGroup gameGroup : getGameGroups()) {
                 if(!gameGroup.getType().equals(gameGroupType)) continue;
+                if(!gameGroup.isAcceptingPlayers()) continue;
 
                 return gameGroup;
             }

@@ -136,6 +136,12 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         return type;
     }
 
+    /**
+     * Sets acceptingPlayers. This boolean is used to determine if players can join this gamegroup to play the game.
+     * It should be set to false if players cannot join this gamegroup to play the game, even if spectators are allowed.
+     *
+     * @param acceptingPlayers The accepting players boolean
+     */
     public void setAcceptingPlayers(boolean acceptingPlayers) {
         this.acceptingPlayers = acceptingPlayers;
 
