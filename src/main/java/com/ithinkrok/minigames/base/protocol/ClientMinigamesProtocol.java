@@ -63,8 +63,11 @@ public class ClientMinigamesProtocol implements ClientListener {
     private Map<String, Instant> getVersionsInPath(Path path) {
         Map<String, Instant> result = new HashMap<>();
 
+        Set<FileVisitOption> options = new HashSet<>();
+        options.add(FileVisitOption.FOLLOW_LINKS);
+
         try {
-            Files.walkFileTree(path, new SimpleFileVisitor<Path>(){
+            Files.walkFileTree(path, options, Integer.MAX_VALUE, new SimpleFileVisitor<Path>(){
 
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
