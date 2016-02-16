@@ -9,13 +9,10 @@ import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Instant;
+import java.util.*;
 
 /**
  * Created by paul on 14/02/16.
@@ -38,6 +35,55 @@ public class ClientMinigamesProtocol implements ClientListener {
         this.client = client;
         this.channel = channel;
 
+        sendLoginPacket(channel);
+        sendDataInfoPacket(channel);
+    }
+
+    private void sendDataInfoPacket(Channel channel) {
+        Config versions = new MemoryConfig('\n');
+
+        addVersionsToConfig(game.getAssetDirectory(), "assets/", versions);
+        addVersionsToConfig(game.getConfigDirectory(), "configs/", versions);
+        addVersionsToConfig(game.getMapDirectory(), "maps/", versions);
+
+        Config payload = new MemoryConfig('\n');
+
+        payload.set("versions", versions);
+        payload.set("mode", "DataInfo");
+
+        channel.write(payload);
+    }
+
+    private void addVersionsToConfig(Path path, String prefix, Config config) {
+        for(Map.Entry<String, Instant> entry : getVersionsInPath(path).entrySet()) {
+            config.set(prefix + entry.getKey(), entry.getValue().toEpochMilli());
+        }
+    }
+
+    private Map<String, Instant> getVersionsInPath(Path path) {
+        Map<String, Instant> result = new HashMap<>();
+
+        try {
+            Files.walkFileTree(path, new SimpleFileVisitor<Path>(){
+
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    Instant dateModified = Files.getLastModifiedTime(file).toInstant();
+
+                    result.put(path.relativize(file).toString(), dateModified);
+
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException e) {
+            System.out.println("Failed to walk file tree for path: " + path);
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+    private void sendLoginPacket(Channel channel) {
         Config payload = new MemoryConfig();
 
         payload.set("mode", "Login");
