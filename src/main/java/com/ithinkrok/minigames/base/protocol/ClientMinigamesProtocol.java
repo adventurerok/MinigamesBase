@@ -8,6 +8,10 @@ import com.ithinkrok.msm.common.Channel;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -99,6 +103,56 @@ public class ClientMinigamesProtocol implements ClientListener {
         switch(mode) {
             case "JoinGameGroup":
                 handleJoinGameGroup(payload);
+                return;
+            case "DataUpdate":
+                handleDataUpdate(payload);
+        }
+    }
+
+    private void handleDataUpdate(Config payload) {
+        String type = payload.getString("data_type");
+
+        Path dataDir;
+
+        switch(type) {
+            case "config":
+                dataDir = game.getConfigDirectory();
+                break;
+            case "map":
+                dataDir = game.getMapDirectory();
+                break;
+            case "asset":
+                dataDir = game.getAssetDirectory();
+                break;
+            default:
+                return;
+        }
+
+        String dataSubpath = payload.getString("data_path");
+
+        Path filePath = dataDir.resolve(dataSubpath);
+        Path fileDirectory = dataDir.getParent();
+
+        if(!Files.exists(fileDirectory)) {
+            try {
+                Files.createDirectories(fileDirectory);
+            } catch (IOException e) {
+                System.out.println("Failed to create directory for data update : " + fileDirectory);
+                e.printStackTrace();
+                return;
+            }
+        }
+
+        byte[] updateBytes = payload.getByteArray("bytes");
+
+        boolean append = payload.getBoolean("append", false);
+
+        try{
+            if(append) Files.write(filePath, updateBytes, StandardOpenOption.APPEND);
+            else Files.write(filePath, updateBytes);
+        } catch (IOException e) {
+            System.out.println("Error while saving minigames config data at:" + filePath);
+            e.printStackTrace();
         }
     }
 
