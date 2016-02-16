@@ -20,6 +20,7 @@ public class ClientMinigamesProtocol implements ClientListener {
 
     private final Game game;
 
+    private Client client;
     private Channel channel;
 
     public ClientMinigamesProtocol(Game game) {
@@ -28,6 +29,7 @@ public class ClientMinigamesProtocol implements ClientListener {
 
     @Override
     public void connectionOpened(Client client, Channel channel) {
+        this.client = client;
         this.channel = channel;
 
         Config payload = new MemoryConfig();
@@ -71,6 +73,7 @@ public class ClientMinigamesProtocol implements ClientListener {
 
     @Override
     public void connectionClosed(Client client) {
+        this.client = null;
         this.channel = null;
     }
 
@@ -92,5 +95,9 @@ public class ClientMinigamesProtocol implements ClientListener {
         UUID playerUUID = UUID.fromString(payload.getString("player"));
 
         game.preJoinGameGroup(playerUUID, type, name);
+
+        if(client == null) return;
+
+        client.changePlayerServer(playerUUID, client.getMinecraftServerInfo().getName());
     }
 }
