@@ -43,7 +43,7 @@ public class ClientMinigamesProtocol implements ClientListener {
         Config versions = new MemoryConfig('\n');
 
         addVersionsToConfig(game.getAssetDirectory(), "assets/", versions);
-        addVersionsToConfig(game.getConfigDirectory(), "configs/", versions);
+        addVersionsToConfig(game.getConfigDirectory(), "config/", versions);
         addVersionsToConfig(game.getMapDirectory(), "maps/", versions);
 
         Config payload = new MemoryConfig('\n');
