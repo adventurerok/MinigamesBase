@@ -19,12 +19,14 @@ import java.util.UUID;
 public class ClientMinigamesProtocol implements ClientListener {
 
     private final Game game;
+    private final boolean primary;
 
     private Client client;
     private Channel channel;
 
-    public ClientMinigamesProtocol(Game game) {
+    public ClientMinigamesProtocol(Game game, boolean primary) {
         this.game = game;
+        this.primary = primary;
     }
 
     @Override
@@ -37,6 +39,8 @@ public class ClientMinigamesProtocol implements ClientListener {
         payload.set("mode", "Login");
 
         payload.set("gamegroup_types", game.getAvailableGameGroupTypes());
+
+        payload.set("primary", primary);
 
         Collection<GameGroup> gameGroups = game.getGameGroups();
         List<Config> gameGroupConfigs = new ArrayList<>();
