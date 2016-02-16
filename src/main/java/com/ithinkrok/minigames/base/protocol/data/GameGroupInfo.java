@@ -1,4 +1,4 @@
-package com.ithinkrok.minigames.base.hub;
+package com.ithinkrok.minigames.base.protocol.data;
 
 import com.ithinkrok.util.config.Config;
 
