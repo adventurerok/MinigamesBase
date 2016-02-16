@@ -93,6 +93,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     private List<CustomListener> defaultAndMapListeners = new ArrayList<>();
     private Countdown countdown;
 
+    private boolean acceptingPlayers = true;
 
     public GameGroup(Game game, String name, String type, String configFile) {
         this.game = game;
@@ -133,6 +134,16 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
 
     public String getType() {
         return type;
+    }
+
+    public void setAcceptingPlayers(boolean acceptingPlayers) {
+        this.acceptingPlayers = acceptingPlayers;
+
+        game.getProtocol().sendGameGroupUpdatePayload(this);
+    }
+
+    public boolean isAcceptingPlayers() {
+        return acceptingPlayers;
     }
 
     public void changeGameState(String gameStateName) {
@@ -237,7 +248,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
 
         config.set("name", name);
         config.set("type", type);
-        config.set("accepting", true); //TODO support for disabling accepting
+        config.set("accepting", acceptingPlayers);
 
         List<String> users = new ArrayList<>();
 
@@ -620,6 +631,8 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
             usersInGroup.put(event.getUser().getUuid(), event.getUser());
 
             currentMap.teleportUser(event.getUser());
+
+            game.getProtocol().sendGameGroupUpdatePayload(GameGroup.this);
         }
 
         @CustomEventHandler(priority = CustomEventHandler.INTERNAL_LAST)
@@ -633,6 +646,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
 
                 //GameGroup only referenced by its users. If there are none left we must unload.
                 if (usersInGroup.isEmpty()) kill();
+                else game.getProtocol().sendGameGroupUpdatePayload(GameGroup.this);
             }
         }
 

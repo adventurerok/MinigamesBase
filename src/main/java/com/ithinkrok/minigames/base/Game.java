@@ -141,6 +141,10 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         MSMClient.addProtocol("Minigames", protocol);
     }
 
+    public ClientMinigamesProtocol getProtocol() {
+        return protocol;
+    }
+
     /**
      * Unloads all chunks in all worlds
      */

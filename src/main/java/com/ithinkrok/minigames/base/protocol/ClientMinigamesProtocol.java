@@ -60,6 +60,16 @@ public class ClientMinigamesProtocol implements ClientListener {
         channel.write(payload);
     }
 
+    public void sendGameGroupUpdatePayload(GameGroup gameGroup) {
+        if(channel == null) return;
+
+        Config payload = gameGroup.toConfig();
+
+        payload.set("mode", "GameGroupUpdate");
+
+        channel.write(payload);
+    }
+
     public void sendGameGroupKilledPayload(GameGroup gameGroup) {
         if(channel == null) return;
 
