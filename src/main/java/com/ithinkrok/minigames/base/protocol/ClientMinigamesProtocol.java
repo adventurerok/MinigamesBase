@@ -36,7 +36,7 @@ public class ClientMinigamesProtocol implements ClientListener {
         this.channel = channel;
 
         sendLoginPacket(channel);
-        sendDataInfoPacket(channel);
+        if(primary) sendDataInfoPacket(channel);
     }
 
     private void sendDataInfoPacket(Channel channel) {
