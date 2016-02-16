@@ -288,6 +288,8 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         config.set("max_players", maxPlayers);
         config.set("motd", motd);
 
+        config.set("server", game.getName());
+
         return config;
     }
 
