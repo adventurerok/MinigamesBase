@@ -96,7 +96,7 @@ public class ClientMinigamesProtocol implements ClientListener {
 
         game.preJoinGameGroup(playerUUID, type, name);
 
-        if(client == null) return;
+        if(client == null || game.getUser(playerUUID) != null) return;
 
         client.changePlayerServer(playerUUID, client.getMinecraftServerInfo().getName());
     }
