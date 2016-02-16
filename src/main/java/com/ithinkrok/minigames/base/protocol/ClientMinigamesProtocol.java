@@ -177,7 +177,7 @@ public class ClientMinigamesProtocol implements ClientListener {
         String dataSubpath = payload.getString("data_path");
 
         Path filePath = dataDir.resolve(dataSubpath);
-        Path fileDirectory = dataDir.getParent();
+        Path fileDirectory = filePath.getParent();
 
         if(!Files.exists(fileDirectory)) {
             try {
@@ -199,6 +199,12 @@ public class ClientMinigamesProtocol implements ClientListener {
         } catch (IOException e) {
             System.out.println("Error while saving minigames config data at:" + filePath);
             e.printStackTrace();
+        }
+
+        boolean finish = payload.getBoolean("finish", true);
+
+        if(finish) {
+            System.out.println("Updated minigames resource at: " + filePath);
         }
     }
 
