@@ -94,6 +94,8 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     private Countdown countdown;
 
     private boolean acceptingPlayers = true;
+    private final int maxPlayers;
+    private String motd = "default motd";
 
     public GameGroup(Game game, String name, String type, String configFile) {
         this.game = game;
@@ -111,10 +113,27 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         if (currentMap != null) defaultAndMapListeners = createDefaultAndMapListeners(currentMap.getListenerMap());
         else defaultAndMapListeners = createDefaultAndMapListeners();
 
+        maxPlayers = baseConfig.getInt("max_players", 40);
+        motd = baseConfig.getString("default_motd", "No default motd");
+
         changeGameState(baseConfig.getString("start_game_state"));
 
         String startMap = baseConfig.getString("start_map");
         if (startMap != null) changeMap(startMap);
+    }
+
+    public int getMaxPlayers() {
+        return maxPlayers;
+    }
+
+    public String getMotd() {
+        return motd;
+    }
+
+    public void setMotd(String motd) {
+        this.motd = motd;
+
+        game.getProtocol().sendGameGroupUpdatePayload(this);
     }
 
     @SuppressWarnings("unchecked")
@@ -264,6 +283,10 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         }
 
         config.set("players", users);
+
+        config.set("player_count", users.size());
+        config.set("max_players", maxPlayers);
+        config.set("motd", motd);
 
         return config;
     }
