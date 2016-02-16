@@ -4,15 +4,21 @@ import com.ithinkrok.minigames.base.database.BooleanUserValue;
 import com.ithinkrok.minigames.base.database.DoubleUserValue;
 import com.ithinkrok.minigames.base.database.IntUserValue;
 import com.ithinkrok.minigames.base.database.StringUserValue;
+import com.ithinkrok.minigames.base.hub.Hub;
 import com.ithinkrok.minigames.base.protocol.ClientMinigamesProtocol;
 import com.ithinkrok.minigames.base.protocol.ClientMinigamesRequestProtocol;
 import com.ithinkrok.msm.client.impl.MSMClient;
 import com.ithinkrok.util.config.BukkitConfig;
 import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.config.MemoryConfig;
+import com.ithinkrok.util.config.YamlConfigIO;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +28,7 @@ import java.util.List;
 public class BasePlugin extends JavaPlugin {
 
     private static Game game;
+    private static Hub hub;
 
     private ClientMinigamesRequestProtocol requestProtocol;
 
@@ -33,13 +40,29 @@ public class BasePlugin extends JavaPlugin {
     public void onEnable() {
         Config config = new BukkitConfig(getConfig());
 
-        game = new Game(this, config);
+        if(config.getBoolean("modules.game", true)) {
+            loadGameModule(config);
+        }
 
-        game.registerListeners();
+        if(config.getBoolean("modules.hub", false)) {
+            loadHubModule();
+        }
+    }
 
+    private void loadHubModule() {
         requestProtocol = new ClientMinigamesRequestProtocol();
 
         MSMClient.addProtocol("MinigamesRequest", requestProtocol);
+
+        hub = new Hub(this, requestProtocol);
+
+        hub.registerListeners();
+    }
+
+    private void loadGameModule(Config config) {
+        game = new Game(this, config);
+
+        game.registerListeners();
     }
 
     @Override
@@ -49,8 +72,11 @@ public class BasePlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        game.unload();
+        if(game != null) game.unload();
         game = null;
+
+        if(hub != null) hub.unload();
+        hub = null;
     }
 
     @Override
