@@ -1,11 +1,17 @@
 package com.ithinkrok.minigames.base.protocol;
 
 import com.ithinkrok.minigames.base.protocol.data.ControllerInfo;
+import com.ithinkrok.minigames.base.protocol.data.GameGroupInfo;
+import com.ithinkrok.minigames.base.protocol.event.GameGroupKilledEvent;
+import com.ithinkrok.minigames.base.protocol.event.GameGroupSpawnedEvent;
+import com.ithinkrok.minigames.base.protocol.event.GameGroupUpdateEvent;
 import com.ithinkrok.msm.client.Client;
 import com.ithinkrok.msm.client.ClientListener;
 import com.ithinkrok.msm.common.Channel;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,11 +21,16 @@ import java.util.List;
  */
 public class ClientMinigamesRequestProtocol implements ClientListener {
 
+    private final Plugin plugin;
     private Channel channel;
 
     private boolean gameGroupInfoEnabled = false;
 
     private final ControllerInfo controllerInfo = new ControllerInfo();
+
+    public ClientMinigamesRequestProtocol(Plugin plugin) {
+        this.plugin = plugin;
+    }
 
     @Override
     public void connectionOpened(Client client, Channel channel) {
@@ -43,6 +54,8 @@ public class ClientMinigamesRequestProtocol implements ClientListener {
                 handleResponseGameGroupInfo(payload);
                 return;
             case "EventGameGroupSpawned":
+                handleEventGameGroupSpawned(payload);
+                return;
             case "EventGameGroupUpdate":
                 handleEventGameGroupUpdate(payload);
                 return;
@@ -51,16 +64,32 @@ public class ClientMinigamesRequestProtocol implements ClientListener {
         }
     }
 
+    private void handleEventGameGroupSpawned(Config payload) {
+        GameGroupInfo gameGroup = controllerInfo.updateGameGroup(payload);
+
+        GameGroupSpawnedEvent event = new GameGroupSpawnedEvent(gameGroup);
+
+        plugin.getServer().getPluginManager().callEvent(event);
+    }
+
     public ControllerInfo getControllerInfo() {
         return controllerInfo;
     }
 
     private void handleEventGameGroupKilled(Config payload) {
-        controllerInfo.removeGameGroup(payload.getString("name"));
+        GameGroupInfo gameGroup = controllerInfo.removeGameGroup(payload.getString("name"));
+
+        GameGroupKilledEvent event = new GameGroupKilledEvent(gameGroup);
+
+        plugin.getServer().getPluginManager().callEvent(event);
     }
 
     private void handleEventGameGroupUpdate(Config payload) {
-        controllerInfo.updateGameGroup(payload);
+        GameGroupInfo gameGroup = controllerInfo.updateGameGroup(payload);
+
+        GameGroupUpdateEvent event = new GameGroupUpdateEvent(gameGroup);
+
+        plugin.getServer().getPluginManager().callEvent(event);
     }
 
     private void handleResponseGameGroupInfo(Config payload) {

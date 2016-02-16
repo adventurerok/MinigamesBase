@@ -16,7 +16,7 @@ public class ControllerInfo {
         gameGroupInfoMap.clear();
     }
 
-    public void updateGameGroup(Config gameGroupConfig) {
+    public GameGroupInfo updateGameGroup(Config gameGroupConfig) {
         String name = gameGroupConfig.getString("name");
 
         GameGroupInfo info = gameGroupInfoMap.get(name);
@@ -27,9 +27,15 @@ public class ControllerInfo {
         } else {
             info.fromConfig(gameGroupConfig);
         }
+
+        return info;
     }
 
-    public void removeGameGroup(String name) {
-        gameGroupInfoMap.remove(name);
+    public GameGroupInfo getGameGroup(String name) {
+        return gameGroupInfoMap.get(name);
+    }
+
+    public GameGroupInfo removeGameGroup(String name) {
+        return gameGroupInfoMap.remove(name);
     }
 }

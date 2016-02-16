@@ -5,20 +5,14 @@ import com.ithinkrok.minigames.base.database.DoubleUserValue;
 import com.ithinkrok.minigames.base.database.IntUserValue;
 import com.ithinkrok.minigames.base.database.StringUserValue;
 import com.ithinkrok.minigames.base.hub.Hub;
-import com.ithinkrok.minigames.base.protocol.ClientMinigamesProtocol;
 import com.ithinkrok.minigames.base.protocol.ClientMinigamesRequestProtocol;
 import com.ithinkrok.msm.client.impl.MSMClient;
 import com.ithinkrok.util.config.BukkitConfig;
 import com.ithinkrok.util.config.Config;
-import com.ithinkrok.util.config.MemoryConfig;
-import com.ithinkrok.util.config.YamlConfigIO;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +44,7 @@ public class BasePlugin extends JavaPlugin {
     }
 
     private void loadHubModule() {
-        requestProtocol = new ClientMinigamesRequestProtocol();
+        requestProtocol = new ClientMinigamesRequestProtocol(this);
 
         MSMClient.addProtocol("MinigamesRequest", requestProtocol);
 
