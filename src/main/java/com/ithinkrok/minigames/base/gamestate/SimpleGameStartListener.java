@@ -71,6 +71,9 @@ public class SimpleGameStartListener implements CustomListener {
 
         if(event.getOldGameState() != null && !event.getOldGameState().getName().equals(lobbyGameState)) return;
 
+        //Stop accepting players
+        event.getGameGroup().setAcceptingPlayers(false);
+
         event.getGameGroup().changeMap(assignGameMap(event.getGameGroup()));
 
         GameGroup gameGroup = event.getGameGroup();
