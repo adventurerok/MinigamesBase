@@ -1,6 +1,7 @@
 package com.ithinkrok.minigames.base;
 
 import com.ithinkrok.minigames.base.event.game.CountdownFinishedEvent;
+import com.ithinkrok.minigames.base.event.game.CountdownMessageEvent;
 import com.ithinkrok.util.lang.LanguageLookup;
 import com.ithinkrok.util.lang.Messagable;
 import com.ithinkrok.minigames.base.task.GameTask;
@@ -69,8 +70,8 @@ public class Countdown implements Nameable {
         task.cancel();
     }
 
-    private void doCountdownMessage(Messagable messagable) {
-        LanguageLookup lookup = messagable.getLanguageLookup();
+    private void doCountdownMessage(GameGroup gameGroup) {
+        LanguageLookup lookup = gameGroup.getLanguageLookup();
         String message = null;
 
         if (secondsRemaining > 30) {
@@ -94,7 +95,10 @@ public class Countdown implements Nameable {
             }
         }
 
-        if(message != null) messagable.sendMessage(message);
+        CountdownMessageEvent event = new CountdownMessageEvent(gameGroup, this, message);
+        gameGroup.gameEvent(event);
+
+        if(message != null) gameGroup.sendMessage(message);
     }
 
     public boolean isFinished() {
