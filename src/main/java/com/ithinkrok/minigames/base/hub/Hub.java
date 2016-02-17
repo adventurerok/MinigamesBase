@@ -40,12 +40,17 @@ public class Hub implements Listener {
     private final Map<Location, HubSign> signs = new HashMap<>();
 
     private final Map<UUID, Location> openSpectatorInventories = new HashMap<>();
+    private final Path configPath;
 
     public Hub(Plugin plugin, ClientMinigamesRequestProtocol requestProtocol) {
         this.plugin = plugin;
         this.requestProtocol = requestProtocol;
 
+        configPath = plugin.getDataFolder().toPath().resolve("signs.yml");
+
         requestProtocol.enableGameGroupInfo();
+
+        loadConfig();
     }
 
     public void registerListeners() {
@@ -57,11 +62,20 @@ public class Hub implements Listener {
     }
 
     public void saveConfig() {
-        Path configPath = plugin.getDataFolder().toPath().resolve("signs.yml");
-
         try {
             YamlConfigIO.saveConfig(configPath, toConfig());
         } catch (IOException e) {
+            System.out.println("Error while saving signs.yml");
+            e.printStackTrace();
+        }
+    }
+
+    public void loadConfig() {
+        try {
+            Config config = YamlConfigIO.loadToConfig(configPath, new MemoryConfig());
+            fromConfig(config);
+        } catch (IOException e) {
+            System.out.println("Error while loading signs.yml");
             e.printStackTrace();
         }
     }
@@ -136,7 +150,7 @@ public class Hub implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
-        signs.remove(event.getBlock().getLocation());
+        if(signs.remove(event.getBlock().getLocation()) != null) saveConfig();
 
         List<UUID> removeKeys = new ArrayList<>();
 
@@ -192,6 +206,8 @@ public class Hub implements Listener {
         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
             sign.update(requestProtocol.getControllerInfo());
         });
+
+        saveConfig();
     }
 
     @EventHandler
