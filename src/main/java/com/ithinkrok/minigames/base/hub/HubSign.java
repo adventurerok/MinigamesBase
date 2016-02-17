@@ -1,11 +1,13 @@
 package com.ithinkrok.minigames.base.hub;
 
+import com.ithinkrok.minigames.base.protocol.ClientMinigamesRequestProtocol;
 import com.ithinkrok.minigames.base.protocol.data.ControllerInfo;
 import com.ithinkrok.minigames.base.protocol.data.GameGroupInfo;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.Player;
 import org.bukkit.event.block.SignChangeEvent;
 
 import java.util.Collection;
@@ -63,6 +65,25 @@ public class HubSign {
         }
 
         sign.update();
+    }
+
+    public void onRightClick(ClientMinigamesRequestProtocol requestProtocol, Player player) {
+        Collection<GameGroupInfo> accepting = requestProtocol.getControllerInfo().getAcceptingGameGroups(gameGroupType);
+
+        GameGroupInfo bestMatch = null;
+
+        for(GameGroupInfo gameGroupInfo : accepting) {
+            if(bestMatch != null && gameGroupInfo.getPlayerCount() < bestMatch.getPlayerCount()) continue;
+
+            bestMatch = gameGroupInfo;
+        }
+
+        String gameGroupName = bestMatch != null ? bestMatch.getName() : null;
+
+        if(gameGroupName != null) player.sendMessage("Sending you to gamegroup: " + gameGroupName);
+        else player.sendMessage("Creating a new " + gameGroupType + " gamegroup for you");
+
+        requestProtocol.sendJoinGameGroupPacket(player.getUniqueId(), gameGroupType, gameGroupName);
     }
 
     public Location getLocation() {

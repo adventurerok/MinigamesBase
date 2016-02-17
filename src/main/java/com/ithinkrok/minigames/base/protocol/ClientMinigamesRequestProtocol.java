@@ -11,10 +11,12 @@ import com.ithinkrok.msm.common.Channel;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by paul on 15/02/16.
@@ -103,6 +105,17 @@ public class ClientMinigamesRequestProtocol implements ClientListener {
         for(Config gameGroupConfig : response) {
             controllerInfo.updateGameGroup(gameGroupConfig);
         }
+    }
+
+    public void sendJoinGameGroupPacket(UUID playerUUID, String type, String name) {
+        Config payload = new MemoryConfig();
+
+        payload.set("player", playerUUID.toString());
+        payload.set("type", type);
+        payload.set("name", name);
+        payload.set("mode", "JoinGameGroup");
+
+        channel.write(payload);
     }
 
     public void enableGameGroupInfo() {

@@ -8,9 +8,11 @@ import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.Plugin;
 
 import java.util.HashMap;
@@ -44,6 +46,16 @@ public class Hub implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
         signs.remove(event.getBlock().getLocation());
+    }
+
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if(!event.hasBlock()  || event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+
+        HubSign sign = signs.get(event.getClickedBlock().getLocation());
+        if(sign == null) return;
+
+        sign.onRightClick(requestProtocol, event.getPlayer());
     }
 
     @EventHandler
