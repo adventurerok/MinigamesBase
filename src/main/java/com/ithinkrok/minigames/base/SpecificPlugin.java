@@ -1,5 +1,9 @@
 package com.ithinkrok.minigames.base;
 
+import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.config.InvalidConfigException;
+import com.ithinkrok.util.config.MemoryConfig;
+import com.ithinkrok.util.config.YamlConfigIO;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -11,9 +15,16 @@ public class SpecificPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        ConfigurationSection config = getConfig();
+        Config config;
+        try {
+            config = YamlConfigIO.loadToConfig(getResource("config.yml"), new MemoryConfig());
+        } catch (InvalidConfigException e) {
+            System.out.println("Failed to load gamegroup configs config");
+            e.printStackTrace();
+            return;
+        }
 
-        ConfigurationSection gameGroupConfigs = config.getConfigurationSection("gamegroup_configs");
+        Config gameGroupConfigs = config.getConfigOrEmpty("gamegroup_configs");
 
         Game game = BasePlugin.getGame();
 
