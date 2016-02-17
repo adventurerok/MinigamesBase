@@ -5,7 +5,9 @@ import com.ithinkrok.minigames.base.protocol.data.ControllerInfo;
 import com.ithinkrok.minigames.base.protocol.event.GameGroupKilledEvent;
 import com.ithinkrok.minigames.base.protocol.event.GameGroupSpawnedEvent;
 import com.ithinkrok.minigames.base.protocol.event.GameGroupUpdateEvent;
+import com.ithinkrok.minigames.base.util.InventoryUtils;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -13,11 +15,14 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.Plugin;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by paul on 16/02/16.
@@ -28,6 +33,8 @@ public class Hub implements Listener {
     private final ClientMinigamesRequestProtocol requestProtocol;
 
     private final Map<Location, HubSign> signs = new HashMap<>();
+
+    private final Map<UUID, Location> openSpectatorInventories = new HashMap<>();
 
     public Hub(Plugin plugin, ClientMinigamesRequestProtocol requestProtocol) {
         this.plugin = plugin;
@@ -44,9 +51,68 @@ public class Hub implements Listener {
 
     }
 
+    public void addOpenSpectatorInventory(Player player, Location location) {
+        openSpectatorInventories.put(player.getUniqueId(), location);
+    }
+
+    @EventHandler
+    public void onInventoryClose(InventoryCloseEvent event) {
+        openSpectatorInventories.remove(event.getPlayer().getUniqueId());
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        if(!(event.getWhoClicked() instanceof Player)) return;
+
+        Player player = (Player) event.getWhoClicked();
+
+        Location signLocation = openSpectatorInventories.get(player.getUniqueId());
+        if(signLocation == null) return;
+
+        HubSign sign = signs.get(signLocation);
+        if(sign == null) return;
+
+        if(event.getCurrentItem() == null) return;
+
+        String gameGroupName = InventoryUtils.getItemName(event.getCurrentItem());
+        if(gameGroupName == null) return;
+
+        String type = sign.getGameGroupType();
+
+        player.sendMessage("Sending you to gamegroup: " + gameGroupName);
+
+        requestProtocol.sendJoinGameGroupPacket(player.getUniqueId(), type, gameGroupName);
+
+        event.setCancelled(true);
+
+        player.closeInventory();
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        openSpectatorInventories.remove(event.getPlayer().getUniqueId());
+    }
+
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
         signs.remove(event.getBlock().getLocation());
+
+        List<UUID> removeKeys = new ArrayList<>();
+
+        for(Map.Entry<UUID, Location> entry : openSpectatorInventories.entrySet()) {
+            if(!entry.getValue().equals(event.getBlock().getLocation())) return;
+
+            removeKeys.add(entry.getKey());
+
+            Player player = plugin.getServer().getPlayer(entry.getKey());
+            if(player == null) return;
+
+            player.closeInventory();
+        }
+
+        for(UUID key : removeKeys) {
+            openSpectatorInventories.remove(key);
+        }
     }
 
     @EventHandler
@@ -97,6 +163,19 @@ public class Hub implements Listener {
     private void updateSigns() {
         for(HubSign sign : signs.values()) {
             sign.update(requestProtocol.getControllerInfo());
+        }
+
+        for(Map.Entry<UUID, Location> entry : openSpectatorInventories.entrySet()) {
+            HubSign sign = signs.get(entry.getValue());
+            if(sign == null) continue;
+
+            Player player = plugin.getServer().getPlayer(entry.getKey());
+            if(player == null) continue;
+
+            Inventory inventory = player.getOpenInventory().getTopInventory();
+            if(inventory == null) continue;
+
+            sign.updateSpectatorInventory(this, inventory);
         }
     }
 

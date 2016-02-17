@@ -211,8 +211,8 @@ public class InventoryUtils {
         return item;
     }
 
-    public static String getDisplayName(ItemStack itemPlaced) {
-        ItemMeta meta = itemPlaced.getItemMeta();
+    public static String getItemName(ItemStack item) {
+        ItemMeta meta = item.getItemMeta();
 
         if (!meta.hasDisplayName()) return null;
         return meta.getDisplayName();

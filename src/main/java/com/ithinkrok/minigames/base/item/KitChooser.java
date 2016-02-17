@@ -54,7 +54,7 @@ public class KitChooser implements CustomListener {
         for (String kitName : choosableKits.keySet()) {
             Kit kit = event.getUserGameGroup().getKit(kitName);
             ItemStack display = choosableKits.get(kitName);
-            if (InventoryUtils.getDisplayName(display) == null) {
+            if (InventoryUtils.getItemName(display) == null) {
                 InventoryUtils.setItemNameAndLore(display, kit.getFormattedName());
             }
 

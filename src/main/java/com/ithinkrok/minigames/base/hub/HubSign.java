@@ -44,6 +44,10 @@ public class HubSign {
         else updateLobbySign(controller);
     }
 
+    public String getGameGroupType() {
+        return gameGroupType;
+    }
+
     private void updateSpectatorSign(ControllerInfo controller) {
         Sign sign = (Sign) location.getBlock().getState();
 
@@ -107,6 +111,19 @@ public class HubSign {
     }
 
     private void onRightClickSpectator(Hub hub, Player player) {
+        Inventory inventory = Bukkit.createInventory(player, 36,
+                WordUtils.capitalizeFully(gameGroupType.replace('_', ' ')) + " Games");
+
+        updateSpectatorInventory(hub, inventory);
+
+        player.openInventory(inventory);
+
+        hub.addOpenSpectatorInventory(player, location);
+    }
+
+    public void updateSpectatorInventory(Hub hub, Inventory inventory) {
+        inventory.clear();
+
         Collection<GameGroupInfo> allCollection = hub.getControllerInfo().getGameGroups(gameGroupType);
 
         List<GameGroupInfo> all = new ArrayList<>(allCollection);
@@ -116,11 +133,6 @@ public class HubSign {
             else if (o2.isAcceptingPlayers() && !o1.isAcceptingPlayers()) return -1;
             return o1.getName().compareTo(o2.getName());
         });
-
-        int size = ((all.size() + 9) / 9) * 9;
-
-        Inventory inventory = Bukkit.createInventory(player, size,
-                WordUtils.capitalizeFully(gameGroupType.replace('_', ' ')) + " Games");
 
         for (GameGroupInfo gameGroup : all) {
             Material mat = gameGroup.isAcceptingPlayers() ? Material.GOLD_BLOCK : Material.IRON_BLOCK;
@@ -143,8 +155,6 @@ public class HubSign {
 
             inventory.addItem(item);
         }
-
-        player.openInventory(inventory);
     }
 
     private void onRightClickLobby(Hub hub, Player player) {
