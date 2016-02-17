@@ -47,7 +47,7 @@ public class HubSign {
         String worldName = config.getString("world");
 
         World world = server.getWorld(worldName);
-        if(world == null) throw new RuntimeException("Unknown world " + worldName);
+        if (world == null) throw new RuntimeException("Unknown world " + worldName);
 
         location = new Location(world, x, y, z);
     }
@@ -57,15 +57,11 @@ public class HubSign {
         else updateLobbySign(controller);
     }
 
-    public String getGameGroupType() {
-        return gameGroupType;
-    }
-
     private void updateSpectatorSign(ControllerInfo controller) {
         Sign sign = (Sign) location.getBlock().getState();
 
-        sign.setLine(0, ChatColor.GRAY + "[" + ChatColor.DARK_AQUA +
-                WordUtils.capitalizeFully(gameGroupType.replace('_', ' ')) + ChatColor.GRAY + "]");
+        sign.setLine(0, ChatColor.DARK_GRAY + "[" + ChatColor.DARK_AQUA +
+                WordUtils.capitalizeFully(gameGroupType.replace('_', ' ')) + ChatColor.DARK_GRAY + "]");
 
         Collection<GameGroupInfo> all = controller.getGameGroups(gameGroupType);
 
@@ -85,8 +81,8 @@ public class HubSign {
     private void updateLobbySign(ControllerInfo controller) {
         Sign sign = (Sign) location.getBlock().getState();
 
-        sign.setLine(0, ChatColor.GRAY + "[" + ChatColor.DARK_AQUA +
-                WordUtils.capitalizeFully(gameGroupType.replace('_', ' ')) + ChatColor.GRAY + "]");
+        sign.setLine(0, ChatColor.DARK_GRAY + "[" + ChatColor.DARK_AQUA +
+                WordUtils.capitalizeFully(gameGroupType.replace('_', ' ')) + ChatColor.DARK_GRAY + "]");
 
         Collection<GameGroupInfo> accepting = controller.getAcceptingGameGroups(gameGroupType);
 
@@ -118,6 +114,10 @@ public class HubSign {
         sign.update();
     }
 
+    public String getGameGroupType() {
+        return gameGroupType;
+    }
+
     public void onRightClick(Hub hub, Player player) {
         if (spectatorSign) onRightClickSpectator(hub, player);
         else onRightClickLobby(hub, player);
@@ -132,6 +132,25 @@ public class HubSign {
         player.openInventory(inventory);
 
         hub.addOpenSpectatorInventory(player, location);
+    }
+
+    private void onRightClickLobby(Hub hub, Player player) {
+        Collection<GameGroupInfo> accepting = hub.getControllerInfo().getAcceptingGameGroups(gameGroupType);
+
+        GameGroupInfo bestMatch = null;
+
+        for (GameGroupInfo gameGroupInfo : accepting) {
+            if (bestMatch != null && gameGroupInfo.getPlayerCount() < bestMatch.getPlayerCount()) continue;
+
+            bestMatch = gameGroupInfo;
+        }
+
+        String gameGroupName = bestMatch != null ? bestMatch.getName() : null;
+
+        if (gameGroupName != null) player.sendMessage("Sending you to gamegroup: " + gameGroupName);
+        else player.sendMessage("Creating a new " + gameGroupType + " gamegroup for you");
+
+        hub.getRequestProtocol().sendJoinGameGroupPacket(player.getUniqueId(), gameGroupType, gameGroupName);
     }
 
     public void updateSpectatorInventory(Hub hub, Inventory inventory) {
@@ -153,40 +172,24 @@ public class HubSign {
             List<String> lore = new ArrayList<>();
 
             if (gameGroup.isAcceptingPlayers()) {
-                lore.add("Join Lobby");
+                lore.add(ChatColor.GREEN + "Join Lobby");
             } else {
-                lore.add("Spectate Game");
+                lore.add(ChatColor.RED + "Spectate Game");
             }
 
-            lore.add(gameGroup.getMotd());
+            lore.add(ChatColor.WHITE + gameGroup.getMotd());
 
-            lore.add("Type: " + gameGroupType);
-            lore.add("Players: [" + gameGroup.getPlayerCount() + "/" + gameGroup.getMaxPlayerCount() + "]");
+            lore.add(ChatColor.RED + "Type: " + ChatColor.GRAY + gameGroupType);
+            lore.add(ChatColor.RED + "Players: " + ChatColor.DARK_GRAY + "[" + ChatColor.GRAY +
+                    gameGroup.getPlayerCount() + ChatColor.DARK_GRAY + "/" + ChatColor.GRAY +
+                    gameGroup.getMaxPlayerCount() + ChatColor.DARK_GRAY +
+                    "]");
 
             ItemStack item = InventoryUtils
                     .createItemWithNameAndLore(mat, 1, 0, gameGroup.getName(), lore.toArray(new String[lore.size()]));
 
             inventory.addItem(item);
         }
-    }
-
-    private void onRightClickLobby(Hub hub, Player player) {
-        Collection<GameGroupInfo> accepting = hub.getControllerInfo().getAcceptingGameGroups(gameGroupType);
-
-        GameGroupInfo bestMatch = null;
-
-        for (GameGroupInfo gameGroupInfo : accepting) {
-            if (bestMatch != null && gameGroupInfo.getPlayerCount() < bestMatch.getPlayerCount()) continue;
-
-            bestMatch = gameGroupInfo;
-        }
-
-        String gameGroupName = bestMatch != null ? bestMatch.getName() : null;
-
-        if (gameGroupName != null) player.sendMessage("Sending you to gamegroup: " + gameGroupName);
-        else player.sendMessage("Creating a new " + gameGroupType + " gamegroup for you");
-
-        hub.getRequestProtocol().sendJoinGameGroupPacket(player.getUniqueId(), gameGroupType, gameGroupName);
     }
 
     public Location getLocation() {
