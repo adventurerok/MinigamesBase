@@ -25,7 +25,7 @@ public class ItemGiver {
         if (config == null) config = ConfigUtils.EMPTY_CONFIG;
         clearInventory = config.getBoolean("clear_inventory");
 
-        List<Config> itemConfigs = config.getConfigList("items");
+        List<Config> itemConfigs = config.getConfigList("custom_items");
 
         items.addAll(itemConfigs.stream().map(CustomItemInfo::new).collect(Collectors.toList()));
 
