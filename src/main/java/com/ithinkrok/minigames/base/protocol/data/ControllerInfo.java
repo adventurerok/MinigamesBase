@@ -21,7 +21,7 @@ public class ControllerInfo {
 
         GameGroupInfo info = gameGroupInfoMap.get(name);
         if(info == null) {
-            info = new GameGroupInfo(gameGroupConfig);
+            info = new GameGroupInfo(this, gameGroupConfig);
 
             gameGroupInfoMap.put(name, info);
         } else {

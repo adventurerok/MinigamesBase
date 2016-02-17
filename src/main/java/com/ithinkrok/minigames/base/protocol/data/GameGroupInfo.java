@@ -7,6 +7,8 @@ import com.ithinkrok.util.config.Config;
  */
 public class GameGroupInfo {
 
+    private final ControllerInfo controller;
+
     private final String name;
 
     private final String type;
@@ -19,7 +21,8 @@ public class GameGroupInfo {
 
     private int maxPlayerCount = 40;
 
-    public GameGroupInfo(Config config) {
+    public GameGroupInfo(ControllerInfo controller, Config config) {
+        this.controller = controller;
         this.name = config.getString("name");
         this.type = config.getString("type");
 
@@ -34,6 +37,10 @@ public class GameGroupInfo {
         if(config.contains("player_count")) playerCount = config.getInt("player_count");
 
         if(config.contains("max_players")) maxPlayerCount = config.getInt("max_players");
+    }
+
+    public ControllerInfo getController() {
+        return controller;
     }
 
     public String getName() {
