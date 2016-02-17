@@ -117,7 +117,7 @@ public class HubSign {
             return o1.getName().compareTo(o2.getName());
         });
 
-        int size = ((all.size() + 1) / 9) * 9;
+        int size = ((all.size() + 9) / 9) * 9;
 
         Inventory inventory = Bukkit.createInventory(player, size,
                 WordUtils.capitalizeFully(gameGroupType.replace('_', ' ')) + " Games");
