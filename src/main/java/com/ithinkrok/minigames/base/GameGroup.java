@@ -606,6 +606,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         game.removeGameGroup(this);
 
         for (Player player : players) {
+            game.sendPlayerToHub(player);
             game.rejoinPlayer(player);
         }
 

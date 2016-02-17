@@ -223,4 +223,8 @@ public class ClientMinigamesProtocol implements ClientListener {
 
         client.changePlayerServer(playerUUID, client.getMinecraftServerInfo().getName());
     }
+
+    public Client getClient() {
+        return client;
+    }
 }

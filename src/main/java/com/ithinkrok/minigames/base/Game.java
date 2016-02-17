@@ -18,6 +18,7 @@ import com.ithinkrok.minigames.base.event.user.state.UserDeathEvent;
 import com.ithinkrok.minigames.base.event.user.state.UserFoodLevelChangeEvent;
 import com.ithinkrok.minigames.base.event.user.world.*;
 import com.ithinkrok.minigames.base.protocol.ClientMinigamesProtocol;
+import com.ithinkrok.msm.client.Client;
 import com.ithinkrok.msm.client.impl.MSMClient;
 import com.ithinkrok.util.lang.LangFile;
 import com.ithinkrok.minigames.base.map.GameMap;
@@ -70,6 +71,8 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
 
     private final String name;
 
+    private final String hubServer;
+
     private final ConcurrentMap<UUID, User> usersInServer = new ConcurrentHashMap<>();
 
     private final Plugin plugin;
@@ -109,6 +112,8 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         this.plugin = plugin;
 
         name = config.getString("bungee.name");
+
+        hubServer = config.getString("bungee.hub");
 
         fallbackConfig = config.getString("fallback_gamegroup");
 
@@ -204,6 +209,10 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     public void registerListeners() {
         Listener listener = new GameListener();
         plugin.getServer().getPluginManager().registerEvents(listener, plugin);
+    }
+
+    public void sendPlayerToHub() {
+
     }
 
     public void registerGameGroupConfig(String name, String configFile) {
@@ -320,6 +329,14 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         }
 
         gameGroup.userEvent(new UserJoinEvent(user, UserJoinEvent.JoinReason.JOINED_SERVER));
+    }
+
+    public boolean sendPlayerToHub(Player player) {
+        Client client = protocol.getClient();
+
+        if(client == null) return false;
+
+        return client.changePlayerServer(player.getUniqueId(), hubServer);
     }
 
     private GameGroup getGameGroupForJoining(UUID uniqueId) {
