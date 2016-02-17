@@ -14,7 +14,7 @@ public abstract class GameGroupEvent extends Event {
         this.gameGroupInfo = gameGroupInfo;
     }
 
-    public GameGroupInfo getGameGroupInfo() {
+    public GameGroupInfo getGameGroup() {
         return gameGroupInfo;
     }
 
