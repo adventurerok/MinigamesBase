@@ -4,6 +4,7 @@ import com.ithinkrok.minigames.base.GameState;
 import com.ithinkrok.minigames.base.Kit;
 import com.ithinkrok.minigames.base.command.CommandConfig;
 import com.ithinkrok.minigames.base.item.CustomItem;
+import com.ithinkrok.minigames.base.util.JSONBook;
 import com.ithinkrok.util.lang.LanguageLookup;
 import com.ithinkrok.minigames.base.map.GameMapInfo;
 import com.ithinkrok.minigames.base.schematic.Schematic;
@@ -37,4 +38,6 @@ public interface ConfigHolder {
     void addCommand(CommandConfig command);
 
     void addMapInfo(GameMapInfo mapInfo);
+
+    void addBook(JSONBook book);
 }

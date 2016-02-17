@@ -4,6 +4,7 @@ import com.ithinkrok.minigames.base.*;
 import com.ithinkrok.minigames.base.command.CommandConfig;
 import com.ithinkrok.minigames.base.item.CustomItem;
 import com.ithinkrok.minigames.base.item.IdentifierMap;
+import com.ithinkrok.minigames.base.util.JSONBook;
 import com.ithinkrok.util.lang.LanguageLookup;
 import com.ithinkrok.util.lang.MultipleLanguageLookup;
 import com.ithinkrok.minigames.base.schematic.PastedSchematic;
@@ -48,6 +49,7 @@ public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.Bo
     private final List<CustomListener> listeners = new ArrayList<>();
     private final Map<String, CustomListener> listenerMap = new HashMap<>();
     private final Map<String, Schematic> schematicMap = new HashMap<>();
+    private final Map<String, JSONBook> bookMap = new HashMap<>();
     private final TaskList mapTaskList = new TaskList();
     private final IdentifierMap<CustomItem> customItemIdentifierMap = new IdentifierMap<>();
     private final HashMap<String, Config> sharedObjects = new HashMap<>();
@@ -314,12 +316,21 @@ public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.Bo
         //TODO custom GameMapInfo support for maps
     }
 
+    @Override
+    public void addBook(JSONBook book) {
+        bookMap.put(book.getName(), book);
+    }
+
     public Map<String, CustomListener> getListenerMap() {
         return listenerMap;
     }
 
     public Schematic getSchematic(String name) {
         return schematicMap.get(name);
+    }
+
+    public JSONBook getBook(String name) {
+        return bookMap.get(name);
     }
 
     @Override

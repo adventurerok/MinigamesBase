@@ -34,6 +34,7 @@ import com.ithinkrok.minigames.base.team.Team;
 import com.ithinkrok.minigames.base.team.TeamIdentifier;
 import com.ithinkrok.minigames.base.team.TeamUserResolver;
 import com.ithinkrok.minigames.base.util.CountdownConfig;
+import com.ithinkrok.minigames.base.util.JSONBook;
 import com.ithinkrok.minigames.base.util.io.ConfigHolder;
 import com.ithinkrok.minigames.base.util.io.ConfigParser;
 import com.ithinkrok.minigames.base.util.io.FileLoader;
@@ -81,6 +82,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     private final IdentifierMap<CustomItem> customItemIdentifierMap = new IdentifierMap<>();
     private final Map<String, Config> sharedObjectMap = new HashMap<>();
     private final Map<String, Schematic> schematicMap = new HashMap<>();
+    private final Map<String, JSONBook> bookMap = new HashMap<>();
     private final Map<String, TeamIdentifier> teamIdentifiers = new HashMap<>();
     private final Map<String, GameState> gameStates = new HashMap<>();
     private final Map<String, Kit> kits = new HashMap<>();
@@ -389,6 +391,11 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     }
 
     @Override
+    public JSONBook loadBook(String name, String path) {
+        return game.loadBook(name, path);
+    }
+
+    @Override
     public LangFile loadLangFile(String path) {
         return game.loadLangFile(path);
     }
@@ -565,6 +572,13 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         kits.put(kit.getName(), kit);
     }
 
+    public JSONBook getBook(String name) {
+        if(currentMap == null) return bookMap.get(name);
+        JSONBook book = currentMap.getBook(name);
+
+        return book != null ? book : bookMap.get(name);
+    }
+
     @Override
     public void addCommand(CommandConfig command) {
         commandMap.put(command.getName(), command);
@@ -578,6 +592,11 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     @Override
     public void addMapInfo(GameMapInfo mapInfo) {
         gameMapInfoMap.put(mapInfo.getName(), mapInfo);
+    }
+
+    @Override
+    public void addBook(JSONBook book) {
+        bookMap.put(book.getName(), book);
     }
 
     public void kill() {

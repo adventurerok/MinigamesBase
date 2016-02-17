@@ -18,6 +18,7 @@ import com.ithinkrok.minigames.base.event.user.state.UserDeathEvent;
 import com.ithinkrok.minigames.base.event.user.state.UserFoodLevelChangeEvent;
 import com.ithinkrok.minigames.base.event.user.world.*;
 import com.ithinkrok.minigames.base.protocol.ClientMinigamesProtocol;
+import com.ithinkrok.minigames.base.util.JSONBook;
 import com.ithinkrok.msm.client.Client;
 import com.ithinkrok.msm.client.impl.MSMClient;
 import com.ithinkrok.util.lang.LangFile;
@@ -239,6 +240,27 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
             System.out.println("Failed to load lang file: " + path);
             e.printStackTrace();
             return new LangFile(new Properties());
+        }
+    }
+
+    @Override
+    public JSONBook loadBook(String name, String pathName) {
+        Path path = configDirectory.resolve(pathName);
+
+        try {
+            List<String> lines = Files.readAllLines(path);
+
+            StringBuilder json = new StringBuilder();
+
+            for(String line : lines) {
+                json.append(line);
+            }
+
+            return new JSONBook(name, json.toString());
+        } catch (IOException e) {
+            System.out.println("Failed to load json book file: " + pathName);
+            e.printStackTrace();
+            return new JSONBook(name, "failed to load");
         }
     }
 
