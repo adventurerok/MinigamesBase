@@ -1,6 +1,7 @@
 package com.ithinkrok.minigames.base.hub;
 
 import com.ithinkrok.minigames.base.protocol.ClientMinigamesRequestProtocol;
+import com.ithinkrok.minigames.base.protocol.data.ControllerInfo;
 import com.ithinkrok.minigames.base.protocol.event.GameGroupKilledEvent;
 import com.ithinkrok.minigames.base.protocol.event.GameGroupSpawnedEvent;
 import com.ithinkrok.minigames.base.protocol.event.GameGroupUpdateEvent;
@@ -55,7 +56,15 @@ public class Hub implements Listener {
         HubSign sign = signs.get(event.getClickedBlock().getLocation());
         if(sign == null) return;
 
-        sign.onRightClick(requestProtocol, event.getPlayer());
+        sign.onRightClick(this, event.getPlayer());
+    }
+
+    public ClientMinigamesRequestProtocol getRequestProtocol() {
+        return requestProtocol;
+    }
+
+    public ControllerInfo getControllerInfo() {
+        return requestProtocol.getControllerInfo();
     }
 
     @EventHandler
