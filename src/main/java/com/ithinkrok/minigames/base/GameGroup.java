@@ -131,6 +131,8 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     }
 
     public void setMotd(String motd) {
+        if(motd.equals(this.motd)) return;
+
         this.motd = motd;
 
         game.getProtocol().sendGameGroupUpdatePayload(this);

@@ -1,5 +1,6 @@
 package com.ithinkrok.minigames.base.gamestate;
 
+import com.ithinkrok.minigames.base.Countdown;
 import com.ithinkrok.minigames.base.GameGroup;
 import com.ithinkrok.minigames.base.GameState;
 import com.ithinkrok.minigames.base.User;
@@ -44,7 +45,6 @@ public class SimpleLobbyListener implements CustomListener {
     private String needsMorePlayersLocale;
     private int minPlayersToStartGame;
 
-
     private String lobbyMapName;
     private String nextGameState;
 
@@ -52,6 +52,15 @@ public class SimpleLobbyListener implements CustomListener {
 
     private CustomItemGiver giveOnJoin;
     private Config config;
+    
+    private String waitingForPlayersLocale;
+    private String starting5Locale;
+    private String starting10Locale;
+    private String starting30Locale;
+    private String starting60Locale;
+    private String starting120Locale;
+    private String startingEventuallyLocale;
+    private String startedLocale;
 
     @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent<GameGroup, GameState> event) {
@@ -71,6 +80,15 @@ public class SimpleLobbyListener implements CustomListener {
 
         quitLocale = config.getString("user_quit_lobby_locale", "user.quit.lobby");
         joinLocale = config.getString("user_join_lobby_locale", "user.join.lobby");
+        
+        waitingForPlayersLocale = config.getString("motd.waiting_locale", "motd.waiting");
+        starting5Locale = config.getString("motd.starting_5_locale", "motd.starting_5");
+        starting10Locale = config.getString("motd.starting_10_locale", "motd.starting_10");
+        starting30Locale = config.getString("motd.starting_30_locale", "motd.starting_30");
+        starting60Locale = config.getString("motd.starting_60_locale", "motd.starting_60");
+        starting120Locale = config.getString("motd.starting_120_locale", "motd.starting_120");
+        startingEventuallyLocale = config.getString("motd.starting_later_locale", "motd.starting_later");
+        startedLocale = config.getString("motd.started_locale", "motd.started");
     }
 
 
@@ -97,6 +115,26 @@ public class SimpleLobbyListener implements CustomListener {
         if (event.getUserGameGroup().hasActiveCountdown()) return;
 
         resetCountdown(event.getUserGameGroup());
+        
+        updateMotd(event.getUserGameGroup());
+    }
+
+    private void updateMotd(GameGroup gameGroup) {
+        if(gameGroup.getUserCount() < minPlayersToStartGame) {
+            gameGroup.setMotd(gameGroup.getLocale(waitingForPlayersLocale));
+            return;
+        }
+
+        Countdown countdown = gameGroup.getCountdown();
+        if(countdown == null) return;
+        int seconds = countdown.getSecondsRemaining();
+
+        if(seconds <= 5) gameGroup.setMotd(gameGroup.getLocale(starting5Locale));
+        else if(seconds <= 10) gameGroup.setMotd(gameGroup.getLocale(starting10Locale));
+        else if(seconds <= 30) gameGroup.setMotd(gameGroup.getLocale(starting30Locale));
+        else if(seconds <= 60) gameGroup.setMotd(gameGroup.getLocale(starting60Locale));
+        else if(seconds <= 120) gameGroup.setMotd(gameGroup.getLocale(starting120Locale));
+        else gameGroup.setMotd(gameGroup.getLocale(startingEventuallyLocale));
     }
 
     private void userJoinLobby(User user) {
@@ -172,6 +210,7 @@ public class SimpleLobbyListener implements CustomListener {
             return;
         }
 
+        event.getGameGroup().setMotd(event.getGameGroup().getLocale(startedLocale));
         event.getGameGroup().changeGameState(nextGameState);
     }
 
