@@ -32,6 +32,32 @@ public class HubSign {
     }
 
     public void update(ControllerInfo controller) {
+        if(spectatorSign) updateSpectatorSign(controller);
+        else updateLobbySign(controller);
+    }
+
+    private void updateSpectatorSign(ControllerInfo controller) {
+        Sign sign = (Sign) location.getBlock().getState();
+
+        sign.setLine(0, ChatColor.GRAY + "[" + ChatColor.DARK_AQUA +
+                WordUtils.capitalizeFully(gameGroupType.replace('_', ' ')) + ChatColor.GRAY + "]");
+
+        Collection<GameGroupInfo> all = controller.getGameGroups(gameGroupType);
+
+        if(all.isEmpty()) {
+            sign.setLine(1, "");
+            sign.setLine(2, ChatColor.RED + "No Games");
+            sign.setLine(3, "");
+        } else {
+            sign.setLine(1, ChatColor.RED + "Spectate Games");
+            sign.setLine(2, ChatColor.DARK_GRAY.toString() + all.size() + ChatColor.BLACK + " games available");
+            sign.setLine(3, ChatColor.BLUE + "Right click to chose");
+        }
+
+        sign.update();
+    }
+
+    public void updateLobbySign(ControllerInfo controller) {
         Sign sign = (Sign) location.getBlock().getState();
 
         sign.setLine(0, ChatColor.GRAY + "[" + ChatColor.DARK_AQUA +

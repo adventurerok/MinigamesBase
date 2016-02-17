@@ -51,4 +51,16 @@ public class ControllerInfo {
 
         return result;
     }
+
+    public Collection<GameGroupInfo> getGameGroups(String type) {
+        Collection<GameGroupInfo> result = new HashSet<>();
+
+        for(GameGroupInfo gameGroupInfo : gameGroupInfoMap.values()) {
+            if(!gameGroupInfo.getType().equals(type)) continue;
+
+            result.add(gameGroupInfo);
+        }
+
+        return result;
+    }
 }
