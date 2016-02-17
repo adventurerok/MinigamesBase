@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 public class CustomItemGiver {
 
     private final List<CustomItemInfo> items = new ArrayList<>();
+    private final List<BookInfo> books = new ArrayList<>();
     private boolean clearInventory = false;
 
     public CustomItemGiver(Config config) {
@@ -25,9 +26,14 @@ public class CustomItemGiver {
         clearInventory = config.getBoolean("clear_inventory");
 
         List<Config> itemConfigs = config.getConfigList("items");
-        if (itemConfigs == null) return;
 
         items.addAll(itemConfigs.stream().map(CustomItemInfo::new).collect(Collectors.toList()));
+
+        List<Config> bookConfigs = config.getConfigList("books");
+
+        for(Config bookConfig : bookConfigs) {
+            books.add(new BookInfo(bookConfig));
+        }
     }
 
     public void giveToUser(User user) {
@@ -44,6 +50,15 @@ public class CustomItemGiver {
             if (itemInfo.slot < 0) user.getInventory().addItem(itemStack);
             else user.getInventory().setItem(itemInfo.slot, itemStack);
         }
+
+        for(BookInfo bookInfo : books) {
+            JSONBook book = user.getGameGroup().getBook(bookInfo.bookName);
+
+            if(!book.isBookItemCreated() && !book.createBookItem(user)) continue;
+
+            if(bookInfo.slot < 0) user.getInventory().addItem(book.getBookItem());
+            else user.getInventory().setItem(bookInfo.slot, book.getBookItem());
+        }
     }
 
     private static class CustomItemInfo {
@@ -57,6 +72,16 @@ public class CustomItemGiver {
 
             if (!config.contains("custom_variables")) return;
             customVariables = new MapVariables(config.getConfigOrEmpty("custom_variables"));
+        }
+    }
+
+    private static class BookInfo {
+        private final String bookName;
+        private final int slot;
+
+        public BookInfo(Config config) {
+            bookName = config.getString("name");
+            slot = config.getInt("slot", -1);
         }
     }
 }

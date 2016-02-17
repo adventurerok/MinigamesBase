@@ -39,7 +39,12 @@ public class JSONBook {
         return user.getInventory().addItem(bookItem.clone()).isEmpty();
     }
 
+    public boolean isBookItemCreated() {
+        return bookItem != null;
+    }
+
     public boolean createBookItem(User user) {
+        if(bookItem != null) return true;
         if(!user.isPlayer()) return false;
 
         PlayerInventory inv = user.getInventory();
@@ -68,6 +73,6 @@ public class JSONBook {
      * @return The book item if it has been created, otherwise null
      */
     public ItemStack getBookItem() {
-        return bookItem;
+        return bookItem.clone();
     }
 }
