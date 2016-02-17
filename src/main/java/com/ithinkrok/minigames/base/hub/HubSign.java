@@ -59,4 +59,8 @@ public class HubSign {
 
         sign.update();
     }
+
+    public Location getLocation() {
+        return location;
+    }
 }
