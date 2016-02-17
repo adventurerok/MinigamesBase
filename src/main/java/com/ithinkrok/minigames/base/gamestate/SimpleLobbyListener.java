@@ -7,6 +7,7 @@ import com.ithinkrok.minigames.base.User;
 import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.base.event.MinigamesCommandEvent;
 import com.ithinkrok.minigames.base.event.game.CountdownFinishedEvent;
+import com.ithinkrok.minigames.base.event.game.CountdownMessageEvent;
 import com.ithinkrok.minigames.base.event.game.GameStateChangedEvent;
 import com.ithinkrok.minigames.base.event.map.MapCreatureSpawnEvent;
 import com.ithinkrok.minigames.base.event.map.MapItemSpawnEvent;
@@ -109,7 +110,7 @@ public class SimpleLobbyListener implements CustomListener {
     }
 
     @CustomEventHandler(priority = CustomEventHandler.LOW)
-    public void eventUserJoin(UserJoinEvent event) {
+    public void onUserJoin(UserJoinEvent event) {
         userJoinLobby(event.getUser());
 
         if (event.getUserGameGroup().hasActiveCountdown()) return;
@@ -117,6 +118,16 @@ public class SimpleLobbyListener implements CustomListener {
         resetCountdown(event.getUserGameGroup());
         
         updateMotd(event.getUserGameGroup());
+    }
+
+    @CustomEventHandler(priority = CustomEventHandler.HIGH)
+    public void onUserQuit(UserQuitEvent event) {
+        updateMotd(event.getUserGameGroup());
+    }
+
+    @CustomEventHandler
+    public void onCountdownMessage(CountdownMessageEvent event) {
+        updateMotd(event.getGameGroup());
     }
 
     private void updateMotd(GameGroup gameGroup) {
