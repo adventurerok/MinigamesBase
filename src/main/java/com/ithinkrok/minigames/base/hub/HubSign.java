@@ -3,6 +3,7 @@ package com.ithinkrok.minigames.base.hub;
 import com.ithinkrok.minigames.base.protocol.data.ControllerInfo;
 import com.ithinkrok.minigames.base.protocol.data.GameGroupInfo;
 import org.apache.commons.lang.WordUtils;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Sign;
 import org.bukkit.event.block.SignChangeEvent;
@@ -31,16 +32,17 @@ public class HubSign {
     public void update(ControllerInfo controller) {
         Sign sign = (Sign) location.getBlock().getState();
 
-        sign.setLine(0, WordUtils.capitalizeFully(gameGroupType.replace('_', ' ')));
+        sign.setLine(0, ChatColor.GRAY + "[" + ChatColor.DARK_AQUA +
+                WordUtils.capitalizeFully(gameGroupType.replace('_', ' ')) + ChatColor.GRAY + "]");
 
         Collection<GameGroupInfo> accepting = controller.getAcceptingGameGroups(gameGroupType);
 
-        if(accepting.isEmpty()) {
+        if (accepting.isEmpty()) {
             sign.setLine(1, "");
-            sign.setLine(2, "Create new Lobby");
+            sign.setLine(2, ChatColor.RED + "Create new Lobby");
             sign.setLine(3, "");
         } else {
-            sign.setLine(1, "Join Lobby");
+            sign.setLine(1, ChatColor.RED + "Join Lobby");
 
             GameGroupInfo bestMatch = null;
 
@@ -53,7 +55,10 @@ public class HubSign {
             //IntelliJ wanted me to add this to stop a warning. This will never be true
             if (bestMatch == null) return;
 
-            sign.setLine(2, bestMatch.getPlayerCount() + "/" + bestMatch.getMaxPlayerCount());
+            sign.setLine(2,
+                    ChatColor.DARK_GRAY + "[" + ChatColor.GRAY + bestMatch.getPlayerCount() + ChatColor.DARK_GRAY +
+                            "/" + ChatColor.GRAY +
+                            bestMatch.getMaxPlayerCount() + ChatColor.DARK_GRAY + "]");
             sign.setLine(3, bestMatch.getMotd());
         }
 
