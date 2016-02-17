@@ -5,7 +5,7 @@ import com.ithinkrok.minigames.base.GameState;
 import com.ithinkrok.minigames.base.User;
 import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.base.event.user.game.UserJoinEvent;
-import com.ithinkrok.minigames.base.util.CustomItemGiver;
+import com.ithinkrok.minigames.base.util.ItemGiver;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
@@ -15,7 +15,7 @@ import com.ithinkrok.util.event.CustomListener;
  */
 public class SimpleInGameListener implements CustomListener {
 
-    protected CustomItemGiver spectatorItems;
+    protected ItemGiver spectatorItems;
 
     protected String spectatorJoinLocaleStub;
 
@@ -27,7 +27,7 @@ public class SimpleInGameListener implements CustomListener {
 
         Config config = event.getConfigOrEmpty();
 
-        spectatorItems = new CustomItemGiver(config.getConfigOrNull("spectator_items"));
+        spectatorItems = new ItemGiver(config.getConfigOrNull("spectator_items"));
         spectatorJoinLocaleStub = config.getString("spectator_join_locale_stub", "spectator.join");
     }
 

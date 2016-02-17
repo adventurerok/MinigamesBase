@@ -8,7 +8,7 @@ import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.base.event.game.GameStateChangedEvent;
 import com.ithinkrok.minigames.base.metadata.MapVote;
 import com.ithinkrok.minigames.base.team.Team;
-import com.ithinkrok.minigames.base.util.CustomItemGiver;
+import com.ithinkrok.minigames.base.util.ItemGiver;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
@@ -33,7 +33,7 @@ public class SimpleGameStartListener implements CustomListener {
 
     private String teamInfoLocale, kitInfoLocale;
 
-    private CustomItemGiver customItemGiver;
+    private ItemGiver itemGiver;
 
     protected GameState gameState;
 
@@ -50,7 +50,7 @@ public class SimpleGameStartListener implements CustomListener {
 
         configureMapVoting(config.getConfigOrEmpty("map_voting"));
 
-        customItemGiver = new CustomItemGiver(config.getConfigOrNull("start_items"));
+        itemGiver = new ItemGiver(config.getConfigOrNull("start_items"));
 
         teamInfoLocale = config.getString("team_info_locale", "start_info.team");
         kitInfoLocale = config.getString("kit_info_locale", "start_info.kit");
@@ -110,7 +110,7 @@ public class SimpleGameStartListener implements CustomListener {
         user.setCollidesWithEntities(true);
         user.setScoreboardHandler(null);
 
-        customItemGiver.giveToUser(user);
+        itemGiver.giveToUser(user);
     }
 
     protected Kit assignUserKit(GameGroup gameGroup) {

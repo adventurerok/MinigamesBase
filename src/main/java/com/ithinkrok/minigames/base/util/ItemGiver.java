@@ -15,13 +15,13 @@ import java.util.stream.Collectors;
 /**
  * Created by paul on 30/01/16.
  */
-public class CustomItemGiver {
+public class ItemGiver {
 
     private final List<CustomItemInfo> items = new ArrayList<>();
     private final List<BookInfo> books = new ArrayList<>();
     private boolean clearInventory = false;
 
-    public CustomItemGiver(Config config) {
+    public ItemGiver(Config config) {
         if (config == null) config = ConfigUtils.EMPTY_CONFIG;
         clearInventory = config.getBoolean("clear_inventory");
 

@@ -19,7 +19,7 @@ import com.ithinkrok.minigames.base.event.user.state.UserFoodLevelChangeEvent;
 import com.ithinkrok.minigames.base.event.user.world.*;
 import com.ithinkrok.minigames.base.scoreboard.MapScoreboardHandler;
 import com.ithinkrok.minigames.base.util.CountdownConfig;
-import com.ithinkrok.minigames.base.util.CustomItemGiver;
+import com.ithinkrok.minigames.base.util.ItemGiver;
 import com.ithinkrok.minigames.base.util.MinigamesConfigs;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
@@ -51,7 +51,7 @@ public class SimpleLobbyListener implements CustomListener {
 
     private String joinLobbyLocaleStub;
 
-    private CustomItemGiver giveOnJoin;
+    private ItemGiver giveOnJoin;
     private Config config;
     
     private String waitingForPlayersLocale;
@@ -75,7 +75,7 @@ public class SimpleLobbyListener implements CustomListener {
 
         lobbyMapName = config.getString("lobby_map");
 
-        giveOnJoin = new CustomItemGiver(config.getConfigOrEmpty("give_on_join"));
+        giveOnJoin = new ItemGiver(config.getConfigOrEmpty("give_on_join"));
 
         joinLobbyLocaleStub = config.getString("join_lobby_locale_stub", "lobby.info");
 

@@ -2,7 +2,7 @@ package com.ithinkrok.minigames.base.listener;
 
 import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.base.event.user.game.UserJoinEvent;
-import com.ithinkrok.minigames.base.util.CustomItemGiver;
+import com.ithinkrok.minigames.base.util.ItemGiver;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
@@ -12,18 +12,18 @@ import com.ithinkrok.util.event.CustomListener;
  */
 public class GiveCustomItemsOnJoin implements CustomListener {
 
-    private CustomItemGiver customItemGiver;
+    private ItemGiver itemGiver;
 
     @CustomEventHandler
     public void onListenerEnabled(ListenerLoadedEvent<?, ?> event) {
         Config config = event.getConfig();
 
-        customItemGiver = new CustomItemGiver(config);
+        itemGiver = new ItemGiver(config);
     }
 
     @CustomEventHandler(priority = CustomEventHandler.LOW)
     public void onUserJoin(UserJoinEvent event) {
-        customItemGiver.giveToUser(event.getUser());
+        itemGiver.giveToUser(event.getUser());
     }
 
 
