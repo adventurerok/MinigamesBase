@@ -6,6 +6,9 @@ import com.ithinkrok.minigames.base.protocol.event.GameGroupKilledEvent;
 import com.ithinkrok.minigames.base.protocol.event.GameGroupSpawnedEvent;
 import com.ithinkrok.minigames.base.protocol.event.GameGroupUpdateEvent;
 import com.ithinkrok.minigames.base.util.InventoryUtils;
+import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.config.MemoryConfig;
+import com.ithinkrok.util.config.YamlConfigIO;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -22,6 +25,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.Plugin;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -48,7 +53,17 @@ public class Hub implements Listener {
     }
 
     public void unload() {
+        saveConfig();
+    }
 
+    public void saveConfig() {
+        Path configPath = plugin.getDataFolder().toPath().resolve("signs.yml");
+
+        try {
+            YamlConfigIO.saveConfig(configPath, toConfig());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void addOpenSpectatorInventory(Player player, Location location) {
@@ -58,6 +73,32 @@ public class Hub implements Listener {
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
         openSpectatorInventories.remove(event.getPlayer().getUniqueId());
+    }
+
+    public Config toConfig() {
+        List<Config> signConfigs = new ArrayList<>();
+
+        for(HubSign sign : signs.values()) {
+            signConfigs.add(sign.toConfig());
+        }
+
+        Config result = new MemoryConfig();
+        result.set("signs", signConfigs);
+
+        return result;
+    }
+
+    public void fromConfig(Config config) {
+        List<Config> signConfigs = config.getConfigList("signs");
+
+        for(Config signConfig : signConfigs) {
+            String worldName = signConfig.getString("world");
+            if(plugin.getServer().getWorld(worldName) == null) continue;
+
+            HubSign sign = new HubSign(plugin.getServer(), signConfig);
+
+            signs.put(sign.getLocation(), sign);
+        }
     }
 
     @EventHandler

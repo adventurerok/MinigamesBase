@@ -1,14 +1,12 @@
 package com.ithinkrok.minigames.base.hub;
 
-import com.ithinkrok.minigames.base.protocol.ClientMinigamesRequestProtocol;
 import com.ithinkrok.minigames.base.protocol.data.ControllerInfo;
 import com.ithinkrok.minigames.base.protocol.data.GameGroupInfo;
 import com.ithinkrok.minigames.base.util.InventoryUtils;
+import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.config.MemoryConfig;
 import org.apache.commons.lang.WordUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.SignChangeEvent;
@@ -37,6 +35,21 @@ public class HubSign {
         gameGroupType = event.getLine(1);
 
         spectatorSign = event.getLine(2).equalsIgnoreCase("spectators");
+    }
+
+    public HubSign(Server server, Config config) {
+        gameGroupType = config.getString("type");
+        spectatorSign = config.getBoolean("spectators");
+
+        int x = config.getInt("x");
+        int y = config.getInt("y");
+        int z = config.getInt("z");
+        String worldName = config.getString("world");
+
+        World world = server.getWorld(worldName);
+        if(world == null) throw new RuntimeException("Unknown world " + worldName);
+
+        location = new Location(world, x, y, z);
     }
 
     public void update(ControllerInfo controller) {
@@ -178,5 +191,18 @@ public class HubSign {
 
     public Location getLocation() {
         return location;
+    }
+
+    public Config toConfig() {
+        Config config = new MemoryConfig();
+
+        config.set("type", gameGroupType);
+        config.set("spectators", spectatorSign);
+        config.set("x", location.getBlockX());
+        config.set("y", location.getBlockY());
+        config.set("z", location.getBlockZ());
+        config.set("world", location.getWorld().getName());
+
+        return config;
     }
 }
