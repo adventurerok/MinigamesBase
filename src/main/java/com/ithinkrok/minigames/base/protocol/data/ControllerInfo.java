@@ -2,7 +2,7 @@ package com.ithinkrok.minigames.base.protocol.data;
 
 import com.ithinkrok.util.config.Config;
 
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -37,5 +37,18 @@ public class ControllerInfo {
 
     public GameGroupInfo removeGameGroup(String name) {
         return gameGroupInfoMap.remove(name);
+    }
+
+    public Collection<GameGroupInfo> getAcceptingGameGroups(String type) {
+        Collection<GameGroupInfo> result = new HashSet<>();
+
+        for(GameGroupInfo gameGroupInfo : gameGroupInfoMap.values()) {
+            if(!gameGroupInfo.getType().equals(type)) continue;
+            if(!gameGroupInfo.isAcceptingPlayers()) continue;
+
+            result.add(gameGroupInfo);
+        }
+
+        return result;
     }
 }

@@ -67,9 +67,10 @@ public class ClientMinigamesRequestProtocol implements ClientListener {
     private void handleEventGameGroupSpawned(Config payload) {
         GameGroupInfo gameGroup = controllerInfo.updateGameGroup(payload);
 
-        GameGroupSpawnedEvent event = new GameGroupSpawnedEvent(gameGroup);
-
-        plugin.getServer().getPluginManager().callEvent(event);
+        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+            GameGroupSpawnedEvent event = new GameGroupSpawnedEvent(gameGroup);
+            plugin.getServer().getPluginManager().callEvent(event);
+        });
     }
 
     public ControllerInfo getControllerInfo() {
@@ -79,17 +80,19 @@ public class ClientMinigamesRequestProtocol implements ClientListener {
     private void handleEventGameGroupKilled(Config payload) {
         GameGroupInfo gameGroup = controllerInfo.removeGameGroup(payload.getString("name"));
 
-        GameGroupKilledEvent event = new GameGroupKilledEvent(gameGroup);
-
-        plugin.getServer().getPluginManager().callEvent(event);
+        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+            GameGroupKilledEvent event = new GameGroupKilledEvent(gameGroup);
+            plugin.getServer().getPluginManager().callEvent(event);
+        });
     }
 
     private void handleEventGameGroupUpdate(Config payload) {
         GameGroupInfo gameGroup = controllerInfo.updateGameGroup(payload);
 
-        GameGroupUpdateEvent event = new GameGroupUpdateEvent(gameGroup);
-
-        plugin.getServer().getPluginManager().callEvent(event);
+        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+            GameGroupUpdateEvent event = new GameGroupUpdateEvent(gameGroup);
+            plugin.getServer().getPluginManager().callEvent(event);
+        });
     }
 
     private void handleResponseGameGroupInfo(Config payload) {
