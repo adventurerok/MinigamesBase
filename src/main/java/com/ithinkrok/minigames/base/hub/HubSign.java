@@ -36,24 +36,27 @@ public class HubSign {
         Collection<GameGroupInfo> accepting = controller.getAcceptingGameGroups(gameGroupType);
 
         if(accepting.isEmpty()) {
-            sign.setLine(1, "Create new Lobby");
-            return;
+            sign.setLine(1, "");
+            sign.setLine(2, "Create new Lobby");
+            sign.setLine(3, "");
+        } else {
+            sign.setLine(1, "Join Lobby");
+
+            GameGroupInfo bestMatch = null;
+
+            for (GameGroupInfo gameGroupInfo : accepting) {
+                if (bestMatch != null && gameGroupInfo.getPlayerCount() <= bestMatch.getPlayerCount()) continue;
+
+                bestMatch = gameGroupInfo;
+            }
+
+            //IntelliJ wanted me to add this to stop a warning. This will never be true
+            if (bestMatch == null) return;
+
+            sign.setLine(2, bestMatch.getPlayerCount() + "/" + bestMatch.getMaxPlayerCount());
+            sign.setLine(3, bestMatch.getMotd());
         }
 
-        sign.setLine(1, "Join Lobby");
-
-        GameGroupInfo bestMatch = null;
-
-        for(GameGroupInfo gameGroupInfo : accepting) {
-            if(bestMatch != null && gameGroupInfo.getPlayerCount() <= bestMatch.getPlayerCount()) continue;
-
-            bestMatch = gameGroupInfo;
-        }
-
-        //IntelliJ wanted me to add this to stop a warning. This will never be true
-        if(bestMatch == null) return;
-
-        sign.setLine(2, bestMatch.getPlayerCount() + "/" + bestMatch.getMaxPlayerCount());
-        sign.setLine(3, bestMatch.getMotd());
+        sign.update();
     }
 }

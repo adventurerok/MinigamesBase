@@ -45,7 +45,9 @@ public class Hub implements Listener {
 
         signs.add(sign);
 
-        sign.update(requestProtocol.getControllerInfo());
+        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+            sign.update(requestProtocol.getControllerInfo());
+        });
     }
 
     @EventHandler
