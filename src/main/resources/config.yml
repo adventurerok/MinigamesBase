@@ -1,17 +1,11 @@
+#Specify if this minecraft server is the primary minigames server on this machine.
+#The primary server will download config updates from the controller and apply them.
+primary: true
 
-# TODO Specify the details of the minigames controller you connect to
-controller:
-  hostname: "localhost"
-  port: 30824
-  private_key: "my_private_key_file.key"
-
-  #Specify if this minecraft server is the primary minigames server on this machine.
-  #The primary server will download config updates from the controller and apply them.
-  primary: true
-
-# TODO Specify bungeecord details of this server
+# Specify bungeecord details of this server
 bungee:
   name: "server1"
+  hub: "hub1"
 
 # Specify the config and maps directories
 directories:
@@ -19,7 +13,12 @@ directories:
   maps: "/srv/minigames/maps"
   assets: "/srv/minigames/assets"
 
-# TODO Specifies if this server has a ramdisk
+# Specifies if this server has a ramdisk
 ramdisk:
   enable: true
   directory: "/tmp"
+
+# Specify which modules are enabled
+modules:
+  game: true
+  hub: false
