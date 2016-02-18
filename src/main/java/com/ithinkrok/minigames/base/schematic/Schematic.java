@@ -3,7 +3,7 @@ package com.ithinkrok.minigames.base.schematic;
 import com.flowpowered.nbt.*;
 import com.flowpowered.nbt.stream.NBTInputStream;
 import com.ithinkrok.minigames.base.Nameable;
-import com.ithinkrok.msm.common.util.ConfigUtils;
+import com.ithinkrok.msm.bukkit.util.BukkitConfigUtils;
 import com.ithinkrok.util.config.Config;
 import org.bukkit.util.Vector;
 
@@ -47,7 +47,7 @@ public class Schematic implements Nameable {
         if (upgradesToTemp == null) upgradesToTemp = Collections.emptyList();
 
         this.upgradesTo = upgradesToTemp;
-        Vector baseOffset = ConfigUtils.getVector(config, "offset");
+        Vector baseOffset = BukkitConfigUtils.getVector(config, "offset");
 
         String schematicFile = config.getString("file");
 

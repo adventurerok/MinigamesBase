@@ -1,7 +1,7 @@
 package com.ithinkrok.minigames.base.event.user.inventory;
 
 import com.ithinkrok.minigames.base.User;
-import org.bukkit.event.Cancellable;
+import com.ithinkrok.util.event.Cancellable;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack;
 /**
  * Created by paul on 02/01/16.
  */
-public class UserInventoryClickEvent extends UserInventoryEvent implements Cancellable{
+public class UserInventoryClickEvent extends UserInventoryEvent implements Cancellable {
 
     private final InventoryClickEvent event;
 

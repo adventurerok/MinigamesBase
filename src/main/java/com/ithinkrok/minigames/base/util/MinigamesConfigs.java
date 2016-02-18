@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.base.util;
 
-import com.ithinkrok.msm.common.util.ConfigUtils;
+import com.ithinkrok.msm.bukkit.util.BukkitConfigUtils;
 import com.ithinkrok.util.config.Config;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -14,8 +14,8 @@ public class MinigamesConfigs {
     public static BoundingBox getBounds(Config config, String path) {
         if (!path.isEmpty()) path = path + ".";
 
-        Vector min = ConfigUtils.getVector(config, path + "min");
-        Vector max = ConfigUtils.getVector(config, path + "max");
+        Vector min = BukkitConfigUtils.getVector(config, path + "min");
+        Vector max = BukkitConfigUtils.getVector(config, path + "max");
 
         return new BoundingBox(min, max);
     }

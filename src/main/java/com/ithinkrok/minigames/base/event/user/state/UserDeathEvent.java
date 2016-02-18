@@ -2,8 +2,8 @@ package com.ithinkrok.minigames.base.event.user.state;
 
 import com.ithinkrok.minigames.base.User;
 import com.ithinkrok.minigames.base.event.user.UserEvent;
+import com.ithinkrok.util.event.Cancellable;
 import org.bukkit.entity.Entity;
-import org.bukkit.event.Cancellable;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;

@@ -35,7 +35,7 @@ import com.ithinkrok.minigames.base.util.InvisiblePlayerAttacker;
 import com.ithinkrok.minigames.base.util.disguise.*;
 import com.ithinkrok.minigames.base.util.io.FileLoader;
 import com.ithinkrok.util.command.CommandUtils;
-import com.ithinkrok.util.config.BukkitConfig;
+import com.ithinkrok.msm.bukkit.util.BukkitConfig;
 import com.ithinkrok.util.config.Config;
 import org.bukkit.*;
 import org.bukkit.configuration.file.YamlConfiguration;

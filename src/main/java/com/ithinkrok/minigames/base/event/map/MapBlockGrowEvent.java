@@ -2,9 +2,9 @@ package com.ithinkrok.minigames.base.event.map;
 
 import com.ithinkrok.minigames.base.GameGroup;
 import com.ithinkrok.minigames.base.map.GameMap;
+import com.ithinkrok.util.event.Cancellable;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.event.Cancellable;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockSpreadEvent;

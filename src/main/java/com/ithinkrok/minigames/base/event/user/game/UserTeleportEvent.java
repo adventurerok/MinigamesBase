@@ -2,13 +2,13 @@ package com.ithinkrok.minigames.base.event.user.game;
 
 import com.ithinkrok.minigames.base.User;
 import com.ithinkrok.minigames.base.event.user.UserEvent;
+import com.ithinkrok.util.event.Cancellable;
 import org.bukkit.Location;
-import org.bukkit.event.Cancellable;
 
 /**
  * Created by paul on 01/01/16.
  */
-public class UserTeleportEvent extends UserEvent implements Cancellable{
+public class UserTeleportEvent extends UserEvent implements Cancellable {
 
     private final Location from;
     private Location to;

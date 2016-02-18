@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
  */
 public class UserRightClickEntityEvent extends UserInteractEvent {
 
-    private PlayerInteractEntityEvent event;
+    private final PlayerInteractEntityEvent event;
 
     public UserRightClickEntityEvent(User user, PlayerInteractEntityEvent event) {
         super(user);
