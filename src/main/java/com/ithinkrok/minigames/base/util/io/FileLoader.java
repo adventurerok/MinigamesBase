@@ -1,8 +1,8 @@
 package com.ithinkrok.minigames.base.util.io;
 
 import com.ithinkrok.minigames.base.util.JSONBook;
-import com.ithinkrok.util.lang.LanguageLookup;
 import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.lang.LanguageLookup;
 
 import java.nio.file.Path;
 

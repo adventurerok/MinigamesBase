@@ -4,7 +4,6 @@ import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.InvalidConfigException;
 import com.ithinkrok.util.config.MemoryConfig;
 import com.ithinkrok.util.config.YamlConfigIO;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**

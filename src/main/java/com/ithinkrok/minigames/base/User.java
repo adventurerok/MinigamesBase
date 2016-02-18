@@ -11,7 +11,6 @@ import com.ithinkrok.minigames.base.event.user.inventory.UserInventoryCloseEvent
 import com.ithinkrok.minigames.base.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.base.inventory.ClickableInventory;
 import com.ithinkrok.minigames.base.item.CustomItem;
-import com.ithinkrok.util.lang.LanguageLookup;
 import com.ithinkrok.minigames.base.map.GameMap;
 import com.ithinkrok.minigames.base.metadata.MetadataHolder;
 import com.ithinkrok.minigames.base.metadata.UserMetadata;
@@ -35,6 +34,7 @@ import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventExecutor;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
+import com.ithinkrok.util.lang.LanguageLookup;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
