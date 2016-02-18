@@ -27,8 +27,6 @@ public class HelpCommand implements CustomListener {
             onListCommand(sender, command);
         }
 
-
-        //TODO Split into pages
     }
 
     private void onUsageCommand(MinigamesCommandSender sender, MinigamesCommand command) {

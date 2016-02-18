@@ -20,14 +20,13 @@ public class TreeFeller {
 
         ArrayList<Location> ingotsToSpawn = new ArrayList<>();
 
-        while(locations.size() > 0){
+        while(!locations.isEmpty()){
             Location pos = locations.removeFirst();
             if(!checker.check(pos)) continue;
 
             Block block = pos.getBlock();
 
             if(block.getType() != Material.LOG && block.getType() != Material.LOG_2) continue;
-            //TODO if(game.isInBuilding(pos)) continue;
 
             block.setType(Material.AIR);
             ingotsToSpawn.add(pos);
