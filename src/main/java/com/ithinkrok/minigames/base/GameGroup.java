@@ -189,6 +189,10 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         changeMap(mapInfo);
     }
 
+    public GameMapInfo getMap(String mapName) {
+        return gameMapInfoMap.get(mapName);
+    }
+
     @SuppressWarnings("unchecked")
     public void changeGameState(GameState gameState) {
         if (gameState.equals(this.gameState)) return;

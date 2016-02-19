@@ -6,6 +6,7 @@ import com.ithinkrok.minigames.base.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.base.inventory.ClickableInventory;
 import com.ithinkrok.minigames.base.inventory.ClickableItem;
 import com.ithinkrok.minigames.base.inventory.event.UserClickItemEvent;
+import com.ithinkrok.minigames.base.map.GameMapInfo;
 import com.ithinkrok.minigames.base.metadata.MapVote;
 import com.ithinkrok.minigames.base.util.InventoryUtils;
 import com.ithinkrok.util.config.Config;
@@ -46,7 +47,10 @@ public class MapVoter implements CustomListener {
         ClickableInventory inventory = new ClickableInventory("Map Voter");
 
         for (String mapName : votable) {
-            ItemStack display = InventoryUtils.createItemWithNameAndLore(mapMaterial, 1, 0, mapName);
+            GameMapInfo mapInfo = event.getUserGameGroup().getMap(mapName);
+
+            ItemStack display =
+                    InventoryUtils.createItemWithNameAndLore(mapMaterial, 1, 0, mapName, mapInfo.getDescription());
 
             ClickableItem item = new ClickableItem(display) {
                 @Override
@@ -67,7 +71,7 @@ public class MapVoter implements CustomListener {
                     }
                     event.getUser().setMetadata(new MapVote(event.getUser(), mapName));
 
-                    for(User user : event.getUserGameGroup().getUsers()) {
+                    for (User user : event.getUserGameGroup().getUsers()) {
                         user.updateScoreboard();
                     }
                 }
