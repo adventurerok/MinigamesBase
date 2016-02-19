@@ -1,5 +1,6 @@
 package com.ithinkrok.minigames.base.command;
 
+import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.base.event.MinigamesCommandEvent;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
@@ -13,6 +14,14 @@ import java.util.*;
  * Created by paul on 25/01/16.
  */
 public class HelpCommand implements CustomListener {
+
+
+    private boolean showBukkitCommands;
+
+    @CustomEventHandler
+    public void onListenerLoaded(ListenerLoadedEvent<?, ?> event) {
+        showBukkitCommands = event.getConfigOrEmpty().getBoolean("all", true);
+    }
 
     @CustomEventHandler
     public void onCommand(MinigamesCommandEvent event) {
@@ -70,25 +79,27 @@ public class HelpCommand implements CustomListener {
                     .getLocale("command.help.line", commandConfig.getName(), commandConfig.getDescription()));
         }
 
-        for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+        if(showBukkitCommands) {
+            for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
 
-            Map<String, Map<String, Object>> commandMap = plugin.getDescription().getCommands();
-            if(commandMap == null) continue;
+                Map<String, Map<String, Object>> commandMap = plugin.getDescription().getCommands();
+                if (commandMap == null) continue;
 
-            for (String commandName : commandMap.keySet()) {
-                PluginCommand pluginCommand = Bukkit.getPluginCommand(commandName);
+                for (String commandName : commandMap.keySet()) {
+                    PluginCommand pluginCommand = Bukkit.getPluginCommand(commandName);
 
-                if (pluginCommand == null) {
-                    System.out.println("Null command: " + commandName);
-                    continue;
+                    if (pluginCommand == null) {
+                        System.out.println("Null command: " + commandName);
+                        continue;
+                    }
+
+                    if (pluginCommand.getPermission() != null && !sender.hasPermission(pluginCommand.getPermission()))
+                        continue;
+
+                    if (!doneCommands.add(commandName)) continue;
+                    outputLines.add(command.getGameGroup()
+                            .getLocale("command.help.line", pluginCommand.getName(), pluginCommand.getDescription()));
                 }
-
-                if (pluginCommand.getPermission() != null && !sender.hasPermission(pluginCommand.getPermission()))
-                    continue;
-
-                if (!doneCommands.add(commandName)) continue;
-                outputLines.add(command.getGameGroup()
-                        .getLocale("command.help.line", pluginCommand.getName(), pluginCommand.getDescription()));
             }
         }
 
