@@ -330,8 +330,19 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
         setSaturation(defaultStats.getDouble("saturation", 5.0));
         setFlySpeed(defaultStats.getDouble("fly_speed", 0.1));
         setWalkSpeed(defaultStats.getDouble("walk_speed", 0.2));
+        setHitDelayTicks((int) (defaultStats.getDouble("max_hit_delay", 1) * 20));
+
+        System.out.println("HDT: " + getHitDelayTicks());
 
         if (removePotionEffects) removePotionEffects();
+    }
+
+    public void setHitDelayTicks(int ticks) {
+        entity.setMaximumNoDamageTicks(ticks);
+    }
+
+    public int getHitDelayTicks() {
+        return entity.getMaximumNoDamageTicks();
     }
 
     public void setMaxHealth(double maxHealth) {

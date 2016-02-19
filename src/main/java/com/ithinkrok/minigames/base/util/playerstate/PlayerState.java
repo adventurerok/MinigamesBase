@@ -196,6 +196,14 @@ public class PlayerState {
         nameCapture.setTabListName(name);
     }
 
+    public void setHitDelayTicks(int ticks) {
+        healthCapture.setHitDelayTicks(ticks);
+    }
+
+    public int getHitDelayTicks() {
+        return healthCapture.getHitDelayTicks();
+    }
+
     public enum CaptureParts {
         INVENTORY,
         ARMOR,
