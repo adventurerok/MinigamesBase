@@ -918,10 +918,10 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
         Bukkit.dispatchCommand(console, "title " + getName() + " times " + fadeIn + " " + stay + " " + fadeOut);
 
         if(subTitle != null) {
-            Bukkit.dispatchCommand(console, "title " + getName() + " subtitle " + subTitle);
+            Bukkit.dispatchCommand(console, "title " + getName() + " subtitle \"" + subTitle + "\"");
         }
 
-        Bukkit.dispatchCommand(console, "title " + getName() + " title " + title);
+        Bukkit.dispatchCommand(console, "title " + getName() + " title \"" + title + "\"");
     }
 
     public double getHealth() {
