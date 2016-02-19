@@ -196,8 +196,8 @@ public class InventoryUtils {
 
         for(String loreLine : lore) {
             if(isIdentifierString(loreLine)) {
-                if(loreLine.length() == 20) continue;
-                loreLine = loreLine.substring(20);
+                if(loreLine.length() <= 24) continue;
+                loreLine = loreLine.substring(24);
             }
             newLore.add(loreLine);
         }
