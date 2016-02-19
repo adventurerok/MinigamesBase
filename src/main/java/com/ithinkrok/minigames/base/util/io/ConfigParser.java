@@ -7,11 +7,15 @@ import com.ithinkrok.minigames.base.item.CustomItem;
 import com.ithinkrok.minigames.base.map.GameMapInfo;
 import com.ithinkrok.minigames.base.schematic.Schematic;
 import com.ithinkrok.minigames.base.team.TeamIdentifier;
+import com.ithinkrok.minigames.base.util.InventoryUtils;
+import com.ithinkrok.minigames.base.util.MinigamesConfigs;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomListener;
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -135,6 +139,13 @@ public final class ConfigParser {
 
             String description = kitConfig.getString("description", "No description");
 
+            ItemStack kitItem;
+            if(kitConfig.contains("item")){
+                kitItem = MinigamesConfigs.getItemStack(kitConfig, "item");
+            } else {
+                kitItem = null;
+            }
+
             Config listenersConfig = kitConfig.getConfigOrNull("listeners");
 
             Collection<Config> listeners = new ArrayList<>();
@@ -145,7 +156,7 @@ public final class ConfigParser {
                 listeners.add(listenerConfig);
             }
 
-            holder.addKit(new Kit(name, formattedName, description, listeners));
+            holder.addKit(new Kit(name, formattedName, description, kitItem, listeners));
         }
     }
 
