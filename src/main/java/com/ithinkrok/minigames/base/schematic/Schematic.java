@@ -3,8 +3,10 @@ package com.ithinkrok.minigames.base.schematic;
 import com.flowpowered.nbt.*;
 import com.flowpowered.nbt.stream.NBTInputStream;
 import com.ithinkrok.minigames.base.Nameable;
+import com.ithinkrok.minigames.base.util.NBTConfigIO;
 import com.ithinkrok.msm.bukkit.util.BukkitConfigUtils;
 import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.config.MemoryConfig;
 import org.bukkit.util.Vector;
 
 import java.io.IOException;
@@ -40,6 +42,8 @@ public class Schematic implements Nameable {
         this.config = config.getConfigOrEmpty("config");
         this.baseRotation = config.getInt("rotation", 0);
 
+
+
         this.allowOverlap = config.getBoolean("allow_overlap");
 
         List<String> upgradesToTemp;
@@ -55,17 +59,18 @@ public class Schematic implements Nameable {
 
         try (NBTInputStream in = new NBTInputStream(Files.newInputStream(schemFile))) {
             CompoundMap nbt = ((CompoundTag) in.readTag()).getValue();
+            Config nbtConfig = NBTConfigIO.loadToConfig(nbt, new MemoryConfig());
 
-            short width = ((ShortTag) nbt.get("Width")).getValue();
-            short height = ((ShortTag) nbt.get("Height")).getValue();
-            short length = ((ShortTag) nbt.get("Length")).getValue();
+            short width = nbtConfig.getShort("Width");
+            short height = nbtConfig.getShort("Height");
+            short length = nbtConfig.getShort("Length");
 
-            int offsetX = ((IntTag) nbt.get("WEOffsetX")).getValue() + baseOffset.getBlockX();
-            int offsetY = ((IntTag) nbt.get("WEOffsetY")).getValue() + baseOffset.getBlockY();
-            int offsetZ = ((IntTag) nbt.get("WEOffsetZ")).getValue() + baseOffset.getBlockZ();
+            int offsetX = nbtConfig.getInt("WEOffsetX") + baseOffset.getBlockX();
+            int offsetY = nbtConfig.getInt("WEOffsetY") + baseOffset.getBlockY();
+            int offsetZ = nbtConfig.getInt("WEOffsetZ") + baseOffset.getBlockZ();
 
-            byte[] blocks = ((ByteArrayTag) nbt.get("Blocks")).getValue();
-            byte[] data = ((ByteArrayTag) nbt.get("Data")).getValue();
+            byte[] blocks = nbtConfig.getByteArray("Blocks");
+            byte[] data = nbtConfig.getByteArray("Data");
 
             this.size = new Vector(width, height, length);
             this.offset = new Vector(offsetX, offsetY, offsetZ);
