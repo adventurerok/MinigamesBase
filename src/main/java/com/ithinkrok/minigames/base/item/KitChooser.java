@@ -14,7 +14,9 @@ import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,7 +24,7 @@ import java.util.Map;
  */
 public class KitChooser implements CustomListener {
 
-    private final Map<String, ItemStack> choosableKits = new LinkedHashMap<>();
+    private List<String> choosableKits;
 
     private String chosenLocale, alreadyLocale, titleLocale;
 
@@ -30,11 +32,7 @@ public class KitChooser implements CustomListener {
     public void onListenerLoaded(ListenerLoadedEvent<?, ?> event) {
         Config config = event.getConfig();
 
-        Config kits = config.getConfigOrNull("choosable_kits");
-
-        for (String kitName : kits.getKeys(false)) {
-            choosableKits.put(kitName, MinigamesConfigs.getItemStack(kits, kitName));
-        }
+        choosableKits = config.getStringList("choosable_kits");
 
         chosenLocale = config.getString("chosen_locale", "kit_chooser.choose.chosen");
         alreadyLocale = config.getString("already_chosen_locale", "kit_chooser.choose.already_chosen");
@@ -51,14 +49,11 @@ public class KitChooser implements CustomListener {
         ClickableInventory inventory = new ClickableInventory(user.getLanguageLookup().getLocale(titleLocale));
 
 
-        for (String kitName : choosableKits.keySet()) {
+        for (String kitName : choosableKits) {
             Kit kit = event.getUserGameGroup().getKit(kitName);
-            ItemStack display = choosableKits.get(kitName);
-            if (InventoryUtils.getItemName(display) == null) {
-                InventoryUtils.setItemNameAndLore(display, kit.getFormattedName());
-            }
+            ItemStack display = kit.getItem().clone();
 
-            ClickableItem item = new ClickableItem(display.clone()) {
+            ClickableItem item = new ClickableItem(display) {
                 @Override
                 public void onClick(UserClickItemEvent event) {
                     if (kitName.equals(event.getUser().getKitName())) {
