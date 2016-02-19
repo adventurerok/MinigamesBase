@@ -332,8 +332,6 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
         setWalkSpeed(defaultStats.getDouble("walk_speed", 0.2));
         setHitDelayTicks((int) (defaultStats.getDouble("max_hit_delay", 1) * 20));
 
-        System.out.println("HDT: " + getHitDelayTicks());
-
         if (removePotionEffects) removePotionEffects();
     }
 
