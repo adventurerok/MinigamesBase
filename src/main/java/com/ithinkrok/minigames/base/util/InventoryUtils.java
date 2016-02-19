@@ -256,4 +256,21 @@ public class InventoryUtils {
         return type.endsWith("HELMET") || type.endsWith("CHESTPLATE") || type.endsWith("LEGGINGS") ||
                 type.endsWith("BOOTS");
     }
+
+    public static List<String> getLore(ItemStack item) {
+        if(isEmpty(item)) return Collections.emptyList();
+
+        ItemMeta meta = item.getItemMeta();
+
+        if(meta.hasLore()) return meta.getLore();
+        else return Collections.emptyList();
+    }
+
+    public static boolean loreContainsLine(ItemStack item, String line) {
+        for(String lore : getLore(item)) {
+            if(lore.equals(line)) return true;
+        }
+
+        return false;
+    }
 }
