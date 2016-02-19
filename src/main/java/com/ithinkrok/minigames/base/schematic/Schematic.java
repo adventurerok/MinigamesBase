@@ -44,6 +44,10 @@ public class Schematic implements Nameable {
 
     private final boolean allowOverlap;
 
+    public BlockEntity getBlockEntity(Vector location) {
+        return blockEntityMap.get(location);
+    }
+
     public Schematic(String name, Path dataFolder, Config config) {
         this.name = name;
         this.formattedName = config.getString("formatted_name", name);

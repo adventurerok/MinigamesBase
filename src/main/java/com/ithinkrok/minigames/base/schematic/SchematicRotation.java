@@ -1,5 +1,6 @@
 package com.ithinkrok.minigames.base.schematic;
 
+import com.ithinkrok.minigames.base.schematic.blockentity.BlockEntity;
 import com.ithinkrok.minigames.base.util.BoundingBox;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
@@ -14,10 +15,14 @@ public class SchematicRotation {
     boolean xzSwap = false;
     boolean xFlip = false;
     boolean zFlip = false;
-    private int rotation;
-    private int width, height, length;
-    private int offsetX, offsetY, offsetZ;
-    private Schematic schematic;
+    private final int rotation;
+    private final int width;
+    private final int height;
+    private final int length;
+    private final int offsetX;
+    private final int offsetY;
+    private final int offsetZ;
+    private final Schematic schematic;
 
     public SchematicRotation(Schematic schematic, int rotation) {
         this.schematic = schematic;
@@ -122,5 +127,18 @@ public class SchematicRotation {
 
     public int getLength() {
         return xzSwap ? width : length;
+    }
+
+    public BlockEntity getBlockEntity(int x, int y, int z) {
+        if (xzSwap) {
+            int i = x;
+            x = z;
+            z = i;
+        }
+
+        if (xFlip) x = width - x - 1;
+        if (zFlip) z = length - z - 1;
+
+        return schematic.getBlockEntity(new Vector(x, y, z));
     }
 }

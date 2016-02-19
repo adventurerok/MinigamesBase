@@ -1,6 +1,7 @@
 package com.ithinkrok.minigames.base.schematic;
 
 import com.ithinkrok.minigames.base.map.GameMap;
+import com.ithinkrok.minigames.base.schematic.blockentity.BlockEntity;
 import com.ithinkrok.minigames.base.task.GameRunnable;
 import com.ithinkrok.minigames.base.task.GameTask;
 import com.ithinkrok.minigames.base.task.TaskScheduler;
@@ -13,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.util.Vector;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -201,6 +203,11 @@ public class SchematicPaster {
                 }
 
                 block.setTypeIdAndData(mat.getId(), rotateData(mat, schem.getRotation(), bData), false);
+
+                BlockEntity blockEntity = schem.getBlockEntity(x, y, z);
+                if(blockEntity != null) {
+                    blockEntity.paste(block, schem.getRotation());
+                }
 
                 ++index;
 
