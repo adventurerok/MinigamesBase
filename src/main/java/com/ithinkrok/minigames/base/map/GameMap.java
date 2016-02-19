@@ -197,7 +197,7 @@ public class GameMap implements LanguageLookup, ConfigHolder, SchematicPaster.Bo
 
         pastedSchematics.forEach(PastedSchematic::removed);
 
-        if (world.getPlayers().size() != 0) System.out.println("There are still players in an unloading map!");
+        if (!world.getPlayers().isEmpty()) System.out.println("There are still players in an unloading map!");
 
         for (Player player : world.getPlayers()) {
             player.teleport(Bukkit.getWorlds().get(0).getSpawnLocation());

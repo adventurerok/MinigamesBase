@@ -52,4 +52,9 @@ public class MinigamesConfigs {
         else if (config.isConfig(path)) return new SoundEffect(config.getConfigOrNull(path));
         else return null;
     }
+
+    public static ParticleEffect getParticleEffect(Config config, String path) {
+        if(config.isConfig(path)) return new ParticleEffect(config.getConfigOrNull(path));
+        else return null;
+    }
 }
