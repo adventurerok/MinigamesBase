@@ -37,6 +37,7 @@ import com.ithinkrok.util.event.CustomListener;
 import com.ithinkrok.util.lang.LanguageLookup;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.*;
@@ -879,6 +880,29 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
     public void setFlying(boolean flying) {
         if (!isPlayer()) return;
         getPlayer().setFlying(flying);
+    }
+
+    public void showTitle(String title) {
+        showTitle(title, null);
+    }
+
+    public void showTitle(String title, String subTitle) {
+        showTitle(title, subTitle, 20, 60, 20);
+    }
+
+    public void showTitle(String title, String subTitle, int fadeIn, int stay, int fadeOut) {
+        if(!isPlayer()) return;
+
+        CommandSender console = Bukkit.getConsoleSender();
+
+        Bukkit.dispatchCommand(console, "title " + getName() + " reset");
+        Bukkit.dispatchCommand(console, "title " + getName() + " times " + fadeIn + " " + stay + " " + fadeOut);
+
+        if(subTitle != null) {
+            Bukkit.dispatchCommand(console, "title " + getName() + " subtitle " + subTitle);
+        }
+
+        Bukkit.dispatchCommand(console, "title " + getName() + " title " + title);
     }
 
     public double getHealth() {
