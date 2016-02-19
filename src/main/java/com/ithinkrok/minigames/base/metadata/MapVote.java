@@ -14,7 +14,7 @@ public class MapVote extends UserMetadata {
 
     private static final Random random = new Random();
 
-    private String mapVote;
+    private final String mapVote;
     private int voteWeight;
 
     public MapVote(User user, String vote) {
