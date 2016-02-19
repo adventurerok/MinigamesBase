@@ -886,6 +886,10 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
     }
 
 
+    public void showAboveHotbarLocale(String locale, Object...args) {
+        showAboveHotbarMessage(gameGroup.getLocale(locale, args));
+    }
+
     public void showAboveHotbarMessage(String message) {
         if(!isPlayer()) return;
 
