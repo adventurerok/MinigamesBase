@@ -38,7 +38,9 @@ public class NBTConfigIO {
             Config temp = new MemoryConfig();
 
             for(Object listItem : (Iterable<?>)value) {
-                result.add(toConfigObject("", listItem, temp));
+                Tag<?> listTag = (Tag<?>) listItem;
+
+                result.add(toConfigObject("", listTag.getValue(), temp));
             }
 
             return result;
