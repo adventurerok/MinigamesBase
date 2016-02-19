@@ -20,7 +20,7 @@ public class ParticleEffect {
     private final int radius;
 
     public ParticleEffect(Config config) {
-        this.effect = Effect.valueOf(config.getString("effect").toUpperCase());
+        this.effect = Effect.getByName(config.getString("effect"));
         this.id = config.getInt("id");
         this.data = config.getInt("data");
         this.offsetX = (float) config.getDouble("offset_x", config.getDouble("r"));
