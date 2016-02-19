@@ -24,9 +24,7 @@ import com.ithinkrok.minigames.base.util.MinigamesConfigs;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.util.Objects;
@@ -113,11 +111,11 @@ public class SimpleLobbyListener implements CustomListener {
     public void onUserJoin(UserJoinEvent event) {
         userJoinLobby(event.getUser());
 
+        updateMotd(event.getUserGameGroup());
+
         if (event.getUserGameGroup().hasActiveCountdown()) return;
 
         resetCountdown(event.getUserGameGroup());
-        
-        updateMotd(event.getUserGameGroup());
     }
 
     @CustomEventHandler(priority = CustomEventHandler.HIGH)

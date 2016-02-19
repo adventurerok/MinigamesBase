@@ -1,6 +1,7 @@
 package com.ithinkrok.minigames.base;
 
 import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 import com.google.common.collect.MapMaker;
 import com.ithinkrok.minigames.base.command.MinigamesCommand;
 import com.ithinkrok.minigames.base.database.DatabaseTask;
