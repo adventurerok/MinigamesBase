@@ -117,6 +117,7 @@ public class SchematicPaster {
             case CHEST:
             case TRAPPED_CHEST:
             case FURNACE:
+            case WALL_SIGN:
                 return (byte) Facing.rotateLadderFurnaceChest(data, rotation);
             case LOG:
             case LOG_2:
