@@ -97,7 +97,12 @@ public class Countdown implements Nameable {
         CountdownMessageEvent event = new CountdownMessageEvent(gameGroup, this, message);
         gameGroup.gameEvent(event);
 
-        if(message != null) gameGroup.sendMessage(message);
+        if(message != null){
+            gameGroup.sendMessage(message);
+            for(User user : gameGroup.getUsers()) {
+                user.showAboveHotbarMessage(message);
+            }
+        }
     }
 
     public boolean isFinished() {
