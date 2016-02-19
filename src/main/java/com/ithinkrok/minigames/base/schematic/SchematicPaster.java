@@ -138,8 +138,8 @@ public class SchematicPaster {
         Location origin;
         Hologram hologram;
         private PastedSchematic building;
-        private SchematicRotation schem;
-        private SchematicOptions options;
+        private final SchematicRotation schem;
+        private final SchematicOptions options;
 
         private boolean clearedOrigin = false;
 
