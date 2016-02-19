@@ -35,7 +35,7 @@ public class Kit implements Nameable {
 
         if(item == null) item = new ItemStack(Material.WOOD_SWORD);
 
-        InventoryUtils.setItemNameAndLore(item, formattedName, description);
+        InventoryUtils.setItemNameAndLore(item, this.formattedName, description);
 
         this.item = item;
 
