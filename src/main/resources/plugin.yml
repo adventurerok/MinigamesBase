@@ -19,6 +19,8 @@ permissions:
   mg.base.user:
     description: "Gives all user commands"
     default: true
+    children:
+      mg.base.help: true
 
   mg.base.mg:
     description: "Allows use of /mg"
@@ -30,6 +32,10 @@ permissions:
 
   mg.base.countdown:
     description: "Allows use of /countdown"
+    default: false
+
+  mg.base.help:
+    description: "Allows use of /help"
     default: false
 
 commands:
