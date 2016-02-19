@@ -125,6 +125,14 @@ public class Team implements Listener, Messagable, LanguageLookup, SharedObjectA
         usersInTeam.remove(user.getUuid());
     }
 
+    public boolean hasPlayerOfKit(String kitName) {
+        for(User user : getUsers()) {
+            if(kitName.equals(user.getKitName())) return true;
+        }
+
+        return false;
+    }
+
     @Override
     public <B extends Metadata> B getMetadata(Class<? extends B> clazz) {
         return metadataMap.getInstance(clazz);
