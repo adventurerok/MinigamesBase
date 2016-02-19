@@ -19,6 +19,7 @@ import java.util.*;
 public class InventoryUtils {
 
     private static final String ID_START = ChatColor.BLACK.toString() + ChatColor.WHITE.toString();
+    private static final String DEFAULT_LORE_STYLE = ChatColor.DARK_PURPLE.toString() + ChatColor.ITALIC.toString();
 
     public static boolean isMaterial(ItemStack stack, Material material) {
         return stack != null && stack.getType() == material;
@@ -104,7 +105,13 @@ public class InventoryUtils {
         if (im.hasLore()) lore = im.getLore();
         else lore = new ArrayList<>();
 
-        lore.add(generateIdentifierString(identifier));
+        String idString = generateIdentifierString(identifier);
+
+        if(lore.isEmpty()) {
+            lore.add(idString);
+        } else {
+            lore.set(0, idString + DEFAULT_LORE_STYLE + lore.get(0));
+        }
 
         im.setLore(lore);
         item.setItemMeta(im);
@@ -185,20 +192,26 @@ public class InventoryUtils {
         if (!im.hasLore()) return item;
 
         List<String> lore = im.getLore();
-        Iterator<String> it = lore.iterator();
+        List<String> newLore = new ArrayList<>();
 
-        while (it.hasNext()) {
-            String loreLine = it.next();
-            if (isIdentifierString(loreLine)) it.remove();
+        for(String loreLine : lore) {
+            if(isIdentifierString(loreLine)) {
+                if(loreLine.length() == 20) continue;
+                loreLine = loreLine.substring(20);
+            }
+            newLore.add(loreLine);
         }
 
-        im.setLore(lore);
+        im.setLore(newLore);
         item.setItemMeta(im);
         return item;
     }
 
     public static ItemStack addLore(ItemStack item, String... lore) {
         ItemMeta im = item.getItemMeta();
+
+        int identifier = getIdentifier(item);
+        if(identifier >= 0) item = removeIdentifier(item);
 
         List<String> oldLore;
         if (im.hasLore()) oldLore = im.getLore();
@@ -208,6 +221,8 @@ public class InventoryUtils {
 
         if (!oldLore.isEmpty()) im.setLore(oldLore);
         item.setItemMeta(im);
+
+        if(identifier >= 0) item = addIdentifier(item, identifier);
         return item;
     }
 
