@@ -1,5 +1,8 @@
 package com.ithinkrok.minigames.base;
 
+import com.comphenix.packetwrapper.WrapperPlayServerChat;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.MutableClassToInstanceMap;
 import com.ithinkrok.minigames.base.command.MinigamesCommandSender;
@@ -880,6 +883,18 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
     public void setFlying(boolean flying) {
         if (!isPlayer()) return;
         getPlayer().setFlying(flying);
+    }
+
+
+    public void showAboveHotbarMessage(String message) {
+        if(!isPlayer()) return;
+
+        WrapperPlayServerChat chatPacket = new WrapperPlayServerChat();
+
+        chatPacket.setMessage(WrappedChatComponent.fromText(message));
+        chatPacket.setPosition((byte) 2);
+
+        chatPacket.sendPacket(getPlayer());
     }
 
     public void showTitle(String title) {
