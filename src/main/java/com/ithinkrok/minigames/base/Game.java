@@ -150,10 +150,6 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         MSMClient.addProtocol("Minigames", protocol);
     }
 
-    public ClientMinigamesProtocol getProtocol() {
-        return protocol;
-    }
-
     /**
      * Unloads all chunks in all worlds
      */
@@ -177,6 +173,10 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         } else {
             disguiseController = new MinigamesDisguiseController();
         }
+    }
+
+    public ClientMinigamesProtocol getProtocol() {
+        return protocol;
     }
 
     public Collection<String> getAvailableGameGroupTypes() {
@@ -253,7 +253,7 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
 
             StringBuilder json = new StringBuilder();
 
-            for(String line : lines) {
+            for (String line : lines) {
                 json.append(line);
             }
 
@@ -327,7 +327,7 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         if (user != null) {
             GameGroup oldGameGroup = user.getGameGroup();
 
-            if(oldGameGroup == gameGroup || gameGroup == null) {
+            if (oldGameGroup == gameGroup || gameGroup == null) {
                 user.becomePlayer(player);
                 gameGroup = oldGameGroup;
             } else {
@@ -340,7 +340,7 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
                 user = createUser(gameGroup, null, player.getUniqueId(), player);
             }
         } else {
-            if(gameGroup == null) {
+            if (gameGroup == null) {
                 if (nameToGameGroup.isEmpty()) {
                     createGameGroup(fallbackConfig);
                 }
@@ -357,7 +357,7 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     public boolean sendPlayerToHub(Player player) {
         Client client = protocol.getClient();
 
-        if(client == null) return false;
+        if (client == null) return false;
 
         return client.changePlayerServer(player.getUniqueId(), hubServer);
     }
@@ -365,16 +365,16 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     private GameGroup getGameGroupForJoining(UUID uniqueId) {
         String gameGroupName = playersJoinGameGroups.remove(uniqueId);
 
-        if(gameGroupName != null && nameToGameGroup.containsKey(gameGroupName)) {
+        if (gameGroupName != null && nameToGameGroup.containsKey(gameGroupName)) {
             return nameToGameGroup.get(gameGroupName);
         }
 
         String gameGroupType = playersJoiningGameGroupTypes.remove(uniqueId);
 
-        if(gameGroupType != null) {
-            for(GameGroup gameGroup : getGameGroups()) {
-                if(!gameGroup.getType().equals(gameGroupType)) continue;
-                if(!gameGroup.isAcceptingPlayers()) continue;
+        if (gameGroupType != null) {
+            for (GameGroup gameGroup : getGameGroups()) {
+                if (!gameGroup.getType().equals(gameGroupType)) continue;
+                if (!gameGroup.isAcceptingPlayers()) continue;
 
                 return gameGroup;
             }
@@ -391,8 +391,7 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     }
 
     public GameGroup createGameGroup(String type) {
-        GameGroup gameGroup =
-                new GameGroup(this, nextGameGroupName(type), type, gameGroupConfigMap.get(type));
+        GameGroup gameGroup = new GameGroup(this, nextGameGroupName(type), type, gameGroupConfigMap.get(type));
 
         nameToGameGroup.put(gameGroup.getName(), gameGroup);
 
@@ -435,11 +434,11 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     public void preJoinGameGroup(UUID playerUUID, String type, String name) {
         doInFuture(task -> {
             playersJoiningGameGroupTypes.put(playerUUID, type);
-            if(name != null) playersJoinGameGroups.put(playerUUID, name);
+            if (name != null) playersJoinGameGroups.put(playerUUID, name);
 
             User user = getUser(playerUUID);
 
-            if(user != null) {
+            if (user != null) {
                 if (!user.isPlayer()) return;
 
                 rejoinPlayer(user.getPlayer());
@@ -724,9 +723,22 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
         public void eventEntityDamaged(EntityDamageEvent event) {
             User attacked = EntityUtils.getActualUser(Game.this, event.getEntity());
-            if (attacked == null) return;
-
             User attacker = null;
+
+            if (attacked == null) {
+                String mapName = event.getEntity().getWorld().getName();
+                GameGroup gameGroup = mapToGameGroup.get(mapName);
+                if (gameGroup == null) return;
+
+                if (event instanceof EntityDamageByEntityEvent) {
+                    attacker = EntityUtils
+                            .getRepresentingUser(gameGroup, ((EntityDamageByEntityEvent) event).getDamager());
+                }
+
+                gameGroup.gameEvent(new MapEntityDamagedEvent(gameGroup, gameGroup.getCurrentMap(), event, attacker));
+                return;
+            }
+
             if (event instanceof EntityDamageByEntityEvent) {
                 attacker = EntityUtils.getRepresentingUser(attacked, ((EntityDamageByEntityEvent) event).getDamager());
                 attacked.getGameGroup()

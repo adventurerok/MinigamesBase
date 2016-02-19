@@ -28,7 +28,7 @@ public class ParticleEffect {
         this.offsetZ = (float) config.getDouble("offset_z", config.getDouble("b"));
         this.speed = (float) config.getDouble("speed", 1d);
         this.particleCount = config.getInt("count");
-        this.radius = config.getInt("radius");
+        this.radius = config.getInt("radius", 60);
     }
 
     public void playEffect(Location location) {
