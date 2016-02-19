@@ -1012,7 +1012,11 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
             while (iterator.hasNext()) {
                 UserMetadata metadata = iterator.next();
 
-                if (metadata.removeOnInGameChange(event)) iterator.remove();
+                if (metadata.removeOnInGameChange(event)){
+                    metadata.cancelAllTasks();
+                    metadata.removed();
+                    iterator.remove();
+                }
             }
         }
 
