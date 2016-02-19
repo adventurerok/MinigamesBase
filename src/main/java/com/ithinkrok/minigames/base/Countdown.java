@@ -16,12 +16,18 @@ public class Countdown implements Nameable {
     private GameTask task;
     private int secondsRemaining;
 
-    public void setSecondsRemaining(int seconds) {
-        this.secondsRemaining = seconds;
+    public Countdown(String name, String localeStub, int secondsRemaining) {
+        this.name = name;
+        this.localeStub = localeStub;
+        this.secondsRemaining = secondsRemaining + 1;
     }
 
     public int getSecondsRemaining() {
         return secondsRemaining;
+    }
+
+    public void setSecondsRemaining(int seconds) {
+        this.secondsRemaining = seconds;
     }
 
     @Override
@@ -34,15 +40,9 @@ public class Countdown implements Nameable {
         return name;
     }
 
-    public Countdown(String name, String localeStub, int secondsRemaining) {
-        this.name = name;
-        this.localeStub = localeStub;
-        this.secondsRemaining = secondsRemaining + 1;
-    }
-
     public void start(GameGroup gameGroup) {
         String startMessage = gameGroup.getLocale(localeStub + ".start", secondsRemaining - 1);
-        if(startMessage != null) gameGroup.sendMessage(startMessage);
+        if (startMessage != null) gameGroup.sendMessage(startMessage);
 
         task = gameGroup.repeatInFuture(task -> {
             --secondsRemaining;
@@ -65,17 +65,19 @@ public class Countdown implements Nameable {
         }, 20, 20);
     }
 
-    public void cancel() {
-        task.cancel();
-    }
-
     private void doCountdownMessage(GameGroup gameGroup) {
         LanguageLookup lookup = gameGroup.getLanguageLookup();
         String message = null;
 
         if (secondsRemaining > 30) {
-            if (secondsRemaining % 60 != 0) return;
-            message = lookup.getLocale(localeStub + ".minutes", secondsRemaining / 60);
+            if (secondsRemaining % 30 != 0) return;
+
+            if (secondsRemaining % 60 == 0) {
+                message = lookup.getLocale(localeStub + ".minutes", secondsRemaining / 60);
+            } else {
+                message =
+                        lookup.getLocale(localeStub + ".minutes_seconds", secondsRemaining / 60, secondsRemaining % 60);
+            }
         } else {
             switch (secondsRemaining) {
                 case 30:
@@ -97,12 +99,16 @@ public class Countdown implements Nameable {
         CountdownMessageEvent event = new CountdownMessageEvent(gameGroup, this, message);
         gameGroup.gameEvent(event);
 
-        if(message != null){
+        if (message != null) {
             gameGroup.sendMessage(message);
-            for(User user : gameGroup.getUsers()) {
+            for (User user : gameGroup.getUsers()) {
                 user.showAboveHotbarMessage(message);
             }
         }
+    }
+
+    public void cancel() {
+        task.cancel();
     }
 
     public boolean isFinished() {
