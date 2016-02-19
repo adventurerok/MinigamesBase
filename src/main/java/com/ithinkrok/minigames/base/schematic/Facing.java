@@ -1,5 +1,7 @@
 package com.ithinkrok.minigames.base.schematic;
 
+import org.bukkit.block.BlockFace;
+
 /**
  * Created by paul on 07/11/15.
  *
@@ -97,6 +99,51 @@ public class Facing {
                 return 4;
             default:
                 return data;
+        }
+    }
+
+    public static int rotateSign(int data, int rot) {
+        rot *= 4;
+
+        return (data + rot) & 0xF;
+    }
+
+    public static BlockFace signRotationToFacing(int data) {
+        switch (data) {
+            case 0:
+                return BlockFace.SOUTH;
+            case 1:
+                return BlockFace.SOUTH_SOUTH_WEST;
+            case 2:
+                return BlockFace.SOUTH_WEST;
+            case 3:
+                return BlockFace.WEST_SOUTH_WEST;
+            case 4:
+                return BlockFace.WEST;
+            case 5:
+                return BlockFace.WEST_NORTH_WEST;
+            case 6:
+                return BlockFace.NORTH_WEST;
+            case 7:
+                return BlockFace.NORTH_NORTH_WEST;
+            case 8:
+                return BlockFace.NORTH;
+            case 9:
+                return BlockFace.NORTH_NORTH_EAST;
+            case 10:
+                return BlockFace.NORTH_EAST;
+            case 11:
+                return BlockFace.EAST_NORTH_EAST;
+            case 12:
+                return BlockFace.EAST;
+            case 13:
+                return BlockFace.EAST_SOUTH_EAST;
+            case 14:
+                return BlockFace.SOUTH_EAST;
+            case 15:
+                return BlockFace.SOUTH_SOUTH_EAST;
+            default:
+                throw new IllegalArgumentException("data must be 0-15");
         }
     }
 
