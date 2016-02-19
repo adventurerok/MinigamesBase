@@ -1,10 +1,10 @@
-== New Idea ==
-Minigames Plugin:
- - One specific command lets console execute commands
- - Communicates with the minigames controller
+== Bugs ==
  - RAM disk should have separate folder depending on server name
  - It put someone in flatland instead of in the world
- - custom hit cap
+
+== New Idea ==
+Minigames Plugin:
+ - Does everything
 
 Minigames controller:
  - Keeps track of which servers are running which minigames, and commands them
