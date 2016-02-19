@@ -14,11 +14,13 @@ public class Kit implements Nameable {
 
     private final String name;
     private final String formattedName;
+    private final String description;
     private final Collection<Config> listeners;
 
-    public Kit(String name, String formattedName, Collection<Config> listeners) {
+    public Kit(String name, String formattedName, String description, Collection<Config> listeners) {
         this.name = name;
         this.formattedName = (formattedName != null) ? formattedName : name;
+        this.description = description;
         this.listeners = listeners;
     }
 
@@ -30,6 +32,10 @@ public class Kit implements Nameable {
     @Override
     public String getFormattedName() {
         return formattedName;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public Collection<CustomListener> createListeners(User user) {

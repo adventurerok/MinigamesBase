@@ -133,6 +133,8 @@ public final class ConfigParser {
 
             String formattedName = kitConfig.getString("formatted_name", null);
 
+            String description = kitConfig.getString("description", "No description");
+
             Config listenersConfig = kitConfig.getConfigOrNull("listeners");
 
             Collection<Config> listeners = new ArrayList<>();
@@ -143,7 +145,7 @@ public final class ConfigParser {
                 listeners.add(listenerConfig);
             }
 
-            holder.addKit(new Kit(name, formattedName, listeners));
+            holder.addKit(new Kit(name, formattedName, description, listeners));
         }
     }
 
