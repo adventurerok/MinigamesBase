@@ -242,7 +242,11 @@ public class BaseGame implements Game, FileLoader {
 
     @Override
     public Config loadConfig(String path) {
-        return new BukkitConfig(YamlConfiguration.loadConfiguration(configDirectory.resolve(path).toFile()));
+        try {
+            return new BukkitConfig(YamlConfiguration.loadConfiguration(configDirectory.resolve(path).toFile()));
+        } catch (Exception e) {
+            throw new RuntimeException("Error while loading config at: " + path, e);
+        }
     }
 
     @Override

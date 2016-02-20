@@ -50,7 +50,7 @@ public final class InfoSigns {
             Constructor<? extends InfoSign> constructor = signClazz.getConstructor(GameGroup.class, Config.class);
 
             return constructor.newInstance(gameGroup, config);
-        } catch (ReflectiveOperationException | ClassCastException e) {
+        } catch (Exception e) {
             InfoSign sign = loadLegacySign(gameGroup, config);
             if(sign != null) return sign;
 
