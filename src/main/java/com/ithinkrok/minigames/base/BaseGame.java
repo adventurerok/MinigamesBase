@@ -8,6 +8,10 @@ import com.ithinkrok.minigames.api.Kit;
 import com.ithinkrok.minigames.api.command.MinigamesCommand;
 import com.ithinkrok.minigames.api.database.DatabaseTask;
 import com.ithinkrok.minigames.api.database.Persistence;
+import com.ithinkrok.minigames.api.event.controller.ControllerGameGroupEvent;
+import com.ithinkrok.minigames.api.event.controller.ControllerKillGameGroupEvent;
+import com.ithinkrok.minigames.api.event.controller.ControllerSpawnGameGroupEvent;
+import com.ithinkrok.minigames.api.event.controller.ControllerUpdateGameGroupEvent;
 import com.ithinkrok.minigames.api.event.map.*;
 import com.ithinkrok.minigames.api.event.user.game.UserCommandEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserJoinEvent;
@@ -21,6 +25,9 @@ import com.ithinkrok.minigames.api.event.user.state.UserFoodLevelChangeEvent;
 import com.ithinkrok.minigames.api.event.user.world.*;
 import com.ithinkrok.minigames.api.map.GameMap;
 import com.ithinkrok.minigames.api.protocol.ClientMinigamesProtocol;
+import com.ithinkrok.minigames.api.protocol.event.GameGroupKilledEvent;
+import com.ithinkrok.minigames.api.protocol.event.GameGroupSpawnedEvent;
+import com.ithinkrok.minigames.api.protocol.event.GameGroupUpdateEvent;
 import com.ithinkrok.minigames.api.task.GameRunnable;
 import com.ithinkrok.minigames.api.task.GameTask;
 import com.ithinkrok.minigames.api.team.Team;
@@ -825,6 +832,33 @@ public class BaseGame implements Game, FileLoader {
         public void eventPlayerInventoryClose(InventoryCloseEvent event) {
             User user = getUser(event.getPlayer().getUniqueId());
             user.getGameGroup().userEvent(new UserInventoryCloseEvent(user, event));
+        }
+
+        @EventHandler
+        public void eventGameGroupSpawned(GameGroupSpawnedEvent event) {
+            for(GameGroup gameGroup : getGameGroups()) {
+                gameGroup.gameEvent(new ControllerSpawnGameGroupEvent(gameGroup, event));
+            }
+        }
+
+        @EventHandler
+        public void eventGameGroupUpdate(GameGroupUpdateEvent event) {
+            for(GameGroup gameGroup : getGameGroups()) {
+                gameGroup.gameEvent(new ControllerUpdateGameGroupEvent(gameGroup, event));
+            }
+        }
+
+        @EventHandler
+        public void eventGameGroupKilled(GameGroupKilledEvent event) {
+            for(GameGroup gameGroup : getGameGroups()) {
+                gameGroup.gameEvent(new ControllerKillGameGroupEvent(gameGroup, event));
+            }
+        }
+
+        @EventHandler
+        public void eventSignChange(SignChangeEvent event) {
+            User user = getUser(event.getPlayer().getUniqueId());
+            user.getGameGroup().userEvent(new UserEditSignEvent(user, event));
         }
     }
 }

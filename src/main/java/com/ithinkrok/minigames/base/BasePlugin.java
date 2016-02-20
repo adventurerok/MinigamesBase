@@ -26,10 +26,14 @@ public class BasePlugin extends SpecificPlugin {
     private static Game game;
     private static Hub hub;
 
-    private ClientMinigamesRequestProtocol requestProtocol;
+    private static ClientMinigamesRequestProtocol requestProtocol;
 
     public static Game getGame() {
         return game;
+    }
+
+    public static ClientMinigamesRequestProtocol getRequestProtocol() {
+        return requestProtocol;
     }
 
     @Override
