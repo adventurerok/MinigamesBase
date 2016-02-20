@@ -212,12 +212,13 @@ public class Database implements DatabaseTaskRunner {
         });
     }
 
-    public void getHighScores(String gameType, int count, Consumer<List<UserScore>> consumer) {
+    public void getHighScores(String gameType, int count, boolean ascending, Consumer<List<UserScore>> consumer) {
         doDatabaseTask(accessor -> {
             Query<UserScore> query = accessor.find(UserScore.class);
 
             query.where().eq("game", gameType);
-            query.orderBy("value desc");
+            if(ascending) query.orderBy("value asc");
+            else query.orderBy("value desc");
 
             query.setMaxRows(count);
             consumer.accept(query.findList());

@@ -11,8 +11,9 @@ import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Sign;
-import org.bukkit.util.StringUtil;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -92,6 +93,14 @@ public abstract class InfoSign implements CustomListener {
         }
 
         return result;
+    }
+
+    protected void saveFormatToConfig(Config config, String key, String[] format) {
+        List<String> list = new ArrayList<>();
+
+        list.addAll(Arrays.asList(format).subList(0, 4));
+
+        config.set(key, list);
     }
 
     public Config toConfig() {

@@ -38,6 +38,7 @@ public class HubListener implements CustomListener {
     static {
         InfoSigns.registerSignType("%lobby_sign%", JoinLobbySign::new);
         InfoSigns.registerSignType("%choose_sign%", GameChooseSign::new);
+        InfoSigns.registerSignType("%high_score%", HighScoreSign::new);
     }
 
     private GameGroup gameGroup;

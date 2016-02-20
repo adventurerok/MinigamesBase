@@ -35,7 +35,12 @@ public final class InfoSigns {
 
         if(creator == null) return null;
 
-        return creator.createSign(event);
+        try {
+            return creator.createSign(event);
+        } catch (Exception ignored) {
+            event.getUser().sendLocale("info_sign.invalid");
+            return null;
+        }
     }
 
     public static InfoSign loadInfoSign(GameGroup gameGroup, Config config) {
