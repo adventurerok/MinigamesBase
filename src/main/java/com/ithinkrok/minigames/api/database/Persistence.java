@@ -36,8 +36,8 @@ public class Persistence extends Thread {
 
     private void checkDDL() {
         try {
-            plugin.getDatabase().find(IntUserValue.class).findRowCount();
-        } catch(PersistenceException e) {
+            plugin.getDatabase().find(UserScore.class).findRowCount();
+        } catch(PersistenceException ignored) {
             try {
                 Method method = JavaPlugin.class.getDeclaredMethod("installDDL");
                 method.setAccessible(true);

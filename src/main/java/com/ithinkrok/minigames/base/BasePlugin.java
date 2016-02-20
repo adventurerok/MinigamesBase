@@ -2,10 +2,7 @@ package com.ithinkrok.minigames.base;
 
 import com.ithinkrok.minigames.api.Game;
 import com.ithinkrok.minigames.api.SpecificPlugin;
-import com.ithinkrok.minigames.api.database.BooleanUserValue;
-import com.ithinkrok.minigames.api.database.DoubleUserValue;
-import com.ithinkrok.minigames.api.database.IntUserValue;
-import com.ithinkrok.minigames.api.database.StringUserValue;
+import com.ithinkrok.minigames.api.database.*;
 import com.ithinkrok.minigames.api.protocol.ClientMinigamesRequestProtocol;
 import com.ithinkrok.msm.bukkit.util.BukkitConfig;
 import com.ithinkrok.msm.client.impl.MSMClient;
@@ -63,6 +60,7 @@ public class BasePlugin extends SpecificPlugin {
     public List<Class<?>> getDatabaseClasses() {
         List<Class<?>> result = new ArrayList<>();
 
+        result.add(UserScore.class);
         result.add(IntUserValue.class);
         result.add(DoubleUserValue.class);
         result.add(BooleanUserValue.class);
