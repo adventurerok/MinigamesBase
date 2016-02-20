@@ -3,11 +3,13 @@ package com.ithinkrok.minigames.api.sign;
 import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.event.user.world.UserEditSignEvent;
 import com.ithinkrok.minigames.api.user.User;
+import com.ithinkrok.msm.common.util.ConfigUtils;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;
 import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Sign;
 
 /**
  * Created by paul on 20/02/16.
@@ -55,6 +57,18 @@ public abstract class InfoSign implements CustomListener {
 
     public Location getLocation() {
         return location;
+    }
+
+    protected void updateSignFromFormat(String[] format, Config config) {
+        Sign sign = (Sign) location.getBlock().getState();
+
+        for(int index = 0; index < 4; ++index) {
+            String formatted = ConfigUtils.formatString(format[index], config);
+
+            sign.setLine(index, formatted);
+        }
+
+        sign.update();
     }
 
     public Config toConfig() {

@@ -1,11 +1,13 @@
 package com.ithinkrok.minigames.api.protocol.data;
 
 import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.config.ConfigSerializable;
+import com.ithinkrok.util.config.MemoryConfig;
 
 /**
  * Created by paul on 16/02/16.
  */
-public class GameGroupInfo {
+public class GameGroupInfo implements ConfigSerializable {
 
     private final ControllerInfo controller;
 
@@ -65,5 +67,19 @@ public class GameGroupInfo {
 
     public int getMaxPlayerCount() {
         return maxPlayerCount;
+    }
+
+    @Override
+    public Config toConfig() {
+        Config result = new MemoryConfig();
+
+        result.set("name", name);
+        result.set("type", type);
+        result.set("accepting", acceptingPlayers);
+        result.set("motd", motd);
+        result.set("player_count", playerCount);
+        result.set("max_players", maxPlayerCount);
+
+        return result;
     }
 }
