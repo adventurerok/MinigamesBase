@@ -60,19 +60,14 @@ public class BaseMap implements GameMap, ConfigHolder {
     private final IdentifierMap<CustomItem> customItemIdentifierMap = new IdentifierMap<>();
     private final HashMap<String, Config> sharedObjects = new HashMap<>();
     private final List<PastedSchematic> pastedSchematics = new ArrayList<>();
-
-    private World world;
     private final WorldHandler worldHandler;
+    private World world;
 
 
     public BaseMap(BaseGameGroup gameGroup, GameMapInfo gameMapInfo) {
         this.gameMapInfo = gameMapInfo;
 
-        loadMap(gameGroup);
-        ConfigParser
-                .parseConfig(gameGroup, this, gameGroup, this, gameMapInfo.getConfigName(), gameMapInfo.getConfig());
-
-        switch(gameMapInfo.getMapType()) {
+        switch (gameMapInfo.getMapType()) {
             case INSTANCE:
                 worldHandler = new InstanceWorldHandler();
                 break;
@@ -82,6 +77,12 @@ public class BaseMap implements GameMap, ConfigHolder {
             default:
                 throw new UnsupportedOperationException("Unsupported map type: " + gameMapInfo.getMapType());
         }
+
+        loadMap(gameGroup);
+
+        ConfigParser
+                .parseConfig(gameGroup, this, gameGroup, this, gameMapInfo.getConfigName(), gameMapInfo.getConfig());
+
     }
 
     private void loadMap(GameGroup gameGroup) {
@@ -89,7 +90,6 @@ public class BaseMap implements GameMap, ConfigHolder {
 
         configureWorld();
     }
-
 
 
     private void configureWorld() {
@@ -129,35 +129,43 @@ public class BaseMap implements GameMap, ConfigHolder {
         }
     }
 
-    @Override public World getWorld() {
+    @Override
+    public World getWorld() {
         return world;
     }
 
-    @Override public void addPastedSchematic(PastedSchematic schematic) {
+    @Override
+    public void addPastedSchematic(PastedSchematic schematic) {
         pastedSchematics.add(schematic);
     }
 
-    @Override public void removePastedSchematic(PastedSchematic schematic) {
+    @Override
+    public void removePastedSchematic(PastedSchematic schematic) {
         pastedSchematics.remove(schematic);
     }
 
-    @Override public GameMapInfo getInfo() {
+    @Override
+    public GameMapInfo getInfo() {
         return gameMapInfo;
     }
 
-    @Override public CustomItem getCustomItem(String name) {
+    @Override
+    public CustomItem getCustomItem(String name) {
         return customItemIdentifierMap.get(name);
     }
 
-    @Override public CustomItem getCustomItem(int identifier) {
+    @Override
+    public CustomItem getCustomItem(int identifier) {
         return customItemIdentifierMap.get(identifier);
     }
 
-    @Override public void bindTaskToMap(GameTask task) {
+    @Override
+    public void bindTaskToMap(GameTask task) {
         mapTaskList.addTask(task);
     }
 
-    @Override public void unloadMap() {
+    @Override
+    public void unloadMap() {
         mapTaskList.cancelAllTasks();
 
         List<PastedSchematic> pastedSchematics = new ArrayList<>(this.pastedSchematics);
@@ -165,6 +173,73 @@ public class BaseMap implements GameMap, ConfigHolder {
         pastedSchematics.forEach(PastedSchematic::removed);
 
         worldHandler.unloadWorld(this);
+    }
+
+    @Override
+    public void teleportUser(User user) {
+        if (user.getLocation().getWorld().equals(world)) return;
+        user.teleport(world.getSpawnLocation());
+    }
+
+    @Override
+    public List<CustomListener> getListeners() {
+        return listeners;
+    }
+
+    @Override
+    public Map<String, CustomListener> getListenerMap() {
+        return listenerMap;
+    }
+
+    @Override
+    public Schematic getSchematic(String name) {
+        return schematicMap.get(name);
+    }
+
+    @Override
+    public JSONBook getBook(String name) {
+        return bookMap.get(name);
+    }
+
+    @Override
+    public Entity spawnEntity(Vector location, EntityType type) {
+        return spawnEntity(getLocation(location), type);
+    }
+
+    @Override
+    public Entity spawnEntity(Location location, EntityType type) {
+        return world.spawnEntity(location, type);
+    }
+
+    @Override
+    public Location getLocation(Vector location) {
+        if (location == null) return null;
+        return new Location(world, location.getX(), location.getY(), location.getZ());
+    }
+
+    @Override
+    public Location getLocation(double x, double y, double z) {
+        return new Location(world, x, y, z);
+    }
+
+    @Override
+    public Block getBlock(Vector location) {
+        return getLocation(location).getBlock();
+    }
+
+    @Override
+    public Block getBlock(int x, int y, int z) {
+        return world.getBlockAt(x, y, z);
+    }
+
+    @Override
+    public Location getSpawn() {
+        return world.getSpawnLocation();
+    }
+
+    @Override
+    public MapType getMapType() {
+        return gameMapInfo.getMapType();
     }
 
     @Override
@@ -184,11 +259,6 @@ public class BaseMap implements GameMap, ConfigHolder {
         return sharedObject != null ? sharedObject : ConfigUtils.EMPTY_CONFIG;
     }
 
-    @Override public void teleportUser(User user) {
-        if (user.getLocation().getWorld().equals(world)) return;
-        user.teleport(world.getSpawnLocation());
-    }
-
     @Override
     public String getLocale(String name) {
         return languageLookup.getLocale(name);
@@ -202,10 +272,6 @@ public class BaseMap implements GameMap, ConfigHolder {
     @Override
     public boolean hasLocale(String name) {
         return languageLookup.hasLocale(name);
-    }
-
-    @Override public List<CustomListener> getListeners() {
-        return listeners;
     }
 
     @Override
@@ -264,18 +330,6 @@ public class BaseMap implements GameMap, ConfigHolder {
         bookMap.put(book.getName(), book);
     }
 
-    @Override public Map<String, CustomListener> getListenerMap() {
-        return listenerMap;
-    }
-
-    @Override public Schematic getSchematic(String name) {
-        return schematicMap.get(name);
-    }
-
-    @Override public JSONBook getBook(String name) {
-        return bookMap.get(name);
-    }
-
     @Override
     public boolean canPaste(BoundingBox bounds) {
         for (PastedSchematic schematic : pastedSchematics) {
@@ -283,39 +337,5 @@ public class BaseMap implements GameMap, ConfigHolder {
         }
 
         return true;
-    }
-
-    @Override public Entity spawnEntity(Vector location, EntityType type) {
-        return spawnEntity(getLocation(location), type);
-    }
-
-    @Override public Entity spawnEntity(Location location, EntityType type) {
-        return world.spawnEntity(location, type);
-    }
-
-    @Override public Location getLocation(Vector location) {
-        if (location == null) return null;
-        return new Location(world, location.getX(), location.getY(), location.getZ());
-    }
-
-    @Override public Location getLocation(double x, double y, double z) {
-        return new Location(world, x, y, z);
-    }
-
-    @Override public Block getBlock(Vector location) {
-        return getLocation(location).getBlock();
-    }
-
-    @Override public Block getBlock(int x, int y, int z) {
-        return world.getBlockAt(x, y, z);
-    }
-
-    @Override public Location getSpawn() {
-        return world.getSpawnLocation();
-    }
-
-    @Override
-    public MapType getMapType() {
-        return gameMapInfo.getMapType();
     }
 }

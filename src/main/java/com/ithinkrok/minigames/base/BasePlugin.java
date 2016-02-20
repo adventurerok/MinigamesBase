@@ -1,6 +1,7 @@
 package com.ithinkrok.minigames.base;
 
 import com.ithinkrok.minigames.api.Game;
+import com.ithinkrok.minigames.api.SpecificPlugin;
 import com.ithinkrok.minigames.api.database.BooleanUserValue;
 import com.ithinkrok.minigames.api.database.DoubleUserValue;
 import com.ithinkrok.minigames.api.database.IntUserValue;
@@ -20,7 +21,7 @@ import java.util.List;
 /**
  * Created by paul on 26/01/16.
  */
-public class BasePlugin extends JavaPlugin {
+public class BasePlugin extends SpecificPlugin {
 
     private static Game game;
     private static Hub hub;
@@ -42,6 +43,8 @@ public class BasePlugin extends JavaPlugin {
         if(config.getBoolean("modules.hub", false)) {
             loadHubModule();
         }
+
+        super.onEnable();
     }
 
     private void loadHubModule() {
