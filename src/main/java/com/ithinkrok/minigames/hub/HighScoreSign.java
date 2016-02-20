@@ -2,8 +2,8 @@ package com.ithinkrok.minigames.hub;
 
 import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.database.UserScore;
+import com.ithinkrok.minigames.api.event.controller.ControllerKillGameGroupEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserEditSignEvent;
-import com.ithinkrok.minigames.api.protocol.event.GameGroupKilledEvent;
 import com.ithinkrok.minigames.api.sign.InfoSign;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.util.config.Config;
@@ -141,7 +141,7 @@ public class HighScoreSign extends InfoSign {
     }
 
     @CustomEventHandler
-    public void onControllerGameGroupKilledEvent(GameGroupKilledEvent event) {
+    public void onControllerGameGroupKilledEvent(ControllerKillGameGroupEvent event) {
         if(!event.getGameGroup().getType().equals(gameType)) return;
 
         updateSign();
