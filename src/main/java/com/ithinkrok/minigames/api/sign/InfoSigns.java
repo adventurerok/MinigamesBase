@@ -2,7 +2,6 @@ package com.ithinkrok.minigames.api.sign;
 
 import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.event.user.world.UserEditSignEvent;
-import com.ithinkrok.minigames.api.sign.InfoSign;
 import com.ithinkrok.minigames.hub.GameChooseSign;
 import com.ithinkrok.minigames.hub.JoinLobbySign;
 import com.ithinkrok.util.config.Config;

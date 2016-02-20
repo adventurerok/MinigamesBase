@@ -138,16 +138,20 @@ public class HubListener implements CustomListener {
 
             signs.put(sign.getLocation(), sign);
 
-            if(sign.getUpdateFrequency() == 0) continue;
-
-            GameTask task = gameGroup.repeatInFuture(task1 -> {
-                if(sign.update()) return;
-
-                signs.remove(sign.getLocation());
-            }, sign.getUpdateFrequency(), sign.getUpdateFrequency());
-
-            gameGroup.bindTaskToCurrentMap(task);
+            startSignTask(sign);
         }
+    }
+
+    private void startSignTask(InfoSign sign) {
+        if(sign.getUpdateFrequency() <= 0) return;
+
+        GameTask task = gameGroup.repeatInFuture(task1 -> {
+            if(sign.update()) return;
+
+            signs.remove(sign.getLocation());
+        }, sign.getUpdateFrequency(), sign.getUpdateFrequency());
+
+        gameGroup.bindTaskToCurrentMap(task);
     }
 
     @CustomEventHandler
@@ -172,6 +176,8 @@ public class HubListener implements CustomListener {
         });
 
         saveConfig();
+
+        startSignTask(sign);
     }
 
     @CustomEventHandler
