@@ -1,4 +1,4 @@
-package com.ithinkrok.minigames.api.util.playerstate;
+package com.ithinkrok.minigames.base.util.playerstate;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.GameMode;

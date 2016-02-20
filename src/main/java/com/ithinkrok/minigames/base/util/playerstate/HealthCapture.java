@@ -1,4 +1,4 @@
-package com.ithinkrok.minigames.api.util.playerstate;
+package com.ithinkrok.minigames.base.util.playerstate;
 
 import org.bukkit.entity.LivingEntity;
 

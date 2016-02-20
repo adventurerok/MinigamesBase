@@ -29,7 +29,7 @@ import com.ithinkrok.minigames.api.user.scoreboard.ScoreboardHandler;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
 import com.ithinkrok.minigames.api.util.SoundEffect;
 import com.ithinkrok.minigames.api.util.disguise.Disguise;
-import com.ithinkrok.minigames.api.util.playerstate.PlayerState;
+import com.ithinkrok.minigames.base.util.playerstate.PlayerState;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventExecutor;
 import com.ithinkrok.util.event.CustomEventHandler;

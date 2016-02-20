@@ -1,4 +1,4 @@
-package com.ithinkrok.minigames.api.util;
+package com.ithinkrok.minigames.base.util;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolManager;
