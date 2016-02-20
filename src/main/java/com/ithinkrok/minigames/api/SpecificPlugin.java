@@ -17,7 +17,7 @@ public class SpecificPlugin extends JavaPlugin {
     public void onEnable() {
         Config config;
         try {
-            config = YamlConfigIO.loadToConfig(getResource("config.yml"), new MemoryConfig());
+            config = YamlConfigIO.loadToConfig(getResource("gamegroups.yml"), new MemoryConfig());
         } catch (InvalidConfigException e) {
             System.out.println("Failed to load gamegroup configs config");
             e.printStackTrace();
