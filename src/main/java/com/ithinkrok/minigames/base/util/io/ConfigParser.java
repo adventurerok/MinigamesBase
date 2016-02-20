@@ -1,13 +1,14 @@
-package com.ithinkrok.minigames.api.util.io;
+package com.ithinkrok.minigames.base.util.io;
 
-import com.ithinkrok.minigames.api.map.GameMapInfo;
 import com.ithinkrok.minigames.api.GameState;
 import com.ithinkrok.minigames.api.Kit;
-import com.ithinkrok.minigames.base.command.CommandConfig;
 import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.schematic.Schematic;
 import com.ithinkrok.minigames.api.team.TeamIdentifier;
 import com.ithinkrok.minigames.api.util.MinigamesConfigs;
+import com.ithinkrok.minigames.api.util.io.ListenerLoader;
+import com.ithinkrok.minigames.base.command.CommandConfig;
+import com.ithinkrok.minigames.base.map.BaseMapInfo;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.ChatColor;
@@ -77,7 +78,7 @@ public final class ConfigParser {
 
     private void loadMaps(Config maps) {
         for (String name : maps.getKeys(false)) {
-            holder.addMapInfo(new GameMapInfo(loader, name, maps.getString(name)));
+            holder.addMapInfo(new BaseMapInfo(loader, name, maps.getString(name)));
         }
     }
 

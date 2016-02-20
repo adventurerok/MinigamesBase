@@ -28,6 +28,7 @@ import com.ithinkrok.minigames.api.team.TeamIdentifier;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.EntityUtils;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
+import com.ithinkrok.minigames.base.util.io.FileLoader;
 import com.ithinkrok.minigames.base.util.InvisiblePlayerAttacker;
 import com.ithinkrok.minigames.api.util.JSONBook;
 import com.ithinkrok.minigames.api.util.disguise.*;
@@ -72,7 +73,7 @@ import java.util.logging.Logger;
  * In future: Will be a TaskScheduler, UserResolver, FileLoader and DatabaseTaskRunner only
  */
 @SuppressWarnings("unchecked")
-public class BaseGame implements Game {
+public class BaseGame implements Game, FileLoader {
 
     private final String name;
 

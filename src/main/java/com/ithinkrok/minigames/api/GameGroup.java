@@ -1,14 +1,12 @@
 package com.ithinkrok.minigames.api;
 
+import com.ithinkrok.minigames.api.database.DatabaseTaskRunner;
 import com.ithinkrok.minigames.api.event.game.GameEvent;
 import com.ithinkrok.minigames.api.event.team.TeamEvent;
 import com.ithinkrok.minigames.api.event.user.UserEvent;
+import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.map.GameMap;
 import com.ithinkrok.minigames.api.map.GameMapInfo;
-import com.ithinkrok.minigames.api.user.User;
-import com.ithinkrok.minigames.base.command.CommandConfig;
-import com.ithinkrok.minigames.api.database.DatabaseTaskRunner;
-import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.metadata.Metadata;
 import com.ithinkrok.minigames.api.metadata.MetadataHolder;
 import com.ithinkrok.minigames.api.schematic.SchematicResolver;
@@ -16,10 +14,10 @@ import com.ithinkrok.minigames.api.task.GameTask;
 import com.ithinkrok.minigames.api.task.TaskScheduler;
 import com.ithinkrok.minigames.api.team.TeamIdentifier;
 import com.ithinkrok.minigames.api.team.TeamUserResolver;
+import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.CountdownConfig;
 import com.ithinkrok.minigames.api.util.JSONBook;
-import com.ithinkrok.minigames.api.util.io.ConfigHolder;
-import com.ithinkrok.minigames.api.util.io.FileLoader;
+import com.ithinkrok.minigames.base.command.CommandConfig;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.lang.LanguageLookup;
 import com.ithinkrok.util.lang.Messagable;
@@ -31,8 +29,8 @@ import java.util.Map;
  * Created by paul on 20/02/16.
  */
 public interface GameGroup
-        extends LanguageLookup, Messagable, TaskScheduler, FileLoader, SharedObjectAccessor, MetadataHolder<Metadata>,SchematicResolver,
-        TeamUserResolver, DatabaseTaskRunner, ConfigHolder {
+        extends LanguageLookup, Messagable, TaskScheduler, SharedObjectAccessor, MetadataHolder<Metadata>,
+        SchematicResolver, TeamUserResolver, DatabaseTaskRunner {
     int getMaxPlayers();
 
     String getMotd();
@@ -41,9 +39,9 @@ public interface GameGroup
 
     String getType();
 
-    void setAcceptingPlayers(boolean acceptingPlayers);
-
     boolean isAcceptingPlayers();
+
+    void setAcceptingPlayers(boolean acceptingPlayers);
 
     void changeGameState(String gameStateName);
 

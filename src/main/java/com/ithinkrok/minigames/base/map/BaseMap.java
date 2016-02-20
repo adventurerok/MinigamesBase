@@ -6,6 +6,8 @@ import com.ithinkrok.minigames.api.map.GameMap;
 import com.ithinkrok.minigames.api.map.GameMapInfo;
 import com.ithinkrok.minigames.api.GameState;
 import com.ithinkrok.minigames.api.Kit;
+import com.ithinkrok.minigames.base.BaseGameGroup;
+import com.ithinkrok.minigames.base.util.io.ConfigHolder;
 import com.ithinkrok.minigames.base.command.CommandConfig;
 import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.item.IdentifierMap;
@@ -16,8 +18,8 @@ import com.ithinkrok.minigames.api.task.TaskList;
 import com.ithinkrok.minigames.api.team.TeamIdentifier;
 import com.ithinkrok.minigames.api.util.BoundingBox;
 import com.ithinkrok.minigames.api.util.JSONBook;
-import com.ithinkrok.minigames.api.util.io.ConfigParser;
-import com.ithinkrok.minigames.api.util.io.DirectoryUtils;
+import com.ithinkrok.minigames.base.util.io.ConfigParser;
+import com.ithinkrok.minigames.base.util.io.DirectoryUtils;
 import com.ithinkrok.msm.common.util.ConfigUtils;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomListener;
@@ -45,7 +47,7 @@ import java.util.Map;
 /**
  * Created by paul on 01/01/16.
  */
-public class BaseMap implements GameMap {
+public class BaseMap implements GameMap, ConfigHolder {
 
     private final GameMapInfo gameMapInfo;
     private final MultipleLanguageLookup languageLookup = new MultipleLanguageLookup();
@@ -60,7 +62,7 @@ public class BaseMap implements GameMap {
     private World world;
     private Path ramdiskPath;
 
-    public BaseMap(GameGroup gameGroup, GameMapInfo gameMapInfo) {
+    public BaseMap(BaseGameGroup gameGroup, GameMapInfo gameMapInfo) {
         this.gameMapInfo = gameMapInfo;
 
         loadMap(gameGroup);

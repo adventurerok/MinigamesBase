@@ -18,6 +18,8 @@ import com.ithinkrok.minigames.api.event.user.game.UserJoinEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserQuitEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserBreakBlockEvent;
 import com.ithinkrok.minigames.api.map.GameMapInfo;
+import com.ithinkrok.minigames.base.util.io.FileLoader;
+import com.ithinkrok.minigames.base.util.io.ConfigHolder;
 import com.ithinkrok.minigames.base.command.CommandConfig;
 import com.ithinkrok.minigames.api.command.MinigamesCommand;
 import com.ithinkrok.minigames.api.database.DatabaseTask;
@@ -32,7 +34,7 @@ import com.ithinkrok.minigames.api.task.TaskList;
 import com.ithinkrok.minigames.api.team.TeamIdentifier;
 import com.ithinkrok.minigames.api.util.CountdownConfig;
 import com.ithinkrok.minigames.api.util.JSONBook;
-import com.ithinkrok.minigames.api.util.io.ConfigParser;
+import com.ithinkrok.minigames.base.util.io.ConfigParser;
 import com.ithinkrok.msm.common.util.ConfigUtils;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;
@@ -55,7 +57,7 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * Created by paul on 31/12/15.
  */
-public class BaseGameGroup implements GameGroup {
+public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
     private final String name;
     private final String type;

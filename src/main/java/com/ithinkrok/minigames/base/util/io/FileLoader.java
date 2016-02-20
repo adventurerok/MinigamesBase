@@ -1,4 +1,4 @@
-package com.ithinkrok.minigames.api.util.io;
+package com.ithinkrok.minigames.base.util.io;
 
 import com.ithinkrok.minigames.api.util.JSONBook;
 import com.ithinkrok.util.config.Config;

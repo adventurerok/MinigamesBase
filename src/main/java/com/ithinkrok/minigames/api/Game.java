@@ -1,13 +1,12 @@
 package com.ithinkrok.minigames.api;
 
-import com.ithinkrok.minigames.api.team.Team;
-import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.database.DatabaseTaskRunner;
 import com.ithinkrok.minigames.api.protocol.ClientMinigamesProtocol;
 import com.ithinkrok.minigames.api.task.TaskScheduler;
+import com.ithinkrok.minigames.api.team.Team;
+import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.user.UserResolver;
 import com.ithinkrok.minigames.api.util.disguise.Disguise;
-import com.ithinkrok.minigames.api.util.io.FileLoader;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -20,12 +19,14 @@ import java.util.logging.Logger;
 /**
  * Created by paul on 20/02/16.
  */
-public interface Game extends TaskScheduler, UserResolver, FileLoader, DatabaseTaskRunner, Nameable {
+public interface Game extends TaskScheduler, UserResolver, DatabaseTaskRunner, Nameable {
     ClientMinigamesProtocol getProtocol();
 
     Collection<String> getAvailableGameGroupTypes();
 
     Collection<? extends GameGroup> getGameGroups();
+
+    Path getAssetDirectory();
 
     Path getRamdiskDirectory();
 

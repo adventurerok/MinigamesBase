@@ -1,52 +1,23 @@
 package com.ithinkrok.minigames.api.map;
 
-import com.ithinkrok.minigames.api.util.io.FileLoader;
 import com.ithinkrok.util.config.Config;
 import org.bukkit.World;
 
 /**
- * Created by paul on 01/01/16.
+ * Created by paul on 20/02/16.
  */
-public class GameMapInfo {
+public interface GameMapInfo {
+    String getName();
 
-    private final String name;
-    private final String configPath;
-    private final Config config;
+    String getConfigName();
 
-    public GameMapInfo(FileLoader fileLoader, String name, String configPath) {
-        this.name = name;
-        this.configPath = configPath;
-        this.config = fileLoader.loadConfig(getConfigName());
-    }
+    String getDescription();
 
-    public String getName() {
-        return name;
-    }
+    boolean getWeatherEnabled();
 
-    public String getConfigName() {
-        return configPath;
-    }
+    Config getConfig();
 
-    public String getDescription() {
-        return config.getString("description");
-    }
+    String getMapFolder();
 
-    public boolean getWeatherEnabled() {
-        return config.getBoolean("enable_weather", true);
-    }
-
-    public Config getConfig() {
-        return config;
-    }
-
-    public String getMapFolder() {
-        return config.getString("folder");
-    }
-
-    public World.Environment getEnvironment() {
-        String envName = config.getString("environment", "normal").toUpperCase();
-
-        return World.Environment.valueOf(envName);
-    }
-
+    World.Environment getEnvironment();
 }
