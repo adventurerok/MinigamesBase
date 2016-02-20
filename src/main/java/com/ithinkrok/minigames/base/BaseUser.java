@@ -664,11 +664,26 @@ public class BaseUser implements Listener, User {
             if (!isPlayer()) return;
 
             Inventory old = null;
-            if(this.openInventory != null) old = getPlayer().getOpenInventory().getTopInventory();
+            if (this.openInventory != null) {
+                old = getPlayer().getOpenInventory().getTopInventory();
+            }
 
             this.openInventory = inventory;
             this.inventoryTether = inventoryTether != null ? inventoryTether.toVector() : null;
-            getPlayer().openInventory(inventory.createInventory(this, old));
+
+            Inventory newInventory = inventory.createInventory(this, old);
+
+            if (newInventory == old) {
+                return;
+            }
+
+            if (old == null) {
+                getPlayer().openInventory(newInventory);
+            } else {
+                doInFuture(task1 -> {
+                    getPlayer().openInventory(newInventory);
+                });
+            }
         });
     }
 
@@ -1066,6 +1081,11 @@ public class BaseUser implements Listener, User {
     }
 
     @Override
+    public Collection<CustomListener> getListeners() {
+        return listeners;
+    }
+
+    @Override
     public String getName() {
         return name;
     }
@@ -1090,11 +1110,6 @@ public class BaseUser implements Listener, User {
     private void showPlayer(User other) {
         if (!isPlayer() || !other.isPlayer()) return;
         getPlayer().showPlayer(other.getPlayer());
-    }
-
-    @Override
-    public Collection<CustomListener> getListeners() {
-        return listeners;
     }
 
     @Override
@@ -1125,9 +1140,6 @@ public class BaseUser implements Listener, User {
     @Override
     public boolean hasPermission(String permission) {
         return entity.hasPermission(permission);
-    }    @Override
-    public void sendLocale(String locale, Object... args) {
-        sendMessage(gameGroup.getLocale(locale, args));
     }
 
     @Override
@@ -1139,16 +1151,13 @@ public class BaseUser implements Listener, User {
     public Config getSharedObject(String name) {
         return gameGroup.getSharedObject(name);
     }    @Override
-    public void sendMessage(String message) {
-        sendMessageNoPrefix(gameGroup.getChatPrefix() + message);
+    public void sendLocale(String locale, Object... args) {
+        sendMessage(gameGroup.getLocale(locale, args));
     }
 
     @Override
     public Config getSharedObjectOrEmpty(String name) {
         return gameGroup.getSharedObjectOrEmpty(name);
-    }    @Override
-    public void sendMessageNoPrefix(String message) {
-        entity.sendMessage(message);
     }
 
     private class UserListener implements CustomListener {
@@ -1257,22 +1266,26 @@ public class BaseUser implements Listener, User {
                 CustomEventExecutor.executeEvent(event, customItem);
             }
         }
-    }    @Override
-    public void sendLocaleNoPrefix(String locale, Object... args) {
-        sendMessageNoPrefix(gameGroup.getLocale(locale, args));
     }
 
 
 
+    @Override
+    public void sendMessage(String message) {
+        sendMessageNoPrefix(gameGroup.getChatPrefix() + message);
+    }
 
 
+    @Override
+    public void sendMessageNoPrefix(String message) {
+        entity.sendMessage(message);
+    }
 
 
-
-
-
-
-
+    @Override
+    public void sendLocaleNoPrefix(String locale, Object... args) {
+        sendMessageNoPrefix(gameGroup.getLocale(locale, args));
+    }
 
 
     @Override

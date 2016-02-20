@@ -1,8 +1,14 @@
 package com.ithinkrok.minigames.base.hub;
 
+import com.ithinkrok.minigames.api.event.user.world.UserEditSignEvent;
+import com.ithinkrok.minigames.api.inventory.ClickableInventory;
+import com.ithinkrok.minigames.api.inventory.ClickableItem;
+import com.ithinkrok.minigames.api.inventory.event.UserClickItemEvent;
 import com.ithinkrok.minigames.api.protocol.data.ControllerInfo;
 import com.ithinkrok.minigames.api.protocol.data.GameGroupInfo;
+import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
+import com.ithinkrok.minigames.hub.HubListener;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;
 import org.apache.commons.lang.WordUtils;
@@ -37,6 +43,14 @@ public class HubSign {
         spectatorSign = event.getLine(2).equalsIgnoreCase("spectators");
     }
 
+    public HubSign(UserEditSignEvent event) {
+        location = event.getBlock().getLocation();
+
+        gameGroupType = event.getLine(1);
+
+        spectatorSign = event.getLine(2).equalsIgnoreCase("spectators");
+    }
+
     public HubSign(Server server, Config config) {
         gameGroupType = config.getString("type");
         spectatorSign = config.getBoolean("spectators");
@@ -52,9 +66,14 @@ public class HubSign {
         location = new Location(world, x, y, z);
     }
 
-    public void update(ControllerInfo controller) {
+    public boolean update(ControllerInfo controller) {
+        Material mat = location.getBlock().getType();
+        if(mat != Material.SIGN_POST && mat != Material.WALL_SIGN) return false;
+
         if (spectatorSign) updateSpectatorSign(controller);
         else updateLobbySign(controller);
+
+        return true;
     }
 
     private void updateSpectatorSign(ControllerInfo controller) {
@@ -118,23 +137,18 @@ public class HubSign {
         return gameGroupType;
     }
 
-    public void onRightClick(Hub hub, Player player) {
-        if (spectatorSign) onRightClickSpectator(hub, player);
-        else onRightClickLobby(hub, player);
+    public void onRightClick(HubListener hub, User user) {
+        if (spectatorSign) onRightClickSpectator(hub, user);
+        else onRightClickLobby(hub, user);
     }
 
-    private void onRightClickSpectator(Hub hub, Player player) {
-        Inventory inventory = Bukkit.createInventory(player, 36,
-                WordUtils.capitalizeFully(gameGroupType.replace('_', ' ')) + " Games");
+    private void onRightClickSpectator(HubListener hub, User user) {
+        updateSpectatorInventory(hub, user);
 
-        updateSpectatorInventory(hub, inventory);
-
-        player.openInventory(inventory);
-
-        hub.addOpenSpectatorInventory(player, location);
+        hub.addOpenSpectatorInventory(user, location);
     }
 
-    private void onRightClickLobby(Hub hub, Player player) {
+    private void onRightClickLobby(HubListener hub, User user) {
         Collection<GameGroupInfo> accepting = hub.getControllerInfo().getAcceptingGameGroups(gameGroupType);
 
         GameGroupInfo bestMatch = null;
@@ -147,14 +161,14 @@ public class HubSign {
 
         String gameGroupName = bestMatch != null ? bestMatch.getName() : null;
 
-        if (gameGroupName != null) player.sendMessage("Sending you to gamegroup: " + gameGroupName);
-        else player.sendMessage("Creating a new " + gameGroupType + " gamegroup for you");
+        if (gameGroupName != null) user.sendMessage("Sending you to gamegroup: " + gameGroupName);
+        else user.sendMessage("Creating a new " + gameGroupType + " gamegroup for you");
 
-        hub.getRequestProtocol().sendJoinGameGroupPacket(player.getUniqueId(), gameGroupType, gameGroupName);
+        hub.getRequestProtocol().sendJoinGameGroupPacket(user.getUuid(), gameGroupType, gameGroupName);
     }
 
-    public void updateSpectatorInventory(Hub hub, Inventory inventory) {
-        inventory.clear();
+    public void updateSpectatorInventory(HubListener hub, User user) {
+        ClickableInventory inventory = new ClickableInventory("Title");
 
         Collection<GameGroupInfo> allCollection = hub.getControllerInfo().getGameGroups(gameGroupType);
 
@@ -188,8 +202,19 @@ public class HubSign {
             ItemStack item = InventoryUtils
                     .createItemWithNameAndLore(mat, 1, 0, gameGroup.getName(), lore.toArray(new String[lore.size()]));
 
-            inventory.addItem(item);
+            ClickableItem clickableItem = new ClickableItem(item) {
+                @Override
+                public void onClick(UserClickItemEvent event) {
+                    user.sendMessage("Sending you to gamegroup: " + gameGroup.getName());
+
+                    hub.getRequestProtocol().sendJoinGameGroupPacket(user.getUuid(), gameGroup.getType(), gameGroup.getName());
+                }
+            };
+
+            inventory.addItem(clickableItem);
         }
+
+        user.showInventory(inventory, null);
     }
 
     public Location getLocation() {

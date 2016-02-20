@@ -5,6 +5,7 @@ import com.ithinkrok.minigames.api.protocol.data.ControllerInfo;
 import com.ithinkrok.minigames.api.protocol.event.GameGroupKilledEvent;
 import com.ithinkrok.minigames.api.protocol.event.GameGroupSpawnedEvent;
 import com.ithinkrok.minigames.api.protocol.event.GameGroupUpdateEvent;
+import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;
@@ -80,8 +81,8 @@ public class Hub implements Listener {
         }
     }
 
-    public void addOpenSpectatorInventory(Player player, Location location) {
-        openSpectatorInventories.put(player.getUniqueId(), location);
+    public void addOpenSpectatorInventory(User user, Location location) {
+        openSpectatorInventories.put(user.getUuid(), location);
     }
 
     @EventHandler
@@ -115,39 +116,6 @@ public class Hub implements Listener {
         }
     }
 
-    @EventHandler
-    public void onInventoryClick(InventoryClickEvent event) {
-        if(!(event.getWhoClicked() instanceof Player)) return;
-
-        Player player = (Player) event.getWhoClicked();
-
-        Location signLocation = openSpectatorInventories.get(player.getUniqueId());
-        if(signLocation == null) return;
-
-        HubSign sign = signs.get(signLocation);
-        if(sign == null) return;
-
-        if(event.getCurrentItem() == null) return;
-
-        String gameGroupName = InventoryUtils.getItemName(event.getCurrentItem());
-        if(gameGroupName == null) return;
-
-        String type = sign.getGameGroupType();
-
-        player.sendMessage("Sending you to gamegroup: " + gameGroupName);
-
-        requestProtocol.sendJoinGameGroupPacket(player.getUniqueId(), type, gameGroupName);
-
-        event.setCancelled(true);
-
-        player.closeInventory();
-    }
-
-    @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event) {
-        openSpectatorInventories.remove(event.getPlayer().getUniqueId());
-    }
-
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
         if(signs.remove(event.getBlock().getLocation()) != null) saveConfig();
@@ -170,16 +138,6 @@ public class Hub implements Listener {
         }
     }
 
-    @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        if(!event.hasBlock()  || event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-
-        HubSign sign = signs.get(event.getClickedBlock().getLocation());
-        if(sign == null) return;
-
-        sign.onRightClick(this, event.getPlayer());
-    }
-
     public ClientMinigamesRequestProtocol getRequestProtocol() {
         return requestProtocol;
     }
@@ -195,58 +153,4 @@ public class Hub implements Listener {
         event.setCancelled(true);
     }
 
-    @EventHandler
-    public void onSignChange(SignChangeEvent event) {
-        if(!event.getLine(0).equalsIgnoreCase("[MG_SIGN]")) return;
-
-        HubSign sign = new HubSign(event);
-
-        signs.put(sign.getLocation(), sign);
-
-        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-            sign.update(requestProtocol.getControllerInfo());
-        });
-
-        saveConfig();
-    }
-
-    @EventHandler
-    public void onGameGroupSpawned(GameGroupSpawnedEvent event) {
-        System.out.println("GameGroup spawned: " + event.getGameGroup().getName());
-
-        updateSigns();
-    }
-
-    private void updateSigns() {
-        for(HubSign sign : signs.values()) {
-            sign.update(requestProtocol.getControllerInfo());
-        }
-
-        for(Map.Entry<UUID, Location> entry : openSpectatorInventories.entrySet()) {
-            HubSign sign = signs.get(entry.getValue());
-            if(sign == null) continue;
-
-            Player player = plugin.getServer().getPlayer(entry.getKey());
-            if(player == null) continue;
-
-            Inventory inventory = player.getOpenInventory().getTopInventory();
-            if(inventory == null) continue;
-
-            sign.updateSpectatorInventory(this, inventory);
-        }
-    }
-
-    @EventHandler
-    public void onGameGroupUpdate(GameGroupUpdateEvent event) {
-        System.out.println("GameGroup update: " + event.getGameGroup().getName());
-
-        updateSigns();
-    }
-
-    @EventHandler
-    public void onGameGroupKilled(GameGroupKilledEvent event) {
-        System.out.println("GameGroup killed: " + event.getGameGroup().getName());
-
-        updateSigns();
-    }
 }

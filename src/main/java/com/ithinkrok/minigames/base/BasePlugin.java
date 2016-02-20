@@ -40,6 +40,10 @@ public class BasePlugin extends SpecificPlugin {
     public void onEnable() {
         Config config = new BukkitConfig(getConfig());
 
+        requestProtocol = new ClientMinigamesRequestProtocol(this);
+
+        MSMClient.addProtocol("MinigamesRequest", requestProtocol);
+
         if(config.getBoolean("modules.game", true)) {
             loadGameModule(config);
         }
@@ -52,10 +56,6 @@ public class BasePlugin extends SpecificPlugin {
     }
 
     private void loadHubModule() {
-        requestProtocol = new ClientMinigamesRequestProtocol(this);
-
-        MSMClient.addProtocol("MinigamesRequest", requestProtocol);
-
         hub = new Hub(this, requestProtocol);
 
         hub.registerListeners();
