@@ -11,6 +11,7 @@ import com.ithinkrok.minigames.api.event.user.world.UserBreakBlockEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserEditSignEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserInteractWorldEvent;
+import com.ithinkrok.minigames.api.map.GameMap;
 import com.ithinkrok.minigames.api.protocol.ClientMinigamesRequestProtocol;
 import com.ithinkrok.minigames.api.protocol.data.ControllerInfo;
 import com.ithinkrok.minigames.api.user.User;
@@ -20,7 +21,6 @@ import com.ithinkrok.util.config.MemoryConfig;
 import com.ithinkrok.util.config.YamlConfigIO;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 import java.io.IOException;
@@ -42,17 +42,33 @@ public class HubListener implements CustomListener {
 
     private Path configPath;
 
+    private Config signsConfig;
+
+    private GameMap map;
+
     @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent<GameGroup, ?> event) {
         this.gameGroup = event.getCreator();
         this.requestProtocol = BasePlugin.getRequestProtocol();
 
-        configPath = Paths.get(event.getConfigOrEmpty().getString("signs_config_path"));
+        Config config = event.getConfigOrEmpty();
+
+        if(config.contains("signs_config_path")) {
+            configPath = Paths.get(config.getString("signs_config_path"));
+        } else if(config.contains("signs")) {
+            signsConfig = config.getConfigOrNull("signs");
+        }
 
         requestProtocol.enableGameGroupInfo();
+
+        if(event.getRepresenting() instanceof GameMap) {
+            this.map = (GameMap) event.getRepresenting();
+        }
     }
 
     public void saveConfig() {
+        if(configPath == null) return;
+
         try {
             YamlConfigIO.saveConfig(configPath, toConfig());
         } catch (IOException e) {
@@ -61,13 +77,19 @@ public class HubListener implements CustomListener {
         }
     }
 
-    public void loadConfig() {
-        try {
-            Config config = YamlConfigIO.loadToConfig(configPath, new MemoryConfig());
-            fromConfig(config);
-        } catch (IOException e) {
-            System.out.println("Error while loading signs.yml");
-            e.printStackTrace();
+    public void loadConfig(GameMap map) {
+        if(configPath != null) {
+            try {
+                Config config = YamlConfigIO.loadToConfig(configPath, new MemoryConfig());
+                fromConfig(config, map);
+            } catch (IOException e) {
+                System.out.println("Error while loading signs.yml");
+                e.printStackTrace();
+            }
+        }
+
+        if(signsConfig != null) {
+            fromConfig(signsConfig, map);
         }
     }
 
@@ -78,7 +100,12 @@ public class HubListener implements CustomListener {
 
     @CustomEventHandler
     public void onMapChange(MapChangedEvent event) {
-        loadConfig();
+        if(this.map != null && this.map != event.getNewMap()){
+            this.signs.clear();
+            return;
+        }
+
+        loadConfig(event.getNewMap());
     }
 
     public Config toConfig() {
@@ -94,14 +121,16 @@ public class HubListener implements CustomListener {
         return result;
     }
 
-    public void fromConfig(Config config) {
+    public void fromConfig(Config config, GameMap map) {
         List<Config> signConfigs = config.getConfigList("signs");
 
         for(Config signConfig : signConfigs) {
-            String worldName = signConfig.getString("world");
-            if(Bukkit.getServer().getWorld(worldName) == null) continue;
+            String mapName = signConfig.getString("world");
+            if(mapName != null && !mapName.equals(map.getInfo().getName())) {
+                continue;
+            }
 
-            HubSign sign = new HubSign(Bukkit.getServer(), signConfig);
+            HubSign sign = new HubSign(map, signConfig);
 
             signs.put(sign.getLocation(), sign);
         }

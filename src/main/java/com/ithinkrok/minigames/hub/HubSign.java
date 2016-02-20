@@ -4,6 +4,7 @@ import com.ithinkrok.minigames.api.event.user.world.UserEditSignEvent;
 import com.ithinkrok.minigames.api.inventory.ClickableInventory;
 import com.ithinkrok.minigames.api.inventory.ClickableItem;
 import com.ithinkrok.minigames.api.inventory.event.UserClickItemEvent;
+import com.ithinkrok.minigames.api.map.GameMap;
 import com.ithinkrok.minigames.api.protocol.data.ControllerInfo;
 import com.ithinkrok.minigames.api.protocol.data.GameGroupInfo;
 import com.ithinkrok.minigames.api.user.User;
@@ -32,30 +33,29 @@ public class HubSign {
     private final Location location;
 
     private final String gameGroupType;
+    private final GameMap map;
 
     private boolean spectatorSign = false;
 
     public HubSign(UserEditSignEvent event) {
         location = event.getBlock().getLocation();
+        map = event.getUserGameGroup().getCurrentMap();
 
         gameGroupType = event.getLine(1);
 
         spectatorSign = event.getLine(2).equalsIgnoreCase("spectators");
     }
 
-    public HubSign(Server server, Config config) {
+    public HubSign(GameMap map, Config config) {
+        this.map = map;
         gameGroupType = config.getString("type");
         spectatorSign = config.getBoolean("spectators");
 
         int x = config.getInt("x");
         int y = config.getInt("y");
         int z = config.getInt("z");
-        String worldName = config.getString("world");
 
-        World world = server.getWorld(worldName);
-        if (world == null) throw new RuntimeException("Unknown world " + worldName);
-
-        location = new Location(world, x, y, z);
+        location = new Location(map.getWorld(), x, y, z);
     }
 
     public boolean update(ControllerInfo controller) {
@@ -221,7 +221,7 @@ public class HubSign {
         config.set("x", location.getBlockX());
         config.set("y", location.getBlockY());
         config.set("z", location.getBlockZ());
-        config.set("world", location.getWorld().getName());
+        config.set("world", map.getInfo().getName());
 
         return config;
     }
