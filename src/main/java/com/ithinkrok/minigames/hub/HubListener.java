@@ -4,6 +4,7 @@ import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.api.event.controller.ControllerGameGroupEvent;
 import com.ithinkrok.minigames.api.event.game.MapChangedEvent;
+import com.ithinkrok.minigames.api.event.map.MapBlockBreakNaturallyEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserJoinEvent;
 import com.ithinkrok.minigames.api.event.user.inventory.UserInventoryCloseEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserBreakBlockEvent;
@@ -14,7 +15,6 @@ import com.ithinkrok.minigames.api.protocol.ClientMinigamesRequestProtocol;
 import com.ithinkrok.minigames.api.protocol.data.ControllerInfo;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.base.BasePlugin;
-import com.ithinkrok.minigames.base.hub.HubSign;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;
 import com.ithinkrok.util.config.YamlConfigIO;
@@ -22,7 +22,6 @@ import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -159,6 +158,11 @@ public class HubListener implements CustomListener {
         for(UUID key : removeKeys) {
             openSpectatorInventories.remove(key);
         }
+    }
+
+    @CustomEventHandler
+    public void onMapBlockBreak(MapBlockBreakNaturallyEvent event) {
+        signs.remove(event.getBlock().getLocation());
     }
 
     @CustomEventHandler

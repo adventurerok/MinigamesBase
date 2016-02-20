@@ -1,4 +1,4 @@
-package com.ithinkrok.minigames.base.hub;
+package com.ithinkrok.minigames.hub;
 
 import com.ithinkrok.minigames.api.event.user.world.UserEditSignEvent;
 import com.ithinkrok.minigames.api.inventory.ClickableInventory;
@@ -34,14 +34,6 @@ public class HubSign {
     private final String gameGroupType;
 
     private boolean spectatorSign = false;
-
-    public HubSign(SignChangeEvent event) {
-        location = event.getBlock().getLocation();
-
-        gameGroupType = event.getLine(1);
-
-        spectatorSign = event.getLine(2).equalsIgnoreCase("spectators");
-    }
 
     public HubSign(UserEditSignEvent event) {
         location = event.getBlock().getLocation();
