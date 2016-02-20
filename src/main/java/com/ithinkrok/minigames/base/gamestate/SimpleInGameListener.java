@@ -1,8 +1,8 @@
 package com.ithinkrok.minigames.base.gamestate;
 
-import com.ithinkrok.minigames.base.GameGroup;
+import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.base.GameState;
-import com.ithinkrok.minigames.base.User;
+import com.ithinkrok.minigames.api.User;
 import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.base.event.user.game.UserJoinEvent;
 import com.ithinkrok.minigames.base.util.ItemGiver;

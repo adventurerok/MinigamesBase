@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.base.user.scoreboard;
 
-import com.ithinkrok.minigames.base.User;
+import com.ithinkrok.minigames.api.User;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;

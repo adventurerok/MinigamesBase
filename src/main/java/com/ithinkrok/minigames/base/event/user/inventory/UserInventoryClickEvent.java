@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.base.event.user.inventory;
 
-import com.ithinkrok.minigames.base.User;
+import com.ithinkrok.minigames.api.User;
 import com.ithinkrok.util.event.Cancellable;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;

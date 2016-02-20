@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.base.event.user.world;
 
-import com.ithinkrok.minigames.base.User;
+import com.ithinkrok.minigames.api.User;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;

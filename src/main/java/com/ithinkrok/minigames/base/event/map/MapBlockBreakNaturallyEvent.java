@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.base.event.map;
 
-import com.ithinkrok.minigames.base.GameGroup;
+import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.base.map.GameMap;
 import org.bukkit.block.Block;
 import org.bukkit.event.block.BlockExpEvent;

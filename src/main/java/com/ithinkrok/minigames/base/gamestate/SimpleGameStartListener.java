@@ -1,13 +1,13 @@
 package com.ithinkrok.minigames.base.gamestate;
 
-import com.ithinkrok.minigames.base.GameGroup;
+import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.base.GameState;
 import com.ithinkrok.minigames.base.Kit;
-import com.ithinkrok.minigames.base.User;
+import com.ithinkrok.minigames.api.User;
 import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.base.event.game.GameStateChangedEvent;
 import com.ithinkrok.minigames.base.metadata.MapVote;
-import com.ithinkrok.minigames.base.team.Team;
+import com.ithinkrok.minigames.api.Team;
 import com.ithinkrok.minigames.base.util.ItemGiver;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;

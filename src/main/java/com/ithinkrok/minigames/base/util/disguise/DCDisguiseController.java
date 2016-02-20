@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.base.util.disguise;
 
-import com.ithinkrok.minigames.base.User;
+import com.ithinkrok.minigames.api.User;
 import org.bukkit.entity.EntityType;
 import pgDev.bukkit.DisguiseCraft.DisguiseCraft;
 import pgDev.bukkit.DisguiseCraft.api.DisguiseCraftAPI;

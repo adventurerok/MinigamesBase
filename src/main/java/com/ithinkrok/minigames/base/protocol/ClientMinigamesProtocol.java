@@ -1,7 +1,7 @@
 package com.ithinkrok.minigames.base.protocol;
 
-import com.ithinkrok.minigames.base.Game;
-import com.ithinkrok.minigames.base.GameGroup;
+import com.ithinkrok.minigames.api.Game;
+import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.msm.client.Client;
 import com.ithinkrok.msm.client.ClientListener;
 import com.ithinkrok.msm.common.Channel;
@@ -95,7 +95,7 @@ public class ClientMinigamesProtocol implements ClientListener {
 
         payload.set("primary", primary);
 
-        Collection<GameGroup> gameGroups = game.getGameGroups();
+        Collection<? extends GameGroup> gameGroups = game.getGameGroups();
         List<Config> gameGroupConfigs = new ArrayList<>();
 
         for(GameGroup gameGroup : gameGroups) {

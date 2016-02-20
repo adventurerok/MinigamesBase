@@ -2,10 +2,12 @@ package com.ithinkrok.minigames.base;
 
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.MutableClassToInstanceMap;
+import com.ithinkrok.minigames.api.Game;
+import com.ithinkrok.minigames.api.GameGroup;
+import com.ithinkrok.minigames.api.User;
 import com.ithinkrok.minigames.base.command.CommandConfig;
 import com.ithinkrok.minigames.base.command.MinigamesCommand;
 import com.ithinkrok.minigames.base.database.DatabaseTask;
-import com.ithinkrok.minigames.base.database.DatabaseTaskRunner;
 import com.ithinkrok.minigames.base.event.MinigamesCommandEvent;
 import com.ithinkrok.minigames.base.event.MinigamesEvent;
 import com.ithinkrok.minigames.base.event.game.CountdownFinishedEvent;
@@ -23,21 +25,15 @@ import com.ithinkrok.minigames.base.item.IdentifierMap;
 import com.ithinkrok.minigames.base.map.GameMap;
 import com.ithinkrok.minigames.base.map.GameMapInfo;
 import com.ithinkrok.minigames.base.metadata.Metadata;
-import com.ithinkrok.minigames.base.metadata.MetadataHolder;
 import com.ithinkrok.minigames.base.schematic.Schematic;
-import com.ithinkrok.minigames.base.schematic.SchematicResolver;
 import com.ithinkrok.minigames.base.task.GameRunnable;
 import com.ithinkrok.minigames.base.task.GameTask;
 import com.ithinkrok.minigames.base.task.TaskList;
-import com.ithinkrok.minigames.base.task.TaskScheduler;
-import com.ithinkrok.minigames.base.team.Team;
+import com.ithinkrok.minigames.api.Team;
 import com.ithinkrok.minigames.base.team.TeamIdentifier;
-import com.ithinkrok.minigames.base.team.TeamUserResolver;
 import com.ithinkrok.minigames.base.util.CountdownConfig;
 import com.ithinkrok.minigames.base.util.JSONBook;
-import com.ithinkrok.minigames.base.util.io.ConfigHolder;
 import com.ithinkrok.minigames.base.util.io.ConfigParser;
-import com.ithinkrok.minigames.base.util.io.FileLoader;
 import com.ithinkrok.msm.common.util.ConfigUtils;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;
@@ -46,7 +42,6 @@ import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
 import com.ithinkrok.util.lang.LangFile;
 import com.ithinkrok.util.lang.LanguageLookup;
-import com.ithinkrok.util.lang.Messagable;
 import com.ithinkrok.util.lang.MultipleLanguageLookup;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -61,16 +56,15 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * Created by paul on 31/12/15.
  */
-public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, FileLoader, SharedObjectAccessor,
-        MetadataHolder<Metadata>, SchematicResolver, TeamUserResolver, DatabaseTaskRunner, ConfigHolder {
+public class BaseGameGroup implements GameGroup {
 
     private final String name;
     private final String type;
 
-    private final ConcurrentMap<UUID, User> usersInGroup = new ConcurrentHashMap<>();
+    private final ConcurrentMap<UUID, BaseUser> usersInGroup = new ConcurrentHashMap<>();
 
-    private final Map<TeamIdentifier, Team> teamsInGroup = new HashMap<>();
-    private final Game game;
+    private final Map<TeamIdentifier, BaseTeam> teamsInGroup = new HashMap<>();
+    private final BaseGame game;
     private final TaskList gameGroupTaskList = new TaskList();
     private final TaskList gameStateTaskList = new TaskList();
     private final CustomListener gameGroupListener;
@@ -99,7 +93,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     private final int maxPlayers;
     private String motd = "default motd";
 
-    public GameGroup(Game game, String name, String type, String configFile) {
+    public BaseGameGroup(BaseGame game, String name, String type, String configFile) {
         this.game = game;
         this.name = name;
         this.type = type;
@@ -124,15 +118,15 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         if (startMap != null) changeMap(startMap);
     }
 
-    public int getMaxPlayers() {
+    @Override public int getMaxPlayers() {
         return maxPlayers;
     }
 
-    public String getMotd() {
+    @Override public String getMotd() {
         return motd;
     }
 
-    public void setMotd(String motd) {
+    @Override public void setMotd(String motd) {
         if(motd.equals(this.motd)) return;
 
         this.motd = motd;
@@ -155,7 +149,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         return result;
     }
 
-    public String getType() {
+    @Override public String getType() {
         return type;
     }
 
@@ -165,35 +159,35 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
      *
      * @param acceptingPlayers The accepting players boolean
      */
-    public void setAcceptingPlayers(boolean acceptingPlayers) {
+    @Override public void setAcceptingPlayers(boolean acceptingPlayers) {
         this.acceptingPlayers = acceptingPlayers;
 
         game.getProtocol().sendGameGroupUpdatePayload(this);
     }
 
-    public boolean isAcceptingPlayers() {
+    @Override public boolean isAcceptingPlayers() {
         return acceptingPlayers;
     }
 
-    public void changeGameState(String gameStateName) {
+    @Override public void changeGameState(String gameStateName) {
         GameState gameState = gameStates.get(gameStateName);
         if (gameState == null) throw new IllegalArgumentException("Unknown game state name: " + gameStateName);
 
         changeGameState(gameState);
     }
 
-    public void changeMap(String mapName) {
+    @Override public void changeMap(String mapName) {
         GameMapInfo mapInfo = gameMapInfoMap.get(mapName);
         Validate.notNull(mapInfo, "The map " + mapName + " does not exist");
 
         changeMap(mapInfo);
     }
 
-    public GameMapInfo getMap(String mapName) {
+    @Override public GameMapInfo getMap(String mapName) {
         return gameMapInfoMap.get(mapName);
     }
 
-    @SuppressWarnings("unchecked")
+    @Override@SuppressWarnings("unchecked")
     public void changeGameState(GameState gameState) {
         if (gameState.equals(this.gameState)) return;
         stopCountdown();
@@ -212,7 +206,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
                 .executeEvent(event, getListeners(getAllUserListeners(), getAllTeamListeners(), oldListeners));
     }
 
-    public void changeMap(GameMapInfo mapInfo) {
+    @Override public void changeMap(GameMapInfo mapInfo) {
         GameMap oldMap = currentMap;
         GameMap newMap = new GameMap(this, mapInfo);
 
@@ -232,7 +226,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         if (oldMap != null) oldMap.unloadMap();
     }
 
-    public void stopCountdown() {
+    @Override public void stopCountdown() {
         if (countdown == null) return;
         countdown.cancel();
 
@@ -255,7 +249,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     private Collection<CustomListener> getAllUserListeners() {
         ArrayList<CustomListener> result = new ArrayList<>(usersInGroup.size());
 
-        for (User user : usersInGroup.values()) {
+        for (BaseUser user : usersInGroup.values()) {
             result.addAll(user.getListeners());
         }
 
@@ -272,11 +266,11 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         return result;
     }
 
-    public Collection<User> getUsers() {
+    @Override public Collection<BaseUser> getUsers() {
         return usersInGroup.values();
     }
 
-    public Config toConfig() {
+    @Override public Config toConfig() {
         Config config = new MemoryConfig();
 
         config.set("name", name);
@@ -301,11 +295,11 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         return config;
     }
 
-    public String getName() {
+    @Override public String getName() {
         return name;
     }
 
-    public void prepareStart() {
+    @Override public void prepareStart() {
         createDefaultAndMapListeners();
     }
 
@@ -314,7 +308,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         game.doDatabaseTask(databaseTask);
     }
 
-    public GameMap getCurrentMap() {
+    @Override public GameMap getCurrentMap() {
         return currentMap;
     }
 
@@ -356,7 +350,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         return teamIdentifiers.get(name);
     }
 
-    public Countdown getCountdown() {
+    @Override public Countdown getCountdown() {
         return countdown;
     }
 
@@ -365,7 +359,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         return usersInGroup.get(uuid);
     }
 
-    public void userEvent(UserEvent event) {
+    @Override public void userEvent(UserEvent event) {
         if (event.getUser().getTeam() != null) {
             CustomEventExecutor.executeEvent(event,
                     getListeners(event.getUser().getListeners(), event.getUser().getTeam().getListeners()));
@@ -374,7 +368,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         }
     }
 
-    public void teamEvent(TeamEvent event) {
+    @Override public void teamEvent(TeamEvent event) {
         CustomEventExecutor
                 .executeEvent(event, event.getTeam().getListeners(), getAllUsersInTeamListeners(event.getTeam()));
     }
@@ -409,28 +403,28 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         return game.getAssetDirectory();
     }
 
-    public GameState getCurrentGameState() {
+    @Override public GameState getCurrentGameState() {
         return gameState;
     }
 
-    public void startCountdown(CountdownConfig countdownConfig) {
+    @Override public void startCountdown(CountdownConfig countdownConfig) {
         startCountdown(countdownConfig.getName(), countdownConfig.getLocaleStub(), countdownConfig.getSeconds());
     }
 
-    public void startCountdown(String name, String localeStub, int seconds) {
+    @Override public void startCountdown(String name, String localeStub, int seconds) {
         if (countdown != null) countdown.cancel();
 
         countdown = new Countdown(name, localeStub, seconds);
         countdown.start(this);
     }
 
-    public CustomItem getCustomItem(String name) {
+    @Override public CustomItem getCustomItem(String name) {
         CustomItem item = null;
         if (currentMap != null) item = currentMap.getCustomItem(name);
         return item != null ? item : customItemIdentifierMap.get(name);
     }
 
-    public CustomItem getCustomItem(int identifier) {
+    @Override public CustomItem getCustomItem(int identifier) {
         CustomItem item = null;
         if (currentMap != null) item = currentMap.getCustomItem(identifier);
         return item != null ? item : customItemIdentifierMap.get(identifier);
@@ -443,19 +437,19 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         return schem != null ? schem : schematicMap.get(name);
     }
 
-    public void gameEvent(GameEvent event) {
+    @Override public void gameEvent(GameEvent event) {
         CustomEventExecutor.executeEvent(event, getListeners(getAllUserListeners(), getAllTeamListeners()));
     }
 
-    public void unload() {
+    @Override public void unload() {
         currentMap.unloadMap();
     }
 
-    public void bindTaskToCurrentGameState(GameTask task) {
+    @Override public void bindTaskToCurrentGameState(GameTask task) {
         gameStateTaskList.addTask(task);
     }
 
-    public void bindTaskToCurrentMap(GameTask task) {
+    @Override public void bindTaskToCurrentMap(GameTask task) {
         if (currentMap == null) throw new RuntimeException("No GameMap to bind task to");
         currentMap.bindTaskToMap(task);
     }
@@ -477,23 +471,23 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         return (currentMap != null && currentMap.hasLocale(name) || languageLookup.hasLocale(name));
     }
 
-    public Game getGame() {
+    @Override public Game getGame() {
         return game;
     }
 
-    public boolean hasActiveCountdown() {
+    @Override public boolean hasActiveCountdown() {
         return countdown != null;
     }
 
-    public boolean hasActiveCountdown(String name) {
+    @Override public boolean hasActiveCountdown(String name) {
         return countdown != null && countdown.getName().equals(name);
     }
 
-    public int getUserCount() {
+    @Override public int getUserCount() {
         return getUsers().size();
     }
 
-    public Kit getKit(String name) {
+    @Override public Kit getKit(String name) {
         return kits.get(name);
     }
 
@@ -517,11 +511,11 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         return metadataMap.containsKey(clazz);
     }
 
-    public GameState getGameState(String gameStateName) {
+    @Override public GameState getGameState(String gameStateName) {
         return gameStates.get(gameStateName);
     }
 
-    public Collection<TeamIdentifier> getTeamIdentifiers() {
+    @Override public Collection<TeamIdentifier> getTeamIdentifiers() {
         return teamIdentifiers.values();
     }
 
@@ -562,8 +556,8 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         teamsInGroup.put(teamIdentifier, createTeam(teamIdentifier));
     }
 
-    private Team createTeam(TeamIdentifier teamIdentifier) {
-        return new Team(teamIdentifier, this);
+    private BaseTeam createTeam(TeamIdentifier teamIdentifier) {
+        return new BaseTeam(teamIdentifier, this);
     }
 
     @Override
@@ -576,7 +570,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         kits.put(kit.getName(), kit);
     }
 
-    public JSONBook getBook(String name) {
+    @Override public JSONBook getBook(String name) {
         if(currentMap == null) return bookMap.get(name);
         JSONBook book = currentMap.getBook(name);
 
@@ -603,7 +597,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         bookMap.put(book.getName(), book);
     }
 
-    public void kill() {
+    @Override public void kill() {
         List<User> users = new ArrayList<>(getUsers());
 
         List<Player> players = new ArrayList<>();
@@ -671,11 +665,11 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         gameGroupTaskList.cancelAllTasks();
     }
 
-    public CommandConfig getCommand(String name) {
+    @Override public CommandConfig getCommand(String name) {
         return name != null ? commandAliasesMap.get(name.toLowerCase()) : null;
     }
 
-    public Map<String, CommandConfig> getCommands() {
+    @Override public Map<String, CommandConfig> getCommands() {
         return commandMap;
     }
 
@@ -684,12 +678,15 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
         @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
         public void eventUserJoin(UserJoinEvent event) {
             if (event.getReason() != UserJoinEvent.JoinReason.JOINED_SERVER) return;
+            if(!(event.getUser() instanceof BaseUser)) {
+                throw new UnsupportedOperationException("Only supports BaseUser");
+            }
 
-            usersInGroup.put(event.getUser().getUuid(), event.getUser());
+            usersInGroup.put(event.getUser().getUuid(), (BaseUser) event.getUser());
 
             currentMap.teleportUser(event.getUser());
 
-            game.getProtocol().sendGameGroupUpdatePayload(GameGroup.this);
+            game.getProtocol().sendGameGroupUpdatePayload(BaseGameGroup.this);
         }
 
         @CustomEventHandler(priority = CustomEventHandler.INTERNAL_LAST)
@@ -703,7 +700,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
 
                 //GameGroup only referenced by its users. If there are none left we must unload.
                 if (usersInGroup.isEmpty()) kill();
-                else game.getProtocol().sendGameGroupUpdatePayload(GameGroup.this);
+                else game.getProtocol().sendGameGroupUpdatePayload(BaseGameGroup.this);
             }
         }
 
@@ -806,7 +803,7 @@ public class GameGroup implements LanguageLookup, Messagable, TaskScheduler, Fil
     }
 
 
-    public String getChatPrefix() {
+    @Override public String getChatPrefix() {
         return chatPrefix;
     }
 

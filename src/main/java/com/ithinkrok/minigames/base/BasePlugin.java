@@ -1,5 +1,6 @@
 package com.ithinkrok.minigames.base;
 
+import com.ithinkrok.minigames.api.Game;
 import com.ithinkrok.minigames.base.database.BooleanUserValue;
 import com.ithinkrok.minigames.base.database.DoubleUserValue;
 import com.ithinkrok.minigames.base.database.IntUserValue;
@@ -54,7 +55,7 @@ public class BasePlugin extends JavaPlugin {
     }
 
     private void loadGameModule(Config config) {
-        game = new Game(this, config);
+        game = new BaseGame(this, config);
 
         game.registerListeners();
     }

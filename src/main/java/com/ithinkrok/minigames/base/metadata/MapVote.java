@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.base.metadata;
 
-import com.ithinkrok.minigames.base.User;
+import com.ithinkrok.minigames.api.User;
 import com.ithinkrok.minigames.base.event.game.GameStateChangedEvent;
 import com.ithinkrok.minigames.base.event.game.MapChangedEvent;
 import com.ithinkrok.minigames.base.event.user.game.UserInGameChangeEvent;
@@ -52,7 +52,7 @@ public class MapVote extends UserMetadata {
         return true;
     }
 
-    public static String getWinningVote(Collection<User> users) {
+    public static String getWinningVote(Collection<? extends User> users) {
         Map<String, Integer> votes = new HashMap<>();
 
         for(User user : users) {
@@ -81,7 +81,7 @@ public class MapVote extends UserMetadata {
         else return winningMaps.get(random.nextInt(winningMaps.size()));
     }
 
-    public static int getVotesForMap(Collection<User> users, String map) {
+    public static int getVotesForMap(Collection<? extends User> users, String map) {
         int count = 0;
 
         for(User user : users) {

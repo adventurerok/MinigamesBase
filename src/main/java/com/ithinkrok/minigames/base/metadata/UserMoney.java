@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.base.metadata;
 
-import com.ithinkrok.minigames.base.User;
+import com.ithinkrok.minigames.api.User;
 import com.ithinkrok.util.config.Config;
 
 /**

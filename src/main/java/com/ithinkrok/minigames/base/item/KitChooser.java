@@ -1,23 +1,18 @@
 package com.ithinkrok.minigames.base.item;
 
 import com.ithinkrok.minigames.base.Kit;
-import com.ithinkrok.minigames.base.User;
+import com.ithinkrok.minigames.api.User;
 import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.base.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.base.inventory.ClickableInventory;
 import com.ithinkrok.minigames.base.inventory.ClickableItem;
 import com.ithinkrok.minigames.base.inventory.event.UserClickItemEvent;
-import com.ithinkrok.minigames.base.util.InventoryUtils;
-import com.ithinkrok.minigames.base.util.MinigamesConfigs;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by paul on 11/01/16.

@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.base.user;
 
-import com.ithinkrok.minigames.base.User;
+import com.ithinkrok.minigames.api.User;
 import com.ithinkrok.minigames.base.event.user.game.UserAbilityCooldownEvent;
 import com.ithinkrok.minigames.base.task.GameTask;
 import com.ithinkrok.minigames.base.task.TaskList;

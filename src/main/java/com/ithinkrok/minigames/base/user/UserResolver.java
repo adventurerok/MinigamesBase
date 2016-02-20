@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.base.user;
 
-import com.ithinkrok.minigames.base.User;
+import com.ithinkrok.minigames.api.User;
 
 import java.util.UUID;
 

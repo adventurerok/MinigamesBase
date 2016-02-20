@@ -1,5 +1,7 @@
 package com.ithinkrok.minigames.base.map;
 
+import com.ithinkrok.minigames.api.GameGroup;
+import com.ithinkrok.minigames.api.User;
 import com.ithinkrok.minigames.base.*;
 import com.ithinkrok.minigames.base.command.CommandConfig;
 import com.ithinkrok.minigames.base.item.CustomItem;

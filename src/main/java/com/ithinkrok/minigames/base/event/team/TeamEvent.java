@@ -1,7 +1,7 @@
 package com.ithinkrok.minigames.base.event.team;
 
 import com.ithinkrok.minigames.base.event.MinigamesEvent;
-import com.ithinkrok.minigames.base.team.Team;
+import com.ithinkrok.minigames.api.Team;
 
 /**
  * Created by paul on 08/01/16.

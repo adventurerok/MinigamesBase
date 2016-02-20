@@ -1,5 +1,7 @@
 package com.ithinkrok.minigames.base.team;
 
+import com.ithinkrok.minigames.api.Team;
+
 /**
  * Created by paul on 16/01/16.
  */

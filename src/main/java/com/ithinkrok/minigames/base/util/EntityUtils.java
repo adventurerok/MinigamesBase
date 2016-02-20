@@ -1,7 +1,7 @@
 package com.ithinkrok.minigames.base.util;
 
-import com.ithinkrok.minigames.base.User;
-import com.ithinkrok.minigames.base.team.Team;
+import com.ithinkrok.minigames.api.User;
+import com.ithinkrok.minigames.api.Team;
 import com.ithinkrok.minigames.base.team.TeamUserResolver;
 import com.ithinkrok.minigames.base.user.UserResolver;
 import org.bukkit.Sound;

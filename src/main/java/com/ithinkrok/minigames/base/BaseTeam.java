@@ -1,25 +1,21 @@
-package com.ithinkrok.minigames.base.team;
+package com.ithinkrok.minigames.base;
 
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.MutableClassToInstanceMap;
-import com.ithinkrok.minigames.base.GameGroup;
-import com.ithinkrok.minigames.base.Nameable;
-import com.ithinkrok.minigames.base.SharedObjectAccessor;
-import com.ithinkrok.minigames.base.User;
+import com.ithinkrok.minigames.api.GameGroup;
+import com.ithinkrok.minigames.api.Team;
+import com.ithinkrok.minigames.api.User;
 import com.ithinkrok.minigames.base.event.game.GameStateChangedEvent;
 import com.ithinkrok.minigames.base.event.game.MapChangedEvent;
 import com.ithinkrok.minigames.base.metadata.Metadata;
-import com.ithinkrok.minigames.base.metadata.MetadataHolder;
 import com.ithinkrok.minigames.base.task.GameRunnable;
 import com.ithinkrok.minigames.base.task.GameTask;
 import com.ithinkrok.minigames.base.task.TaskList;
-import com.ithinkrok.minigames.base.task.TaskScheduler;
-import com.ithinkrok.minigames.base.user.UserResolver;
+import com.ithinkrok.minigames.base.team.TeamIdentifier;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
 import com.ithinkrok.util.lang.LanguageLookup;
-import com.ithinkrok.util.lang.Messagable;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
@@ -36,12 +32,11 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * Created by paul on 31/12/15.
  */
-public class Team implements Listener, Messagable, LanguageLookup, SharedObjectAccessor, TaskScheduler, UserResolver,
-        MetadataHolder<Metadata>, Nameable {
+public class BaseTeam implements Listener, Team {
 
     private final TeamIdentifier teamIdentifier;
-    private final ConcurrentMap<UUID, User> usersInTeam = new ConcurrentHashMap<>();
-    private final GameGroup gameGroup;
+    private final ConcurrentMap<UUID, BaseUser> usersInTeam = new ConcurrentHashMap<>();
+    private final BaseGameGroup gameGroup;
 
     private final ClassToInstanceMap<Metadata> metadataMap = MutableClassToInstanceMap.create();
 
@@ -49,34 +44,34 @@ public class Team implements Listener, Messagable, LanguageLookup, SharedObjectA
 
     private final Collection<CustomListener> listeners = new ArrayList<>();
 
-    public Team(TeamIdentifier teamIdentifier, GameGroup gameGroup) {
+    public BaseTeam(TeamIdentifier teamIdentifier, BaseGameGroup gameGroup) {
         this.teamIdentifier = teamIdentifier;
         this.gameGroup = gameGroup;
 
         listeners.add(new TeamListener());
     }
 
-    public void makeEntityRepresentTeam(Entity entity) {
+    @Override public void makeEntityRepresentTeam(Entity entity) {
         gameGroup.getGame().makeEntityRepresentTeam(this, entity);
     }
 
-    public Collection<CustomListener> getListeners() {
+    @Override public Collection<CustomListener> getListeners() {
         return listeners;
     }
 
-    public GameGroup getGameGroup() {
+    @Override public GameGroup getGameGroup() {
         return gameGroup;
     }
 
-    public int getUserCount() {
+    @Override public int getUserCount() {
         return getUsers().size();
     }
 
-    public Collection<User> getUsers() {
+    @Override public Collection<BaseUser> getUsers() {
         return usersInTeam.values();
     }
 
-    public TeamIdentifier getTeamIdentifier() {
+    @Override public TeamIdentifier getTeamIdentifier() {
         return teamIdentifier;
     }
 
@@ -90,15 +85,15 @@ public class Team implements Listener, Messagable, LanguageLookup, SharedObjectA
         return teamIdentifier.getFormattedName();
     }
 
-    public ChatColor getChatColor() {
+    @Override public ChatColor getChatColor() {
         return teamIdentifier.getChatColor();
     }
 
-    public Color getArmorColor() {
+    @Override public Color getArmorColor() {
         return teamIdentifier.getArmorColor();
     }
 
-    public DyeColor getDyeColor() {
+    @Override public DyeColor getDyeColor() {
         return teamIdentifier.getDyeColor();
     }
 
@@ -117,15 +112,19 @@ public class Team implements Listener, Messagable, LanguageLookup, SharedObjectA
         return gameGroup.hasLocale(name);
     }
 
-    public void addUser(User user) {
-        usersInTeam.put(user.getUuid(), user);
+    @Override public void addUser(User user) {
+        if(!(user instanceof BaseUser)) {
+            throw new UnsupportedOperationException("Only supports BaseUser");
+        }
+
+        usersInTeam.put(user.getUuid(), (BaseUser) user);
     }
 
-    public void removeUser(User user) {
+    @Override public void removeUser(User user) {
         usersInTeam.remove(user.getUuid());
     }
 
-    public boolean hasPlayerOfKit(String kitName) {
+    @Override public boolean hasPlayerOfKit(String kitName) {
         for(User user : getUsers()) {
             if(kitName.equals(user.getKitName())) return true;
         }
@@ -203,11 +202,11 @@ public class Team implements Listener, Messagable, LanguageLookup, SharedObjectA
         return usersInTeam.get(uuid);
     }
 
-    public void updateUserScoreboards() {
+    @Override public void updateUserScoreboards() {
         getUsers().forEach(User::updateScoreboard);
     }
 
-    public void removeFromGameGroup() {
+    @Override public void removeFromGameGroup() {
         for(Metadata metadata : metadataMap.values()) {
             metadata.removed();
         }

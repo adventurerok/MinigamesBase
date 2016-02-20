@@ -1,5 +1,6 @@
 package com.ithinkrok.minigames.base;
 
+import com.ithinkrok.minigames.api.Game;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.InvalidConfigException;
 import com.ithinkrok.util.config.MemoryConfig;

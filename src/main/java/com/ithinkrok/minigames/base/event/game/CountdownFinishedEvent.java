@@ -1,7 +1,7 @@
 package com.ithinkrok.minigames.base.event.game;
 
 import com.ithinkrok.minigames.base.Countdown;
-import com.ithinkrok.minigames.base.GameGroup;
+import com.ithinkrok.minigames.api.GameGroup;
 
 /**
  * Created by paul on 04/01/16.

@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.base.event.user.inventory;
 
-import com.ithinkrok.minigames.base.User;
+import com.ithinkrok.minigames.api.User;
 import com.ithinkrok.minigames.base.event.user.UserEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;

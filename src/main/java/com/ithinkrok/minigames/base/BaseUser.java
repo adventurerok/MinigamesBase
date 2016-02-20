@@ -1,11 +1,11 @@
 package com.ithinkrok.minigames.base;
 
 import com.comphenix.packetwrapper.WrapperPlayServerChat;
-import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.MutableClassToInstanceMap;
-import com.ithinkrok.minigames.base.command.MinigamesCommandSender;
+import com.ithinkrok.minigames.api.GameGroup;
+import com.ithinkrok.minigames.api.User;
 import com.ithinkrok.minigames.base.event.game.GameStateChangedEvent;
 import com.ithinkrok.minigames.base.event.game.MapChangedEvent;
 import com.ithinkrok.minigames.base.event.user.game.*;
@@ -15,18 +15,15 @@ import com.ithinkrok.minigames.base.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.base.inventory.ClickableInventory;
 import com.ithinkrok.minigames.base.item.CustomItem;
 import com.ithinkrok.minigames.base.map.GameMap;
-import com.ithinkrok.minigames.base.metadata.MetadataHolder;
 import com.ithinkrok.minigames.base.metadata.UserMetadata;
 import com.ithinkrok.minigames.base.task.GameRunnable;
 import com.ithinkrok.minigames.base.task.GameTask;
 import com.ithinkrok.minigames.base.task.TaskList;
-import com.ithinkrok.minigames.base.task.TaskScheduler;
-import com.ithinkrok.minigames.base.team.Team;
+import com.ithinkrok.minigames.api.Team;
 import com.ithinkrok.minigames.base.team.TeamIdentifier;
 import com.ithinkrok.minigames.base.user.AttackerTracker;
 import com.ithinkrok.minigames.base.user.CooldownHandler;
 import com.ithinkrok.minigames.base.user.UpgradeHandler;
-import com.ithinkrok.minigames.base.user.UserResolver;
 import com.ithinkrok.minigames.base.user.scoreboard.ScoreboardDisplay;
 import com.ithinkrok.minigames.base.user.scoreboard.ScoreboardHandler;
 import com.ithinkrok.minigames.base.util.InventoryUtils;
@@ -57,8 +54,7 @@ import static com.ithinkrok.minigames.base.util.InventoryUtils.createLeatherArmo
  * Created by paul on 31/12/15.
  */
 @SuppressWarnings("unchecked")
-public class User implements MinigamesCommandSender, TaskScheduler, Listener, UserResolver, MetadataHolder<UserMetadata>,
-        SharedObjectAccessor, Nameable {
+public class BaseUser implements Listener, User {
 
     private static final HashSet<Material> SEE_THROUGH = new HashSet<>();
     private static final Random random = new Random();
@@ -69,7 +65,7 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
         SEE_THROUGH.add(Material.STATIONARY_WATER);
     }
 
-    private final GameGroup gameGroup;
+    private final BaseGameGroup gameGroup;
     private final UUID uuid;
     private final AttackerTracker fireAttacker = new AttackerTracker(this);
     private final AttackerTracker witherAttacker = new AttackerTracker(this);
@@ -81,7 +77,7 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
     private final TaskList userTaskList = new TaskList();
     private final TaskList inGameTaskList = new TaskList();
     private final Collection<CustomListener> listeners = new ArrayList<>();
-    private Team team;
+    private BaseTeam team;
     private Kit kit;
     private LivingEntity entity;
     private PlayerState playerState;
@@ -99,7 +95,7 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
 
     private GameTask revalidateTask;
 
-    public User(GameGroup gameGroup, Team team, UUID uuid, LivingEntity entity) {
+    public BaseUser(BaseGameGroup gameGroup, BaseTeam team, UUID uuid, LivingEntity entity) {
         this.gameGroup = gameGroup;
         this.team = team;
         this.uuid = uuid;
@@ -118,27 +114,28 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
         repeatInFuture(task -> decrementAttackerTimers(), 20, 20);
     }
 
+    @Override
     public void fixCloakedUsers() {
-        for(User u : gameGroup.getUsers()) {
-            if(this == u) continue;
+        for (BaseUser u : gameGroup.getUsers()) {
+            if (this == u) continue;
 
-            if(u.isCloaked()) hidePlayer(u);
-            else{
+            if (u.isCloaked()) hidePlayer(u);
+            else {
                 hidePlayer(u);
 
                 doInFuture(task -> {
-                    if(!u.isCloaked()) {
+                    if (!u.isCloaked()) {
                         showPlayer(u);
                     }
                 });
             }
 
-            if(isCloaked()) u.hidePlayer(this);
+            if (isCloaked()) u.hidePlayer(this);
             else {
                 u.hidePlayer(this);
 
                 doInFuture(task -> {
-                    if(!isCloaked()) {
+                    if (!isCloaked()) {
                         u.showPlayer(this);
                     }
                 });
@@ -146,25 +143,23 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
         }
     }
 
+    @Override
     public boolean isPlayer() {
         return entity instanceof Player;
     }
 
+    @Override
     public Player getPlayer() {
         if (!isPlayer()) throw new RuntimeException("You have no player");
         return (Player) entity;
     }
 
-    private void decrementAttackerTimers() {
-        lastAttacker.decreaseAttackerTimer(20);
-        fireAttacker.decreaseAttackerTimer(20);
-        witherAttacker.decreaseAttackerTimer(20);
-    }
-
+    @Override
     public ClickableInventory getOpenInventory() {
         return openInventory;
     }
 
+    @Override
     public void setShowCloakedUsers(boolean showCloakedPlayers) {
         this.showCloakedPlayers = showCloakedPlayers;
 
@@ -178,6 +173,7 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
         }
     }
 
+    @Override
     public void becomeEntity(EntityType entityType) {
         if (!isPlayer()) return;
 
@@ -206,11 +202,7 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
 
         entity.setRemoveWhenFarAway(true);
 
-        if(disguise != null) disguise(disguise);
-    }
-
-    public Location getLocation() {
-        return entity.getLocation();
+        if (disguise != null) disguise(disguise);
     }
 
     private boolean revalidateNonPlayer(Location loc) {
@@ -224,6 +216,12 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
         return true;
     }
 
+    @Override
+    public Location getLocation() {
+        return entity.getLocation();
+    }
+
+    @Override
     public void launchVictoryFirework() {
         Location loc = getLocation();
 
@@ -234,11 +232,13 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
 
         firework.setVelocity(new Vector(0, 0.5f, 0));
         FireworkMeta meta = firework.getFireworkMeta();
-        meta.addEffect(FireworkEffect.builder().with(FireworkEffect.Type.BURST).trail(true).withColor(color)
-                .withFade(fade).build());
+        meta.addEffect(
+                FireworkEffect.builder().with(FireworkEffect.Type.BURST).trail(true).withColor(color).withFade(fade)
+                        .build());
         firework.setFireworkMeta(meta);
     }
 
+    @Override
     public void becomePlayer(Player player) {
         if (isPlayer()) return;
 
@@ -258,17 +258,19 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
         scoreboardDisplay = new ScoreboardDisplay(this, player);
         updateScoreboard();
 
-        if(disguise != null) disguise(disguise);
+        if (disguise != null) disguise(disguise);
     }
 
+    @Override
     public boolean isCloaked() {
         return cloaked;
     }
 
+    @Override
     public void cloak() {
         cloaked = true;
 
-        for (User u : gameGroup.getUsers()) {
+        for (BaseUser u : gameGroup.getUsers()) {
             if (this == u) continue;
 
             if (u.showCloakedUsers()) continue;
@@ -277,21 +279,19 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
         }
     }
 
+    @Override
     public void updateScoreboard() {
         if (scoreboardDisplay == null || scoreboardHandler == null) return;
 
         scoreboardHandler.updateScoreboard(this, scoreboardDisplay);
     }
 
+    @Override
     public boolean showCloakedUsers() {
         return showCloakedPlayers;
     }
 
-    private void hidePlayer(User other) {
-        if (!isPlayer() || !other.isPlayer()) return;
-        getPlayer().hidePlayer(other.getPlayer());
-    }
-
+    @Override
     public void removeNonPlayer() {
         if (isPlayer()) return;
         entity.remove();
@@ -301,30 +301,36 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
         gameGroup.userEvent(new UserQuitEvent(this, UserQuitEvent.QuitReason.NON_PLAYER_REMOVED));
     }
 
+    @Override
     public void disguise(EntityType type) {
         disguise(new Disguise(type));
     }
 
+    @Override
     public void disguise(Disguise disguise) {
         this.disguise = disguise;
         gameGroup.getGame().disguiseUser(this, disguise);
     }
 
+    @Override
     public void unDisguise() {
         this.disguise = null;
         gameGroup.getGame().unDisguiseUser(this);
     }
 
+    @Override
     public void setAllowFlight(boolean allowFlight) {
         if (isPlayer()) getPlayer().setAllowFlight(allowFlight);
         else playerState.setAllowFlight(allowFlight);
     }
 
+    @Override
     public void setFlySpeed(double flySpeed) {
         if (isPlayer()) getPlayer().setFlySpeed((float) flySpeed);
         else playerState.setFlySpeed((float) flySpeed);
     }
 
+    @Override
     public void resetUserStats(boolean removePotionEffects) {
         Config defaultStats = getSharedObjectOrEmpty("user").getConfigOrEmpty("default_stats");
 
@@ -339,33 +345,40 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
         if (removePotionEffects) removePotionEffects();
     }
 
-    public void setHitDelayTicks(int ticks) {
-        entity.setMaximumNoDamageTicks(ticks);
-    }
-
+    @Override
     public int getHitDelayTicks() {
         return entity.getMaximumNoDamageTicks();
     }
 
+    @Override
+    public void setHitDelayTicks(int ticks) {
+        entity.setMaximumNoDamageTicks(ticks);
+    }
+
+    @Override
     public void setMaxHealth(double maxHealth) {
         entity.setMaxHealth(maxHealth);
     }
 
+    @Override
     public void setFoodLevel(int foodLevel) {
         if (isPlayer()) getPlayer().setFoodLevel(foodLevel);
         else playerState.setFoodLevel(foodLevel);
     }
 
+    @Override
     public void setSaturation(double saturation) {
         if (isPlayer()) getPlayer().setSaturation((float) saturation);
         else playerState.setSaturation((float) saturation);
     }
 
+    @Override
     public void setWalkSpeed(double walkSpeed) {
         if (isPlayer()) getPlayer().setWalkSpeed((float) walkSpeed);
         else playerState.setWalkSpeed((float) walkSpeed);
     }
 
+    @Override
     public void removePotionEffects() {
         List<PotionEffect> effects = new ArrayList<>(entity.getActivePotionEffects());
 
@@ -376,40 +389,44 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
         entity.setFireTicks(0);
     }
 
+    @Override
     public void setCollidesWithEntities(boolean collides) {
         if (!isPlayer()) return;
 
         getPlayer().spigot().setCollidesWithEntities(collides);
     }
 
+    @Override
     public void decloak() {
         cloaked = false;
 
-        for (User u : gameGroup.getUsers()) {
+        for (BaseUser u : gameGroup.getUsers()) {
             if (this == u) continue;
 
             u.showPlayer(this);
         }
     }
 
-    private void showPlayer(User other) {
-        if (!isPlayer() || !other.isPlayer()) return;
-        getPlayer().showPlayer(other.getPlayer());
-    }
-
+    @Override
     public String getTeamName() {
         return team != null ? team.getName() : null;
     }
 
-    public Team getTeam() {
+    @Override
+    public BaseTeam getTeam() {
         return team;
     }
 
+    @Override
     public void setTeam(Team team) {
+        if (team != null && !(team instanceof BaseTeam)) {
+            throw new UnsupportedOperationException("Only supports BaseTeam");
+        }
+
         if (team == this.team) return;
 
         Team oldTeam = this.team;
-        Team newTeam = this.team = team;
+        Team newTeam = this.team = (BaseTeam) team;
 
         if (oldTeam != null) oldTeam.removeUser(this);
         if (newTeam != null) newTeam.addUser(this);
@@ -418,10 +435,12 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
         gameGroup.userEvent(event);
     }
 
+    @Override
     public Kit getKit() {
         return kit;
     }
 
+    @Override
     public void setKit(Kit kit) {
         if (kit == this.kit) return;
 
@@ -440,27 +459,22 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
         gameGroup.userEvent(event);
     }
 
+    @Override
     public TeamIdentifier getTeamIdentifier() {
         return team != null ? team.getTeamIdentifier() : null;
     }
 
-    public Collection<CustomListener> getListeners() {
-        return listeners;
-    }
-
-    public GameGroup getGameGroup() {
+    @Override
+    public BaseGameGroup getGameGroup() {
         return gameGroup;
     }
 
     @Override
-    public User getUser(UUID uuid) {
-        return gameGroup.getUser(uuid);
-    }
-
     public boolean isInGame() {
         return isInGame;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public void setInGame(boolean inGame) {
         isInGame = inGame;
@@ -482,6 +496,7 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
         gameGroup.userEvent(new UserInGameChangeEvent(this));
     }
 
+    @Override
     public void setSpectator(boolean spectator) {
         if (spectator == this.spectator) return;
         if (spectator && isInGame())
@@ -512,25 +527,6 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
     }
 
     @Override
-    public <B extends UserMetadata> B getMetadata(Class<? extends B> clazz) {
-        return metadataMap.getInstance(clazz);
-    }
-
-    @Override
-    public <B extends UserMetadata> void setMetadata(B metadata) {
-        UserMetadata oldMetadata = metadataMap.put(metadata.getMetadataClass(), metadata);
-
-        if (oldMetadata != null && oldMetadata != metadata) {
-            oldMetadata.cancelAllTasks();
-            oldMetadata.removed();
-        }
-    }
-
-    @Override
-    public boolean hasMetadata(Class<? extends UserMetadata> clazz) {
-        return metadataMap.containsKey(clazz);
-    }
-
     public void setScoreboardHandler(ScoreboardHandler scoreboardHandler) {
         this.scoreboardHandler = scoreboardHandler;
         if (scoreboardDisplay != null) {
@@ -539,24 +535,29 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
         }
     }
 
+    @Override
     public GameMode getGameMode() {
         return isPlayer() ? getPlayer().getGameMode() : playerState.getGameMode();
     }
 
+    @Override
     public void setGameMode(GameMode gameMode) {
         if (isPlayer()) getPlayer().setGameMode(gameMode);
         else playerState.setGameMode(gameMode);
     }
 
+    @Override
     public int getFireTicks() {
         return entity.getFireTicks();
     }
 
+    @Override
     public void setFireTicks(User fireAttacker, int fireTicks) {
         this.fireAttacker.setAttacker(fireAttacker, fireTicks);
         entity.setFireTicks(fireTicks);
     }
 
+    @Override
     public void setWitherTicks(User witherAttacker, int witherTicks) {
         setWitherTicks(witherAttacker, witherTicks, 0);
     }
@@ -564,53 +565,65 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
     /**
      * @param witherAmplifier The amplifier for the effect. Level n is amplifier n-1.
      */
+    @Override
     public void setWitherTicks(User witherAttacker, int witherTicks, int witherAmplifier) {
         this.witherAttacker.setAttacker(witherAttacker, witherTicks);
         entity.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, witherAmplifier, witherAmplifier));
     }
 
+    @Override
     public boolean startCoolDown(String ability, int seconds, String coolDownLocale) {
         return cooldownHandler.startCoolDown(ability, seconds, coolDownLocale);
     }
 
+    @Override
     public void stopCoolDown(String ability, String stopLocale) {
         cooldownHandler.stopCoolDown(ability, stopLocale);
     }
 
+    @Override
     public void playSound(Location location, SoundEffect sound) {
         if (!isPlayer()) return;
 
         getPlayer().playSound(location, sound.getSound(), sound.getVolume(), sound.getPitch());
     }
 
+    @Override
     public boolean isCoolingDown(String ability) {
         return cooldownHandler.isCoolingDown(ability);
     }
 
+    @Override
     public int getUpgradeLevel(String upgrade) {
         return upgradeHandler.getUpgradeLevel(upgrade);
     }
 
+    @Override
     public void setUpgradeLevel(String upgrade, int level) {
         upgradeHandler.setUpgradeLevel(upgrade, level);
     }
 
+    @Override
     public ItemStack createCustomItemForUser(CustomItem item) {
         return item.createWithVariables(gameGroup, upgradeHandler);
     }
 
+    @Override
     public <T extends Projectile> T launchProjectile(Class<? extends T> projectileClass) {
         return entity.launchProjectile(projectileClass);
     }
 
+    @Override
     public UpgradeHandler getUpgradeLevels() {
         return upgradeHandler;
     }
 
+    @Override
     public UUID getUuid() {
         return uuid;
     }
 
+    @Override
     public boolean teleport(Vector loc) {
         Location target =
                 new Location(getLocation().getWorld(), loc.getX(), loc.getY(), loc.getZ(), getLocation().getYaw(),
@@ -619,6 +632,7 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
 
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public boolean teleport(Location location) {
         UserTeleportEvent event = new UserTeleportEvent(this, getLocation(), location);
@@ -633,14 +647,17 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
         return revalidateNonPlayer(event.getTo()) || success;
     }
 
+    @Override
     public boolean isViewingClickableInventory() {
         return openInventory != null;
     }
 
+    @Override
     public ClickableInventory getClickableInventory() {
         return openInventory;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public void showInventory(ClickableInventory inventory, Location inventoryTether) {
         doInFuture(task -> {
@@ -681,6 +698,7 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
         userTaskList.cancelAllTasks();
     }
 
+    @Override
     public void redoInventory() {
         if (this.openInventory == null || !isPlayer()) return;
 
@@ -689,53 +707,58 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
         this.openInventory.populateInventory(viewing, this);
     }
 
+    @Override
     public Location getInventoryTether() {
         return gameGroup.getCurrentMap().getLocation(inventoryTether);
     }
 
+    @Override
     public void setXpLevel(int level) {
         if (isPlayer()) getPlayer().setLevel(level);
         else playerState.setLevel(level);
     }
 
+    @Override
     public float getExp() {
         return isPlayer() ? getPlayer().getExp() : playerState.getExp();
     }
 
+    @Override
     public void setExp(double exp) {
         if (isPlayer()) getPlayer().setExp((float) exp);
         else playerState.setExp((float) exp);
     }
 
+    @Override
     public void bindTaskToInGame(GameTask task) {
         inGameTaskList.addTask(task);
     }
 
+    @Override
     public String getTabListName() {
         if (!isPlayer()) return playerState.getTabListName();
         else return getPlayer().getPlayerListName();
     }
 
+    @Override
     public void setTabListName(String tabListName) {
         if (!isPlayer()) playerState.setTabListName(tabListName);
         else getPlayer().setPlayerListName(tabListName);
     }
 
+    @Override
     public Block rayTraceBlocks(int maxDistance) {
         return entity.getTargetBlock(SEE_THROUGH, maxDistance);
     }
 
     @Override
-    public boolean hasPermission(String permission) {
-        return entity.hasPermission(permission);
-    }
-
     public Inventory createInventory(int size, String title) {
         size = ((size / 9) + 1) * 9;
 
         return Bukkit.createInventory((InventoryHolder) entity, size, title);
     }
 
+    @Override
     public void closeInventory() {
         doInFuture(task -> {
             if (!isPlayer()) return;
@@ -747,24 +770,11 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
     }
 
     @Override
-    public boolean hasSharedObject(String name) {
-        return gameGroup.hasSharedObject(name);
-    }
-
-    @Override
-    public Config getSharedObject(String name) {
-        return gameGroup.getSharedObject(name);
-    }
-
-    @Override
-    public Config getSharedObjectOrEmpty(String name) {
-        return gameGroup.getSharedObjectOrEmpty(name);
-    }
-
     public void giveColoredArmor(Color color, boolean unbreakable) {
         giveColoredArmor(color, unbreakable, true, true, true, true);
     }
 
+    @Override
     public void giveColoredArmor(Color color, boolean unbreakable, boolean helmet, boolean chestplate, boolean leggings,
                                  boolean boots) {
         PlayerInventory inv = getInventory();
@@ -785,10 +795,12 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
         }
     }
 
+    @Override
     public PlayerInventory getInventory() {
         return isPlayer() ? getPlayer().getInventory() : playerState.getInventory();
     }
 
+    @Override
     public void clearArmor(boolean helmet, boolean chestplate, boolean leggings, boolean boots) {
         EntityEquipment equipment = entity.getEquipment();
 
@@ -798,63 +810,78 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
         if (boots) equipment.setBoots(null);
     }
 
+    @Override
     public void clearArmor() {
         clearArmor(true, true, true, true);
     }
 
+    @Override
     public String getKitName() {
         return kit != null ? kit.getName() : null;
     }
 
+    @Override
     public Location getCompassTarget() {
         if (!isPlayer()) return null;
         return getPlayer().getCompassTarget();
     }
 
+    @Override
     public void setCompassTarget(Location compassTarget) {
         if (isPlayer()) getPlayer().setCompassTarget(compassTarget);
     }
 
+    @Override
     public void addPotionEffect(PotionEffect effect) {
         entity.addPotionEffect(effect);
     }
 
+    @Override
     public void addPotionEffect(PotionEffect effect, boolean force) {
         entity.addPotionEffect(effect, force);
     }
 
+    @Override
     public double getHeath() {
         return entity.getHealth();
     }
 
+    @Override
     public User getFireAttacker() {
         return fireAttacker.getAttacker();
     }
 
+    @Override
     public User getWitherAttacker() {
         return witherAttacker.getAttacker();
     }
 
+    @Override
     public User getLastAttacker() {
         return lastAttacker.getAttacker();
     }
 
+    @Override
     public void setLastAttacker(User lastAttacker) {
         this.lastAttacker.setAttacker(lastAttacker);
     }
 
+    @Override
     public boolean isInsideVehicle() {
         return entity.isInsideVehicle();
     }
 
+    @Override
     public Entity getVehicle() {
         return entity.getVehicle();
     }
 
+    @Override
     public LivingEntity getEntity() {
         return entity;
     }
 
+    @Override
     public TNTPrimed createExplosion(Location loc, float power, boolean fire, int fuseTicks) {
         TNTPrimed tnt = (TNTPrimed) getMap().spawnEntity(loc, EntityType.PRIMED_TNT);
 
@@ -868,30 +895,35 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
         return tnt;
     }
 
+    @Override
     public GameMap getMap() {
         return gameGroup.getCurrentMap();
     }
 
+    @Override
     public void makeEntityRepresentUser(Entity entity) {
         gameGroup.getGame().makeEntityRepresentUser(this, entity);
     }
 
+    @Override
     public boolean isFlying() {
         return isPlayer() && getPlayer().isFlying();
     }
 
+    @Override
     public void setFlying(boolean flying) {
         if (!isPlayer()) return;
         getPlayer().setFlying(flying);
     }
 
-
-    public void showAboveHotbarLocale(String locale, Object...args) {
+    @Override
+    public void showAboveHotbarLocale(String locale, Object... args) {
         showAboveHotbarMessage(gameGroup.getLocale(locale, args));
     }
 
+    @Override
     public void showAboveHotbarMessage(String message) {
-        if(!isPlayer()) return;
+        if (!isPlayer()) return;
 
         WrapperPlayServerChat chatPacket = new WrapperPlayServerChat();
 
@@ -901,49 +933,58 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
         chatPacket.sendPacket(getPlayer());
     }
 
+    @Override
     public void showTitle(String title) {
         showTitle(title, null);
     }
 
+    @Override
     public void showTitle(String title, String subTitle) {
         showTitle(title, subTitle, 20, 60, 20);
     }
 
+    @Override
     public void showTitle(String title, String subTitle, int fadeIn, int stay, int fadeOut) {
-        if(!isPlayer()) return;
+        if (!isPlayer()) return;
 
         CommandSender console = Bukkit.getConsoleSender();
 
         Bukkit.dispatchCommand(console, "title " + getName() + " reset");
         Bukkit.dispatchCommand(console, "title " + getName() + " times " + fadeIn + " " + stay + " " + fadeOut);
 
-        if(subTitle != null) {
+        if (subTitle != null) {
             Bukkit.dispatchCommand(console, "title " + getName() + " subtitle \"" + subTitle + "\"");
         }
 
         Bukkit.dispatchCommand(console, "title " + getName() + " title \"" + title + "\"");
     }
 
+    @Override
     public double getHealth() {
         return entity.getHealth();
     }
 
+    @Override
     public void setHealth(double health) {
         entity.setHealth(health);
     }
 
+    @Override
     public boolean hasPotionEffect(PotionEffectType type) {
         return entity.hasPotionEffect(type);
     }
 
+    @Override
     public void setFallDistance(double fallDistance) {
         entity.setFallDistance((float) fallDistance);
     }
 
+    @Override
     public boolean isOnGround() {
         return entity.isOnGround();
     }
 
+    @Override
     public boolean unstuck(int maxRadius) {
         Block base = getLocation().add(0, 1, 0).getBlock();
         Block block;
@@ -981,10 +1022,12 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
         return false;
     }
 
+    @Override
     public void setVelocity(Vector velocity) {
         entity.setVelocity(velocity);
     }
 
+    @Override
     public void removeFromGameGroup() {
         setScoreboardHandler(null);
 
@@ -998,9 +1041,111 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
         }
 
         metadataMap.clear();
+    }
+
+    @Override
+    public EntityType getVisibleEntityType() {
+        if (disguise != null) return disguise.getEntityType();
+        else return entity.getType();
+    }
+
+    @Override
+    public String getDisplayName() {
+        return isPlayer() ? getPlayer().getDisplayName() : entity.getCustomName();
+    }
+
+    @Override
+    public void setDisplayName(String displayName) {
+        if (!isPlayer()) entity.setCustomName(displayName);
+        else getPlayer().setDisplayName(displayName);
+
+        if (disguise != null && disguise.isShowUserNameAboveEntity()) disguise(disguise);
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getFormattedName() {
+        String displayName = getDisplayName();
+        return displayName != null ? displayName : getName();
+    }
+
+    private void hidePlayer(User other) {
+        if (!isPlayer() || !other.isPlayer()) return;
+        getPlayer().hidePlayer(other.getPlayer());
+    }
+
+    private void decrementAttackerTimers() {
+        lastAttacker.decreaseAttackerTimer(20);
+        fireAttacker.decreaseAttackerTimer(20);
+        witherAttacker.decreaseAttackerTimer(20);
+    }
+
+    private void showPlayer(User other) {
+        if (!isPlayer() || !other.isPlayer()) return;
+        getPlayer().showPlayer(other.getPlayer());
+    }
+
+    @Override
+    public Collection<CustomListener> getListeners() {
+        return listeners;
+    }
+
+    @Override
+    public User getUser(UUID uuid) {
+        return gameGroup.getUser(uuid);
+    }
+
+    @Override
+    public <B extends UserMetadata> B getMetadata(Class<? extends B> clazz) {
+        return metadataMap.getInstance(clazz);
+    }
+
+    @Override
+    public <B extends UserMetadata> void setMetadata(B metadata) {
+        UserMetadata oldMetadata = metadataMap.put(metadata.getMetadataClass(), metadata);
+
+        if (oldMetadata != null && oldMetadata != metadata) {
+            oldMetadata.cancelAllTasks();
+            oldMetadata.removed();
+        }
+    }
+
+    @Override
+    public boolean hasMetadata(Class<? extends UserMetadata> clazz) {
+        return metadataMap.containsKey(clazz);
+    }
+
+    @Override
+    public boolean hasPermission(String permission) {
+        return entity.hasPermission(permission);
     }    @Override
     public void sendLocale(String locale, Object... args) {
         sendMessage(gameGroup.getLocale(locale, args));
+    }
+
+    @Override
+    public boolean hasSharedObject(String name) {
+        return gameGroup.hasSharedObject(name);
+    }
+
+    @Override
+    public Config getSharedObject(String name) {
+        return gameGroup.getSharedObject(name);
+    }    @Override
+    public void sendMessage(String message) {
+        sendMessageNoPrefix(gameGroup.getChatPrefix() + message);
+    }
+
+    @Override
+    public Config getSharedObjectOrEmpty(String name) {
+        return gameGroup.getSharedObjectOrEmpty(name);
+    }    @Override
+    public void sendMessageNoPrefix(String message) {
+        entity.sendMessage(message);
     }
 
     private class UserListener implements CustomListener {
@@ -1012,7 +1157,7 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
             while (iterator.hasNext()) {
                 UserMetadata metadata = iterator.next();
 
-                if (metadata.removeOnInGameChange(event)){
+                if (metadata.removeOnInGameChange(event)) {
                     metadata.cancelAllTasks();
                     metadata.removed();
                     iterator.remove();
@@ -1070,7 +1215,7 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
                 CustomItem customItem = gameGroup.getCustomItem(id);
                 if (!customItem.replaceOnUpgrade()) continue;
 
-                ItemStack replace = customItem.createForUser(User.this);
+                ItemStack replace = customItem.createForUser(BaseUser.this);
                 if (replace.isSimilar(old)) continue;
 
                 replace.setAmount(old.getAmount());
@@ -1109,56 +1254,22 @@ public class User implements MinigamesCommandSender, TaskScheduler, Listener, Us
                 CustomEventExecutor.executeEvent(event, customItem);
             }
         }
-    }
-
-    public EntityType getVisibleEntityType() {
-        if(disguise != null) return disguise.getEntityType();
-        else return entity.getType();
-    }
-
-
-    @Override
-    public void sendMessage(String message) {
-        sendMessageNoPrefix(gameGroup.getChatPrefix() + message);
-    }
-
-
-    @Override
-    public void sendMessageNoPrefix(String message) {
-        entity.sendMessage(message);
-    }
-
-
-    @Override
+    }    @Override
     public void sendLocaleNoPrefix(String locale, Object... args) {
         sendMessageNoPrefix(gameGroup.getLocale(locale, args));
     }
 
 
-    @Override
-    public String getFormattedName() {
-        String displayName = getDisplayName();
-        return displayName != null ? displayName : getName();
-    }
 
 
-    @Override
-    public String getName() {
-        return name;
-    }
 
 
-    public void setDisplayName(String displayName) {
-        if (!isPlayer()) entity.setCustomName(displayName);
-        else getPlayer().setDisplayName(displayName);
-
-        if(disguise != null && disguise.isShowUserNameAboveEntity()) disguise(disguise);
-    }
 
 
-    public String getDisplayName() {
-        return isPlayer() ? getPlayer().getDisplayName() : entity.getCustomName();
-    }
+
+
+
+
 
 
     @Override

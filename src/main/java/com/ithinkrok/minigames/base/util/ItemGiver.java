@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.base.util;
 
-import com.ithinkrok.minigames.base.User;
+import com.ithinkrok.minigames.api.User;
 import com.ithinkrok.minigames.base.item.CustomItem;
 import com.ithinkrok.minigames.base.util.math.MapVariables;
 import com.ithinkrok.minigames.base.util.math.Variables;

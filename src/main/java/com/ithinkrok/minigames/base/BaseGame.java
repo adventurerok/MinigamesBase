@@ -1,11 +1,13 @@
 package com.ithinkrok.minigames.base;
 
 import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
 import com.google.common.collect.MapMaker;
+import com.ithinkrok.minigames.api.Game;
+import com.ithinkrok.minigames.api.GameGroup;
+import com.ithinkrok.minigames.api.Team;
+import com.ithinkrok.minigames.api.User;
 import com.ithinkrok.minigames.base.command.MinigamesCommand;
 import com.ithinkrok.minigames.base.database.DatabaseTask;
-import com.ithinkrok.minigames.base.database.DatabaseTaskRunner;
 import com.ithinkrok.minigames.base.database.Persistence;
 import com.ithinkrok.minigames.base.event.map.*;
 import com.ithinkrok.minigames.base.event.user.game.UserCommandEvent;
@@ -22,22 +24,19 @@ import com.ithinkrok.minigames.base.map.GameMap;
 import com.ithinkrok.minigames.base.protocol.ClientMinigamesProtocol;
 import com.ithinkrok.minigames.base.task.GameRunnable;
 import com.ithinkrok.minigames.base.task.GameTask;
-import com.ithinkrok.minigames.base.task.TaskScheduler;
-import com.ithinkrok.minigames.base.team.Team;
 import com.ithinkrok.minigames.base.team.TeamIdentifier;
-import com.ithinkrok.minigames.base.user.UserResolver;
 import com.ithinkrok.minigames.base.util.EntityUtils;
 import com.ithinkrok.minigames.base.util.InventoryUtils;
 import com.ithinkrok.minigames.base.util.InvisiblePlayerAttacker;
 import com.ithinkrok.minigames.base.util.JSONBook;
 import com.ithinkrok.minigames.base.util.disguise.*;
-import com.ithinkrok.minigames.base.util.io.FileLoader;
 import com.ithinkrok.msm.bukkit.util.BukkitConfig;
 import com.ithinkrok.msm.client.Client;
 import com.ithinkrok.msm.client.impl.MSMClient;
 import com.ithinkrok.util.command.CommandUtils;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.lang.LangFile;
+import org.apache.commons.lang.Validate;
 import org.bukkit.*;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.*;
@@ -69,13 +68,13 @@ import java.util.logging.Logger;
  * In future: Will be a TaskScheduler, UserResolver, FileLoader and DatabaseTaskRunner only
  */
 @SuppressWarnings("unchecked")
-public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTaskRunner, Nameable {
+public class BaseGame implements Game {
 
     private final String name;
 
     private final String hubServer;
 
-    private final ConcurrentMap<UUID, User> usersInServer = new ConcurrentHashMap<>();
+    private final ConcurrentMap<UUID, BaseUser> usersInServer = new ConcurrentHashMap<>();
 
     private final Plugin plugin;
     private final Persistence persistence;
@@ -88,8 +87,8 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     private final Map<String, String> gameGroupConfigMap = new HashMap<>();
     private final String fallbackConfig;
 
-    private final Map<String, GameGroup> mapToGameGroup = new MapMaker().weakValues().makeMap();
-    private final Map<String, GameGroup> nameToGameGroup = new MapMaker().weakValues().makeMap();
+    private final Map<String, BaseGameGroup> mapToGameGroup = new MapMaker().weakValues().makeMap();
+    private final Map<String, BaseGameGroup> nameToGameGroup = new MapMaker().weakValues().makeMap();
 
     /**
      * Maps player UUID to game group type
@@ -110,7 +109,7 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
 
     private DisguiseController disguiseController;
 
-    public Game(BasePlugin plugin, Config config) {
+    public BaseGame(BasePlugin plugin, Config config) {
         this.plugin = plugin;
 
         name = config.getString("bungee.name");
@@ -175,19 +174,19 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         }
     }
 
-    public ClientMinigamesProtocol getProtocol() {
+    @Override public ClientMinigamesProtocol getProtocol() {
         return protocol;
     }
 
-    public Collection<String> getAvailableGameGroupTypes() {
+    @Override public Collection<String> getAvailableGameGroupTypes() {
         return gameGroupConfigMap.keySet();
     }
 
-    public Collection<GameGroup> getGameGroups() {
+    @Override public Collection<BaseGameGroup> getGameGroups() {
         return nameToGameGroup.values();
     }
 
-    public String getName() {
+    @Override public String getName() {
         return name;
     }
 
@@ -196,32 +195,32 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         return name;
     }
 
-    public Path getRamdiskDirectory() {
+    @Override public Path getRamdiskDirectory() {
         return ramdiskDirectory;
     }
 
-    public Path getConfigDirectory() {
+    @Override public Path getConfigDirectory() {
         return configDirectory;
     }
 
-    public Path getMapDirectory() {
+    @Override public Path getMapDirectory() {
         return mapDirectory;
     }
 
-    public void registerListeners() {
+    @Override public void registerListeners() {
         Listener listener = new GameListener();
         plugin.getServer().getPluginManager().registerEvents(listener, plugin);
     }
 
-    public void sendPlayerToHub() {
+    @Override public void sendPlayerToHub() {
 
     }
 
-    public void registerGameGroupConfig(String name, String configFile) {
+    @Override public void registerGameGroupConfig(String name, String configFile) {
         gameGroupConfigMap.put(name, configFile);
     }
 
-    public void removeUser(User user) {
+    @Override public void removeUser(User user) {
         usersInServer.values().remove(user);
 
         user.removeFromGameGroup();
@@ -270,17 +269,17 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         return assetsDirectory;
     }
 
-    public GameGroup getGameGroup(String ggName) {
+    @Override public BaseGameGroup getGameGroup(String ggName) {
         return nameToGameGroup.get(ggName);
     }
 
-    public void unload() {
+    @Override public void unload() {
         nameToGameGroup.values().forEach(GameGroup::unload);
 
         persistence.onPluginDisabled();
     }
 
-    public void removeGameGroup(GameGroup gameGroup) {
+    @Override public void removeGameGroup(GameGroup gameGroup) {
         nameToGameGroup.values().remove(gameGroup);
 
         protocol.sendGameGroupKilledPayload(gameGroup);
@@ -291,41 +290,47 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         persistence.doTask(task);
     }
 
-    public void makeEntityRepresentUser(User user, Entity entity) {
+    @Override public void makeEntityRepresentUser(User user, Entity entity) {
         entity.setMetadata("rep", new FixedMetadataValue(plugin, user.getUuid()));
     }
 
-    public void makeEntityActualUser(User user, Entity entity) {
+    @Override public void makeEntityActualUser(User user, Entity entity) {
         entity.setMetadata("actual", new FixedMetadataValue(plugin, user.getUuid()));
     }
 
-    public void setGameGroupForMap(GameGroup gameGroup, String mapName) {
+    @Override public void setGameGroupForMap(GameGroup gameGroup, String mapName) {
+        Validate.notNull(gameGroup, "gameGroup cannot be null");
+
+        if(!(gameGroup instanceof BaseGameGroup)) {
+            throw new UnsupportedOperationException("Only supports BaseGameGroup");
+        }
+
         mapToGameGroup.values().remove(gameGroup);
-        mapToGameGroup.put(mapName, gameGroup);
+        mapToGameGroup.put(mapName, (BaseGameGroup) gameGroup);
     }
 
-    public void makeEntityRepresentTeam(Team team, Entity entity) {
+    @Override public void makeEntityRepresentTeam(Team team, Entity entity) {
         entity.setMetadata("team", new FixedMetadataValue(plugin, team.getName()));
     }
 
-    public void disguiseUser(User user, EntityType type) {
+    @Override public void disguiseUser(User user, EntityType type) {
         disguiseController.disguise(user, type);
     }
 
-    public void disguiseUser(User user, Disguise disguise) {
+    @Override public void disguiseUser(User user, Disguise disguise) {
         disguiseController.disguise(user, disguise);
     }
 
-    public void unDisguiseUser(User user) {
+    @Override public void unDisguiseUser(User user) {
         disguiseController.unDisguise(user);
     }
 
-    public void rejoinPlayer(Player player) {
-        User user = getUser(player.getUniqueId());
-        GameGroup gameGroup = getGameGroupForJoining(player.getUniqueId());
+    @Override public void rejoinPlayer(Player player) {
+        BaseUser user = getUser(player.getUniqueId());
+        BaseGameGroup gameGroup = getGameGroupForJoining(player.getUniqueId());
 
         if (user != null) {
-            GameGroup oldGameGroup = user.getGameGroup();
+            BaseGameGroup oldGameGroup = user.getGameGroup();
 
             if (oldGameGroup == gameGroup || gameGroup == null) {
                 user.becomePlayer(player);
@@ -354,7 +359,7 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         gameGroup.userEvent(new UserJoinEvent(user, UserJoinEvent.JoinReason.JOINED_SERVER));
     }
 
-    public boolean sendPlayerToHub(Player player) {
+    @Override public boolean sendPlayerToHub(Player player) {
         Client client = protocol.getClient();
 
         if (client == null) return false;
@@ -362,7 +367,7 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         return client.changePlayerServer(player.getUniqueId(), hubServer);
     }
 
-    private GameGroup getGameGroupForJoining(UUID uniqueId) {
+    private BaseGameGroup getGameGroupForJoining(UUID uniqueId) {
         String gameGroupName = playersJoinGameGroups.remove(uniqueId);
 
         if (gameGroupName != null && nameToGameGroup.containsKey(gameGroupName)) {
@@ -372,7 +377,7 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         String gameGroupType = playersJoiningGameGroupTypes.remove(uniqueId);
 
         if (gameGroupType != null) {
-            for (GameGroup gameGroup : getGameGroups()) {
+            for (BaseGameGroup gameGroup : getGameGroups()) {
                 if (!gameGroup.getType().equals(gameGroupType)) continue;
                 if (!gameGroup.isAcceptingPlayers()) continue;
 
@@ -386,12 +391,12 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
     }
 
     @Override
-    public User getUser(UUID uuid) {
+    public BaseUser getUser(UUID uuid) {
         return usersInServer.get(uuid);
     }
 
-    public GameGroup createGameGroup(String type) {
-        GameGroup gameGroup = new GameGroup(this, nextGameGroupName(type), type, gameGroupConfigMap.get(type));
+    @Override public BaseGameGroup createGameGroup(String type) {
+        BaseGameGroup gameGroup = new BaseGameGroup(this, nextGameGroupName(type), type, gameGroupConfigMap.get(type));
 
         nameToGameGroup.put(gameGroup.getName(), gameGroup);
 
@@ -402,14 +407,14 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         return gameGroup;
     }
 
-    public GameGroup getSpawnGameGroup() {
+    @Override public BaseGameGroup getSpawnGameGroup() {
         if (nameToGameGroup.isEmpty()) return null;
 
         return nameToGameGroup.values().iterator().next();
     }
 
-    private User createUser(GameGroup gameGroup, Team team, UUID uuid, LivingEntity entity) {
-        User user = new User(gameGroup, team, uuid, entity);
+    private BaseUser createUser(BaseGameGroup gameGroup, BaseTeam team, UUID uuid, LivingEntity entity) {
+        BaseUser user = new BaseUser(gameGroup, team, uuid, entity);
 
         usersInServer.put(user.getUuid(), user);
         return user;
@@ -427,11 +432,11 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
         return result;
     }
 
-    public Logger getLogger() {
+    @Override public Logger getLogger() {
         return plugin.getLogger();
     }
 
-    public void preJoinGameGroup(UUID playerUUID, String type, String name) {
+    @Override public void preJoinGameGroup(UUID playerUUID, String type, String name) {
         doInFuture(task -> {
             playersJoiningGameGroupTypes.put(playerUUID, type);
             if (name != null) playersJoinGameGroups.put(playerUUID, name);
@@ -515,7 +520,8 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
 
             ProjectileSource thrower = event.getPotion().getShooter();
             User throwerUser = null;
-            if (thrower instanceof Entity) throwerUser = EntityUtils.getRepresentingUser(Game.this, (Entity) thrower);
+            if (thrower instanceof Entity) throwerUser = EntityUtils.getRepresentingUser(BaseGame.this, (Entity)
+                    thrower);
 
             gameGroup.gameEvent(new MapPotionSplashEvent(gameGroup, map, event, throwerUser));
         }
@@ -722,7 +728,7 @@ public class Game implements TaskScheduler, UserResolver, FileLoader, DatabaseTa
 
         @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
         public void eventEntityDamaged(EntityDamageEvent event) {
-            User attacked = EntityUtils.getActualUser(Game.this, event.getEntity());
+            User attacked = EntityUtils.getActualUser(BaseGame.this, event.getEntity());
             User attacker = null;
 
             if (attacked == null) {

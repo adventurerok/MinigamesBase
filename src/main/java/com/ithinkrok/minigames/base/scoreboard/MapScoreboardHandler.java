@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.base.scoreboard;
 
-import com.ithinkrok.minigames.base.User;
+import com.ithinkrok.minigames.api.User;
 import com.ithinkrok.minigames.base.metadata.MapVote;
 import com.ithinkrok.minigames.base.user.scoreboard.ScoreboardDisplay;
 import com.ithinkrok.minigames.base.user.scoreboard.ScoreboardHandler;
