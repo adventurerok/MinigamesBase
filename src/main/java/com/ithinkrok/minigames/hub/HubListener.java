@@ -11,6 +11,8 @@ import com.ithinkrok.minigames.api.event.user.world.UserEditSignEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserInteractWorldEvent;
 import com.ithinkrok.minigames.api.map.GameMap;
+import com.ithinkrok.minigames.api.sign.InfoSign;
+import com.ithinkrok.minigames.api.sign.InfoSigns;
 import com.ithinkrok.minigames.api.task.GameTask;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;
@@ -32,6 +34,11 @@ import java.util.Map;
  * Created by paul on 20/02/16.
  */
 public class HubListener implements CustomListener {
+
+    static {
+        InfoSigns.registerSignType("%lobby_sign%", JoinLobbySign::new);
+        InfoSigns.registerSignType("%choose_sign%", GameChooseSign::new);
+    }
 
     private GameGroup gameGroup;
 

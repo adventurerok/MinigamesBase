@@ -1,7 +1,10 @@
-package com.ithinkrok.minigames.hub;
+package com.ithinkrok.minigames.api.sign;
 
 import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.event.user.world.UserEditSignEvent;
+import com.ithinkrok.minigames.api.sign.InfoSign;
+import com.ithinkrok.minigames.hub.GameChooseSign;
+import com.ithinkrok.minigames.hub.JoinLobbySign;
 import com.ithinkrok.util.config.Config;
 
 import java.lang.reflect.Constructor;
@@ -17,16 +20,15 @@ public final class InfoSigns {
 
     }
 
-    private interface PlacedSignCreator {
+    public interface PlacedSignCreator {
         InfoSign createSign(UserEditSignEvent event);
     }
 
     private static final Map<String, PlacedSignCreator> loadedSignCreatorMap = new HashMap<>();
 
 
-    static {
-        loadedSignCreatorMap.put("%lobby_sign%", JoinLobbySign::new);
-        loadedSignCreatorMap.put("%choose_sign%", GameChooseSign::new);
+    public static void registerSignType(String signTopLine, PlacedSignCreator creator) {
+        loadedSignCreatorMap.put(signTopLine, creator);
     }
 
     public static InfoSign createInfoSign(UserEditSignEvent event) {
