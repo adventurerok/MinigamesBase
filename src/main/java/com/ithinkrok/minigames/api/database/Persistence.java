@@ -2,6 +2,8 @@ package com.ithinkrok.minigames.api.database;
 
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.Query;
+import com.avaje.ebeaninternal.api.SpiEbeanServer;
+import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -36,15 +38,13 @@ public class Persistence extends Thread {
 
     private void checkDDL() {
         try {
-            plugin.getDatabase().find(UserScore.class).findRowCount();
-        } catch(PersistenceException ignored) {
-            try {
-                Method method = JavaPlugin.class.getDeclaredMethod("installDDL");
-                method.setAccessible(true);
-                method.invoke(plugin);
-            } catch (ReflectiveOperationException e1) {
-                e1.printStackTrace();
-            }
+            SpiEbeanServer serv = (SpiEbeanServer) plugin.getDatabase();
+            DdlGenerator gen = serv.getDdlGenerator();
+
+            gen.runScript(false, gen.generateCreateDdl().replace("create table", "create table if not exists"));
+        } catch(PersistenceException e) {
+            System.out.println("Error creating database tables");
+            e.printStackTrace();
         }
     }
 
