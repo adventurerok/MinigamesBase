@@ -705,18 +705,28 @@ public class BaseGame implements Game, FileLoader {
         public void eventEntityDamagedByEntity(EntityDamageByEntityEvent event) {
             GameGroup gameGroup = getGameGroup(event.getEntity().getWorld());
 
+            Config gameConfig = gameGroup.getSharedObjectOrEmpty("game");
+
+            boolean friendlyFire = gameConfig.getBoolean("friendly_fire");
+            boolean noTeamFire = gameConfig.getBoolean("no_team_fire");
+            boolean notInGameFire = gameConfig.getBoolean("not_in_game_fire");
+
+            if(gameConfig.getBoolean("all_fire")) {
+                friendlyFire = noTeamFire = notInGameFire = true;
+            }
+
             Team attackerTeam = EntityUtils.getRepresentingTeam(gameGroup, event.getDamager());
             Team targetTeam = EntityUtils.getRepresentingTeam(gameGroup, event.getEntity());
 
             User attacker = EntityUtils.getRepresentingUser(gameGroup, event.getDamager());
             if (attacker == null) {
-                if (Objects.equals(attackerTeam, targetTeam)) {
+                if (Objects.equals(attackerTeam, targetTeam) && !friendlyFire) {
                     event.setCancelled(true);
                 }
                 return;
             }
 
-            if (attackerTeam == null) {
+            if (attackerTeam == null && !noTeamFire) {
                 event.setCancelled(true);
                 return;
             }
@@ -724,13 +734,13 @@ public class BaseGame implements Game, FileLoader {
             User target = EntityUtils.getActualUser(attacker, event.getEntity());
             boolean representing = !attacker.equals(EntityUtils.getActualUser(gameGroup, event.getDamager()));
 
-            if (target != null && !target.isInGame()) {
+            if (target != null && !target.isInGame() && !notInGameFire) {
                 event.setCancelled(true);
                 return;
             }
 
-            if (attackerTeam.equals(targetTeam)) {
-                if (!(representing && attacker == target)) {
+            if (Objects.equals(attackerTeam, targetTeam)) {
+                if (!(representing && attacker == target) &&!friendlyFire) {
                     event.setCancelled(true);
                     return;
                 }

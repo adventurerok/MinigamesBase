@@ -7,13 +7,11 @@ import com.ithinkrok.minigames.api.database.DoubleUserValue;
 import com.ithinkrok.minigames.api.database.IntUserValue;
 import com.ithinkrok.minigames.api.database.StringUserValue;
 import com.ithinkrok.minigames.api.protocol.ClientMinigamesRequestProtocol;
-import com.ithinkrok.minigames.base.hub.Hub;
 import com.ithinkrok.msm.bukkit.util.BukkitConfig;
 import com.ithinkrok.msm.client.impl.MSMClient;
 import com.ithinkrok.util.config.Config;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +22,6 @@ import java.util.List;
 public class BasePlugin extends SpecificPlugin {
 
     private static Game game;
-    private static Hub hub;
 
     private static ClientMinigamesRequestProtocol requestProtocol;
 
@@ -48,17 +45,7 @@ public class BasePlugin extends SpecificPlugin {
             loadGameModule(config);
         }
 
-        if(config.getBoolean("modules.hub", false)) {
-            loadHubModule();
-        }
-
         super.onEnable();
-    }
-
-    private void loadHubModule() {
-        hub = new Hub(this, requestProtocol);
-
-        hub.registerListeners();
     }
 
     private void loadGameModule(Config config) {
@@ -70,15 +57,6 @@ public class BasePlugin extends SpecificPlugin {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         return super.onCommand(sender, command, label, args);
-    }
-
-    @Override
-    public void onDisable() {
-        if(game != null) game.unload();
-        game = null;
-
-        if(hub != null) hub.unload();
-        hub = null;
     }
 
     @Override
