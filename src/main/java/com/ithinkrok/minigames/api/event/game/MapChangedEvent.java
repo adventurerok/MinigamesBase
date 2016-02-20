@@ -1,12 +1,13 @@
 package com.ithinkrok.minigames.api.event.game;
 
 import com.ithinkrok.minigames.api.GameGroup;
+import com.ithinkrok.minigames.api.event.InfoSignEvent;
 import com.ithinkrok.minigames.api.map.GameMap;
 
 /**
  * Created by paul on 02/01/16.
  */
-public class MapChangedEvent extends GameEvent {
+public class MapChangedEvent extends GameEvent implements InfoSignEvent {
 
     private final GameMap oldMap;
     private final GameMap newMap;

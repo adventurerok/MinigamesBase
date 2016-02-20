@@ -36,7 +36,7 @@ public class ClientMinigamesRequestProtocol implements ClientListener {
     public void connectionOpened(Client client, Channel channel) {
         this.channel = channel;
 
-        if(gameGroupInfoEnabled) enableGameGroupInfo();
+        if(gameGroupInfoEnabled) enableControllerInfo();
     }
 
     @Override
@@ -116,7 +116,7 @@ public class ClientMinigamesRequestProtocol implements ClientListener {
         channel.write(payload);
     }
 
-    public void enableGameGroupInfo() {
+    public void enableControllerInfo() {
         gameGroupInfoEnabled = true;
 
         if(channel == null) return;

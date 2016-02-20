@@ -1,24 +1,21 @@
 package com.ithinkrok.minigames.hub;
 
 import com.ithinkrok.minigames.api.GameGroup;
+import com.ithinkrok.minigames.api.event.InfoSignEvent;
 import com.ithinkrok.minigames.api.event.ListenerLoadedEvent;
-import com.ithinkrok.minigames.api.event.controller.ControllerGameGroupEvent;
 import com.ithinkrok.minigames.api.event.game.MapChangedEvent;
 import com.ithinkrok.minigames.api.event.map.MapBlockBreakNaturallyEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserJoinEvent;
-import com.ithinkrok.minigames.api.event.user.inventory.UserInventoryCloseEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserBreakBlockEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserEditSignEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserInteractWorldEvent;
 import com.ithinkrok.minigames.api.map.GameMap;
-import com.ithinkrok.minigames.api.protocol.ClientMinigamesRequestProtocol;
-import com.ithinkrok.minigames.api.protocol.data.ControllerInfo;
-import com.ithinkrok.minigames.api.user.User;
-import com.ithinkrok.minigames.base.BasePlugin;
+import com.ithinkrok.minigames.api.task.GameTask;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;
 import com.ithinkrok.util.config.YamlConfigIO;
+import com.ithinkrok.util.event.CustomEventExecutor;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.Location;
@@ -26,19 +23,19 @@ import org.bukkit.Location;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by paul on 20/02/16.
  */
 public class HubListener implements CustomListener {
 
-    private ClientMinigamesRequestProtocol requestProtocol;
     private GameGroup gameGroup;
 
-    private final Map<Location, HubSign> signs = new HashMap<>();
-
-    private final Map<UUID, Location> openSpectatorInventories = new HashMap<>();
+    private final Map<Location, InfoSign> signs = new HashMap<>();
 
     private Path configPath;
 
@@ -49,7 +46,6 @@ public class HubListener implements CustomListener {
     @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent<GameGroup, ?> event) {
         this.gameGroup = event.getCreator();
-        this.requestProtocol = BasePlugin.getRequestProtocol();
 
         Config config = event.getConfigOrEmpty();
 
@@ -59,7 +55,7 @@ public class HubListener implements CustomListener {
             signsConfig = config.getConfigOrNull("signs");
         }
 
-        requestProtocol.enableGameGroupInfo();
+        gameGroup.getRequestProtocol().enableControllerInfo();
 
         if(event.getRepresenting() instanceof GameMap) {
             this.map = (GameMap) event.getRepresenting();
@@ -111,7 +107,7 @@ public class HubListener implements CustomListener {
     public Config toConfig() {
         List<Config> signConfigs = new ArrayList<>();
 
-        for(HubSign sign : signs.values()) {
+        for(InfoSign sign : signs.values()) {
             signConfigs.add(sign.toConfig());
         }
 
@@ -130,63 +126,26 @@ public class HubListener implements CustomListener {
                 continue;
             }
 
-            HubSign sign = new HubSign(map, signConfig);
-
-            signs.put(sign.getLocation(), sign);
-        }
-    }
-
-    public void addOpenSpectatorInventory(User user, Location location) {
-        openSpectatorInventories.put(user.getUuid(), location);
-    }
-
-    private void updateSigns() {
-        Iterator<HubSign> iterator = signs.values().iterator();
-
-        while(iterator.hasNext()) {
-            HubSign sign = iterator.next();
-
-            if(!sign.update(requestProtocol.getControllerInfo())) {
-                iterator.remove();
-            }
-        }
-
-        for(Map.Entry<UUID, Location> entry : openSpectatorInventories.entrySet()) {
-            HubSign sign = signs.get(entry.getValue());
+            InfoSign sign = InfoSigns.loadInfoSign(gameGroup, signConfig);
             if(sign == null) continue;
 
-            User user = gameGroup.getUser(entry.getKey());
-            if(user == null) continue;
+            signs.put(sign.getLocation(), sign);
 
-            sign.updateSpectatorInventory(this, user);
+            if(sign.getUpdateFrequency() == 0) continue;
+
+            GameTask task = gameGroup.repeatInFuture(task1 -> {
+                if(sign.update()) return;
+
+                signs.remove(sign.getLocation());
+            }, sign.getUpdateFrequency(), sign.getUpdateFrequency());
+
+            gameGroup.bindTaskToCurrentMap(task);
         }
-    }
-
-    @CustomEventHandler
-    public void onInventoryClose(UserInventoryCloseEvent event) {
-        openSpectatorInventories.remove(event.getUser().getUuid());
     }
 
     @CustomEventHandler
     public void onUserBreakBlock(UserBreakBlockEvent event) {
         if(signs.remove(event.getBlock().getLocation()) != null) saveConfig();
-
-        List<UUID> removeKeys = new ArrayList<>();
-
-        for(Map.Entry<UUID, Location> entry : openSpectatorInventories.entrySet()) {
-            if(!entry.getValue().equals(event.getBlock().getLocation())) return;
-
-            removeKeys.add(entry.getKey());
-
-            User user = gameGroup.getUser(entry.getKey());
-            if(user == null) return;
-
-            user.closeInventory();
-        }
-
-        for(UUID key : removeKeys) {
-            openSpectatorInventories.remove(key);
-        }
     }
 
     @CustomEventHandler
@@ -196,14 +155,13 @@ public class HubListener implements CustomListener {
 
     @CustomEventHandler
     public void onSignChange(UserEditSignEvent event) {
-        if(!event.getLine(0).equalsIgnoreCase("[MG_SIGN]")) return;
-
-        HubSign sign = new HubSign(event);
+        InfoSign sign = InfoSigns.createInfoSign(event);
+        if(sign == null) return;
 
         signs.put(sign.getLocation(), sign);
 
         gameGroup.doInFuture(task -> {
-           sign.update(requestProtocol.getControllerInfo());
+           sign.update();
         });
 
         saveConfig();
@@ -213,22 +171,17 @@ public class HubListener implements CustomListener {
     public void onUserInteractWorld(UserInteractWorldEvent event) {
         if(!event.hasBlock() || event.getInteractType() != UserInteractEvent.InteractType.RIGHT_CLICK) return;
 
-        HubSign sign = signs.get(event.getClickedBlock().getLocation());
+        InfoSign sign = signs.get(event.getClickedBlock().getLocation());
         if(sign == null) return;
 
-        sign.onRightClick(this, event.getUser());
+        sign.onRightClick(event.getUser());
     }
 
     @CustomEventHandler
-    public void onControllerGameGroupEvent(ControllerGameGroupEvent event) {
-        updateSigns();
+    public void onInfoSignEvent(InfoSignEvent event) {
+        for(InfoSign sign : signs.values()) {
+            CustomEventExecutor.executeEvent(event, sign);
+        }
     }
 
-    public ControllerInfo getControllerInfo() {
-        return requestProtocol.getControllerInfo();
-    }
-
-    public ClientMinigamesRequestProtocol getRequestProtocol() {
-        return requestProtocol;
-    }
 }

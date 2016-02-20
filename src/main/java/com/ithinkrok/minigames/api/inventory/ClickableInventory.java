@@ -22,10 +22,12 @@ public class ClickableInventory {
 
 
     private final String title;
+    private final String identifier;
     private final Map<Integer, ClickableItem> items = new LinkedHashMap<>();
 
     public ClickableInventory(Config config) {
         this.title = config.getString("title", "Missing Inv Title");
+        this.identifier = config.getString("identifier", title);
 
         loadFromConfig(config.getConfigList("items"));
     }
@@ -56,7 +58,16 @@ public class ClickableInventory {
     }
 
     public ClickableInventory(String title) {
+        this(title, title);
+    }
+
+    public ClickableInventory(String title, String identifier) {
         this.title = title;
+        this.identifier = identifier;
+    }
+
+    public String getIdentifier() {
+        return identifier;
     }
 
     public Inventory createInventory(User user) {

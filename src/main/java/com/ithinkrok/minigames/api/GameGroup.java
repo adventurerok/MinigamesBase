@@ -9,6 +9,8 @@ import com.ithinkrok.minigames.api.map.GameMap;
 import com.ithinkrok.minigames.api.map.GameMapInfo;
 import com.ithinkrok.minigames.api.metadata.Metadata;
 import com.ithinkrok.minigames.api.metadata.MetadataHolder;
+import com.ithinkrok.minigames.api.protocol.ClientMinigamesRequestProtocol;
+import com.ithinkrok.minigames.api.protocol.data.ControllerInfo;
 import com.ithinkrok.minigames.api.schematic.SchematicResolver;
 import com.ithinkrok.minigames.api.task.GameTask;
 import com.ithinkrok.minigames.api.task.TaskScheduler;
@@ -46,6 +48,12 @@ public interface GameGroup
     void changeGameState(String gameStateName);
 
     void changeMap(String mapName);
+
+    ClientMinigamesRequestProtocol getRequestProtocol();
+
+    ControllerInfo getControllerInfo();
+
+    void requestControllerInfo();
 
     GameMapInfo getMap(String mapName);
 

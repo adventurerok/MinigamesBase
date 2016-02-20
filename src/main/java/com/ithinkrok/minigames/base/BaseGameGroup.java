@@ -21,6 +21,8 @@ import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.item.IdentifierMap;
 import com.ithinkrok.minigames.api.map.GameMapInfo;
 import com.ithinkrok.minigames.api.metadata.Metadata;
+import com.ithinkrok.minigames.api.protocol.ClientMinigamesRequestProtocol;
+import com.ithinkrok.minigames.api.protocol.data.ControllerInfo;
 import com.ithinkrok.minigames.api.schematic.Schematic;
 import com.ithinkrok.minigames.api.task.GameRunnable;
 import com.ithinkrok.minigames.api.task.GameTask;
@@ -182,6 +184,21 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         Validate.notNull(mapInfo, "The map " + mapName + " does not exist");
 
         changeMap(mapInfo);
+    }
+
+    @Override
+    public ClientMinigamesRequestProtocol getRequestProtocol() {
+        return BasePlugin.getRequestProtocol();
+    }
+
+    @Override
+    public ControllerInfo getControllerInfo() {
+        return getRequestProtocol().getControllerInfo();
+    }
+
+    @Override
+    public void requestControllerInfo() {
+        getRequestProtocol().enableControllerInfo();
     }
 
     @Override public GameMapInfo getMap(String mapName) {
