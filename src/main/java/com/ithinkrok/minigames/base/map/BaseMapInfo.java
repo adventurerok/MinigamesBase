@@ -1,6 +1,7 @@
 package com.ithinkrok.minigames.base.map;
 
 import com.ithinkrok.minigames.api.map.GameMapInfo;
+import com.ithinkrok.minigames.api.map.MapType;
 import com.ithinkrok.minigames.base.util.io.FileLoader;
 import com.ithinkrok.util.config.Config;
 import org.bukkit.World;
@@ -48,6 +49,11 @@ public class BaseMapInfo implements GameMapInfo {
         String envName = config.getString("environment", "normal").toUpperCase();
 
         return World.Environment.valueOf(envName);
+    }
+
+    @Override
+    public MapType getMapType() {
+        return MapType.valueOf(config.getString("type", "instance").toUpperCase());
     }
 
 }

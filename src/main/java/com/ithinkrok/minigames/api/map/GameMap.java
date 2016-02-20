@@ -63,4 +63,6 @@ public interface GameMap extends LanguageLookup, SchematicPaster.BoundsChecker, 
     Block getBlock(int x, int y, int z);
 
     Location getSpawn();
+
+    MapType getMapType();
 }

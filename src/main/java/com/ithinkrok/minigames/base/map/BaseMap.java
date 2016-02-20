@@ -7,6 +7,7 @@ import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.item.IdentifierMap;
 import com.ithinkrok.minigames.api.map.GameMap;
 import com.ithinkrok.minigames.api.map.GameMapInfo;
+import com.ithinkrok.minigames.api.map.MapType;
 import com.ithinkrok.minigames.api.schematic.PastedSchematic;
 import com.ithinkrok.minigames.api.schematic.Schematic;
 import com.ithinkrok.minigames.api.task.GameTask;
@@ -59,8 +60,10 @@ public class BaseMap implements GameMap, ConfigHolder {
     private final IdentifierMap<CustomItem> customItemIdentifierMap = new IdentifierMap<>();
     private final HashMap<String, Config> sharedObjects = new HashMap<>();
     private final List<PastedSchematic> pastedSchematics = new ArrayList<>();
+
     private World world;
-    private Path ramdiskPath;
+    private final WorldHandler worldHandler;
+
 
     public BaseMap(BaseGameGroup gameGroup, GameMapInfo gameMapInfo) {
         this.gameMapInfo = gameMapInfo;
@@ -68,67 +71,23 @@ public class BaseMap implements GameMap, ConfigHolder {
         loadMap(gameGroup);
         ConfigParser
                 .parseConfig(gameGroup, this, gameGroup, this, gameMapInfo.getConfigName(), gameMapInfo.getConfig());
+
+        switch(gameMapInfo.getMapType()) {
+            case INSTANCE:
+                worldHandler = new InstanceWorldHandler();
+                break;
+            default:
+                throw new UnsupportedOperationException("Unsupported map type: " + gameMapInfo.getMapType());
+        }
     }
 
     private void loadMap(GameGroup gameGroup) {
-
-        String randomWorldName = getRandomWorldName(gameMapInfo.getName());
-        Path copyFrom = gameGroup.getGame().getMapDirectory().resolve(gameMapInfo.getMapFolder());
-
-        boolean ramdisk = gameGroup.getGame().getRamdiskDirectory() != null;
-        Path copyTo;
-
-        if (ramdisk) {
-            ramdiskPath = gameGroup.getGame().getRamdiskDirectory().resolve(randomWorldName);
-            copyTo = ramdiskPath;
-        } else {
-            copyTo = Paths.get("./" + randomWorldName + "/");
-        }
-
-        try {
-            DirectoryUtils.copy(copyFrom, copyTo);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        if (ramdisk) {
-            try {
-                Path linkLocation = Paths.get("./" + randomWorldName + "/");
-                Files.deleteIfExists(linkLocation);
-
-                Files.createSymbolicLink(linkLocation, copyTo);
-            } catch (IOException e) {
-                System.out.println("Failed to create symbolic link for map: " + randomWorldName);
-                e.printStackTrace();
-            }
-        }
-
-        try {
-            Files.deleteIfExists(copyTo.resolve("uid.dat"));
-        } catch (IOException e) {
-            System.out.println("Could not delete uid.dat for world. This could cause errors");
-            e.printStackTrace();
-        }
-
-        WorldCreator creator = new WorldCreator(randomWorldName);
-
-        creator.environment(gameMapInfo.getEnvironment());
-
-        world = creator.createWorld();
-        world.setAutoSave(false);
+        world = worldHandler.loadWorld(gameGroup, this);
 
         configureWorld();
     }
 
-    private String getRandomWorldName(String mapName) {
-        int count = 0;
-        String randomWorldName;
-        do {
-            randomWorldName = mapName + "-" + String.format("%04X", count++);
-        } while (Bukkit.getWorld(randomWorldName) != null);
 
-        return randomWorldName;
-    }
 
     private void configureWorld() {
         Config config = gameMapInfo.getConfig();
@@ -202,31 +161,7 @@ public class BaseMap implements GameMap, ConfigHolder {
 
         pastedSchematics.forEach(PastedSchematic::removed);
 
-        if (!world.getPlayers().isEmpty()) System.out.println("There are still players in an unloading map!");
-
-        for (Player player : world.getPlayers()) {
-            player.teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
-        }
-
-        boolean success = Bukkit.unloadWorld(world, false);
-
-        if (ramdiskPath != null) {
-            try {
-                DirectoryUtils.delete(ramdiskPath);
-            } catch (IOException e) {
-                System.out.println("Failed to delete map on ramdisk.");
-                e.printStackTrace();
-            }
-        }
-
-        try {
-            DirectoryUtils.delete(world.getWorldFolder().toPath());
-        } catch (IOException e) {
-            System.out.println("Failed to unload map. When bukkit tried to unload, it returned " + success);
-            System.out.println("Please make sure there are no players in the map before deleting?");
-            e.printStackTrace();
-        }
-
+        worldHandler.unloadWorld(this);
     }
 
     @Override
@@ -374,5 +309,10 @@ public class BaseMap implements GameMap, ConfigHolder {
 
     @Override public Location getSpawn() {
         return world.getSpawnLocation();
+    }
+
+    @Override
+    public MapType getMapType() {
+        return gameMapInfo.getMapType();
     }
 }

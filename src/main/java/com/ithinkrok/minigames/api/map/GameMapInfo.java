@@ -20,4 +20,6 @@ public interface GameMapInfo {
     String getMapFolder();
 
     World.Environment getEnvironment();
+
+    MapType getMapType();
 }
