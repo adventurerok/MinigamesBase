@@ -663,9 +663,12 @@ public class BaseUser implements Listener, User {
         doInFuture(task -> {
             if (!isPlayer()) return;
 
+            Inventory old = null;
+            if(this.openInventory != null) old = getPlayer().getOpenInventory().getTopInventory();
+
             this.openInventory = inventory;
             this.inventoryTether = inventoryTether != null ? inventoryTether.toVector() : null;
-            getPlayer().openInventory(inventory.createInventory(this));
+            getPlayer().openInventory(inventory.createInventory(this, old));
         });
     }
 

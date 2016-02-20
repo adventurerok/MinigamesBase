@@ -65,6 +65,16 @@ public class ClickableInventory {
         return populateInventory(inventory, user);
     }
 
+    public Inventory createInventory(User user, Inventory old) {
+        if(old == null || items.size() > old.getSize()) {
+            old = user.createInventory(items.size(), title);
+        } else {
+            old.clear();
+        }
+
+        return populateInventory(old, user);
+    }
+
     public Inventory populateInventory(Inventory inventory, User user) {
         for (ClickableItem item : items.values()) {
             CalculateItemForUserEvent event = new CalculateItemForUserEvent(user, this, item);
