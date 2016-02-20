@@ -3,6 +3,7 @@ package com.ithinkrok.minigames.api.database;
 import com.avaje.ebean.Query;
 import com.ithinkrok.minigames.api.user.User;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
@@ -196,22 +197,30 @@ public class Database implements DatabaseTaskRunner {
         });
     }
 
-    public void getUserScore(User user, String gameType, DoubleConsumer consumer, double def) {
-        getUserScore(user.getUuid(), gameType, consumer, def);
+    public void getUserScore(User user, String gameType, Consumer<UserScore> consumer) {
+        getUserScore(user.getUuid(), gameType, consumer);
     }
 
-    public void getUserScore(UUID user, String gameType, DoubleConsumer consumer, double def) {
+    public void getUserScore(UUID user, String gameType, Consumer<UserScore> consumer) {
         doDatabaseTask(accessor -> {
             Query<UserScore> query = accessor.find(UserScore.class);
 
             query.where().eq("player_uuid", user.toString()).eq("game", gameType);
 
             UserScore result = query.findUnique();
-            if(result == null) {
-                consumer.accept(def);
-            } else {
-                consumer.accept(result.getValue());
-            }
+            consumer.accept(result);
+        });
+    }
+
+    public void getHighScores(String gameType, int count, Consumer<List<UserScore>> consumer) {
+        doDatabaseTask(accessor -> {
+            Query<UserScore> query = accessor.find(UserScore.class);
+
+            query.where().eq("game", gameType);
+            query.orderBy("value desc");
+
+            query.setMaxRows(count);
+            consumer.accept(query.findList());
         });
     }
 
