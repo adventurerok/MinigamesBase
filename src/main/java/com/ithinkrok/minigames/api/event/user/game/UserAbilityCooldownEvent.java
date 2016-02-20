@@ -1,8 +1,8 @@
 package com.ithinkrok.minigames.api.event.user.game;
 
-import com.ithinkrok.minigames.api.User;
+import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.event.user.UserEvent;
-import com.ithinkrok.minigames.base.util.SoundEffect;
+import com.ithinkrok.minigames.api.util.SoundEffect;
 
 /**
  * Created by paul on 03/01/16.

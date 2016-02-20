@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.api.map;
 
-import com.ithinkrok.minigames.base.util.io.FileLoader;
+import com.ithinkrok.minigames.api.util.io.FileLoader;
 import com.ithinkrok.util.config.Config;
 import org.bukkit.World;
 

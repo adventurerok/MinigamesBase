@@ -1,7 +1,7 @@
 package com.ithinkrok.minigames.base.command;
 
-import com.ithinkrok.minigames.base.Nameable;
-import com.ithinkrok.minigames.base.util.io.ListenerLoader;
+import com.ithinkrok.minigames.api.Nameable;
+import com.ithinkrok.minigames.api.util.io.ListenerLoader;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomListener;
 

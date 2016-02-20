@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.api.event.user.state;
 
-import com.ithinkrok.minigames.api.User;
+import com.ithinkrok.minigames.api.user.User;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;

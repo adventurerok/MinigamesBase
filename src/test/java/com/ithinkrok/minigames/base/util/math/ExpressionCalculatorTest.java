@@ -1,5 +1,7 @@
 package com.ithinkrok.minigames.base.util.math;
 
+import com.ithinkrok.minigames.api.util.math.ExpressionCalculator;
+import com.ithinkrok.minigames.api.util.math.Variables;
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
 import org.junit.Test;

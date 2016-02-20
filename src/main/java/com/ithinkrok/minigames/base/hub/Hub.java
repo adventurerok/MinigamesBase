@@ -1,11 +1,11 @@
 package com.ithinkrok.minigames.base.hub;
 
-import com.ithinkrok.minigames.base.protocol.ClientMinigamesRequestProtocol;
-import com.ithinkrok.minigames.base.protocol.data.ControllerInfo;
-import com.ithinkrok.minigames.base.protocol.event.GameGroupKilledEvent;
-import com.ithinkrok.minigames.base.protocol.event.GameGroupSpawnedEvent;
-import com.ithinkrok.minigames.base.protocol.event.GameGroupUpdateEvent;
-import com.ithinkrok.minigames.base.util.InventoryUtils;
+import com.ithinkrok.minigames.api.protocol.ClientMinigamesRequestProtocol;
+import com.ithinkrok.minigames.api.protocol.data.ControllerInfo;
+import com.ithinkrok.minigames.api.protocol.event.GameGroupKilledEvent;
+import com.ithinkrok.minigames.api.protocol.event.GameGroupSpawnedEvent;
+import com.ithinkrok.minigames.api.protocol.event.GameGroupUpdateEvent;
+import com.ithinkrok.minigames.api.util.InventoryUtils;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;
 import com.ithinkrok.util.config.YamlConfigIO;

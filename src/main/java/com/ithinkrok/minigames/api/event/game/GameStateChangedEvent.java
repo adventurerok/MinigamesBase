@@ -1,7 +1,7 @@
 package com.ithinkrok.minigames.api.event.game;
 
 import com.ithinkrok.minigames.api.GameGroup;
-import com.ithinkrok.minigames.base.GameState;
+import com.ithinkrok.minigames.api.GameState;
 
 /**
  * Created by paul on 02/01/16.

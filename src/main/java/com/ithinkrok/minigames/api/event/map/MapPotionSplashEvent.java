@@ -1,7 +1,7 @@
 package com.ithinkrok.minigames.api.event.map;
 
 import com.ithinkrok.minigames.api.GameGroup;
-import com.ithinkrok.minigames.api.User;
+import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.map.GameMap;
 import com.ithinkrok.util.event.Cancellable;
 import org.bukkit.entity.LivingEntity;

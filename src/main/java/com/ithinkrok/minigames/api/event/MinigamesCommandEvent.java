@@ -1,7 +1,7 @@
 package com.ithinkrok.minigames.api.event;
 
-import com.ithinkrok.minigames.base.command.MinigamesCommand;
-import com.ithinkrok.minigames.base.command.MinigamesCommandSender;
+import com.ithinkrok.minigames.api.command.MinigamesCommand;
+import com.ithinkrok.minigames.api.command.MinigamesCommandSender;
 import com.ithinkrok.util.command.event.CustomCommandEvent;
 
 /**

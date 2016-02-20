@@ -1,7 +1,7 @@
 package com.ithinkrok.minigames.api.event.user.game;
 
-import com.ithinkrok.minigames.api.Team;
-import com.ithinkrok.minigames.api.User;
+import com.ithinkrok.minigames.api.team.Team;
+import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.event.user.UserEvent;
 
 /**

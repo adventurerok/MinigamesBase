@@ -1,12 +1,12 @@
 package com.ithinkrok.minigames.base;
 
 import com.ithinkrok.minigames.api.Game;
-import com.ithinkrok.minigames.base.database.BooleanUserValue;
-import com.ithinkrok.minigames.base.database.DoubleUserValue;
-import com.ithinkrok.minigames.base.database.IntUserValue;
-import com.ithinkrok.minigames.base.database.StringUserValue;
+import com.ithinkrok.minigames.api.database.BooleanUserValue;
+import com.ithinkrok.minigames.api.database.DoubleUserValue;
+import com.ithinkrok.minigames.api.database.IntUserValue;
+import com.ithinkrok.minigames.api.database.StringUserValue;
 import com.ithinkrok.minigames.base.hub.Hub;
-import com.ithinkrok.minigames.base.protocol.ClientMinigamesRequestProtocol;
+import com.ithinkrok.minigames.api.protocol.ClientMinigamesRequestProtocol;
 import com.ithinkrok.msm.bukkit.util.BukkitConfig;
 import com.ithinkrok.msm.client.impl.MSMClient;
 import com.ithinkrok.util.config.Config;

@@ -1,7 +1,7 @@
 package com.ithinkrok.minigames.base.gamestate;
 
 import com.ithinkrok.minigames.api.GameGroup;
-import com.ithinkrok.minigames.api.User;
+import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.api.event.MinigamesCommandEvent;
 import com.ithinkrok.minigames.api.event.game.CountdownFinishedEvent;
@@ -15,12 +15,12 @@ import com.ithinkrok.minigames.api.event.user.inventory.UserInventoryClickEvent;
 import com.ithinkrok.minigames.api.event.user.state.UserDamagedEvent;
 import com.ithinkrok.minigames.api.event.user.state.UserFoodLevelChangeEvent;
 import com.ithinkrok.minigames.api.event.user.world.*;
-import com.ithinkrok.minigames.base.Countdown;
-import com.ithinkrok.minigames.base.GameState;
+import com.ithinkrok.minigames.api.Countdown;
+import com.ithinkrok.minigames.api.GameState;
 import com.ithinkrok.minigames.base.scoreboard.MapScoreboardHandler;
-import com.ithinkrok.minigames.base.util.CountdownConfig;
-import com.ithinkrok.minigames.base.util.ItemGiver;
-import com.ithinkrok.minigames.base.util.MinigamesConfigs;
+import com.ithinkrok.minigames.api.util.CountdownConfig;
+import com.ithinkrok.minigames.api.util.ItemGiver;
+import com.ithinkrok.minigames.api.util.MinigamesConfigs;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;

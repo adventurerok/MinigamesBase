@@ -1,8 +1,8 @@
 package com.ithinkrok.minigames.base.hub;
 
-import com.ithinkrok.minigames.base.protocol.data.ControllerInfo;
-import com.ithinkrok.minigames.base.protocol.data.GameGroupInfo;
-import com.ithinkrok.minigames.base.util.InventoryUtils;
+import com.ithinkrok.minigames.api.protocol.data.ControllerInfo;
+import com.ithinkrok.minigames.api.protocol.data.GameGroupInfo;
+import com.ithinkrok.minigames.api.util.InventoryUtils;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;
 import org.apache.commons.lang.WordUtils;
