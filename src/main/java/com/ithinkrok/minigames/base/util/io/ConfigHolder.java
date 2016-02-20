@@ -1,10 +1,10 @@
 package com.ithinkrok.minigames.base.util.io;
 
+import com.ithinkrok.minigames.api.map.GameMapInfo;
 import com.ithinkrok.minigames.base.GameState;
 import com.ithinkrok.minigames.base.Kit;
 import com.ithinkrok.minigames.base.command.CommandConfig;
 import com.ithinkrok.minigames.base.item.CustomItem;
-import com.ithinkrok.minigames.base.map.GameMapInfo;
 import com.ithinkrok.minigames.base.schematic.Schematic;
 import com.ithinkrok.minigames.base.team.TeamIdentifier;
 import com.ithinkrok.minigames.base.util.JSONBook;

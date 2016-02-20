@@ -11,7 +11,10 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by paul on 31/12/15.

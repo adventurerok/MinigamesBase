@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.base.schematic.event;
 
-import com.ithinkrok.minigames.base.event.MinigamesEvent;
+import com.ithinkrok.minigames.api.event.MinigamesEvent;
 import com.ithinkrok.minigames.base.schematic.PastedSchematic;
 
 /**

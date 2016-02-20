@@ -1,7 +1,7 @@
 package com.ithinkrok.minigames.base.inventory;
 
 import com.ithinkrok.minigames.api.User;
-import com.ithinkrok.minigames.base.event.user.inventory.UserInventoryClickEvent;
+import com.ithinkrok.minigames.api.event.user.inventory.UserInventoryClickEvent;
 import com.ithinkrok.minigames.base.inventory.event.CalculateItemForUserEvent;
 import com.ithinkrok.minigames.base.inventory.event.UserClickItemEvent;
 import com.ithinkrok.minigames.base.util.InventoryUtils;

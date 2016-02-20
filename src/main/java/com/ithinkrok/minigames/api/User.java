@@ -1,12 +1,12 @@
 package com.ithinkrok.minigames.api;
 
+import com.ithinkrok.minigames.api.map.GameMap;
 import com.ithinkrok.minigames.base.Kit;
 import com.ithinkrok.minigames.base.Nameable;
 import com.ithinkrok.minigames.base.SharedObjectAccessor;
 import com.ithinkrok.minigames.base.command.MinigamesCommandSender;
 import com.ithinkrok.minigames.base.inventory.ClickableInventory;
 import com.ithinkrok.minigames.base.item.CustomItem;
-import com.ithinkrok.minigames.base.map.GameMap;
 import com.ithinkrok.minigames.base.metadata.MetadataHolder;
 import com.ithinkrok.minigames.base.metadata.UserMetadata;
 import com.ithinkrok.minigames.base.task.GameTask;

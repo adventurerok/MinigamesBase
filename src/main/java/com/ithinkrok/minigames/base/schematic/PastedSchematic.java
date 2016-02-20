@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.base.schematic;
 
-import com.ithinkrok.minigames.base.map.GameMap;
+import com.ithinkrok.minigames.api.map.GameMap;
 import com.ithinkrok.minigames.base.schematic.event.SchematicDestroyedEvent;
 import com.ithinkrok.minigames.base.schematic.event.SchematicFinishedEvent;
 import com.ithinkrok.minigames.base.task.GameTask;

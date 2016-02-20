@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.base.util.io;
 
-import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
+import com.ithinkrok.minigames.api.event.ListenerLoadedEvent;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventExecutor;
 import com.ithinkrok.util.event.CustomListener;

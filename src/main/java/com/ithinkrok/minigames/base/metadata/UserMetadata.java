@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.base.metadata;
 
-import com.ithinkrok.minigames.base.event.user.game.UserInGameChangeEvent;
+import com.ithinkrok.minigames.api.event.user.game.UserInGameChangeEvent;
 
 /**
  * Created by paul on 04/01/16.

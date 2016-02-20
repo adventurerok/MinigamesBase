@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.base.schematic;
 
-import com.ithinkrok.minigames.base.map.GameMap;
+import com.ithinkrok.minigames.api.map.GameMap;
 import com.ithinkrok.minigames.base.schematic.blockentity.BlockEntity;
 import com.ithinkrok.minigames.base.task.GameRunnable;
 import com.ithinkrok.minigames.base.task.GameTask;
@@ -14,7 +14,6 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.util.Vector;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;

@@ -1,7 +1,7 @@
 package com.ithinkrok.minigames.base.user;
 
 import com.ithinkrok.minigames.api.User;
-import com.ithinkrok.minigames.base.event.user.game.UserUpgradeEvent;
+import com.ithinkrok.minigames.api.event.user.game.UserUpgradeEvent;
 import com.ithinkrok.minigames.base.util.math.ExpressionCalculator;
 import com.ithinkrok.minigames.base.util.math.Variables;
 

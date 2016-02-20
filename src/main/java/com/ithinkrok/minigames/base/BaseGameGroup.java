@@ -4,32 +4,32 @@ import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.MutableClassToInstanceMap;
 import com.ithinkrok.minigames.api.Game;
 import com.ithinkrok.minigames.api.GameGroup;
+import com.ithinkrok.minigames.api.Team;
 import com.ithinkrok.minigames.api.User;
+import com.ithinkrok.minigames.api.event.MinigamesCommandEvent;
+import com.ithinkrok.minigames.api.event.MinigamesEvent;
+import com.ithinkrok.minigames.api.event.game.CountdownFinishedEvent;
+import com.ithinkrok.minigames.api.event.game.GameEvent;
+import com.ithinkrok.minigames.api.event.game.GameStateChangedEvent;
+import com.ithinkrok.minigames.api.event.game.MapChangedEvent;
+import com.ithinkrok.minigames.api.event.map.MapBlockBreakNaturallyEvent;
+import com.ithinkrok.minigames.api.event.team.TeamEvent;
+import com.ithinkrok.minigames.api.event.user.UserEvent;
+import com.ithinkrok.minigames.api.event.user.game.UserJoinEvent;
+import com.ithinkrok.minigames.api.event.user.game.UserQuitEvent;
+import com.ithinkrok.minigames.api.event.user.world.UserBreakBlockEvent;
+import com.ithinkrok.minigames.api.map.GameMapInfo;
 import com.ithinkrok.minigames.base.command.CommandConfig;
 import com.ithinkrok.minigames.base.command.MinigamesCommand;
 import com.ithinkrok.minigames.base.database.DatabaseTask;
-import com.ithinkrok.minigames.base.event.MinigamesCommandEvent;
-import com.ithinkrok.minigames.base.event.MinigamesEvent;
-import com.ithinkrok.minigames.base.event.game.CountdownFinishedEvent;
-import com.ithinkrok.minigames.base.event.game.GameEvent;
-import com.ithinkrok.minigames.base.event.game.GameStateChangedEvent;
-import com.ithinkrok.minigames.base.event.game.MapChangedEvent;
-import com.ithinkrok.minigames.base.event.map.MapBlockBreakNaturallyEvent;
-import com.ithinkrok.minigames.base.event.team.TeamEvent;
-import com.ithinkrok.minigames.base.event.user.UserEvent;
-import com.ithinkrok.minigames.base.event.user.game.UserJoinEvent;
-import com.ithinkrok.minigames.base.event.user.game.UserQuitEvent;
-import com.ithinkrok.minigames.base.event.user.world.UserBreakBlockEvent;
 import com.ithinkrok.minigames.base.item.CustomItem;
 import com.ithinkrok.minigames.base.item.IdentifierMap;
-import com.ithinkrok.minigames.base.map.GameMap;
-import com.ithinkrok.minigames.base.map.GameMapInfo;
+import com.ithinkrok.minigames.base.map.BaseMap;
 import com.ithinkrok.minigames.base.metadata.Metadata;
 import com.ithinkrok.minigames.base.schematic.Schematic;
 import com.ithinkrok.minigames.base.task.GameRunnable;
 import com.ithinkrok.minigames.base.task.GameTask;
 import com.ithinkrok.minigames.base.task.TaskList;
-import com.ithinkrok.minigames.api.Team;
 import com.ithinkrok.minigames.base.team.TeamIdentifier;
 import com.ithinkrok.minigames.base.util.CountdownConfig;
 import com.ithinkrok.minigames.base.util.JSONBook;
@@ -85,7 +85,7 @@ public class BaseGameGroup implements GameGroup {
     private final Map<String, GameMapInfo> gameMapInfoMap = new HashMap<>();
     private final MultipleLanguageLookup languageLookup = new MultipleLanguageLookup();
     private GameState gameState;
-    private GameMap currentMap;
+    private BaseMap currentMap;
     private List<CustomListener> defaultAndMapListeners = new ArrayList<>();
     private Countdown countdown;
 
@@ -207,8 +207,8 @@ public class BaseGameGroup implements GameGroup {
     }
 
     @Override public void changeMap(GameMapInfo mapInfo) {
-        GameMap oldMap = currentMap;
-        GameMap newMap = new GameMap(this, mapInfo);
+        BaseMap oldMap = currentMap;
+        BaseMap newMap = new BaseMap(this, mapInfo);
 
         usersInGroup.values().forEach(newMap::teleportUser);
 
@@ -308,7 +308,7 @@ public class BaseGameGroup implements GameGroup {
         game.doDatabaseTask(databaseTask);
     }
 
-    @Override public GameMap getCurrentMap() {
+    @Override public BaseMap getCurrentMap() {
         return currentMap;
     }
 

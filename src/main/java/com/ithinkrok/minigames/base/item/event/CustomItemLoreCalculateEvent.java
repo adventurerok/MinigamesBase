@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.base.item.event;
 
-import com.ithinkrok.minigames.base.event.MinigamesEvent;
+import com.ithinkrok.minigames.api.event.MinigamesEvent;
 import com.ithinkrok.minigames.base.item.CustomItem;
 import com.ithinkrok.minigames.base.util.math.Variables;
 import com.ithinkrok.util.lang.LanguageLookup;

@@ -1,7 +1,7 @@
 package com.ithinkrok.minigames.base.listener;
 
-import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
-import com.ithinkrok.minigames.base.event.user.game.UserJoinEvent;
+import com.ithinkrok.minigames.api.event.ListenerLoadedEvent;
+import com.ithinkrok.minigames.api.event.user.game.UserJoinEvent;
 import com.ithinkrok.minigames.base.util.ItemGiver;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;

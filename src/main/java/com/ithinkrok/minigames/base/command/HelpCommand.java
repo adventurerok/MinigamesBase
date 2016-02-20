@@ -1,7 +1,7 @@
 package com.ithinkrok.minigames.base.command;
 
-import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
-import com.ithinkrok.minigames.base.event.MinigamesCommandEvent;
+import com.ithinkrok.minigames.api.event.ListenerLoadedEvent;
+import com.ithinkrok.minigames.api.event.MinigamesCommandEvent;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.Bukkit;

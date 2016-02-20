@@ -1,6 +1,7 @@
 package com.ithinkrok.minigames.base.schematic;
 
-import com.flowpowered.nbt.*;
+import com.flowpowered.nbt.CompoundMap;
+import com.flowpowered.nbt.CompoundTag;
 import com.flowpowered.nbt.stream.NBTInputStream;
 import com.ithinkrok.minigames.base.Nameable;
 import com.ithinkrok.minigames.base.schematic.blockentity.BlockEntity;
@@ -10,7 +11,6 @@ import com.ithinkrok.minigames.base.util.NBTConfigIO;
 import com.ithinkrok.msm.bukkit.util.BukkitConfigUtils;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;
-import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 import java.io.IOException;

@@ -1,7 +1,8 @@
 package com.ithinkrok.minigames.base.map;
 
 import com.ithinkrok.minigames.api.GameGroup;
-import com.ithinkrok.minigames.base.event.ListenerLoadedEvent;
+import com.ithinkrok.minigames.api.event.ListenerLoadedEvent;
+import com.ithinkrok.minigames.api.map.GameMap;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
