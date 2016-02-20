@@ -98,7 +98,7 @@ public class HubListener implements CustomListener {
 
     @CustomEventHandler
     public void onUserJoin(UserJoinEvent event) {
-        event.getUser().setInGame(true);
+
     }
 
     @CustomEventHandler
