@@ -4,12 +4,16 @@ import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.event.user.world.UserEditSignEvent;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.msm.common.util.ConfigUtils;
+import com.ithinkrok.util.StringUtils;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;
 import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Sign;
+import org.bukkit.util.StringUtil;
+
+import java.util.List;
 
 /**
  * Created by paul on 20/02/16.
@@ -65,10 +69,29 @@ public abstract class InfoSign implements CustomListener {
         for(int index = 0; index < 4; ++index) {
             String formatted = ConfigUtils.formatString(format[index], config);
 
+            formatted = StringUtils.convertAmpersandToSelectionCharacter(formatted);
+
             sign.setLine(index, formatted);
         }
 
         sign.update();
+    }
+
+    protected String[] loadFormatFromConfig(Config config, String key) {
+        return loadFormatFromConfig(config, key, null);
+    }
+
+    protected String[] loadFormatFromConfig(Config config, String key, String[] def) {
+        if(!config.contains(key)) return def;
+
+        List<String> format = config.getStringList(key);
+        String[] result = new String[4];
+
+        for (int index = 0; index < 4; ++index) {
+            result[index] = format.get(index);
+        }
+
+        return result;
     }
 
     public Config toConfig() {

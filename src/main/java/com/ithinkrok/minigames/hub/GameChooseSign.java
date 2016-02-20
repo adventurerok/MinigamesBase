@@ -9,10 +9,10 @@ import com.ithinkrok.minigames.api.protocol.data.GameGroupInfo;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
 import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.config.MemoryConfig;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.block.Sign;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
@@ -24,38 +24,52 @@ public class GameChooseSign extends HubSign {
 
     private final String runtimeID = UUID.randomUUID().toString();
 
+    private final String[] existsFormat;
+    private final String[] notExistsFormat;
+
     public GameChooseSign(UserEditSignEvent event) {
         super(event);
+
+        existsFormat = defaultExistsFormat();
+        notExistsFormat = defaultNotExistsFormat();
     }
 
     public GameChooseSign(GameGroup gameGroup, Config config) {
         super(gameGroup, config);
+
+        existsFormat = loadFormatFromConfig(config, "exists_format", defaultExistsFormat());
+        notExistsFormat = loadFormatFromConfig(config, "not_exists_format", defaultNotExistsFormat());
+    }
+
+    private String[] defaultExistsFormat() {
+        return new String[]{"&8[&3{formatted_type}&8]", "&cSpectate Games", "&8{amount} &0games available",
+                "&9Right click chose"};
+    }
+
+    private String[] defaultNotExistsFormat() {
+        return new String[]{"&8[&3{formatted_type}&8]", "", "&cNo Games", ""};
     }
 
     @Override
     protected void updateSign() {
-        Sign sign = (Sign) location.getBlock().getState();
+        Config config = new MemoryConfig();
 
-        sign.setLine(0, ChatColor.DARK_GRAY + "[" + ChatColor.DARK_AQUA +
-                WordUtils.capitalizeFully(gameGroupType.replace('_', ' ')) + ChatColor.DARK_GRAY + "]");
+        config.set("type", gameGroupType);
+        config.set("formatted_type", WordUtils.capitalizeFully(gameGroupType.replace('_', ' ')));
 
         Collection<GameGroupInfo> all = gameGroup.getControllerInfo().getGameGroups(gameGroupType);
 
+        config.set("amount", all.size());
+
         if (all.isEmpty()) {
-            sign.setLine(1, "");
-            sign.setLine(2, ChatColor.RED + "No Games");
-            sign.setLine(3, "");
+            updateSignFromFormat(notExistsFormat, config);
         } else {
-            sign.setLine(1, ChatColor.RED + "Spectate Games");
-            sign.setLine(2, ChatColor.DARK_GRAY.toString() + all.size() + ChatColor.BLACK + " games available");
-            sign.setLine(3, ChatColor.BLUE + "Right click chose");
+            updateSignFromFormat(existsFormat, config);
         }
 
-        sign.update();
-
-        for(User user : gameGroup.getUsers()) {
-            if(user.getClickableInventory() == null ||
-                    !user.getClickableInventory().getIdentifier().equals(runtimeID)) continue;
+        for (User user : gameGroup.getUsers()) {
+            if (user.getClickableInventory() == null || !user.getClickableInventory().getIdentifier().equals(runtimeID))
+                continue;
 
             updateInventory(user);
         }
