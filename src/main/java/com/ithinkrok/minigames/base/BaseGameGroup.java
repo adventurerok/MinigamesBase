@@ -4,6 +4,7 @@ import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.MutableClassToInstanceMap;
 import com.ithinkrok.minigames.api.*;
 import com.ithinkrok.minigames.api.command.MinigamesCommand;
+import com.ithinkrok.minigames.api.database.Database;
 import com.ithinkrok.minigames.api.database.DatabaseTask;
 import com.ithinkrok.minigames.api.event.MinigamesCommandEvent;
 import com.ithinkrok.minigames.api.event.MinigamesEvent;
@@ -87,6 +88,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     private final Map<String, CommandConfig> commandAliasesMap = new HashMap<>();
     private final Map<String, GameMapInfo> gameMapInfoMap = new HashMap<>();
     private final MultipleLanguageLookup languageLookup = new MultipleLanguageLookup();
+    private final Database database;
     private GameState gameState;
     private BaseMap currentMap;
     private List<CustomListener> defaultAndMapListeners = new ArrayList<>();
@@ -100,6 +102,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         this.game = game;
         this.name = name;
         this.type = type;
+        this.database = new Database(this);
 
         gameGroupListener = new GameGroupListener();
         defaultAndMapListeners = createDefaultAndMapListeners();
@@ -135,6 +138,11 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         this.motd = motd;
 
         game.getProtocol().sendGameGroupUpdatePayload(this);
+    }
+
+    @Override
+    public Database getDatabase() {
+        return database;
     }
 
     @SuppressWarnings("unchecked")

@@ -1,5 +1,6 @@
 package com.ithinkrok.minigames.api;
 
+import com.ithinkrok.minigames.api.database.Database;
 import com.ithinkrok.minigames.api.database.DatabaseTaskRunner;
 import com.ithinkrok.minigames.api.event.game.GameEvent;
 import com.ithinkrok.minigames.api.event.team.TeamEvent;
@@ -38,6 +39,8 @@ public interface GameGroup
     String getMotd();
 
     void setMotd(String motd);
+
+    Database getDatabase();
 
     String getType();
 
