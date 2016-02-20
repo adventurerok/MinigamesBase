@@ -216,10 +216,10 @@ public class Database implements DatabaseTaskRunner {
     }
 
     public void setUserScore(User user, String gameType, double value) {
-        setDoubleUserValue(user.getUuid(), user.getName(), gameType, value);
+        setUserScore(user.getUuid(), user.getName(), gameType, value);
     }
 
-    public void setDoubleUserValue(UUID user, String userName, String gameType, double value) {
+    public void setUserScore(UUID user, String userName, String gameType, double value) {
         doDatabaseTask(accessor -> {
             Query<UserScore> query = accessor.find(UserScore.class);
 
