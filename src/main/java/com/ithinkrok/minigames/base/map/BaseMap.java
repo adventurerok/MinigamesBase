@@ -76,6 +76,9 @@ public class BaseMap implements GameMap, ConfigHolder {
             case INSTANCE:
                 worldHandler = new InstanceWorldHandler();
                 break;
+            case SAVED:
+                worldHandler = new SavedWorldHandler();
+                break;
             default:
                 throw new UnsupportedOperationException("Unsupported map type: " + gameMapInfo.getMapType());
         }
