@@ -1,12 +1,12 @@
 package com.ithinkrok.minigames.api.team;
 
 import com.ithinkrok.minigames.api.GameGroup;
-import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.Nameable;
 import com.ithinkrok.minigames.api.SharedObjectAccessor;
 import com.ithinkrok.minigames.api.metadata.Metadata;
 import com.ithinkrok.minigames.api.metadata.MetadataHolder;
 import com.ithinkrok.minigames.api.task.TaskScheduler;
+import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.user.UserResolver;
 import com.ithinkrok.util.event.CustomListener;
 import com.ithinkrok.util.lang.LanguageLookup;

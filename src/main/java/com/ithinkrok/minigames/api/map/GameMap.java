@@ -1,12 +1,12 @@
 package com.ithinkrok.minigames.api.map;
 
-import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.SharedObjectAccessor;
 import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.schematic.PastedSchematic;
 import com.ithinkrok.minigames.api.schematic.Schematic;
 import com.ithinkrok.minigames.api.schematic.SchematicPaster;
 import com.ithinkrok.minigames.api.task.GameTask;
+import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.JSONBook;
 import com.ithinkrok.util.event.CustomListener;
 import com.ithinkrok.util.lang.LanguageLookup;

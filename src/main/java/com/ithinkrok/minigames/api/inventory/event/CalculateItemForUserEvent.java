@@ -1,9 +1,9 @@
 package com.ithinkrok.minigames.api.inventory.event;
 
-import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.event.user.UserEvent;
 import com.ithinkrok.minigames.api.inventory.ClickableInventory;
 import com.ithinkrok.minigames.api.inventory.ClickableItem;
+import com.ithinkrok.minigames.api.user.User;
 import org.bukkit.inventory.ItemStack;
 
 /**

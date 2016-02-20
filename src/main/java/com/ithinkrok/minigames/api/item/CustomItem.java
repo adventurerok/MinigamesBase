@@ -1,11 +1,11 @@
 package com.ithinkrok.minigames.api.item;
 
-import com.ithinkrok.minigames.api.user.User;
+import com.ithinkrok.minigames.api.Nameable;
 import com.ithinkrok.minigames.api.event.user.game.UserAbilityCooldownEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserAttackEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserInteractEvent;
-import com.ithinkrok.minigames.api.Nameable;
 import com.ithinkrok.minigames.api.item.event.CustomItemLoreCalculateEvent;
+import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
 import com.ithinkrok.minigames.api.util.io.ListenerLoader;
 import com.ithinkrok.minigames.api.util.math.Calculator;

@@ -1,8 +1,8 @@
 package com.ithinkrok.minigames.api.event.map;
 
 import com.ithinkrok.minigames.api.GameGroup;
-import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.map.GameMap;
+import com.ithinkrok.minigames.api.user.User;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;

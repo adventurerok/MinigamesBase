@@ -1,9 +1,9 @@
 package com.ithinkrok.minigames.util.inventory.event;
 
-import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.event.user.UserEvent;
-import com.ithinkrok.minigames.util.inventory.Buyable;
 import com.ithinkrok.minigames.api.inventory.ClickableInventory;
+import com.ithinkrok.minigames.api.user.User;
+import com.ithinkrok.minigames.util.inventory.Buyable;
 
 /**
  * Created by paul on 08/01/16.

@@ -1,11 +1,13 @@
 package com.ithinkrok.minigames.util.metadata;
 
-import com.ithinkrok.minigames.api.metadata.*;
-import com.ithinkrok.minigames.api.team.Team;
-import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.event.game.GameStateChangedEvent;
 import com.ithinkrok.minigames.api.event.game.MapChangedEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserInGameChangeEvent;
+import com.ithinkrok.minigames.api.metadata.Metadata;
+import com.ithinkrok.minigames.api.metadata.MetadataHolder;
+import com.ithinkrok.minigames.api.metadata.UserMetadata;
+import com.ithinkrok.minigames.api.team.Team;
+import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.util.config.Config;
 
 /**

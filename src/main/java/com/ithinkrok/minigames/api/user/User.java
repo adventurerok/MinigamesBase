@@ -1,18 +1,18 @@
 package com.ithinkrok.minigames.api.user;
 
 import com.ithinkrok.minigames.api.GameGroup;
-import com.ithinkrok.minigames.api.map.GameMap;
-import com.ithinkrok.minigames.api.team.Team;
 import com.ithinkrok.minigames.api.Kit;
 import com.ithinkrok.minigames.api.Nameable;
 import com.ithinkrok.minigames.api.SharedObjectAccessor;
 import com.ithinkrok.minigames.api.command.MinigamesCommandSender;
 import com.ithinkrok.minigames.api.inventory.ClickableInventory;
 import com.ithinkrok.minigames.api.item.CustomItem;
+import com.ithinkrok.minigames.api.map.GameMap;
 import com.ithinkrok.minigames.api.metadata.MetadataHolder;
 import com.ithinkrok.minigames.api.metadata.UserMetadata;
 import com.ithinkrok.minigames.api.task.GameTask;
 import com.ithinkrok.minigames.api.task.TaskScheduler;
+import com.ithinkrok.minigames.api.team.Team;
 import com.ithinkrok.minigames.api.team.TeamIdentifier;
 import com.ithinkrok.minigames.api.user.scoreboard.ScoreboardHandler;
 import com.ithinkrok.minigames.api.util.SoundEffect;
