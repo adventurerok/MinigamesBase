@@ -1,6 +1,6 @@
-package com.ithinkrok.minigames.api.inventory;
+package com.ithinkrok.minigames.util.inventory;
 
-import com.ithinkrok.minigames.api.inventory.event.BuyablePurchaseEvent;
+import com.ithinkrok.minigames.util.inventory.event.BuyablePurchaseEvent;
 import com.ithinkrok.minigames.api.inventory.event.CalculateItemForUserEvent;
 import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.util.InventoryUtils;

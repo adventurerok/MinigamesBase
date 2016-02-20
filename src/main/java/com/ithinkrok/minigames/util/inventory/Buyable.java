@@ -1,10 +1,11 @@
-package com.ithinkrok.minigames.api.inventory;
+package com.ithinkrok.minigames.util.inventory;
 
+import com.ithinkrok.minigames.api.inventory.ClickableItem;
 import com.ithinkrok.minigames.api.user.User;
-import com.ithinkrok.minigames.api.inventory.event.BuyablePurchaseEvent;
+import com.ithinkrok.minigames.util.inventory.event.BuyablePurchaseEvent;
 import com.ithinkrok.minigames.api.inventory.event.CalculateItemForUserEvent;
 import com.ithinkrok.minigames.api.inventory.event.UserClickItemEvent;
-import com.ithinkrok.minigames.api.metadata.Money;
+import com.ithinkrok.minigames.util.metadata.Money;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
 import com.ithinkrok.minigames.api.util.SoundEffect;
 import com.ithinkrok.minigames.api.util.math.Calculator;

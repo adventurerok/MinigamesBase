@@ -1,5 +1,7 @@
-package com.ithinkrok.minigames.api.metadata;
+package com.ithinkrok.minigames.util.metadata;
 
+import com.ithinkrok.minigames.api.metadata.Metadata;
+import com.ithinkrok.minigames.api.metadata.MetadataHolder;
 import com.ithinkrok.minigames.api.team.Team;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.util.config.Config;

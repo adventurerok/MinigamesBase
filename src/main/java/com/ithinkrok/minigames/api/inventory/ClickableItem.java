@@ -31,7 +31,7 @@ public abstract class ClickableItem implements Identifiable {
         return baseDisplay;
     }
 
-    public  void onCalculateItem(CalculateItemForUserEvent event) {
+    public void onCalculateItem(CalculateItemForUserEvent event) {
         //Does nothing by default as the event uses item.getBaseDisplayStack() by default
     }
 

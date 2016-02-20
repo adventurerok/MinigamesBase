@@ -1,4 +1,4 @@
-package com.ithinkrok.minigames.api.item;
+package com.ithinkrok.minigames.util.item;
 
 import com.ithinkrok.minigames.api.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserAttackEvent;

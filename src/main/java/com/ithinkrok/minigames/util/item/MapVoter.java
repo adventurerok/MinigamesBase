@@ -1,4 +1,4 @@
-package com.ithinkrok.minigames.api.item;
+package com.ithinkrok.minigames.util.item;
 
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.event.ListenerLoadedEvent;
@@ -7,7 +7,7 @@ import com.ithinkrok.minigames.api.map.GameMapInfo;
 import com.ithinkrok.minigames.api.inventory.ClickableInventory;
 import com.ithinkrok.minigames.api.inventory.ClickableItem;
 import com.ithinkrok.minigames.api.inventory.event.UserClickItemEvent;
-import com.ithinkrok.minigames.api.metadata.MapVote;
+import com.ithinkrok.minigames.util.metadata.MapVote;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;

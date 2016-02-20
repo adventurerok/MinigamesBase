@@ -1,5 +1,6 @@
-package com.ithinkrok.minigames.api.util;
+package com.ithinkrok.minigames.util;
 
+import com.ithinkrok.minigames.api.util.LocationChecker;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
