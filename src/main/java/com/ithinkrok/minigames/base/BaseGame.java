@@ -8,7 +8,6 @@ import com.ithinkrok.minigames.api.Kit;
 import com.ithinkrok.minigames.api.command.MinigamesCommand;
 import com.ithinkrok.minigames.api.database.DatabaseTask;
 import com.ithinkrok.minigames.api.database.Persistence;
-import com.ithinkrok.minigames.api.event.controller.ControllerGameGroupEvent;
 import com.ithinkrok.minigames.api.event.controller.ControllerKillGameGroupEvent;
 import com.ithinkrok.minigames.api.event.controller.ControllerSpawnGameGroupEvent;
 import com.ithinkrok.minigames.api.event.controller.ControllerUpdateGameGroupEvent;
@@ -187,57 +186,228 @@ public class BaseGame implements Game, FileLoader {
         }
     }
 
-    @Override public ClientMinigamesProtocol getProtocol() {
+    @Override
+    public ClientMinigamesProtocol getProtocol() {
         return protocol;
     }
 
-    @Override public Collection<String> getAvailableGameGroupTypes() {
+    @Override
+    public Collection<String> getAvailableGameGroupTypes() {
         return gameGroupConfigMap.keySet();
     }
 
-    @Override public Collection<BaseGameGroup> getGameGroups() {
+    @Override
+    public Collection<BaseGameGroup> getGameGroups() {
         return nameToGameGroup.values();
     }
 
-    @Override public String getName() {
+    @Override
+    public Path getAssetDirectory() {
+        return assetsDirectory;
+    }
+
+    @Override
+    public Path getRamdiskDirectory() {
+        return ramdiskDirectory;
+    }
+
+    @Override
+    public Path getConfigDirectory() {
+        return configDirectory;
+    }
+
+    @Override
+    public Path getMapDirectory() {
+        return mapDirectory;
+    }
+
+    @Override
+    public void registerListeners() {
+        Listener listener = new GameListener();
+        plugin.getServer().getPluginManager().registerEvents(listener, plugin);
+    }
+
+    @Override
+    public void sendPlayerToHub() {
+
+    }
+
+    @Override
+    public void registerGameGroupConfig(String name, String configFile) {
+        gameGroupConfigMap.put(name, configFile);
+    }
+
+    @Override
+    public void removeUser(User user) {
+        Validate.notNull(user, "user cannot be null");
+        if (!(user instanceof BaseUser)) throw new UnsupportedOperationException("Only supports BaseUser");
+
+        usersInServer.values().remove(user);
+
+        user.removeFromGameGroup();
+        user.cancelAllTasks();
+    }
+
+    @Override
+    public BaseGameGroup getGameGroup(String ggName) {
+        return nameToGameGroup.get(ggName);
+    }
+
+    @Override
+    public void unload() {
+        nameToGameGroup.values().forEach(GameGroup::unload);
+
+        persistence.onPluginDisabled();
+    }
+
+    @Override
+    public void removeGameGroup(GameGroup gameGroup) {
+        Validate.notNull(gameGroup, "gameGroup cannot be null");
+        if (!(gameGroup instanceof BaseGameGroup)) {
+            throw new UnsupportedOperationException("Only supports BaseGameGroup");
+        }
+
+        nameToGameGroup.values().remove(gameGroup);
+
+        protocol.sendGameGroupKilledPayload(gameGroup);
+    }
+
+    @Override
+    public void makeEntityRepresentUser(User user, Entity entity) {
+        entity.setMetadata("rep", new FixedMetadataValue(plugin, user.getUuid()));
+    }
+
+    @Override
+    public void makeEntityActualUser(User user, Entity entity) {
+        entity.setMetadata("actual", new FixedMetadataValue(plugin, user.getUuid()));
+    }
+
+    @Override
+    public void setGameGroupForMap(GameGroup gameGroup, String mapName) {
+        Validate.notNull(gameGroup, "gameGroup cannot be null");
+
+        if (!(gameGroup instanceof BaseGameGroup)) {
+            throw new UnsupportedOperationException("Only supports BaseGameGroup");
+        }
+
+        mapToGameGroup.values().remove(gameGroup);
+        mapToGameGroup.put(mapName, (BaseGameGroup) gameGroup);
+    }
+
+    @Override
+    public void makeEntityRepresentTeam(Team team, Entity entity) {
+        entity.setMetadata("team", new FixedMetadataValue(plugin, team.getName()));
+    }
+
+    @Override
+    public void disguiseUser(User user, EntityType type) {
+        disguiseController.disguise(user, type);
+    }
+
+    @Override
+    public void disguiseUser(User user, Disguise disguise) {
+        disguiseController.disguise(user, disguise);
+    }
+
+    @Override
+    public void unDisguiseUser(User user) {
+        disguiseController.unDisguise(user);
+    }
+
+    @Override
+    public void rejoinPlayer(Player player) {
+        BaseUser user = getUser(player.getUniqueId());
+        BaseGameGroup gameGroup = getGameGroupForJoining(player.getUniqueId());
+
+        if (user != null) {
+            BaseGameGroup oldGameGroup = user.getGameGroup();
+
+            if (oldGameGroup == gameGroup || gameGroup == null) {
+                user.becomePlayer(player);
+                gameGroup = oldGameGroup;
+            } else {
+                UserQuitEvent quitEvent = new UserQuitEvent(user, UserQuitEvent.QuitReason.CHANGED_GAMEGROUP);
+
+                oldGameGroup.userEvent(quitEvent);
+
+                removeUser(user);
+
+                user = createUser(gameGroup, null, player.getUniqueId(), player);
+            }
+        } else {
+            if (gameGroup == null) {
+                if (nameToGameGroup.isEmpty()) {
+                    createGameGroup(fallbackConfig);
+                }
+
+                gameGroup = getSpawnGameGroup();
+            }
+
+            user = createUser(gameGroup, null, player.getUniqueId(), player);
+        }
+
+        gameGroup.userEvent(new UserJoinEvent(user, UserJoinEvent.JoinReason.JOINED_SERVER));
+    }
+
+    @Override
+    public boolean sendPlayerToHub(Player player) {
+        Client client = protocol.getClient();
+
+        if (client == null) return false;
+
+        return client.changePlayerServer(player.getUniqueId(), hubServer);
+    }
+
+    @Override
+    public BaseGameGroup createGameGroup(String type) {
+        BaseGameGroup gameGroup = new BaseGameGroup(this, nextGameGroupName(type), type, gameGroupConfigMap.get(type));
+
+        nameToGameGroup.put(gameGroup.getName(), gameGroup);
+
+        getLogger().info("Created " + type + " gamegroup: " + gameGroup.getName());
+
+        protocol.sendGameGroupSpawnedPayload(gameGroup);
+
+        return gameGroup;
+    }
+
+    @Override
+    public BaseGameGroup getSpawnGameGroup() {
+        if (nameToGameGroup.isEmpty()) return null;
+
+        return nameToGameGroup.values().iterator().next();
+    }
+
+    @Override
+    public Logger getLogger() {
+        return plugin.getLogger();
+    }
+
+    @Override
+    public void preJoinGameGroup(UUID playerUUID, String type, String name) {
+        doInFuture(task -> {
+            playersJoiningGameGroupTypes.put(playerUUID, type);
+            if (name != null) playersJoinGameGroups.put(playerUUID, name);
+
+            User user = getUser(playerUUID);
+
+            if (user != null) {
+                if (!user.isPlayer()) return;
+
+                rejoinPlayer(user.getPlayer());
+            }
+
+        });
+    }
+
+    @Override
+    public String getName() {
         return name;
     }
 
     @Override
     public String getFormattedName() {
         return name;
-    }
-
-    @Override public Path getRamdiskDirectory() {
-        return ramdiskDirectory;
-    }
-
-    @Override public Path getConfigDirectory() {
-        return configDirectory;
-    }
-
-    @Override public Path getMapDirectory() {
-        return mapDirectory;
-    }
-
-    @Override public void registerListeners() {
-        Listener listener = new GameListener();
-        plugin.getServer().getPluginManager().registerEvents(listener, plugin);
-    }
-
-    @Override public void sendPlayerToHub() {
-
-    }
-
-    @Override public void registerGameGroupConfig(String name, String configFile) {
-        gameGroupConfigMap.put(name, configFile);
-    }
-
-    @Override public void removeUser(User user) {
-        usersInServer.values().remove(user);
-
-        user.removeFromGameGroup();
-        user.cancelAllTasks();
     }
 
     @Override
@@ -282,106 +452,8 @@ public class BaseGame implements Game, FileLoader {
     }
 
     @Override
-    public Path getAssetDirectory() {
-        return assetsDirectory;
-    }
-
-    @Override public BaseGameGroup getGameGroup(String ggName) {
-        return nameToGameGroup.get(ggName);
-    }
-
-    @Override public void unload() {
-        nameToGameGroup.values().forEach(GameGroup::unload);
-
-        persistence.onPluginDisabled();
-    }
-
-    @Override public void removeGameGroup(GameGroup gameGroup) {
-        nameToGameGroup.values().remove(gameGroup);
-
-        protocol.sendGameGroupKilledPayload(gameGroup);
-    }
-
-    @Override
     public void doDatabaseTask(DatabaseTask task) {
         persistence.doTask(task);
-    }
-
-    @Override public void makeEntityRepresentUser(User user, Entity entity) {
-        entity.setMetadata("rep", new FixedMetadataValue(plugin, user.getUuid()));
-    }
-
-    @Override public void makeEntityActualUser(User user, Entity entity) {
-        entity.setMetadata("actual", new FixedMetadataValue(plugin, user.getUuid()));
-    }
-
-    @Override public void setGameGroupForMap(GameGroup gameGroup, String mapName) {
-        Validate.notNull(gameGroup, "gameGroup cannot be null");
-
-        if(!(gameGroup instanceof BaseGameGroup)) {
-            throw new UnsupportedOperationException("Only supports BaseGameGroup");
-        }
-
-        mapToGameGroup.values().remove(gameGroup);
-        mapToGameGroup.put(mapName, (BaseGameGroup) gameGroup);
-    }
-
-    @Override public void makeEntityRepresentTeam(Team team, Entity entity) {
-        entity.setMetadata("team", new FixedMetadataValue(plugin, team.getName()));
-    }
-
-    @Override public void disguiseUser(User user, EntityType type) {
-        disguiseController.disguise(user, type);
-    }
-
-    @Override public void disguiseUser(User user, Disguise disguise) {
-        disguiseController.disguise(user, disguise);
-    }
-
-    @Override public void unDisguiseUser(User user) {
-        disguiseController.unDisguise(user);
-    }
-
-    @Override public void rejoinPlayer(Player player) {
-        BaseUser user = getUser(player.getUniqueId());
-        BaseGameGroup gameGroup = getGameGroupForJoining(player.getUniqueId());
-
-        if (user != null) {
-            BaseGameGroup oldGameGroup = user.getGameGroup();
-
-            if (oldGameGroup == gameGroup || gameGroup == null) {
-                user.becomePlayer(player);
-                gameGroup = oldGameGroup;
-            } else {
-                UserQuitEvent quitEvent = new UserQuitEvent(user, UserQuitEvent.QuitReason.CHANGED_GAMEGROUP);
-
-                oldGameGroup.userEvent(quitEvent);
-
-                removeUser(user);
-
-                user = createUser(gameGroup, null, player.getUniqueId(), player);
-            }
-        } else {
-            if (gameGroup == null) {
-                if (nameToGameGroup.isEmpty()) {
-                    createGameGroup(fallbackConfig);
-                }
-
-                gameGroup = getSpawnGameGroup();
-            }
-
-            user = createUser(gameGroup, null, player.getUniqueId(), player);
-        }
-
-        gameGroup.userEvent(new UserJoinEvent(user, UserJoinEvent.JoinReason.JOINED_SERVER));
-    }
-
-    @Override public boolean sendPlayerToHub(Player player) {
-        Client client = protocol.getClient();
-
-        if (client == null) return false;
-
-        return client.changePlayerServer(player.getUniqueId(), hubServer);
     }
 
     private BaseGameGroup getGameGroupForJoining(UUID uniqueId) {
@@ -412,24 +484,6 @@ public class BaseGame implements Game, FileLoader {
         return usersInServer.get(uuid);
     }
 
-    @Override public BaseGameGroup createGameGroup(String type) {
-        BaseGameGroup gameGroup = new BaseGameGroup(this, nextGameGroupName(type), type, gameGroupConfigMap.get(type));
-
-        nameToGameGroup.put(gameGroup.getName(), gameGroup);
-
-        getLogger().info("Created " + type + " gamegroup: " + gameGroup.getName());
-
-        protocol.sendGameGroupSpawnedPayload(gameGroup);
-
-        return gameGroup;
-    }
-
-    @Override public BaseGameGroup getSpawnGameGroup() {
-        if (nameToGameGroup.isEmpty()) return null;
-
-        return nameToGameGroup.values().iterator().next();
-    }
-
     private BaseUser createUser(BaseGameGroup gameGroup, BaseTeam team, UUID uuid, LivingEntity entity) {
         BaseUser user = new BaseUser(gameGroup, team, uuid, entity);
 
@@ -447,26 +501,6 @@ public class BaseGame implements Game, FileLoader {
         } while (nameToGameGroup.containsKey(result));
 
         return result;
-    }
-
-    @Override public Logger getLogger() {
-        return plugin.getLogger();
-    }
-
-    @Override public void preJoinGameGroup(UUID playerUUID, String type, String name) {
-        doInFuture(task -> {
-            playersJoiningGameGroupTypes.put(playerUUID, type);
-            if (name != null) playersJoinGameGroups.put(playerUUID, name);
-
-            User user = getUser(playerUUID);
-
-            if (user != null) {
-                if (!user.isPlayer()) return;
-
-                rejoinPlayer(user.getPlayer());
-            }
-
-        });
     }
 
     @Override
@@ -537,8 +571,8 @@ public class BaseGame implements Game, FileLoader {
 
             ProjectileSource thrower = event.getPotion().getShooter();
             User throwerUser = null;
-            if (thrower instanceof Entity) throwerUser = EntityUtils.getRepresentingUser(BaseGame.this, (Entity)
-                    thrower);
+            if (thrower instanceof Entity)
+                throwerUser = EntityUtils.getRepresentingUser(BaseGame.this, (Entity) thrower);
 
             gameGroup.gameEvent(new MapPotionSplashEvent(gameGroup, map, event, throwerUser));
         }
@@ -715,7 +749,7 @@ public class BaseGame implements Game, FileLoader {
             boolean noTeamFire = gameConfig.getBoolean("no_team_fire");
             boolean notInGameFire = gameConfig.getBoolean("not_in_game_fire");
 
-            if(gameConfig.getBoolean("all_fire")) {
+            if (gameConfig.getBoolean("all_fire")) {
                 friendlyFire = noTeamFire = notInGameFire = true;
             }
 
@@ -744,7 +778,7 @@ public class BaseGame implements Game, FileLoader {
             }
 
             if (Objects.equals(attackerTeam, targetTeam)) {
-                if (!(representing && attacker == target) &&!friendlyFire) {
+                if (!(representing && attacker == target) && !friendlyFire) {
                     event.setCancelled(true);
                     return;
                 }
@@ -850,21 +884,21 @@ public class BaseGame implements Game, FileLoader {
 
         @EventHandler
         public void eventGameGroupSpawned(GameGroupSpawnedEvent event) {
-            for(GameGroup gameGroup : getGameGroups()) {
+            for (GameGroup gameGroup : getGameGroups()) {
                 gameGroup.gameEvent(new ControllerSpawnGameGroupEvent(gameGroup, event));
             }
         }
 
         @EventHandler
         public void eventGameGroupUpdate(GameGroupUpdateEvent event) {
-            for(GameGroup gameGroup : getGameGroups()) {
+            for (GameGroup gameGroup : getGameGroups()) {
                 gameGroup.gameEvent(new ControllerUpdateGameGroupEvent(gameGroup, event));
             }
         }
 
         @EventHandler
         public void eventGameGroupKilled(GameGroupKilledEvent event) {
-            for(GameGroup gameGroup : getGameGroups()) {
+            for (GameGroup gameGroup : getGameGroups()) {
                 gameGroup.gameEvent(new ControllerKillGameGroupEvent(gameGroup, event));
             }
         }
