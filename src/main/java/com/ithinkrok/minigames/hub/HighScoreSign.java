@@ -142,8 +142,10 @@ public class HighScoreSign extends InfoSign {
 
     @CustomEventHandler
     public void onControllerGameGroupKilledEvent(ControllerKillGameGroupEvent event) {
-        if(!event.getGameGroup().getType().equals(gameType)) return;
+        if(!event.getControllerGameGroup().getType().equals(gameType)) return;
 
-        updateSign();
+        gameGroup.doInFuture(task -> {
+            update();
+        }, 100);
     }
 }
