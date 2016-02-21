@@ -1,5 +1,6 @@
 package com.ithinkrok.minigames.util.metadata;
 
+import com.ithinkrok.minigames.api.database.Database;
 import com.ithinkrok.minigames.api.metadata.Metadata;
 import com.ithinkrok.minigames.api.metadata.MetadataHolder;
 import com.ithinkrok.minigames.api.user.User;
@@ -20,10 +21,20 @@ public class UserMoney extends Money {
         Config config = user.getGameGroup().getSharedObjectOrEmpty("user_money_metadata");
 
         loadValues(config, "user");
+
+        Database database = user.getGameGroup().getDatabase();
+        database.getIntUserValue(user, "money_message_level", value -> {
+            messageLevel = value;
+        }, 1);
     }
 
     public void setMessageLevel(int messageLevel) {
+        if(this.messageLevel == messageLevel) return;
+
         this.messageLevel = messageLevel;
+
+        Database database = user.getGameGroup().getDatabase();
+        database.setIntUserValue(user, "money_message_level", messageLevel);
     }
 
     public int getMessageLevel() {
