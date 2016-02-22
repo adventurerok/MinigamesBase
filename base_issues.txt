@@ -11,3 +11,5 @@ Minigames controller:
  - Provides stats for all minigames (num players, etc...)
  - Manipulates bungee servers
  - Records minigame errors
+
+ - ADD COMMAND TO SHOW CONTROLLER STATE. THIS COULD HELP FIX BUG!
