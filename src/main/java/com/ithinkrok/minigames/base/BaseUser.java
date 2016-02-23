@@ -771,7 +771,7 @@ public class BaseUser implements Listener, User {
 
     @Override
     public Inventory createInventory(int size, String title) {
-        size = ((size / 9) + 1) * 9;
+        size = ((size + 8) / 9) * 9;
 
         return Bukkit.createInventory((InventoryHolder) entity, size, title);
     }
