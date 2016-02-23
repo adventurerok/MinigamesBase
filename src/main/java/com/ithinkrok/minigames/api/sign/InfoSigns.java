@@ -1,12 +1,13 @@
 package com.ithinkrok.minigames.api.sign;
 
+import com.google.common.collect.ClassToInstanceMap;
 import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.event.user.world.UserEditSignEvent;
-import com.ithinkrok.minigames.hub.sign.GameChooseSign;
-import com.ithinkrok.minigames.hub.sign.JoinLobbySign;
 import com.ithinkrok.util.config.Config;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,35 +16,33 @@ import java.util.Map;
  */
 public final class InfoSigns {
 
+    private static final Map<String, PlacedSignCreator> loadedSignCreatorMap = new HashMap<>();
+
     private InfoSigns() {
 
     }
-
-    public interface PlacedSignCreator {
-        InfoSign createSign(UserEditSignEvent event);
-    }
-
-    private static final Map<String, PlacedSignCreator> loadedSignCreatorMap = new HashMap<>();
-
 
     public static void registerSignType(String signTopLine, PlacedSignCreator creator) {
         loadedSignCreatorMap.put(signTopLine, creator);
     }
 
-    public static InfoSign createInfoSign(UserEditSignEvent event) {
+    public static InfoSign createInfoSign(UserEditSignEvent event, ClassToInstanceMap<SignController> signControllers) {
         PlacedSignCreator creator = loadedSignCreatorMap.get(event.getLine(0));
 
-        if(creator == null) return null;
+        if (creator == null) return null;
 
         try {
-            return creator.createSign(event);
+            SignController controller = getSignControllerForSign(signControllers, creator.getSignClass());
+
+            return creator.createSign(event, controller);
         } catch (Exception ignored) {
             event.getUser().sendLocale("info_sign.invalid");
             return null;
         }
     }
 
-    public static InfoSign loadInfoSign(GameGroup gameGroup, Config config) {
+    public static InfoSign loadInfoSign(GameGroup gameGroup, Config config,
+                                        ClassToInstanceMap<SignController> signControllers) {
         String className = config.getString("class");
 
         //The class names may have changed due to refactoring
@@ -51,20 +50,35 @@ public final class InfoSigns {
 
         try {
             Class<?> clazz = Class.forName(className);
+            Class<? extends InfoSign> signClass = clazz.asSubclass(InfoSign.class);
 
-            Class<? extends InfoSign> signClazz = clazz.asSubclass(InfoSign.class);
+            SignController controller = getSignControllerForSign(signControllers, signClass);
 
-            Constructor<? extends InfoSign> constructor = signClazz.getConstructor(GameGroup.class, Config.class);
+            Constructor<? extends InfoSign> constructor =
+                    signClass.getConstructor(GameGroup.class, Config.class, SignController.class);
 
-            return constructor.newInstance(gameGroup, config);
+            return constructor.newInstance(gameGroup, config, controller);
         } catch (Exception e) {
-            InfoSign sign = loadLegacySign(gameGroup, config);
-            if(sign != null) return sign;
-
             System.out.println("Error loading InfoSign config " + className);
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static SignController getSignControllerForSign(ClassToInstanceMap<SignController> signControllers,
+                                                          Class<? extends InfoSign> signClass)
+            throws ReflectiveOperationException {
+
+        Class<? extends SignController> controllerClass = getSignControllerClass(signClass);
+
+        SignController controller = null;
+        if (controllerClass != null) {
+            controller = signControllers.getInstance(controllerClass);
+            if (controller == null) {
+                controller = controllerClass.newInstance();
+            }
+        }
+        return controller;
     }
 
     private static String mapOldClassNameToNewClassName(String className) {
@@ -80,13 +94,35 @@ public final class InfoSigns {
         }
     }
 
-    private static InfoSign loadLegacySign(GameGroup gameGroup, Config config) {
-        if(!config.contains("type") || !config.contains("spectators")) return null;
+    private static Class<? extends SignController> getSignControllerClass(Class<?> signClass)
+            throws ReflectiveOperationException {
+        if (!InfoSign.class.isAssignableFrom(signClass)) return null;
 
-        if(config.getBoolean("spectators")) {
-            return new GameChooseSign(gameGroup, config);
-        } else {
-            return new JoinLobbySign(gameGroup, config);
+        try {
+            Method method = signClass.getMethod("getControllerClass");
+
+            if (!Modifier.isStatic(method.getModifiers())) {
+                return getSignControllerClass(signClass.getSuperclass());
+            }
+
+            Object result = method.invoke(null);
+            if (!(result instanceof Class<?>)) {
+                return getSignControllerClass(signClass.getSuperclass());
+            }
+
+            Class<?> resultClass = (Class<?>) result;
+            if (!SignController.class.isAssignableFrom(resultClass)) {
+                return getSignControllerClass(signClass.getSuperclass());
+            }
+
+            return resultClass.asSubclass(SignController.class);
+        } catch (ReflectiveOperationException ignored) {
+            return getSignControllerClass(signClass.getSuperclass());
         }
+    }
+
+    public interface PlacedSignCreator {
+        InfoSign createSign(UserEditSignEvent event, SignController signController);
+        Class<? extends InfoSign> getSignClass();
     }
 }

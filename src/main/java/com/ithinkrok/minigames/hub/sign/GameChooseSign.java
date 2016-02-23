@@ -6,6 +6,7 @@ import com.ithinkrok.minigames.api.inventory.ClickableInventory;
 import com.ithinkrok.minigames.api.inventory.ClickableItem;
 import com.ithinkrok.minigames.api.inventory.event.UserClickItemEvent;
 import com.ithinkrok.minigames.api.protocol.data.GameGroupInfo;
+import com.ithinkrok.minigames.api.sign.SignController;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
 import com.ithinkrok.util.config.Config;
@@ -27,15 +28,15 @@ public class GameChooseSign extends HubSign {
     private final String[] existsFormat;
     private final String[] notExistsFormat;
 
-    public GameChooseSign(UserEditSignEvent event) {
-        super(event);
+    public GameChooseSign(UserEditSignEvent event, SignController signController) {
+        super(event, signController);
 
         existsFormat = defaultExistsFormat();
         notExistsFormat = defaultNotExistsFormat();
     }
 
-    public GameChooseSign(GameGroup gameGroup, Config config) {
-        super(gameGroup, config);
+    public GameChooseSign(GameGroup gameGroup, Config config, SignController signController) {
+        super(gameGroup, config, signController);
 
         existsFormat = loadFormatFromConfig(config, "exists_format", defaultExistsFormat());
         notExistsFormat = loadFormatFromConfig(config, "not_exists_format", defaultNotExistsFormat());

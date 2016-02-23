@@ -5,6 +5,7 @@ import com.ithinkrok.minigames.api.database.UserScore;
 import com.ithinkrok.minigames.api.event.controller.ControllerKillGameGroupEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserEditSignEvent;
 import com.ithinkrok.minigames.api.sign.InfoSign;
+import com.ithinkrok.minigames.api.sign.SignController;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;
@@ -28,8 +29,9 @@ public class HighScoreSign extends InfoSign {
     protected final String mode;
     protected final String[] format;
 
-    public HighScoreSign(UserEditSignEvent event) {
-        super(event);
+
+    public HighScoreSign(UserEditSignEvent event, SignController signController) {
+        super(event, signController);
 
         gameType = event.getLine(1);
         position = Integer.parseInt(event.getLine(2));
@@ -39,8 +41,8 @@ public class HighScoreSign extends InfoSign {
     }
 
     @SuppressWarnings("unused")
-    public HighScoreSign(GameGroup gameGroup, Config config) {
-        super(gameGroup, config);
+    public HighScoreSign(GameGroup gameGroup, Config config, SignController signController) {
+        super(gameGroup, config, signController);
 
         gameType = config.getString("game_type");
         position = config.getInt("position");

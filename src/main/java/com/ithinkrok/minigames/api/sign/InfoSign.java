@@ -23,16 +23,19 @@ public abstract class InfoSign implements CustomListener {
 
     protected final GameGroup gameGroup;
     protected final Location location;
+    protected final SignController signController;
 
     protected int updateFrequency = 0;
 
-    public InfoSign(UserEditSignEvent event) {
+    public InfoSign(UserEditSignEvent event, SignController signController) {
+        this.signController = signController;
         location = event.getBlock().getLocation();
         gameGroup = event.getUserGameGroup();
     }
 
-    public InfoSign(GameGroup gameGroup, Config config) {
+    public InfoSign(GameGroup gameGroup, Config config, SignController signController) {
         this.gameGroup = gameGroup;
+        this.signController = signController;
 
         int x = config.getInt("x");
         int y = config.getInt("y");

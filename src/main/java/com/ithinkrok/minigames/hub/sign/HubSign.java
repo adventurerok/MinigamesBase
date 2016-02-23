@@ -4,12 +4,9 @@ import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.event.controller.ControllerGameGroupEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserEditSignEvent;
 import com.ithinkrok.minigames.api.sign.InfoSign;
-import com.ithinkrok.msm.common.util.ConfigUtils;
+import com.ithinkrok.minigames.api.sign.SignController;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
-import org.bukkit.block.Sign;
-
-import java.util.List;
 
 /**
  * Created by paul on 16/02/16.
@@ -18,14 +15,14 @@ public abstract class HubSign extends InfoSign {
 
     protected final String gameGroupType;
 
-    public HubSign(UserEditSignEvent event) {
-        super(event);
+    public HubSign(UserEditSignEvent event, SignController signController) {
+        super(event, signController);
 
         gameGroupType = event.getLine(1);
     }
 
-    public HubSign(GameGroup gameGroup, Config config) {
-        super(gameGroup, config);
+    public HubSign(GameGroup gameGroup, Config config, SignController signController) {
+        super(gameGroup, config, signController);
         gameGroupType = config.getString("type");
     }
 
