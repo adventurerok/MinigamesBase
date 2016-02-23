@@ -46,7 +46,7 @@ public class SpectateChooser implements CustomListener {
             meta.setOwner(user.getName());
             item.setItemMeta(meta);
 
-            inv.addItem(new ClickableItem(item) {
+            inv.addItem(new ClickableItem(item, -1) {
                 @Override
                 public void onClick(UserClickItemEvent event) {
                     User clicked = event.getUserGameGroup().getUser(userUUID);

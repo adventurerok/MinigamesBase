@@ -118,7 +118,7 @@ public class GameChooseSign extends HubSign {
             ItemStack item = InventoryUtils
                     .createItemWithNameAndLore(mat, 1, 0, gameGroup.getName(), lore.toArray(new String[lore.size()]));
 
-            ClickableItem clickableItem = new ClickableItem(item) {
+            ClickableItem clickableItem = new ClickableItem(item, updateFrequency) {
                 @Override
                 public void onClick(UserClickItemEvent event) {
                     user.sendMessage("Sending you to gamegroup: " + gameGroup.getName());

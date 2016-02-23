@@ -37,8 +37,8 @@ public abstract class Buyable extends ClickableItem {
 
     private final Map<String, Calculator> upgradeOnBuy = new HashMap<>();
 
-    public Buyable(ItemStack baseDisplay) {
-        super(baseDisplay);
+    public Buyable(ItemStack baseDisplay, int slot) {
+        super(baseDisplay, slot);
     }
 
     @Override

@@ -19,8 +19,8 @@ public class Upgradable extends Buyable {
     private String customItem;
     private boolean giveItem = true;
 
-    public Upgradable(ItemStack baseDisplay) {
-        super(baseDisplay);
+    public Upgradable(ItemStack baseDisplay, int slot) {
+        super(baseDisplay, slot);
     }
 
     @Override

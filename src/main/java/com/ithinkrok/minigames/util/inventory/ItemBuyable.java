@@ -25,8 +25,8 @@ public class ItemBuyable extends Buyable {
 
     private String noSpaceLocale;
 
-    public ItemBuyable(ItemStack baseDisplay) {
-        super(baseDisplay);
+    public ItemBuyable(ItemStack baseDisplay, int slot) {
+        super(baseDisplay, slot);
     }
 
     @Override

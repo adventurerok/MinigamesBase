@@ -64,7 +64,7 @@ public class MapVoter implements CustomListener {
             ItemStack display =
                     InventoryUtils.createItemWithNameAndLore(mapMaterial, 1, 0, mapName, description);
 
-            ClickableItem item = new ClickableItem(display) {
+            ClickableItem item = new ClickableItem(display, -1) {
                 @Override
                 public void onClick(UserClickItemEvent event) {
                     event.getUser().closeInventory();

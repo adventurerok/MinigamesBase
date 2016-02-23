@@ -48,7 +48,7 @@ public class KitChooser implements CustomListener {
             Kit kit = event.getUserGameGroup().getKit(kitName);
             ItemStack display = kit.getItem().clone();
 
-            ClickableItem item = new ClickableItem(display) {
+            ClickableItem item = new ClickableItem(display, -1) {
                 @Override
                 public void onClick(UserClickItemEvent event) {
                     if (kitName.equals(event.getUser().getKitName())) {

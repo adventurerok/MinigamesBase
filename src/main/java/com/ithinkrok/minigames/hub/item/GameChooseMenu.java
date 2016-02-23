@@ -42,7 +42,7 @@ public class GameChooseMenu implements CustomListener {
 
         for(Map.Entry<String, ItemStack> entry : gameGroups.entrySet()) {
 
-            ClickableItem item = new ClickableItem(entry.getValue()) {
+            ClickableItem item = new ClickableItem(entry.getValue(), -1) {
                 @Override
                 public void onClick(UserClickItemEvent event) {
                     event.getUser().sendMessage("test: " + entry.getKey());

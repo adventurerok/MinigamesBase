@@ -53,7 +53,7 @@ public class TeamChooser implements CustomListener {
             ItemStack display = InventoryUtils.createItemWithNameAndLore(chooserMaterial, 1, identifier.getDyeColor().getWoolData(),
                     identifier.getFormattedName());
 
-            ClickableItem item = new ClickableItem(display) {
+            ClickableItem item = new ClickableItem(display, -1) {
 
                 @Override
                 public void onClick(UserClickItemEvent event) {

@@ -37,11 +37,13 @@ public class ClickableInventory {
         for (Config config : items) {
             String className = config.getString("class");
             ItemStack display = MinigamesConfigs.getItemStack(config, "display");
+            int slot = config.getInt("slot", -1);
+
             try {
                 Class<? extends ClickableItem> itemClass = (Class<? extends ClickableItem>) Class.forName(className);
 
-                Constructor<? extends ClickableItem> constructor = itemClass.getConstructor(ItemStack.class);
-                ClickableItem item = constructor.newInstance(display);
+                Constructor<? extends ClickableItem> constructor = itemClass.getConstructor(ItemStack.class, int.class);
+                ClickableItem item = constructor.newInstance(display, slot);
 
                 Config itemConfig = config.getConfigOrNull("config");
                 if (itemConfig != null) item.configure(itemConfig);
@@ -70,22 +72,6 @@ public class ClickableInventory {
         return identifier;
     }
 
-    public Inventory createInventory(User user) {
-        Inventory inventory = user.createInventory(items.size(), title);
-
-        return populateInventory(inventory, user);
-    }
-
-    public Inventory createInventory(User user, Inventory old) {
-        if(old == null || items.size() > old.getSize()) {
-            old = user.createInventory(items.size(), title);
-        } else {
-            old.clear();
-        }
-
-        return populateInventory(old, user);
-    }
-
     public Inventory populateInventory(Inventory inventory, User user) {
         for (ClickableItem item : items.values()) {
             CalculateItemForUserEvent event = new CalculateItemForUserEvent(user, this, item);
@@ -96,10 +82,30 @@ public class ClickableInventory {
                 event.setDisplay(InventoryUtils.addIdentifier(event.getDisplay().clone(), item.getIdentifier()));
             }
 
-            inventory.addItem(event.getDisplay());
+            if(item.getSlot() >= 0) {
+                inventory.setItem(item.getSlot(), event.getDisplay());
+            } else {
+                inventory.addItem(event.getDisplay());
+            }
         }
 
         return inventory;
+    }
+
+    public Inventory createInventory(User user, Inventory old) {
+        if (old == null || items.size() > old.getSize()) {
+            int highestSlot = items.size();
+            for(ClickableItem item : items.values()) {
+                if(item.getSlot() + 1 > highestSlot) {
+                    highestSlot = item.getSlot() + 1;
+                }
+            }
+            old = user.createInventory(highestSlot, title);
+        } else {
+            old.clear();
+        }
+
+        return populateInventory(old, user);
     }
 
     public void inventoryClick(UserInventoryClickEvent event) {
