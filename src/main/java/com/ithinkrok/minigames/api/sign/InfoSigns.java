@@ -45,6 +45,7 @@ public final class InfoSigns {
     public static InfoSign loadInfoSign(GameGroup gameGroup, Config config,
                                         ClassToInstanceMap<SignController> signControllers) {
         String className = config.getString("class");
+        if(className == null) return null;
 
         //The class names may have changed due to refactoring
         className = mapOldClassNameToNewClassName(className);

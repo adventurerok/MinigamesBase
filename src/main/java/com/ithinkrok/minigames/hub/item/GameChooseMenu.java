@@ -6,6 +6,7 @@ import com.ithinkrok.minigames.api.inventory.ClickableInventory;
 import com.ithinkrok.minigames.api.inventory.ClickableItem;
 import com.ithinkrok.minigames.api.inventory.event.UserClickItemEvent;
 import com.ithinkrok.minigames.api.item.CustomItem;
+import com.ithinkrok.minigames.api.protocol.ClientMinigamesRequestProtocol;
 import com.ithinkrok.minigames.api.util.MinigamesConfigs;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
@@ -45,6 +46,9 @@ public class GameChooseMenu implements CustomListener {
                 @Override
                 public void onClick(UserClickItemEvent event) {
                     event.getUser().sendMessage("test: " + entry.getKey());
+
+                    ClientMinigamesRequestProtocol requestProtocol = event.getUserGameGroup().getRequestProtocol();
+                    requestProtocol.sendJoinGameGroupPacket(event.getUser().getUuid(), entry.getKey(), null);
                 }
             };
 
