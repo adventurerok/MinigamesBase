@@ -1,9 +1,10 @@
-package com.ithinkrok.minigames.hub;
+package com.ithinkrok.minigames.hub.sign;
 
 import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.event.user.world.UserEditSignEvent;
 import com.ithinkrok.minigames.api.protocol.data.GameGroupInfo;
 import com.ithinkrok.minigames.api.user.User;
+import com.ithinkrok.minigames.hub.sign.HubSign;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;
 import org.apache.commons.lang.WordUtils;

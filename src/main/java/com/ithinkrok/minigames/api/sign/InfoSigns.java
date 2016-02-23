@@ -2,8 +2,8 @@ package com.ithinkrok.minigames.api.sign;
 
 import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.event.user.world.UserEditSignEvent;
-import com.ithinkrok.minigames.hub.GameChooseSign;
-import com.ithinkrok.minigames.hub.JoinLobbySign;
+import com.ithinkrok.minigames.hub.sign.GameChooseSign;
+import com.ithinkrok.minigames.hub.sign.JoinLobbySign;
 import com.ithinkrok.util.config.Config;
 
 import java.lang.reflect.Constructor;
@@ -46,6 +46,9 @@ public final class InfoSigns {
     public static InfoSign loadInfoSign(GameGroup gameGroup, Config config) {
         String className = config.getString("class");
 
+        //The class names may have changed due to refactoring
+        className = mapOldClassNameToNewClassName(className);
+
         try {
             Class<?> clazz = Class.forName(className);
 
@@ -61,6 +64,19 @@ public final class InfoSigns {
             System.out.println("Error loading InfoSign config " + className);
             e.printStackTrace();
             return null;
+        }
+    }
+
+    private static String mapOldClassNameToNewClassName(String className) {
+        switch (className) {
+            case "com.ithinkrok.minigames.hub.HighScoreSign":
+                return "com.ithinkrok.minigames.hub.sign.HighScoreSign";
+            case "com.ithinkrok.minigames.hub.JoinLobbySign":
+                return "com.ithinkrok.minigames.hub.sign.JoinLobbySign";
+            case "com.ithinkrok.minigames.hub.GameChooseSign":
+                return "com.ithinkrok.minigames.hub.sign.GameChooseSign";
+            default:
+                return className;
         }
     }
 

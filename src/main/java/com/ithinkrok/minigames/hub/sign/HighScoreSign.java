@@ -1,4 +1,4 @@
-package com.ithinkrok.minigames.hub;
+package com.ithinkrok.minigames.hub.sign;
 
 import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.database.UserScore;
