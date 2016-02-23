@@ -22,8 +22,9 @@ public final class InfoSigns {
 
     }
 
-    public static void registerSignType(String signTopLine, PlacedSignCreator creator) {
-        loadedSignCreatorMap.put(signTopLine, creator);
+    public static void registerSignType(String signTopLine, Class<? extends InfoSign> signClass,
+                                        PlacedSignConstructor creator) {
+        loadedSignCreatorMap.put(signTopLine, new PlacedSignCreator(creator, signClass));
     }
 
     public static InfoSign createInfoSign(UserEditSignEvent event, ClassToInstanceMap<SignController> signControllers) {
@@ -121,8 +122,26 @@ public final class InfoSigns {
         }
     }
 
-    public interface PlacedSignCreator {
+    public interface PlacedSignConstructor {
         InfoSign createSign(UserEditSignEvent event, SignController signController);
-        Class<? extends InfoSign> getSignClass();
+    }
+
+    private static class PlacedSignCreator {
+
+        PlacedSignConstructor constructor;
+        Class<? extends InfoSign> signClass;
+
+        public PlacedSignCreator(PlacedSignConstructor constructor, Class<? extends InfoSign> signClass) {
+            this.constructor = constructor;
+            this.signClass = signClass;
+        }
+
+        InfoSign createSign(UserEditSignEvent event, SignController signController) {
+            return constructor.createSign(event, signController);
+        }
+
+        Class<? extends InfoSign> getSignClass() {
+            return signClass;
+        }
     }
 }

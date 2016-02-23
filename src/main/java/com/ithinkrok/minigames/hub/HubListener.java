@@ -1,5 +1,7 @@
 package com.ithinkrok.minigames.hub;
 
+import com.google.common.collect.ClassToInstanceMap;
+import com.google.common.collect.MutableClassToInstanceMap;
 import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.event.InfoSignEvent;
 import com.ithinkrok.minigames.api.event.ListenerLoadedEvent;
@@ -13,6 +15,7 @@ import com.ithinkrok.minigames.api.event.user.world.UserInteractWorldEvent;
 import com.ithinkrok.minigames.api.map.GameMap;
 import com.ithinkrok.minigames.api.sign.InfoSign;
 import com.ithinkrok.minigames.api.sign.InfoSigns;
+import com.ithinkrok.minigames.api.sign.SignController;
 import com.ithinkrok.minigames.api.task.GameTask;
 import com.ithinkrok.minigames.hub.sign.GameChooseSign;
 import com.ithinkrok.minigames.hub.sign.HighScoreSign;
@@ -39,14 +42,16 @@ import java.util.Map;
 public class HubListener implements CustomListener {
 
     static {
-        InfoSigns.registerSignType("%lobby_sign%", JoinLobbySign::new);
-        InfoSigns.registerSignType("%choose_sign%", GameChooseSign::new);
-        InfoSigns.registerSignType("%high_score%", HighScoreSign::new);
+        InfoSigns.registerSignType("%lobby_sign%", JoinLobbySign.class, JoinLobbySign::new);
+        InfoSigns.registerSignType("%choose_sign%", GameChooseSign.class, GameChooseSign::new);
+        InfoSigns.registerSignType("%high_score%", HighScoreSign.class, HighScoreSign::new);
     }
 
     private GameGroup gameGroup;
 
     private final Map<Location, InfoSign> signs = new HashMap<>();
+
+    private final ClassToInstanceMap<SignController> signControllers = MutableClassToInstanceMap.create();
 
     private Path configPath;
 
@@ -137,7 +142,7 @@ public class HubListener implements CustomListener {
                 continue;
             }
 
-            InfoSign sign = InfoSigns.loadInfoSign(gameGroup, signConfig);
+            InfoSign sign = InfoSigns.loadInfoSign(gameGroup, signConfig, signControllers);
             if(sign == null) continue;
 
             signs.put(sign.getLocation(), sign);
@@ -170,7 +175,7 @@ public class HubListener implements CustomListener {
 
     @CustomEventHandler
     public void onSignChange(UserEditSignEvent event) {
-        InfoSign sign = InfoSigns.createInfoSign(event);
+        InfoSign sign = InfoSigns.createInfoSign(event, signControllers);
         if(sign == null) return;
 
         signs.put(sign.getLocation(), sign);
