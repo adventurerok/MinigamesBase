@@ -134,7 +134,9 @@ public class GameChooseMenu implements CustomListener {
             Database database = user.getGameGroup().getDatabase();
             database.getBooleanUserValue(user, "mg_direct_join", aBoolean -> {
                 directJoin = aBoolean;
-                user.redoInventory();
+                user.doInFuture(task -> {
+                    user.redoInventory();
+                }, 2);
             }, false);
         }
 
