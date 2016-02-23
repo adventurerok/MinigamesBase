@@ -1,13 +1,22 @@
 package com.ithinkrok.minigames.hub.item;
 
+import com.ithinkrok.minigames.api.database.Database;
 import com.ithinkrok.minigames.api.event.ListenerLoadedEvent;
+import com.ithinkrok.minigames.api.event.game.GameStateChangedEvent;
+import com.ithinkrok.minigames.api.event.game.MapChangedEvent;
+import com.ithinkrok.minigames.api.event.user.game.UserInGameChangeEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.api.inventory.ClickableInventory;
 import com.ithinkrok.minigames.api.inventory.ClickableItem;
+import com.ithinkrok.minigames.api.inventory.event.CalculateItemForUserEvent;
 import com.ithinkrok.minigames.api.inventory.event.UserClickItemEvent;
 import com.ithinkrok.minigames.api.item.CustomItem;
+import com.ithinkrok.minigames.api.metadata.UserMetadata;
 import com.ithinkrok.minigames.api.protocol.ClientMinigamesRequestProtocol;
+import com.ithinkrok.minigames.api.user.User;
+import com.ithinkrok.minigames.api.util.InventoryUtils;
 import com.ithinkrok.minigames.api.util.MinigamesConfigs;
+import com.ithinkrok.minigames.hub.sign.GameChooseSign;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
@@ -23,6 +32,14 @@ public class GameChooseMenu implements CustomListener {
 
     private final Map<String, ItemStack> gameGroups = new HashMap<>();
 
+    private ItemStack directJoinOff;
+    private ItemStack directJoinOn;
+
+    private String inventoryTitleLocale;
+    private String transferLocale;
+    private String directJoinOnLocale;
+    private String directJoinOffLocale;
+
     @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent<?, CustomItem> event) {
         Config config = event.getConfigOrEmpty();
@@ -34,21 +51,35 @@ public class GameChooseMenu implements CustomListener {
 
             gameGroups.put(gameGroupType, item);
         }
+
+        directJoinOn = MinigamesConfigs.getItemStack(config, "direct_join_enabled_item");
+        directJoinOff = MinigamesConfigs.getItemStack(config, "direct_join_disabled_item");
+
+        inventoryTitleLocale = config.getString("inventory_title_locale", "game_chooser.title");
+        transferLocale = config.getString("transfer_locale", "game_chooser.transfer");
+        directJoinOnLocale = config.getString("direct_join_on_locale", "game_chooser.direct_join.enable");
+        directJoinOffLocale = config.getString("direct_join_off_locale", "game_chooser.direct_join.disable");
     }
 
     @CustomEventHandler
     public void onRightClick(UserInteractEvent event) {
-        ClickableInventory inventory = new ClickableInventory("Game Types");
+        String inventoryTitle = event.getUserGameGroup().getLocale(inventoryTitleLocale);
+        ClickableInventory inventory = new ClickableInventory(inventoryTitle);
+
+        GameChooseMetadata metadata = GameChooseMetadata.getOrCreate(event.getUser());
 
         for(Map.Entry<String, ItemStack> entry : gameGroups.entrySet()) {
 
             ClickableItem item = new ClickableItem(entry.getValue(), -1) {
                 @Override
                 public void onClick(UserClickItemEvent event) {
-                    event.getUser().sendMessage("Sending you to game type: " + entry.getKey());
-
-                    ClientMinigamesRequestProtocol requestProtocol = event.getUserGameGroup().getRequestProtocol();
-                    requestProtocol.sendJoinGameGroupPacket(event.getUser().getUuid(), entry.getKey(), null);
+                    if(metadata.isDirectJoin()) {
+                        event.getUser().sendLocale(transferLocale, entry.getKey());
+                        ClientMinigamesRequestProtocol requestProtocol = event.getUserGameGroup().getRequestProtocol();
+                        requestProtocol.sendJoinGameGroupPacket(event.getUser().getUuid(), entry.getKey(), null);
+                    } else {
+                        event.getUser().sendMessage("Not supported yet!");
+                    }
 
                     event.getUser().closeInventory();
                 }
@@ -57,8 +88,91 @@ public class GameChooseMenu implements CustomListener {
             inventory.addItem(item);
         }
 
-        //TODO toggle sending the user to the lobby (if possible) or sending the user to a hub area
+        ClickableItem directJoin = new ClickableItem(directJoinOff, 26) {
+
+            @Override
+            public void onCalculateItem(CalculateItemForUserEvent event) {
+                ItemStack item;
+
+                if(metadata.isDirectJoin()) {
+                    item = directJoinOn;
+                } else {
+                    item = directJoinOff;
+                }
+
+                item = InventoryUtils.addIdentifier(item, this.getIdentifier());
+                event.setDisplay(item);
+            }
+
+            @Override
+            public void onClick(UserClickItemEvent event) {
+                metadata.setDirectJoin(!metadata.isDirectJoin());
+                event.getUser().redoInventory();
+
+                if(metadata.isDirectJoin()) {
+                    event.getUser().sendLocale(directJoinOnLocale);
+                } else {
+                    event.getUser().sendLocale(directJoinOffLocale);
+                }
+            }
+        };
+
+        inventory.addItem(directJoin);
 
         event.getUser().showInventory(inventory, null);
+    }
+
+    private static class GameChooseMetadata extends UserMetadata {
+
+        private final User user;
+
+        private boolean directJoin = false;
+
+        public GameChooseMetadata(User user) {
+            this.user = user;
+
+            Database database = user.getGameGroup().getDatabase();
+            database.getBooleanUserValue(user, "mg_direct_join", aBoolean -> {
+                directJoin = aBoolean;
+                user.redoInventory();
+            }, false);
+        }
+
+        public boolean isDirectJoin() {
+            return directJoin;
+        }
+
+        public void setDirectJoin(boolean directJoin) {
+            this.directJoin = directJoin;
+
+            Database database = user.getGameGroup().getDatabase();
+            database.setBooleanUserValue(user, "mg_direct_join", directJoin);
+        }
+
+        @Override
+        public boolean removeOnInGameChange(UserInGameChangeEvent event) {
+            return false;
+        }
+
+        @Override
+        public boolean removeOnGameStateChange(GameStateChangedEvent event) {
+            return false;
+        }
+
+        @Override
+        public boolean removeOnMapChange(MapChangedEvent event) {
+            return false;
+        }
+
+        public static GameChooseMetadata getOrCreate(User user) {
+            GameChooseMetadata metadata = user.getMetadata(GameChooseMetadata.class);
+
+            if(metadata == null) {
+                metadata = new GameChooseMetadata(user);
+                user.setMetadata(metadata);
+            }
+
+            return metadata;
+        }
     }
 }
