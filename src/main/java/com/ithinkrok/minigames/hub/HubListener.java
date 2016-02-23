@@ -20,6 +20,7 @@ import com.ithinkrok.minigames.api.task.GameTask;
 import com.ithinkrok.minigames.hub.sign.GameChooseSign;
 import com.ithinkrok.minigames.hub.sign.HighScoreSign;
 import com.ithinkrok.minigames.hub.sign.JoinLobbySign;
+import com.ithinkrok.minigames.util.ItemGiver;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;
 import com.ithinkrok.util.config.YamlConfigIO;
@@ -59,6 +60,8 @@ public class HubListener implements CustomListener {
 
     private GameMap map;
 
+    private ItemGiver itemGiver;
+
     @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent<GameGroup, ?> event) {
         this.gameGroup = event.getCreator();
@@ -75,6 +78,10 @@ public class HubListener implements CustomListener {
 
         if(event.getRepresenting() instanceof GameMap) {
             this.map = (GameMap) event.getRepresenting();
+        }
+
+        if(config.contains("items")) {
+            itemGiver = new ItemGiver(config.getConfigOrNull("items"));
         }
     }
 
@@ -107,7 +114,9 @@ public class HubListener implements CustomListener {
 
     @CustomEventHandler
     public void onUserJoin(UserJoinEvent event) {
-
+        if(itemGiver != null) {
+            itemGiver.giveToUser(event.getUser());
+        }
     }
 
     @CustomEventHandler
