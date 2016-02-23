@@ -45,15 +45,19 @@ public class GameChooseMenu implements CustomListener {
             ClickableItem item = new ClickableItem(entry.getValue(), -1) {
                 @Override
                 public void onClick(UserClickItemEvent event) {
-                    event.getUser().sendMessage("test: " + entry.getKey());
+                    event.getUser().sendMessage("Sending you to game type: " + entry.getKey());
 
                     ClientMinigamesRequestProtocol requestProtocol = event.getUserGameGroup().getRequestProtocol();
                     requestProtocol.sendJoinGameGroupPacket(event.getUser().getUuid(), entry.getKey(), null);
+
+                    event.getUser().closeInventory();
                 }
             };
 
             inventory.addItem(item);
         }
+
+        //TODO toggle sending the user to the lobby (if possible) or sending the user to a hub area
 
         event.getUser().showInventory(inventory, null);
     }
