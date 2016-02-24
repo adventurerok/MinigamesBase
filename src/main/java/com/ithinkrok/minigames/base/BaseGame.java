@@ -343,6 +343,21 @@ public class BaseGame implements Game, FileLoader {
         }
 
         gameGroup.userEvent(new UserJoinEvent(user, UserJoinEvent.JoinReason.JOINED_SERVER));
+
+        final BaseUser finalUser = user;
+        user.doInFuture(task -> {
+           hideNonGameGroupPlayers(finalUser);
+        });
+    }
+
+    private void hideNonGameGroupPlayers(BaseUser user) {
+        for(Player player : plugin.getServer().getOnlinePlayers()) {
+            BaseUser other = getUser(player);
+            if(other != null && other.getGameGroup() == user.getGameGroup()) continue;
+
+            user.getPlayer().hidePlayer(player);
+            player.hidePlayer(user.getPlayer());
+        }
     }
 
     @Override
