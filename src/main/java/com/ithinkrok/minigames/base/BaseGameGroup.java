@@ -344,8 +344,8 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         config.set("motd", motd);
 
         if (currentMap != null) {
-            config.set("map", currentMap.getInfo().getName());
-            config.set("map_type", currentMap.getInfo().getMapType());
+            config.set("map.name", currentMap.getInfo().getName());
+            config.set("map.type", currentMap.getInfo().getMapType().toString());
         }
 
         config.set("server", game.getName());
