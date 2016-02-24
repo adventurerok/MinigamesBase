@@ -49,7 +49,7 @@ public class BooleanUserValue {
         this.property = property;
     }
 
-    public boolean getValue() {
+    public boolean isValue() {
         return value;
     }
 

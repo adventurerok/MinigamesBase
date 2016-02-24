@@ -125,7 +125,7 @@ public class Database implements DatabaseTaskRunner {
             if(result == null) {
                 consumer.accept(def);
             } else {
-                consumer.accept(result.getValue());
+                consumer.accept(result.isValue());
             }
         });
     }
