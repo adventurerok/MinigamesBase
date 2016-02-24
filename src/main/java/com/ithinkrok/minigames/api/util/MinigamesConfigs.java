@@ -1,6 +1,7 @@
 package com.ithinkrok.minigames.api.util;
 
 import com.ithinkrok.msm.bukkit.util.BukkitConfigUtils;
+import com.ithinkrok.util.StringUtils;
 import com.ithinkrok.util.config.Config;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -41,6 +42,7 @@ public class MinigamesConfigs {
         int damage = config.getInt("damage", 0);
 
         String name = config.getString("name", null);
+        if(name != null) name = StringUtils.convertAmpersandToSelectionCharacter(name);
 
         //TODO add more options for ItemStack loading
 
