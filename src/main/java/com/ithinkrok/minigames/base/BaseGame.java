@@ -347,6 +347,7 @@ public class BaseGame implements Game, FileLoader {
 
     @Override
     public boolean sendPlayerToHub(Player player) {
+        if(hubServer == null) return false;
         Client client = protocol.getClient();
 
         if (client == null) return false;
