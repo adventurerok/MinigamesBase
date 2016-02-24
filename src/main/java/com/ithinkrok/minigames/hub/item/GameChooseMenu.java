@@ -17,9 +17,11 @@ import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
 import com.ithinkrok.minigames.api.util.MinigamesConfigs;
 import com.ithinkrok.minigames.hub.sign.GameChooseSign;
+import com.ithinkrok.msm.bukkit.util.BukkitConfigUtils;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
+import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
@@ -30,7 +32,7 @@ import java.util.Map;
  */
 public class GameChooseMenu implements CustomListener {
 
-    private final Map<String, ItemStack> gameGroups = new HashMap<>();
+    private final Map<String, Config> gameGroups = new HashMap<>();
 
     private ItemStack directJoinOff;
     private ItemStack directJoinOn;
@@ -47,9 +49,7 @@ public class GameChooseMenu implements CustomListener {
         Config gameGroupsConfig = config.getConfigOrEmpty("gamegroups");
 
         for(String gameGroupType : gameGroupsConfig.getKeys(false)) {
-            ItemStack item = MinigamesConfigs.getItemStack(gameGroupsConfig, gameGroupType);
-
-            gameGroups.put(gameGroupType, item);
+            gameGroups.put(gameGroupType, gameGroupsConfig.getConfigOrNull(gameGroupType));
         }
 
         directJoinOn = MinigamesConfigs.getItemStack(config, "direct_join_enabled_item");
@@ -68,9 +68,10 @@ public class GameChooseMenu implements CustomListener {
 
         GameChooseMetadata metadata = GameChooseMetadata.getOrCreate(event.getUser());
 
-        for(Map.Entry<String, ItemStack> entry : gameGroups.entrySet()) {
+        for(Map.Entry<String, Config> entry : gameGroups.entrySet()) {
+            ItemStack display = MinigamesConfigs.getItemStack(entry.getValue(), "item");
 
-            ClickableItem item = new ClickableItem(entry.getValue(), -1) {
+            ClickableItem item = new ClickableItem(display, -1) {
                 @Override
                 public void onClick(UserClickItemEvent event) {
                     if(metadata.isDirectJoin()) {
@@ -78,7 +79,9 @@ public class GameChooseMenu implements CustomListener {
                         ClientMinigamesRequestProtocol requestProtocol = event.getUserGameGroup().getRequestProtocol();
                         requestProtocol.sendJoinGameGroupPacket(event.getUser().getUuid(), entry.getKey(), null);
                     } else {
-                        event.getUser().sendMessage("Not supported yet!");
+                        Location loc = BukkitConfigUtils.getLocation(entry.getValue(), event.getUser().getLocation()
+                                .getWorld(), "teleport");
+                        event.getUser().teleport(loc);
                     }
 
                     event.getUser().closeInventory();
