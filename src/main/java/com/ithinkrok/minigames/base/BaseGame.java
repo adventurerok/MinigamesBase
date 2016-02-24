@@ -290,8 +290,11 @@ public class BaseGame implements Game, FileLoader {
             throw new UnsupportedOperationException("Only supports BaseGameGroup");
         }
 
-        mapToGameGroup.values().remove(gameGroup);
         mapToGameGroup.put(mapName, (BaseGameGroup) gameGroup);
+    }
+
+    public void removeGameGroupForMap(String mapName) {
+        mapToGameGroup.remove(mapName);
     }
 
     @Override
@@ -484,6 +487,14 @@ public class BaseGame implements Game, FileLoader {
         return usersInServer.get(uuid);
     }
 
+    private BaseUser getUser(Entity entity) {
+        String mapName = entity.getWorld().getName();
+        BaseGameGroup gameGroup = mapToGameGroup.get(mapName);
+
+        if (gameGroup == null) return null;
+        return gameGroup.getUser(entity.getUniqueId());
+    }
+
     private BaseUser createUser(BaseGameGroup gameGroup, BaseTeam team, UUID uuid, LivingEntity entity) {
         BaseUser user = new BaseUser(gameGroup, team, uuid, entity);
 
@@ -563,8 +574,7 @@ public class BaseGame implements Game, FileLoader {
 
         @EventHandler
         public void eventPotionSplash(PotionSplashEvent event) {
-            String mapName = event.getPotion().getWorld().getName();
-            GameGroup gameGroup = mapToGameGroup.get(mapName);
+            GameGroup gameGroup = getGameGroup(event.getPotion().getWorld());
             if (gameGroup == null) return;
 
             GameMap map = gameGroup.getCurrentMap();
@@ -579,7 +589,11 @@ public class BaseGame implements Game, FileLoader {
 
         @EventHandler
         public void eventPlayerChat(AsyncPlayerChatEvent event) {
-            User user = getUser(event.getPlayer().getUniqueId());
+            User user = getUser(event.getPlayer());
+            if(user == null) {
+                System.out.println("Player not in gamegroup: " + event.getPlayer().getName());
+                return;
+            }
 
             Iterator<Player> it = event.getRecipients().iterator();
             while (it.hasNext()) {
@@ -664,19 +678,34 @@ public class BaseGame implements Game, FileLoader {
 
         @EventHandler
         public void eventPlayerDropItem(PlayerDropItemEvent event) {
-            User user = getUser(event.getPlayer().getUniqueId());
+            User user = getUser(event.getPlayer());
+            if(user == null) {
+                System.out.println("Player not in gamegroup: " + event.getPlayer().getName());
+                return;
+            }
+
             user.getGameGroup().userEvent(new UserDropItemEvent(user, event));
         }
 
         @EventHandler
         public void eventPlayerPickupItem(PlayerPickupItemEvent event) {
-            User user = getUser(event.getPlayer().getUniqueId());
+            User user = getUser(event.getPlayer());
+            if(user == null) {
+                System.out.println("Player not in gamegroup: " + event.getPlayer().getName());
+                return;
+            }
+
             user.getGameGroup().userEvent(new UserPickupItemEvent(user, event));
         }
 
         @EventHandler
         public void eventPlayerInteractWorld(PlayerInteractEvent event) {
-            User user = getUser(event.getPlayer().getUniqueId());
+            User user = getUser(event.getPlayer());
+            if(user == null) {
+                System.out.println("Player not in gamegroup: " + event.getPlayer().getName());
+                return;
+            }
+
             user.getGameGroup().userEvent(new UserInteractWorldEvent(user, event));
 
             if (event.isCancelled() && InventoryUtils.isArmor(event.getItem())) event.getPlayer().updateInventory();
@@ -684,19 +713,33 @@ public class BaseGame implements Game, FileLoader {
 
         @EventHandler
         public void eventBlockBreak(BlockBreakEvent event) {
-            User user = getUser(event.getPlayer().getUniqueId());
+            User user = getUser(event.getPlayer());
+            if(user == null) {
+                System.out.println("Player not in gamegroup: " + event.getPlayer().getName());
+                return;
+            }
+
             user.getGameGroup().userEvent(new UserBreakBlockEvent(user, event));
         }
 
         @EventHandler
         public void eventBlockPlace(BlockPlaceEvent event) {
-            User user = getUser(event.getPlayer().getUniqueId());
+            User user = getUser(event.getPlayer());
+            if(user == null) {
+                System.out.println("Player not in gamegroup: " + event.getPlayer().getName());
+                return;
+            }
+
             user.getGameGroup().userEvent(new UserPlaceBlockEvent(user, event));
         }
 
         @EventHandler
         public void eventCommandPreprocess(PlayerCommandPreprocessEvent event) {
-            User sender = getUser(event.getPlayer().getUniqueId());
+            User sender = getUser(event.getPlayer());
+            if(sender == null) {
+                System.out.println("Player not in gamegroup: " + event.getPlayer().getName());
+                return;
+            }
 
             List<String> correctedArgs = CommandUtils.splitStringIntoArguments(event.getMessage());
             String commandName = correctedArgs.get(0).toLowerCase();
@@ -789,12 +832,12 @@ public class BaseGame implements Game, FileLoader {
 
         @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
         public void eventEntityDamaged(EntityDamageEvent event) {
-            User attacked = EntityUtils.getActualUser(BaseGame.this, event.getEntity());
+            GameGroup gameGroup = getGameGroup(event.getEntity().getWorld());
+
+            User attacked = EntityUtils.getActualUser(gameGroup, event.getEntity());
             User attacker = null;
 
             if (attacked == null) {
-                String mapName = event.getEntity().getWorld().getName();
-                GameGroup gameGroup = mapToGameGroup.get(mapName);
                 if (gameGroup == null) return;
 
                 if (event instanceof EntityDamageByEntityEvent) {
@@ -860,25 +903,45 @@ public class BaseGame implements Game, FileLoader {
 
         @EventHandler
         public void eventPlayerFoodLevelChange(FoodLevelChangeEvent event) {
-            User user = getUser(event.getEntity().getUniqueId());
+            User user = getUser(event.getEntity());
+            if(user == null) {
+                System.out.println("Player not in gamegroup: " + event.getEntity().getName());
+                return;
+            }
+
             user.getGameGroup().userEvent(new UserFoodLevelChangeEvent(user, event));
         }
 
         @EventHandler
         public void eventPlayerInteractEntity(PlayerInteractEntityEvent event) {
-            User user = getUser(event.getPlayer().getUniqueId());
+            User user = getUser(event.getPlayer());
+            if(user == null) {
+                System.out.println("Player not in gamegroup: " + event.getPlayer().getName());
+                return;
+            }
+
             user.getGameGroup().userEvent(new UserRightClickEntityEvent(user, event));
         }
 
         @EventHandler
         public void eventPlayerInventoryClick(InventoryClickEvent event) {
-            User user = getUser(event.getWhoClicked().getUniqueId());
+            User user = getUser(event.getWhoClicked());
+            if(user == null) {
+                System.out.println("Player not in gamegroup: " + event.getWhoClicked().getName());
+                return;
+            }
+
             user.getGameGroup().userEvent(new UserInventoryClickEvent(user, event));
         }
 
         @EventHandler
         public void eventPlayerInventoryClose(InventoryCloseEvent event) {
-            User user = getUser(event.getPlayer().getUniqueId());
+            User user = getUser(event.getPlayer());
+            if(user == null) {
+                System.out.println("Player not in gamegroup: " + event.getPlayer().getName());
+                return;
+            }
+
             user.getGameGroup().userEvent(new UserInventoryCloseEvent(user, event));
         }
 
@@ -905,7 +968,12 @@ public class BaseGame implements Game, FileLoader {
 
         @EventHandler
         public void eventSignChange(SignChangeEvent event) {
-            User user = getUser(event.getPlayer().getUniqueId());
+            User user = getUser(event.getPlayer());
+            if(user == null) {
+                System.out.println("Player not in gamegroup: " + event.getPlayer().getName());
+                return;
+            }
+
             user.getGameGroup().userEvent(new UserEditSignEvent(user, event));
         }
     }

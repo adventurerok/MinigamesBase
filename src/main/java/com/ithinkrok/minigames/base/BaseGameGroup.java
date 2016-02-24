@@ -249,7 +249,10 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
         defaultAndMapListeners = createDefaultAndMapListeners(newMap.getListenerMap());
 
-        if (oldMap != null) oldMap.unloadMap();
+        if (oldMap != null){
+            oldMap.unloadMap();
+            game.removeGameGroupForMap(oldMap.getWorld().getName());
+        }
     }
 
     @Override public void stopCountdown() {
@@ -381,7 +384,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     }
 
     @Override
-    public User getUser(UUID uuid) {
+    public BaseUser getUser(UUID uuid) {
         return usersInGroup.get(uuid);
     }
 
@@ -468,7 +471,12 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     }
 
     @Override public void unload() {
+        if(currentMap == null) return;
+
+        String mapName = currentMap.getWorld().getName();
         currentMap.unloadMap();
+        game.removeGameGroupForMap(mapName);
+        currentMap = null;
     }
 
     @Override public void bindTaskToCurrentGameState(GameTask task) {
@@ -656,8 +664,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         }
 
         doInFuture(task -> {
-            currentMap.unloadMap();
-            currentMap = null;
+            unload();
         });
 
     }
