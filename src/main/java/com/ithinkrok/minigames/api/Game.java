@@ -7,6 +7,7 @@ import com.ithinkrok.minigames.api.team.Team;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.user.UserResolver;
 import com.ithinkrok.minigames.api.util.disguise.Disguise;
+import com.ithinkrok.minigames.base.BaseUser;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -19,7 +20,7 @@ import java.util.logging.Logger;
 /**
  * Created by paul on 20/02/16.
  */
-public interface Game extends TaskScheduler, UserResolver, DatabaseTaskRunner, Nameable {
+public interface Game extends TaskScheduler, DatabaseTaskRunner, Nameable {
     ClientMinigamesProtocol getProtocol();
 
     Collection<String> getAvailableGameGroupTypes();
@@ -73,4 +74,6 @@ public interface Game extends TaskScheduler, UserResolver, DatabaseTaskRunner, N
     Logger getLogger();
 
     void preJoinGameGroup(UUID playerUUID, String type, String name);
+
+    BaseUser getUser(Entity entity);
 }

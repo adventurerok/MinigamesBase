@@ -7,6 +7,7 @@ import com.ithinkrok.msm.client.ClientListener;
 import com.ithinkrok.msm.common.Channel;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;
+import org.bukkit.Bukkit;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -219,7 +220,7 @@ public class ClientMinigamesProtocol implements ClientListener {
 
         game.preJoinGameGroup(playerUUID, type, name);
 
-        if(client == null || game.getUser(playerUUID) != null) return;
+        if(client == null || Bukkit.getPlayer(playerUUID) != null) return;
 
         client.changePlayerServer(playerUUID, client.getMinecraftServerInfo().getName());
     }

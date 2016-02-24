@@ -71,7 +71,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Logger;
 
 /**
@@ -86,8 +85,6 @@ public class BaseGame implements Game, FileLoader {
 
     private final String hubServer;
 
-    private final ConcurrentMap<UUID, BaseUser> usersInServer = new ConcurrentHashMap<>();
-
     private final Plugin plugin;
     private final Persistence persistence;
 
@@ -100,7 +97,7 @@ public class BaseGame implements Game, FileLoader {
     private final String fallbackConfig;
 
     private final Map<String, BaseGameGroup> mapToGameGroup = new MapMaker().weakValues().makeMap();
-    private final Map<String, BaseGameGroup> nameToGameGroup = new MapMaker().weakValues().makeMap();
+    private final Map<String, BaseGameGroup> nameToGameGroup = new HashMap<>();
 
     /**
      * Maps player UUID to game group type
@@ -242,8 +239,6 @@ public class BaseGame implements Game, FileLoader {
         Validate.notNull(user, "user cannot be null");
         if (!(user instanceof BaseUser)) throw new UnsupportedOperationException("Only supports BaseUser");
 
-        usersInServer.values().remove(user);
-
         user.removeFromGameGroup();
         user.cancelAllTasks();
     }
@@ -319,34 +314,32 @@ public class BaseGame implements Game, FileLoader {
 
     @Override
     public void rejoinPlayer(Player player) {
-        BaseUser user = getUser(player.getUniqueId());
         BaseGameGroup gameGroup = getGameGroupForJoining(player.getUniqueId());
+
+        if(gameGroup == null) {
+            if(nameToGameGroup.isEmpty()) {
+                createGameGroup(fallbackConfig);
+            }
+            gameGroup = getSpawnGameGroup();
+        }
+
+        BaseUser user = gameGroup.getUser(player.getUniqueId());
+        BaseUser oldUser = getUser(player);
 
         if (user != null) {
             BaseGameGroup oldGameGroup = user.getGameGroup();
 
-            if (oldGameGroup == gameGroup || gameGroup == null) {
-                user.becomePlayer(player);
-                gameGroup = oldGameGroup;
-            } else {
-                UserQuitEvent quitEvent = new UserQuitEvent(user, UserQuitEvent.QuitReason.CHANGED_GAMEGROUP);
+            if (oldUser != null && oldUser != user) {
+                UserQuitEvent quitEvent = new UserQuitEvent(oldUser, UserQuitEvent.QuitReason.CHANGED_GAMEGROUP);
 
                 oldGameGroup.userEvent(quitEvent);
 
                 removeUser(user);
-
-                user = createUser(gameGroup, null, player.getUniqueId(), player);
             }
+
+            user.becomePlayer(player);
         } else {
-            if (gameGroup == null) {
-                if (nameToGameGroup.isEmpty()) {
-                    createGameGroup(fallbackConfig);
-                }
-
-                gameGroup = getSpawnGameGroup();
-            }
-
-            user = createUser(gameGroup, null, player.getUniqueId(), player);
+            user = new BaseUser(gameGroup, null, player.getUniqueId(), player);
         }
 
         gameGroup.userEvent(new UserJoinEvent(user, UserJoinEvent.JoinReason.JOINED_SERVER));
@@ -392,12 +385,10 @@ public class BaseGame implements Game, FileLoader {
             playersJoiningGameGroupTypes.put(playerUUID, type);
             if (name != null) playersJoinGameGroups.put(playerUUID, name);
 
-            User user = getUser(playerUUID);
+            Player player = plugin.getServer().getPlayer(playerUUID);
 
-            if (user != null) {
-                if (!user.isPlayer()) return;
-
-                rejoinPlayer(user.getPlayer());
+            if (player != null) {
+                rejoinPlayer(player);
             }
 
         });
@@ -483,23 +474,12 @@ public class BaseGame implements Game, FileLoader {
     }
 
     @Override
-    public BaseUser getUser(UUID uuid) {
-        return usersInServer.get(uuid);
-    }
-
-    private BaseUser getUser(Entity entity) {
+    public BaseUser getUser(Entity entity) {
         String mapName = entity.getWorld().getName();
         BaseGameGroup gameGroup = mapToGameGroup.get(mapName);
 
         if (gameGroup == null) return null;
         return gameGroup.getUser(entity.getUniqueId());
-    }
-
-    private BaseUser createUser(BaseGameGroup gameGroup, BaseTeam team, UUID uuid, LivingEntity entity) {
-        BaseUser user = new BaseUser(gameGroup, team, uuid, entity);
-
-        usersInServer.put(user.getUuid(), user);
-        return user;
     }
 
     private String nextGameGroupName(String configName) {
@@ -566,7 +546,11 @@ public class BaseGame implements Game, FileLoader {
         public void eventPlayerQuit(PlayerQuitEvent event) {
             event.setQuitMessage(null);
 
-            User user = getUser(event.getPlayer().getUniqueId());
+            User user = getUser(event.getPlayer());
+            if(user == null) {
+                System.out.println("Player not in gamegroup: " + event.getPlayer().getName());
+                return;
+            }
 
             UserQuitEvent userEvent = new UserQuitEvent(user, UserQuitEvent.QuitReason.QUIT_SERVER);
             user.getGameGroup().userEvent(userEvent);
@@ -582,7 +566,7 @@ public class BaseGame implements Game, FileLoader {
             ProjectileSource thrower = event.getPotion().getShooter();
             User throwerUser = null;
             if (thrower instanceof Entity)
-                throwerUser = EntityUtils.getRepresentingUser(BaseGame.this, (Entity) thrower);
+                throwerUser = EntityUtils.getRepresentingUser(gameGroup, (Entity) thrower);
 
             gameGroup.gameEvent(new MapPotionSplashEvent(gameGroup, map, event, throwerUser));
         }

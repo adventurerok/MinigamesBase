@@ -44,7 +44,7 @@ public class InvisiblePlayerAttacker {
                 for (Player target : protocolManager.getEntityTrackers(observer)) {
                     // No need to simulate an attack if the player is already visible
                     if (!observer.canSee(target)) {
-                        User user = game.getUser(target.getUniqueId());
+                        User user = game.getUser(target);
                         if(user == null || !user.isInGame()) continue;
 
                         // Bounding box of the given player
