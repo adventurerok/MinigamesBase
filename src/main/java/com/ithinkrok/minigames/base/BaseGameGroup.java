@@ -184,7 +184,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
         this.motd = motd;
 
-        game.getProtocol().sendGameGroupUpdatePayload(this);
+        sendUpdatePayload();
     }
 
     @Override
@@ -212,7 +212,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     public void setAcceptingPlayers(boolean acceptingPlayers) {
         this.acceptingPlayers = acceptingPlayers;
 
-        game.getProtocol().sendGameGroupUpdatePayload(this);
+        sendUpdatePayload();
     }
 
     @Override
@@ -270,6 +270,10 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         CustomEventExecutor
                 .executeEvent(event, getListeners(getAllUserListeners(), getAllTeamListeners(), oldListeners));
 
+        sendUpdatePayload();
+    }
+
+    public void sendUpdatePayload() {
         game.getProtocol().sendGameGroupUpdatePayload(this);
     }
 
@@ -296,7 +300,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
             game.removeGameGroupForMap(oldMap.getWorld().getName());
         }
 
-        game.getProtocol().sendGameGroupUpdatePayload(this);
+        sendUpdatePayload();
     }
 
     @Override
@@ -770,7 +774,10 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
         @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
         public void eventUserJoin(UserJoinEvent event) {
-            if (event.getReason() != UserJoinEvent.JoinReason.JOINED_SERVER) return;
+            if (event.getReason() != UserJoinEvent.JoinReason.JOINED_SERVER){
+                sendUpdatePayload();
+                return;
+            }
             if (!(event.getUser() instanceof BaseUser)) {
                 throw new UnsupportedOperationException("Only supports BaseUser");
             }
@@ -779,7 +786,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
             currentMap.teleportUser(event.getUser());
 
-            game.getProtocol().sendGameGroupUpdatePayload(BaseGameGroup.this);
+            sendUpdatePayload();
         }
 
         @CustomEventHandler(priority = CustomEventHandler.INTERNAL_LAST)
@@ -793,7 +800,9 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
                 //GameGroup only referenced by its users. If there are none left we must unload.
                 if (usersInGroup.isEmpty()) kill();
-                else game.getProtocol().sendGameGroupUpdatePayload(BaseGameGroup.this);
+                else sendUpdatePayload();
+            } else {
+                sendUpdatePayload();
             }
         }
 
