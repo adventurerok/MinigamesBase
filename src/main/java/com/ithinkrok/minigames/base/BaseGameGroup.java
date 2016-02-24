@@ -308,6 +308,8 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         if (countdown == null) return;
         countdown.cancel();
 
+        countdown = null;
+
         //Remove countdown level from Users
         for (User user : getUsers()) {
             user.setXpLevel(0);
