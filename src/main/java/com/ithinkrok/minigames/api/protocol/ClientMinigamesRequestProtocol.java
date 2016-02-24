@@ -106,6 +106,7 @@ public class ClientMinigamesRequestProtocol implements ClientListener {
     }
 
     public void sendJoinGameGroupPacket(UUID playerUUID, String type, String name) {
+        if(channel == null) return;
         Config payload = new MemoryConfig();
 
         payload.set("player", playerUUID.toString());
