@@ -62,6 +62,7 @@ public class Schematic implements Nameable {
 
         this.upgradesTo = upgradesToTemp;
         Vector baseOffset = BukkitConfigUtils.getVector(config, "offset");
+        if(baseOffset == null) baseOffset = new Vector();
 
         String schematicFile = config.getString("file");
 
