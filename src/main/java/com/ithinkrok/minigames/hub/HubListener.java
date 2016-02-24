@@ -8,6 +8,7 @@ import com.ithinkrok.minigames.api.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.api.event.game.MapChangedEvent;
 import com.ithinkrok.minigames.api.event.map.MapBlockBreakNaturallyEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserJoinEvent;
+import com.ithinkrok.minigames.api.event.user.state.UserDeathEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserBreakBlockEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserEditSignEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserInteractEvent;
@@ -117,6 +118,11 @@ public class HubListener implements CustomListener {
         if(itemGiver != null) {
             itemGiver.giveToUser(event.getUser());
         }
+    }
+
+    @CustomEventHandler
+    public void onUserDeath(UserDeathEvent event) {
+        event.setCancelled(false);
     }
 
     @CustomEventHandler
