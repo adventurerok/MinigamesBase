@@ -7,6 +7,8 @@ import com.ithinkrok.minigames.api.event.game.CountdownFinishedEvent;
 import com.ithinkrok.minigames.api.event.game.CountdownMessageEvent;
 import com.ithinkrok.minigames.api.event.game.GameStateChangedEvent;
 import com.ithinkrok.minigames.api.event.user.UserEvent;
+import com.ithinkrok.minigames.api.event.user.game.UserJoinEvent;
+import com.ithinkrok.minigames.api.event.user.game.UserQuitEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserChatEvent;
 import com.ithinkrok.minigames.api.task.GameTask;
 import com.ithinkrok.minigames.api.user.User;
@@ -15,6 +17,7 @@ import com.ithinkrok.minigames.api.util.MinigamesConfigs;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 
@@ -31,12 +34,20 @@ public class SimpleAftermathListener implements CustomListener {
 
     private GameState gameState;
 
+    protected String quitLocale;
+    protected String joinLocale;
+
     @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent<GameGroup, GameState> event) {
         gameState = event.getRepresenting();
 
         Config config = event.getConfigOrEmpty();
+
         countdown = MinigamesConfigs.getCountdown(config, "countdown", "aftermath", 15, "countdowns.aftermath");
+
+
+        quitLocale = config.getString("user_quit_locale", "user.quit");
+        joinLocale = config.getString("user_join_locale", "user.join");
     }
 
     @CustomEventHandler
@@ -100,4 +111,23 @@ public class SimpleAftermathListener implements CustomListener {
         return user.isInGame();
     }
 
+    @CustomEventHandler(priority = CustomEventHandler.MONITOR)
+    public void sendQuitMessageOnUserQuit(UserQuitEvent event) {
+        if(event.getReason() == UserQuitEvent.QuitReason.NON_PLAYER_REMOVED) return;
+
+        String name = event.getUser().getFormattedName();
+        int currentPlayers = event.getUserGameGroup().getUserCount() - 1;
+        int maxPlayers = Bukkit.getMaxPlayers();
+
+        event.getUserGameGroup().sendLocale(quitLocale, name, currentPlayers, maxPlayers);
+    }
+
+    @CustomEventHandler(priority = CustomEventHandler.FIRST)
+    public void sendJoinMessageOnUserJoin(UserJoinEvent event) {
+        String name = event.getUser().getFormattedName();
+        int currentPlayers = event.getUserGameGroup().getUserCount();
+        int maxPlayers = Bukkit.getMaxPlayers();
+
+        event.getUserGameGroup().sendLocale(joinLocale, name, currentPlayers, maxPlayers);
+    }
 }
