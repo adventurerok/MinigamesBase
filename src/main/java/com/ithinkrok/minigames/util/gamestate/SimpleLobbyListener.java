@@ -1,4 +1,4 @@
-package com.ithinkrok.minigames.base.gamestate;
+package com.ithinkrok.minigames.util.gamestate;
 
 import com.ithinkrok.minigames.api.Countdown;
 import com.ithinkrok.minigames.api.GameGroup;
