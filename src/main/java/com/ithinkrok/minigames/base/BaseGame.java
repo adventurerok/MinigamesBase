@@ -852,10 +852,10 @@ public class BaseGame implements Game, FileLoader {
                 attacked.getGameGroup().userEvent(new UserDamagedEvent(attacked, event));
             }
 
-            if (attacked.getHeath() - event.getFinalDamage() > 0 && event.getFinalDamage() > 0.01) {
+            if (attacked.getHeath() - event.getFinalDamage() > 0.01 && event.getFinalDamage() > 0.01) {
                 if (attacker != null) attacked.setLastAttacker(attacker);
 
-                if (attacked.isCloaked()) {
+                if (attacked.isCloaked() && attacked.isInGame()) {
                     attacked.getLocation().getWorld().playSound(attacked.getLocation(), Sound.HURT_FLESH, 1.0f, 1.0f);
                 }
 
@@ -889,7 +889,7 @@ public class BaseGame implements Game, FileLoader {
             UserDeathEvent deathEvent = new UserDeathEvent(attacked, event, attacker, assist);
             attacked.getGameGroup().userEvent(deathEvent);
 
-            if (!deathEvent.getPlayDeathSound()) return;
+            if (!deathEvent.getPlayDeathSound() || !attacked.isInGame()) return;
 
             attacked.getLocation().getWorld()
                     .playSound(attacked.getLocation(), EntityUtils.getDeathSound(attacked.getVisibleEntityType()), 1.0f,
