@@ -852,7 +852,7 @@ public class BaseGame implements Game, FileLoader {
                 attacked.getGameGroup().userEvent(new UserDamagedEvent(attacked, event));
             }
 
-            if (attacked.getHeath() - event.getFinalDamage() > 0) {
+            if (attacked.getHeath() - event.getFinalDamage() > 0 && event.getFinalDamage() > 0.01) {
                 if (attacker != null) attacked.setLastAttacker(attacker);
 
                 if (attacked.isCloaked()) {
