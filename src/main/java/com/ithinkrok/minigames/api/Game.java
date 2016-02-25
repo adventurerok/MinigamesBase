@@ -37,8 +37,6 @@ public interface Game extends TaskScheduler, DatabaseTaskRunner, Nameable {
 
     void registerListeners();
 
-    void sendPlayerToHub();
-
     void registerGameGroupConfig(String name, String configFile);
 
     void removeUser(User user);

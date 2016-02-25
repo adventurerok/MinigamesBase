@@ -225,11 +225,6 @@ public class BaseGame implements Game, FileLoader {
     }
 
     @Override
-    public void sendPlayerToHub() {
-
-    }
-
-    @Override
     public void registerGameGroupConfig(String name, String configFile) {
         gameGroupConfigMap.put(name, configFile);
     }
