@@ -322,6 +322,10 @@ public class BaseUser implements Listener, User {
     public void setAllowFlight(boolean allowFlight) {
         if (isPlayer()) getPlayer().setAllowFlight(allowFlight);
         else playerState.setAllowFlight(allowFlight);
+
+        if(!allowFlight) {
+            setFlying(false);
+        }
     }
 
     @Override
