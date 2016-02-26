@@ -1,0 +1,33 @@
+
+lang_files:
+  - "global/global.lang"
+
+commands:
+  ahelp:
+    description: "Shows all command help"
+    permission: "mg.base.help"
+    usage: "/<command>"
+    class: "com.ithinkrok.minigames.util.command.HelpCommand"
+  help:
+    description: "Shows minigames command help"
+    aliases: ["?"]
+    permission: "mg.base.help"
+    usage: "/<command>"
+    class: "com.ithinkrok.minigames.util.command.HelpCommand"
+    config:
+      all: false
+  gamestate:
+    description: "Changes the GameState of the current GameGroup"
+    aliases: ["gs", "gstate"]
+    permission: "mg.base.gamestate"
+    usage: "/<command> <gamestate>"
+    class: "com.ithinkrok.minigames.util.command.GameStateCommand"
+  countdown:
+    description: "Modifies countdowns"
+    aliases: ["cd", "cdown", "cdwn"]
+    permission: "mg.base.countdown"
+    usage: |
+      /<command> add/set <amount>
+      /<command> finish/cancel
+      /<command> start <name> <seconds> <localestub>
+    class: "com.ithinkrok.minigames.util.command.CountdownCommand"

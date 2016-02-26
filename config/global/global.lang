@@ -1,0 +1,89 @@
+#Global commands
+command.help.title= &e---- &6Command List\: &e-- &6Page &c%s&6/&c%s &e----
+command.help.line= &3%s: &f%s
+command.help.usage= &e---- &6%s Usage\: &e----\n%s\n&6Description\: %s
+command.help.unknown=&cUnknown command\: %s
+command.help.invalid_page=&cInvalid page\: %s
+command.help.end=&6End of help pages.
+command.help.next_page=&6Type &c/help %s &6to read the next page.
+
+command.requires.game_group=&cThis command requires a GameGroup/User
+command.requires.user=&cThis command requires a User
+command.requires.team_identifier=&cThis command requires a Team
+command.requires.arguments=&cThis command requires at least %s arguments
+command.requires.permission=&cThis command requires the permission &3%s, talk to an admin if you believe you should \
+  have this command.
+
+command.gamestate.unknown=&cUnknown GameState %s
+command.gamestate.changed=&aGameState changed to %s
+
+command.countdown.none=&cThere is no countdown at the moment
+command.countdown.started=&aStarted countdown %s for %s seconds
+command.countdown.added=&aAdded %s seconds to the current countdown
+command.countdown.set=&aSet the seconds remaining of the countdown to %s
+command.countdown.finished=&aFinished the current countdown early
+command.countdown.stopped=&aStopped the current countdown
+
+#Global money messages
+money.transfer.too_expensive=&cYou do not have that amount of money
+money.transfer.team=%s &3transferred &a$%s &eto your team's account!
+money.transfer.user=%s &3transferred &a$%s &eto %s&e's account!
+money.balance.team.new=&eYour Team's new Balance is\: &a$%s&e!
+money.balance.team.subtract=&c$%s &ewas deducted from your Team's Account!
+money.balance.team.add=&a$%s &ewas added to your Team's Account!
+money.balance.user.new=&eYour new Balance is: &a$%s!
+money.balance.user.subtract=&c$%s &ewas deducted from your Account!
+money.balance.user.add=&a$%s &ewas added to your Account!
+
+#Global custom_item defaults
+cooldowns.default.wait=&cPlease wait for this ability to cool down!
+timeouts.default.wait=&cYou are already using this ability!
+
+lore.cooldown=Cooldown\: %s seconds
+
+#ClickableItem defaults
+buyable.team.no_money=&cYour Team and you do not have enough money to purchase this item!
+buyable.user.no_money=&cYou do not have enough money to purchase this item!
+buyable.cannot_buy=&cYou cannot buy this item!
+buyable.user.pay_team=&ePaid &c$%s &eusing your own money as your team did not have enough!
+buyable.team.description=&7Cost\: &3$%s &7(&6Team Money&7)
+buyable.user.description=&7Cost\: &3$%s &7(&6Player Money&7)
+
+item_buyable.no_space=&cYou do not have enough inventory space!
+
+#Default join/quit messages
+user.quit=%s &equit
+user.join=%s &ejoined
+user.quit.lobby=%s &7left the lobby &8[&7%s&8/&7%s&8]
+user.join.lobby=%s &7joined the lobby &8[&7%s&8/&7%s&8]
+user.quit.spectator=&d%s &dquit spectating the game
+user.join.spectator=&d%s &dstarted spectating the game
+
+#Defaults for scoreboards provided by MinigamesBase
+map_scoreboard.title=&3Map Votes
+
+#Defaults for motds
+motd.waiting=Need more players
+motd.starting_5=Starts in <5s
+motd.starting_10=Starts in <10s
+motd.starting_30=Starts in <30s
+motd.starting_60=Starts in <1m
+motd.starting_120=Starts in <2m
+motd.starting_later=Counting down
+motd.started=Game Started
+motd.showdown=In Showdown!
+motd.aftermath=Game Ended
+
+info_sign.invalid=&cInvalid sign
+
+# Default countdowns
+countdowns.start.minutes=&7Game starting in&6 %s &7Minutes..
+countdowns.start.seconds=&7Game starting in&6 %s &7Seconds..
+countdowns.start.final=&6%s&7!
+countdowns.start.now=&7Game starting &6NOW&7!
+countdowns.start.needs_more_players=&7Not enough Players Online for Game to start!
+
+countdowns.end.start=&e&lTeleporting back to the lobby in %s seconds!
+countdowns.end.minutes=&e&lGame ending in&c&l %s minutes!
+countdowns.end.seconds=&e&lGame ending in&c&l %s seconds!
+countdowns.end.final=&e&lGame ending in&c&l %s seconds!

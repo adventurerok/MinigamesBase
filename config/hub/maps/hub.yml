@@ -1,0 +1,5 @@
+folder: "hub"
+description: "The hub"
+environment: normal
+enable_weather: false
+type: saved

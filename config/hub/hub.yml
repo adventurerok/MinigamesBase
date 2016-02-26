@@ -1,0 +1,47 @@
+chat_prefix: "&7[&3Hub&7] &e"
+
+lang_files:
+  - "global/global.lang"
+  - "hub/hub.lang"
+
+maps:
+  hub: "hub/maps/hub.yml"
+
+shared_objects:
+  game:
+    all_fire: true
+
+game_states:
+  hub:
+    listeners:
+      hub:
+        class: "com.ithinkrok.minigames.hub.HubListener"
+        config:
+          signs_config_path: "plugins/MinigamesBase/signs.yml"
+          items:
+            clear_inventory: false
+            custom_items:
+              - name: "game_chooser"
+                slot: 4
+
+custom_items:
+  game_chooser:
+    material: "COMPASS"
+    display_name_locale: "game_chooser.name"
+    description_locale: "game_chooser.desc"
+    listeners:
+      game_chooser:
+        events: ["rightClick"]
+        class: "com.ithinkrok.minigames.hub.item.GameChooseMenu"
+        config:
+          gamegroups:
+            colony_wars:
+              item: "GOLD_INGOT,1,0,&1&lColony Wars"
+              teleport: "387.5,141.05,-357.5,-90,0"
+          direct_join_enabled_item: "DIAMOND_BLOCK,1,0,&c&lDisable Direct Join"
+          direct_join_disabled_item: "COAL_BLOCK,1,0,&a&lEnable Direct Join"
+
+start_game_state: "hub"
+start_map: "hub"
+max_players: 250
+default_motd: "Hub sign really"
