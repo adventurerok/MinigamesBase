@@ -851,7 +851,12 @@ public class BaseGame implements Game, FileLoader {
                 attacked.getGameGroup().userEvent(new UserDamagedEvent(attacked, event));
             }
 
-            if (attacked.getHeath() - event.getFinalDamage() > 0.01 && event.getFinalDamage() > 0.01) {
+            //Skip playing the sound if you take no damage
+            if(event.getFinalDamage() < 0.01) {
+                return;
+            }
+
+            if (attacked.getHeath() - event.getFinalDamage() > 0.01) {
                 if (attacker != null) attacked.setLastAttacker(attacker);
 
                 if (attacked.isCloaked() && attacked.isInGame()) {
