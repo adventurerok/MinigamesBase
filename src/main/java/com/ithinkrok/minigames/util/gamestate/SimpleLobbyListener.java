@@ -162,6 +162,7 @@ public class SimpleLobbyListener implements CustomListener {
         user.setGameMode(GameMode.ADVENTURE);
         user.setSpectator(false);
         user.resetUserStats(true);
+        user.setAllowFlight(false);
 
         user.setDisplayName(user.getName());
         user.setTabListName(user.getName());
