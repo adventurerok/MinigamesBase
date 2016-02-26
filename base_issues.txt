@@ -2,6 +2,8 @@
  - RAM disk should have separate folder depending on server name
  - It put someone in flatland instead of in the world
  - Add option to enable death by default
+ - No cheat plus blocking block breaks
+ - join command
 
 == New Idea ==
 Minigames Plugin:
