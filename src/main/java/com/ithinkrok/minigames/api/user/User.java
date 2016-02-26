@@ -257,6 +257,8 @@ public interface User
 
     void setVelocity(Vector velocity);
 
+    Vector getVelocity();
+
     void removeFromGameGroup();
 
     EntityType getVisibleEntityType();

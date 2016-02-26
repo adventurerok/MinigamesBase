@@ -1050,6 +1050,11 @@ public class BaseUser implements Listener, User {
     }
 
     @Override
+    public Vector getVelocity() {
+        return entity.getVelocity();
+    }
+
+    @Override
     public void removeFromGameGroup() {
         setScoreboardHandler(null);
 
