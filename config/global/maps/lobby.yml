@@ -1,0 +1,4 @@
+folder: "infected_lobby"
+description: "The default lobby map"
+environment: "normal"
+enable_weather: false
