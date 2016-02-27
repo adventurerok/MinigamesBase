@@ -54,7 +54,7 @@ public interface Game extends TaskScheduler, DatabaseTaskRunner, Nameable {
 
     void setGameGroupForMap(GameGroup gameGroup, String mapName);
 
-    BaseGameGroup getGameGroupFromMapName(String mapName);
+    GameGroup getGameGroupFromMapName(String mapName);
 
     void makeEntityRepresentTeam(Team team, Entity entity);
 

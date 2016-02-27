@@ -864,11 +864,6 @@ public class BaseUser implements Listener, User {
     }
 
     @Override
-    public double getHeath() {
-        return entity.getHealth();
-    }
-
-    @Override
     public User getFireAttacker() {
         return fireAttacker.getAttacker();
     }

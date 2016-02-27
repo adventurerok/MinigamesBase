@@ -207,8 +207,6 @@ public interface User
 
     void addPotionEffect(PotionEffect effect, boolean force);
 
-    double getHeath();
-
     User getFireAttacker();
 
     User getWitherAttacker();
