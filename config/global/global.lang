@@ -87,3 +87,23 @@ countdowns.end.start=&e&lTeleporting back to the lobby in %s seconds!
 countdowns.end.minutes=&e&lGame ending in&c&l %s minutes!
 countdowns.end.seconds=&e&lGame ending in&c&l %s seconds!
 countdowns.end.final=&e&lGame ending in&c&l %s seconds!
+
+# Commonly used items
+map_voter.name=Map Voter
+map_voter.desc=Allows you to vote for maps
+map_voter.vote.player=&6%s &6voted for &3%s&3!
+map_voter.vote.transfer=&6%s &6changed their vote from &3%s&6 to &3%s&6!
+map_voter.vote.already_voted=&cYou already voted for &3%s&c!
+map_voter.random.desc=Will select a random map when the game starts
+
+team_chooser.name=Team Chooser
+team_chooser.desc=Lets you choose a team!
+team_chooser.choose.title=Team Chooser
+team_chooser.choose.chosen=&6You will be in the %s &6Team in the next game!
+team_chooser.choose.full=&cThe %s &cTeam is full. Try another
+team_chooser.choose.already_chosen=&cYou are already in the %s &cTeam
+
+invisible_user_toggle.name=Show/Hide other spectators
+
+spectate_chooser.name=Spectate Chooser
+spectate_chooser.title=Spectate Chooser
