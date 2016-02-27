@@ -253,7 +253,8 @@ public class BaseGame implements Game, FileLoader {
         mapToGameGroup.put(mapName, (BaseGameGroup) gameGroup);
     }
 
-    public BaseGameGroup getGameGroupFromMap(String mapName) {
+    @Override
+    public BaseGameGroup getGameGroupFromMapName(String mapName) {
         return mapToGameGroup.get(mapName);
     }
 

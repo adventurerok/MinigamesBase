@@ -1,5 +1,6 @@
 package com.ithinkrok.minigames.base.bukkitlistener;
 
+import com.ithinkrok.minigames.api.Game;
 import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.Kit;
 import com.ithinkrok.minigames.api.command.MinigamesCommand;
@@ -56,9 +57,9 @@ import java.util.Objects;
  */
 public class GameBukkitListener implements Listener {
 
-    private final BaseGame game;
+    private final Game game;
 
-    public GameBukkitListener(BaseGame game) {
+    public GameBukkitListener(Game game) {
         this.game = game;
     }
 
@@ -79,7 +80,7 @@ public class GameBukkitListener implements Listener {
     }
 
     private GameGroup getGameGroup(World world) {
-        return game.getGameGroupFromMap(world.getName());
+        return game.getGameGroupFromMapName(world.getName());
     }
 
     @EventHandler
@@ -136,7 +137,7 @@ public class GameBukkitListener implements Listener {
         if (event instanceof BlockBreakEvent) return;
 
         String mapName = event.getBlock().getWorld().getName();
-        GameGroup gameGroup = game.getGameGroupFromMap(mapName);
+        GameGroup gameGroup = game.getGameGroupFromMapName(mapName);
         if (gameGroup == null) return;
 
         GameMap map = gameGroup.getCurrentMap();
@@ -149,7 +150,7 @@ public class GameBukkitListener implements Listener {
     @EventHandler
     public void eventBlockBurn(BlockBurnEvent event) {
         String mapName = event.getBlock().getWorld().getName();
-        GameGroup gameGroup = game.getGameGroupFromMap(mapName);
+        GameGroup gameGroup = game.getGameGroupFromMapName(mapName);
         if (gameGroup == null) return;
 
         GameMap map = gameGroup.getCurrentMap();
@@ -165,7 +166,7 @@ public class GameBukkitListener implements Listener {
     @EventHandler
     public void eventBlockGrow(BlockGrowEvent event) {
         String mapName = event.getBlock().getWorld().getName();
-        GameGroup gameGroup = game.getGameGroupFromMap(mapName);
+        GameGroup gameGroup = game.getGameGroupFromMapName(mapName);
         if (gameGroup == null) return;
 
         GameMap map = gameGroup.getCurrentMap();
@@ -176,7 +177,7 @@ public class GameBukkitListener implements Listener {
     @EventHandler
     public void eventItemSpawn(ItemSpawnEvent event) {
         String mapName = event.getEntity().getWorld().getName();
-        GameGroup gameGroup = game.getGameGroupFromMap(mapName);
+        GameGroup gameGroup = game.getGameGroupFromMapName(mapName);
         if (gameGroup == null) return;
 
         GameMap map = gameGroup.getCurrentMap();
@@ -189,7 +190,7 @@ public class GameBukkitListener implements Listener {
     @EventHandler
     public void eventCreatureSpawn(CreatureSpawnEvent event) {
         String mapName = event.getEntity().getWorld().getName();
-        GameGroup gameGroup = game.getGameGroupFromMap(mapName);
+        GameGroup gameGroup = game.getGameGroupFromMapName(mapName);
         if (gameGroup == null) return;
 
         GameMap map = gameGroup.getCurrentMap();
