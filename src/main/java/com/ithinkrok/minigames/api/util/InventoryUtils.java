@@ -33,16 +33,16 @@ public class InventoryUtils {
         return setLeatherArmorColor(new ItemStack(material), armorColor);
     }
 
-    public static ItemStack createLeatherArmorItem(Material material, Color armorColor, boolean unbreakable) {
-        return setUnbreakable(setLeatherArmorColor(new ItemStack(material), armorColor), unbreakable);
-    }
-
     public static ItemStack setLeatherArmorColor(ItemStack armor, Color armorColor) {
         LeatherArmorMeta meta = (LeatherArmorMeta) armor.getItemMeta();
 
         meta.setColor(armorColor);
         armor.setItemMeta(meta);
         return armor;
+    }
+
+    public static ItemStack createLeatherArmorItem(Material material, Color armorColor, boolean unbreakable) {
+        return setUnbreakable(setLeatherArmorColor(new ItemStack(material), armorColor), unbreakable);
     }
 
     public static ItemStack setUnbreakable(ItemStack itemStack, boolean unbreakable) {
@@ -63,13 +63,13 @@ public class InventoryUtils {
         int durability = parts.length >= 3 ? Integer.parseInt(parts[2].trim()) : 0;
         String name = parts.length >= 4 ? parts[3] : null;
 
-        if(name != null) name = StringUtils.convertAmpersandToSelectionCharacter(name);
+        if (name != null) name = StringUtils.convertAmpersandToSelectionCharacter(name);
 
         String[] lore;
         if (parts.length >= 5) lore = Arrays.copyOfRange(parts, 4, parts.length - 1);
         else lore = new String[0];
 
-        for(int index = 0; index < lore.length; ++index) {
+        for (int index = 0; index < lore.length; ++index) {
             lore[index] = StringUtils.convertAmpersandToSelectionCharacter(lore[index]);
         }
 
@@ -117,7 +117,7 @@ public class InventoryUtils {
 
         String idString = generateIdentifierString(identifier);
 
-        if(lore.isEmpty()) {
+        if (lore.isEmpty()) {
             lore.add(idString);
         } else {
             lore.set(0, idString + DEFAULT_LORE_STYLE + lore.get(0));
@@ -187,13 +187,17 @@ public class InventoryUtils {
 
     public static void replaceItem(Inventory inventory, ItemStack stack) {
         int id = getIdentifier(stack);
-        if(id == -1) throw new RuntimeException("replaceItem() can only be used on items with identifiers");
+        if (id == -1) throw new RuntimeException("replaceItem() can only be used on items with identifiers");
 
-        for(int index = 0; index < inventory.getSize(); ++index) {
-            if(getIdentifier(inventory.getItem(index)) != id) continue;
+        for (int index = 0; index < inventory.getSize(); ++index) {
+            if (getIdentifier(inventory.getItem(index)) != id) continue;
 
             inventory.setItem(index, stack);
         }
+    }
+
+    public static ItemStack addLore(ItemStack item, String... lore) {
+        return addLore(item, Arrays.asList(lore));
     }
 
     public static ItemStack removeIdentifier(ItemStack item) {
@@ -204,9 +208,9 @@ public class InventoryUtils {
         List<String> lore = im.getLore();
         List<String> newLore = new ArrayList<>();
 
-        for(String loreLine : lore) {
-            if(isIdentifierString(loreLine)) {
-                if(loreLine.length() <= 24) continue;
+        for (String loreLine : lore) {
+            if (isIdentifierString(loreLine)) {
+                if (loreLine.length() <= 24) continue;
                 loreLine = loreLine.substring(24);
             }
             newLore.add(loreLine);
@@ -214,25 +218,6 @@ public class InventoryUtils {
 
         im.setLore(newLore);
         item.setItemMeta(im);
-        return item;
-    }
-
-    public static ItemStack addLore(ItemStack item, String... lore) {
-        ItemMeta im = item.getItemMeta();
-
-        int identifier = getIdentifier(item);
-        if(identifier >= 0) item = removeIdentifier(item);
-
-        List<String> oldLore;
-        if (im.hasLore()) oldLore = im.getLore();
-        else oldLore = new ArrayList<>();
-
-        Collections.addAll(oldLore, lore);
-
-        if (!oldLore.isEmpty()) im.setLore(oldLore);
-        item.setItemMeta(im);
-
-        if(identifier >= 0) item = addIdentifier(item, identifier);
         return item;
     }
 
@@ -267,20 +252,39 @@ public class InventoryUtils {
                 type.endsWith("BOOTS");
     }
 
-    public static List<String> getLore(ItemStack item) {
-        if(isEmpty(item)) return Collections.emptyList();
-
-        ItemMeta meta = item.getItemMeta();
-
-        if(meta.hasLore()) return meta.getLore();
-        else return Collections.emptyList();
-    }
-
     public static boolean loreContainsLine(ItemStack item, String line) {
-        for(String lore : getLore(item)) {
-            if(lore.equals(line)) return true;
+        for (String lore : getLore(item)) {
+            if (lore.equals(line)) return true;
         }
 
         return false;
+    }
+
+    public static List<String> getLore(ItemStack item) {
+        if (isEmpty(item)) return Collections.emptyList();
+
+        ItemMeta meta = item.getItemMeta();
+
+        if (meta.hasLore()) return meta.getLore();
+        else return Collections.emptyList();
+    }
+
+    public static ItemStack addLore(ItemStack item, List<String> lore) {
+        ItemMeta im = item.getItemMeta();
+
+        int identifier = getIdentifier(item);
+        if (identifier >= 0) item = removeIdentifier(item);
+
+        List<String> oldLore;
+        if (im.hasLore()) oldLore = im.getLore();
+        else oldLore = new ArrayList<>();
+
+        oldLore.addAll(lore);
+
+        if (!oldLore.isEmpty()) im.setLore(oldLore);
+        item.setItemMeta(im);
+
+        if (identifier >= 0) item = addIdentifier(item, identifier);
+        return item;
     }
 }

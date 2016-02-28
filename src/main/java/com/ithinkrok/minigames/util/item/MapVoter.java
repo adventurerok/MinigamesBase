@@ -15,6 +15,7 @@ import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -53,16 +54,25 @@ public class MapVoter implements CustomListener {
 
         for (String mapName : votable) {
             String description;
+            List<String> credit = Collections.emptyList();
+
             if(mapName.equals(randomMapName)){
                 description = event.getUserGameGroup().getLocale(randomMapDescriptionLocale);
             } else {
                 GameMapInfo mapInfo = event.getUserGameGroup().getMap(mapName);
-                if(mapInfo != null) description = mapInfo.getDescription();
+                if(mapInfo != null) {
+                    description = mapInfo.getDescription();
+                    credit = mapInfo.getCredit();
+                }
                 else description = "Invalid map";
             }
 
             ItemStack display =
                     InventoryUtils.createItemWithNameAndLore(mapMaterial, 1, 0, mapName, description);
+
+            display = InventoryUtils.addLore(display, "");
+            display = InventoryUtils.addLore(display, credit);
+
 
             ClickableItem item = new ClickableItem(display, -1) {
                 @Override
