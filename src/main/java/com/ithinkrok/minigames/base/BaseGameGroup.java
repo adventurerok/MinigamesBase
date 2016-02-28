@@ -301,6 +301,10 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         }
 
         sendUpdatePayload();
+
+        for(String credit : mapInfo.getCredit()) {
+            sendMessage(credit);
+        }
     }
 
     @Override
