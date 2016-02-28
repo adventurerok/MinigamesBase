@@ -6,6 +6,7 @@ import com.ithinkrok.minigames.api.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.api.event.game.CountdownFinishedEvent;
 import com.ithinkrok.minigames.api.event.game.CountdownMessageEvent;
 import com.ithinkrok.minigames.api.event.game.GameStateChangedEvent;
+import com.ithinkrok.minigames.api.event.map.MapCreatureSpawnEvent;
 import com.ithinkrok.minigames.api.event.user.UserEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserJoinEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserQuitEvent;
@@ -74,6 +75,11 @@ public class SimpleAftermathListener implements CustomListener {
         }, 20, 20);
 
         event.getGameGroup().bindTaskToCurrentGameState(task);
+    }
+
+    @CustomEventHandler
+    public void onCreatureSpawn(MapCreatureSpawnEvent event) {
+        event.setCancelled(true);
     }
 
     @CustomEventHandler
