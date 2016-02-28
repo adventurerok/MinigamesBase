@@ -123,6 +123,10 @@ public class SignListener implements CustomListener {
 
             signs.put(sign.getLocation(), sign);
 
+            gameGroup.doInFuture(task -> {
+                sign.update();
+            });
+
             startSignTask(sign);
         }
     }
