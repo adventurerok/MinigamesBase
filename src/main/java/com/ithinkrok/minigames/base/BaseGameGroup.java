@@ -369,11 +369,6 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     }
 
     @Override
-    public void prepareStart() {
-        createDefaultAndMapListeners();
-    }
-
-    @Override
     public BaseMap getCurrentMap() {
         return currentMap;
     }
