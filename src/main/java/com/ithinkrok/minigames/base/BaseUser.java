@@ -639,6 +639,14 @@ public class BaseUser implements Listener, User {
     @Override
     @SuppressWarnings("unchecked")
     public boolean teleport(Location location) {
+        if(getMap() != null && !getMap().getWorld().getName().equals(location.getWorld().getName())) {
+            try{
+                throw new RuntimeException("Tried to teleport user to another Bukkit world");
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+            }
+        }
+
         UserTeleportEvent event = new UserTeleportEvent(this, getLocation(), location);
 
         gameGroup.userEvent(event);

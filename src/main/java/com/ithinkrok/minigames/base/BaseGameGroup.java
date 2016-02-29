@@ -282,9 +282,9 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         BaseMap oldMap = currentMap;
         BaseMap newMap = new BaseMap(this, mapInfo);
 
-        usersInGroup.values().forEach(newMap::teleportUser);
-
         currentMap = newMap;
+
+        usersInGroup.values().forEach(newMap::teleportUser);
 
         game.setGameGroupForMap(this, newMap.getWorld().getName());
 
