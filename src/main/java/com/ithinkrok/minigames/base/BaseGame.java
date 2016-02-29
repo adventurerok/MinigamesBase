@@ -278,20 +278,23 @@ public class BaseGame implements Game, FileLoader {
         BaseUser user = gameGroup.getUser(player.getUniqueId());
         BaseUser oldUser = getUser(player);
 
-        if (user != null) {
-            BaseGameGroup oldGameGroup = user.getGameGroup();
+        boolean hadUser = user != null;
 
-            if (oldUser != null && oldUser != user && oldUser.isPlayer()) {
-                UserQuitEvent quitEvent = new UserQuitEvent(oldUser, UserQuitEvent.QuitReason.CHANGED_GAMEGROUP);
-
-                oldGameGroup.userEvent(quitEvent);
-
-                user.removeFromGameGroup();
-            }
-
-            user.becomePlayer(player);
-        } else {
+        if(user == null){
             user = new BaseUser(gameGroup, null, player.getUniqueId(), player);
+        }
+
+        //Send an event to the old user's gamegroup notifying them that the user is no longer a player
+        if (oldUser != null && oldUser != user && oldUser.isPlayer()) {
+            BaseGameGroup oldGameGroup = oldUser.getGameGroup();
+            UserQuitEvent quitEvent = new UserQuitEvent(oldUser, UserQuitEvent.QuitReason.CHANGED_GAMEGROUP);
+
+            oldGameGroup.userEvent(quitEvent);
+        }
+
+        //If the user is rejoining, make them become a player
+        if(hadUser) {
+            user.becomePlayer(player);
         }
 
         gameGroup.userEvent(new UserJoinEvent(user, UserJoinEvent.JoinReason.JOINED_SERVER));
