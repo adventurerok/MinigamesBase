@@ -18,7 +18,6 @@ import com.ithinkrok.minigames.api.util.disguise.Disguise;
 import com.ithinkrok.minigames.api.util.disguise.DisguiseController;
 import com.ithinkrok.minigames.base.bukkitlistener.GameBukkitListener;
 import com.ithinkrok.minigames.base.util.InvisiblePlayerAttacker;
-import com.ithinkrok.minigames.base.util.disguise.DCDisguiseController;
 import com.ithinkrok.minigames.base.util.disguise.LDDisguiseController;
 import com.ithinkrok.minigames.base.util.disguise.MinigamesDisguiseController;
 import com.ithinkrok.minigames.base.util.io.FileLoader;
@@ -28,9 +27,12 @@ import com.ithinkrok.msm.client.impl.MSMClient;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.lang.LangFile;
 import org.apache.commons.lang.Validate;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
+import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
@@ -146,8 +148,6 @@ public class BaseGame implements Game, FileLoader {
     private void setupDisguiseController() {
         if (Bukkit.getPluginManager().getPlugin("LibsDisguises") != null) {
             disguiseController = new LDDisguiseController();
-        } else if (Bukkit.getPluginManager().getPlugin("DisguiseCraft") != null) {
-            disguiseController = new DCDisguiseController();
         } else {
             disguiseController = new MinigamesDisguiseController();
         }

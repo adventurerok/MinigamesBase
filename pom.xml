@@ -87,12 +87,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>pgDev</groupId>
-            <artifactId>DisguiseCraft</artifactId>
-            <version>5.1</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>LibsDisguises</groupId>
             <artifactId>LibsDisguises</artifactId>
             <version>8.6.7-SNAPSHOT</version>
