@@ -422,8 +422,6 @@ public class GameBukkitListener implements Listener {
         UserDeathEvent deathEvent = new UserDeathEvent(attacked, event, attacker, assist);
         attacked.getGameGroup().userEvent(deathEvent);
 
-        if (!deathEvent.getPlayDeathSound() || !attacked.isInGame()) return;
-
         //Log death messages
         if (attacker != null) {
             System.out.println(attacked.getName() + " died: reason=" + event.getCause() + ", finalDamage=" +
@@ -434,6 +432,8 @@ public class GameBukkitListener implements Listener {
             System.out.println(attacked.getName() + " died: reason=" + event.getCause() + ", finalDamage=" +
                     event.getFinalDamage() + ", attacker=null");
         }
+
+        if (!deathEvent.getPlayDeathSound() || !attacked.isInGame()) return;
 
         attacked.getLocation().getWorld()
                 .playSound(attacked.getLocation(), EntityUtils.getDeathSound(attacked.getVisibleEntityType()), 1.0f,
