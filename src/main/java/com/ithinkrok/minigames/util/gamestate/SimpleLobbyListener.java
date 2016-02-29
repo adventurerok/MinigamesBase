@@ -303,7 +303,7 @@ public class SimpleLobbyListener implements CustomListener {
     public void sendQuitMessageOnUserQuit(UserQuitEvent event) {
         String name = event.getUser().getFormattedName();
         int currentPlayers = event.getUserGameGroup().getUserCount() - 1;
-        int maxPlayers = Bukkit.getMaxPlayers();
+        int maxPlayers = event.getUserGameGroup().getMaxPlayers();
 
         event.getUserGameGroup().sendLocale(quitLocale, name, currentPlayers, maxPlayers);
     }
@@ -312,7 +312,7 @@ public class SimpleLobbyListener implements CustomListener {
     public void sendJoinMessageOnUserJoin(UserJoinEvent event) {
         String name = event.getUser().getFormattedName();
         int currentPlayers = event.getUserGameGroup().getUserCount();
-        int maxPlayers = Bukkit.getMaxPlayers();
+        int maxPlayers = event.getUserGameGroup().getMaxPlayers();
 
         event.getUserGameGroup().sendLocale(joinLocale, name, currentPlayers, maxPlayers);
     }
