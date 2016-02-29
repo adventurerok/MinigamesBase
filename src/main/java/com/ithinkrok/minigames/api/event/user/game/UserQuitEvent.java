@@ -21,8 +21,8 @@ public class UserQuitEvent extends UserEvent {
     }
 
     public void setRemoveUser(boolean removeUser) {
-        if(!removeUser && reason != QuitReason.QUIT_SERVER) {
-            throw new UnsupportedOperationException("The user can only be not removed if they are quitting the server");
+        if (!removeUser && reason == QuitReason.NON_PLAYER_REMOVED) {
+            throw new IllegalStateException("removeUser cannot be set to false if the reason is NON_PLAYER_REMOVED");
         }
 
         this.removeUser = removeUser;

@@ -200,15 +200,6 @@ public class BaseGame implements Game, FileLoader {
     }
 
     @Override
-    public void removeUser(User user) {
-        Validate.notNull(user, "user cannot be null");
-        if (!(user instanceof BaseUser)) throw new UnsupportedOperationException("Only supports BaseUser");
-
-        user.removeFromGameGroup();
-        user.cancelAllTasks();
-    }
-
-    @Override
     public BaseGameGroup getGameGroup(String ggName) {
         return nameToGameGroup.get(ggName);
     }
@@ -264,11 +255,6 @@ public class BaseGame implements Game, FileLoader {
     }
 
     @Override
-    public void disguiseUser(User user, EntityType type) {
-        disguiseController.disguise(user, type);
-    }
-
-    @Override
     public void disguiseUser(User user, Disguise disguise) {
         disguiseController.disguise(user, disguise);
     }
@@ -295,12 +281,12 @@ public class BaseGame implements Game, FileLoader {
         if (user != null) {
             BaseGameGroup oldGameGroup = user.getGameGroup();
 
-            if (oldUser != null && oldUser != user) {
+            if (oldUser != null && oldUser != user && oldUser.isPlayer()) {
                 UserQuitEvent quitEvent = new UserQuitEvent(oldUser, UserQuitEvent.QuitReason.CHANGED_GAMEGROUP);
 
                 oldGameGroup.userEvent(quitEvent);
 
-                removeUser(user);
+                user.removeFromGameGroup();
             }
 
             user.becomePlayer(player);

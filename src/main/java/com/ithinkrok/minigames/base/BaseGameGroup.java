@@ -514,8 +514,6 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         for (User user : users) {
             user.removeFromGameGroup();
 
-            game.removeUser(user);
-
             if (user.isPlayer()) players.add(user.getPlayer());
         }
 
@@ -539,6 +537,8 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         }
 
         doInFuture(task -> {
+            //Make sure all tasks are cancelled
+            cancelAllTasks();
             unload();
         });
 
@@ -796,8 +796,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
                 event.getUser().setTeam(null);
                 usersInGroup.remove(event.getUser().getUuid());
 
-                event.getUser().cancelAllTasks();
-                game.removeUser(event.getUser());
+                event.getUser().removeFromGameGroup();
 
                 //GameGroup only referenced by its users. If there are none left we must unload.
                 if (usersInGroup.isEmpty()) kill();

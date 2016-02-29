@@ -1071,6 +1071,8 @@ public class BaseUser implements Listener, User {
         }
 
         metadataMap.clear();
+
+        cancelAllTasks();
     }
 
     @Override

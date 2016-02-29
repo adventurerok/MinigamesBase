@@ -40,8 +40,6 @@ public interface Game extends TaskScheduler, DatabaseTaskRunner, Nameable {
 
     void registerGameGroupConfig(String name, String configFile);
 
-    void removeUser(User user);
-
     GameGroup getGameGroup(String ggName);
 
     void unload();
@@ -57,8 +55,6 @@ public interface Game extends TaskScheduler, DatabaseTaskRunner, Nameable {
     GameGroup getGameGroupFromMapName(String mapName);
 
     void makeEntityRepresentTeam(Team team, Entity entity);
-
-    void disguiseUser(User user, EntityType type);
 
     void disguiseUser(User user, Disguise disguise);
 

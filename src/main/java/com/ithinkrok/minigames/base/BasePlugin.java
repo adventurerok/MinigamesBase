@@ -45,6 +45,11 @@ public class BasePlugin extends SpecificPlugin {
         super.onEnable();
     }
 
+    @Override
+    public void onDisable() {
+        game.unload();
+    }
+
     private void loadGameModule(Config config) {
         game = new BaseGame(this, config);
 
