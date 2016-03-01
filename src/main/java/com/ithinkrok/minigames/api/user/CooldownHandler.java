@@ -61,7 +61,7 @@ public class CooldownHandler {
 
         //if (!isInGame()) return;
         UserAbilityCooldownEvent event = new UserAbilityCooldownEvent(user, ability, new SoundEffect(Sound
-                .ZOMBIE_UNFECT, 1.0f, 2.0f), user.getGameGroup().getLocale(stopLocale));
+                .ENTITY_ZOMBIE_VILLAGER_CURE, 1.0f, 2.0f), user.getGameGroup().getLocale(stopLocale));
 
         user.getGameGroup().userEvent(event);
 

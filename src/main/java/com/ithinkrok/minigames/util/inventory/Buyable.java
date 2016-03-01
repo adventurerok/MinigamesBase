@@ -152,7 +152,8 @@ public abstract class Buyable extends ClickableItem {
             userMoney.subtractMoney(cost, true);
         }
 
-        event.getUser().playSound(event.getUser().getLocation(), new SoundEffect(Sound.BLAZE_HIT, 1.0f, 1.0f));
+        event.getUser().playSound(event.getUser().getLocation(), new SoundEffect(Sound.ENTITY_BLAZE_HURT
+                , 1.0f, 1.0f));
 
         event.getUser().redoInventory();
     }

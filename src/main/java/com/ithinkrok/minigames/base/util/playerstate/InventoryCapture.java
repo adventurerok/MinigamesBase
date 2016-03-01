@@ -1,5 +1,6 @@
 package com.ithinkrok.minigames.base.util.playerstate;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.InventoryType;
@@ -12,11 +13,12 @@ import java.util.*;
 /**
  * Created by paul on 31/12/15.
  */
+@SuppressWarnings("NewExceptionWithoutArguments")
 public class InventoryCapture implements PlayerInventory {
 
-    private static ArmorCapture EMPTY_ARMOR = new ArmorCapture(new ItemStack[4]);
+    private static final ArmorCapture EMPTY_ARMOR = new ArmorCapture(new ItemStack[4]);
 
-    private PlayerState playerState;
+    private final PlayerState playerState;
     private ItemStack[] contents;
 
     public InventoryCapture(PlayerState playerState, ItemStack[] contents) {
@@ -25,17 +27,17 @@ public class InventoryCapture implements PlayerInventory {
         this.contents = contents;
     }
 
-    private EntityEquipment equipment(){
-        if(playerState == null) return EMPTY_ARMOR;
-        if(playerState.getPlaceholder() != null) return playerState.getPlaceholder().getEquipment();
-        if(playerState.getEquipment() != null) return playerState.getEquipment();
-
-        return EMPTY_ARMOR;
-    }
-
     @Override
     public ItemStack[] getArmorContents() {
         return equipment().getArmorContents();
+    }
+
+    private EntityEquipment equipment() {
+        if (playerState == null) return EMPTY_ARMOR;
+        if (playerState.getPlaceholder() != null) return playerState.getPlaceholder().getEquipment();
+        if (playerState.getEquipment() != null) return playerState.getEquipment();
+
+        return EMPTY_ARMOR;
     }
 
     @Override
@@ -56,6 +58,87 @@ public class InventoryCapture implements PlayerInventory {
     @Override
     public ItemStack getBoots() {
         return equipment().getBoots();
+    }
+
+    @Override
+    public void setItem(int index, ItemStack item) {
+        if (item != null && (item.getType() == Material.AIR || item.getAmount() == 0)) item = null;
+        contents[index] = item;
+    }
+
+    @Override
+    public void setBoots(ItemStack boots) {
+        equipment().setBoots(boots);
+    }
+
+    @Override
+    public ItemStack getItemInMainHand() {
+        return equipment().getItemInMainHand();
+    }
+
+    @Override
+    public void setItemInMainHand(ItemStack item) {
+        equipment().setItemInOffHand(item);
+    }
+
+    @Override
+    public ItemStack getItemInOffHand() {
+        return equipment().getItemInOffHand();
+    }
+
+    @Override
+    public void setItemInOffHand(ItemStack item) {
+        equipment().setItemInOffHand(item);
+    }
+
+    @Override
+    public ItemStack getItemInHand() {
+        return equipment().getItemInHand();
+    }
+
+    @Override
+    public void setItemInHand(ItemStack stack) {
+        equipment().setItemInHand(stack);
+    }
+
+    @Override
+    public int getHeldItemSlot() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setHeldItemSlot(int slot) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int clear(int id, int data) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public HumanEntity getHolder() {
+        return null;
+    }
+
+    @Override
+    public void setLeggings(ItemStack leggings) {
+        equipment().setLeggings(leggings);
+    }
+
+    @Override
+    public void setChestplate(ItemStack chestplate) {
+        equipment().setChestplate(chestplate);
+    }
+
+    @Override
+    public void setHelmet(ItemStack helmet) {
+        equipment().setHelmet(helmet);
+    }
+
+    @Override
+    public void setArmorContents(ItemStack[] items) {
+        equipment().setArmorContents(items);
     }
 
     @Override
@@ -84,33 +167,27 @@ public class InventoryCapture implements PlayerInventory {
     }
 
     @Override
-    public void setItem(int index, ItemStack item) {
-        if(item != null && (item.getType() == Material.AIR || item.getAmount() == 0)) item = null;
-        contents[index] = item;
-    }
-
-    @Override
     public HashMap<Integer, ItemStack> addItem(ItemStack... items) throws IllegalArgumentException {
         HashMap<Integer, ItemStack> result = new HashMap<>();
 
-        for(int index = 0; index < items.length; ++index) {
+        for (int index = 0; index < items.length; ++index) {
             ItemStack copy = items[index].clone();
-            for(int i = 0; i < contents.length; ++i) {
-                if(copy == null) break;
+            for (int i = 0; i < contents.length; ++i) {
+                if (copy == null) break;
 
                 ItemStack at = contents[i];
 
-                if(at == null) contents[i] = copy;
-                else if(at.isSimilar(copy)) {
+                if (at == null) contents[i] = copy;
+                else if (at.isSimilar(copy)) {
                     int change = Math.min(copy.getAmount(), Math.max(at.getMaxStackSize() - at.getAmount(), 0));
 
                     at.setAmount(at.getAmount() + change);
                     copy.setAmount(copy.getAmount() - change);
-                    if(copy.getAmount() == 0) copy = null;
+                    if (copy.getAmount() == 0) copy = null;
                 }
             }
 
-            if(copy != null) result.put(index, copy);
+            if (copy != null) result.put(index, copy);
         }
 
         return result;
@@ -188,9 +265,9 @@ public class InventoryCapture implements PlayerInventory {
 
     @Override
     public int first(Material material) throws IllegalArgumentException {
-        for(int i = 0; i < contents.length; ++i) {
-            if((material == null || material == Material.AIR) && contents[i] == null) return i;
-            else if(contents[i] != null && contents[i].getType() == material) return i;
+        for (int i = 0; i < contents.length; ++i) {
+            if ((material == null || material == Material.AIR) && contents[i] == null) return i;
+            else if (contents[i] != null && contents[i].getType() == material) return i;
         }
 
         return -1;
@@ -198,8 +275,8 @@ public class InventoryCapture implements PlayerInventory {
 
     @Override
     public int first(ItemStack item) {
-        for(int i = 0; i < contents.length; ++i) {
-            if(contents[i] != null && contents[i].equals(item)) return i;
+        for (int i = 0; i < contents.length; ++i) {
+            if (contents[i] != null && contents[i].equals(item)) return i;
         }
 
         return -1;
@@ -212,14 +289,14 @@ public class InventoryCapture implements PlayerInventory {
 
     @Override
     public void remove(int materialId) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Removing by materialId is unsupported");
     }
 
     @Override
     public void remove(Material material) throws IllegalArgumentException {
         int first;
 
-        while((first = first(material)) != -1) {
+        while ((first = first(material)) != -1) {
             setItem(first, null);
         }
     }
@@ -228,7 +305,7 @@ public class InventoryCapture implements PlayerInventory {
     public void remove(ItemStack item) {
         int first;
 
-        while((first = first(item)) != -1) {
+        while ((first = first(item)) != -1) {
             setItem(first, null);
         }
     }
@@ -259,61 +336,6 @@ public class InventoryCapture implements PlayerInventory {
     }
 
     @Override
-    public void setArmorContents(ItemStack[] items) {
-        equipment().setArmorContents(items);
-    }
-
-    @Override
-    public void setHelmet(ItemStack helmet) {
-        equipment().setHelmet(helmet);
-    }
-
-    @Override
-    public void setChestplate(ItemStack chestplate) {
-        equipment().setChestplate(chestplate);
-    }
-
-    @Override
-    public void setLeggings(ItemStack leggings) {
-        equipment().setLeggings(leggings);
-    }
-
-    @Override
-    public void setBoots(ItemStack boots) {
-        equipment().setBoots(boots);
-    }
-
-    @Override
-    public ItemStack getItemInHand() {
-        return equipment().getItemInHand();
-    }
-
-    @Override
-    public void setItemInHand(ItemStack stack) {
-        equipment().setItemInHand(stack);
-    }
-
-    @Override
-    public int getHeldItemSlot() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setHeldItemSlot(int slot) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public int clear(int id, int data) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public HumanEntity getHolder() {
-        return null;
-    }
-
-    @Override
     public ListIterator<ItemStack> iterator() {
         List<ItemStack> list = Arrays.asList(contents);
 
@@ -323,5 +345,10 @@ public class InventoryCapture implements PlayerInventory {
     @Override
     public ListIterator<ItemStack> iterator(int index) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Location getLocation() {
+        return null;
     }
 }

@@ -135,14 +135,12 @@ public class SchematicPaster {
 
     private static class SchematicBuilderTask implements GameRunnable {
 
+        private final SchematicRotation schem;
+        private final SchematicOptions options;
         int index = 0;
-
         Location origin;
         Hologram hologram;
         private PastedSchematic building;
-        private final SchematicRotation schem;
-        private final SchematicOptions options;
-
         private boolean clearedOrigin = false;
 
         public SchematicBuilderTask(Location origin, PastedSchematic building, SchematicRotation schem,
@@ -204,7 +202,7 @@ public class SchematicPaster {
                 block.setTypeIdAndData(mat.getId(), rotateData(mat, schem.getRotation(), bData), false);
 
                 BlockEntity blockEntity = schem.getBlockEntity(x, y, z);
-                if(blockEntity != null) {
+                if (blockEntity != null) {
                     blockEntity.paste(block, schem.getRotation());
                 }
 
@@ -230,7 +228,8 @@ public class SchematicPaster {
             }
 
             if (building.getCenterBlock() != null) {
-                building.getCenterBlock().getWorld().playSound(building.getCenterBlock(), Sound.LEVEL_UP, 1.0f, 1.0f);
+                building.getCenterBlock().getWorld()
+                        .playSound(building.getCenterBlock(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
             }
 
             building.setFinished();

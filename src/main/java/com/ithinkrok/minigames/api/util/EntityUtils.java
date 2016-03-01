@@ -79,53 +79,53 @@ public class EntityUtils {
     public static Sound getDeathSound(EntityType entityType) {
         switch(entityType) {
             case BAT:
-                return Sound.BAT_DEATH;
+                return Sound.ENTITY_BAT_DEATH;
             case BLAZE:
-                return Sound.BLAZE_DEATH;
+                return Sound.ENTITY_BLAZE_DEATH;
             case OCELOT:
-                return Sound.CAT_HIT;
+                return Sound.ENTITY_CAT_DEATH;
             case CHICKEN:
-                return Sound.CHICKEN_HURT;
+                return Sound.ENTITY_CHICKEN_DEATH;
             case COW:
-                return Sound.COW_HURT;
+                return Sound.ENTITY_COW_DEATH;
             case CREEPER:
-                return Sound.CREEPER_DEATH;
+                return Sound.ENTITY_CREEPER_DEATH;
             case ENDER_DRAGON:
-                return Sound.ENDERDRAGON_DEATH;
+                return Sound.ENTITY_ENDERDRAGON_DEATH;
             case ENDERMAN:
-                return Sound.ENDERDRAGON_DEATH;
+                return Sound.ENTITY_ENDERMEN_DEATH;
             case GHAST:
-                return Sound.GHAST_DEATH;
+                return Sound.ENTITY_GHAST_DEATH;
             case IRON_GOLEM:
-                return Sound.IRONGOLEM_DEATH;
+                return Sound.ENTITY_IRONGOLEM_DEATH;
             case MAGMA_CUBE:
-                return Sound.MAGMACUBE_JUMP;
+                return Sound.ENTITY_MAGMACUBE_DEATH;
             case PIG:
-                return Sound.PIG_DEATH;
+                return Sound.ENTITY_PIG_DEATH;
             case SHEEP:
-                return Sound.SHEEP_IDLE;
+                return Sound.ENTITY_SHEEP_DEATH;
             case SILVERFISH:
-                return Sound.SILVERFISH_KILL;
+                return Sound.ENTITY_SILVERFISH_DEATH;
             case SKELETON:
-                return Sound.SKELETON_DEATH;
+                return Sound.ENTITY_SKELETON_DEATH;
             case SLIME:
-                return Sound.SLIME_ATTACK;
+                return Sound.ENTITY_SLIME_DEATH;
             case SPIDER:
-                return Sound.SPIDER_DEATH;
+                return Sound.ENTITY_SPIDER_DEATH;
             case WITHER:
-                return Sound.WITHER_DEATH;
+                return Sound.ENTITY_WITHER_DEATH;
             case WOLF:
-                return Sound.WOLF_DEATH;
+                return Sound.ENTITY_WOLF_DEATH;
             case ZOMBIE:
-                return Sound.ZOMBIE_DEATH;
+                return Sound.ENTITY_ZOMBIE_DEATH;
             case PIG_ZOMBIE:
-                return Sound.ZOMBIE_PIG_DEATH;
+                return Sound.ENTITY_ZOMBIE_PIG_DEATH;
             case HORSE:
-                return Sound.HORSE_DEATH;
+                return Sound.ENTITY_HORSE_DEATH;
             case VILLAGER:
-                return Sound.VILLAGER_DEATH;
+                return Sound.ENTITY_VILLAGER_DEATH;
             default:
-                return Sound.HURT_FLESH;
+                return Sound.ENTITY_PLAYER_DEATH;
         }
     }
 

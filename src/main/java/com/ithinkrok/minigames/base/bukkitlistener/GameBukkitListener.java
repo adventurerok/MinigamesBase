@@ -389,7 +389,8 @@ public class GameBukkitListener implements Listener {
             if (attacker != null) attacked.setLastAttacker(attacker);
 
             if (attacked.isCloaked() && attacked.isInGame()) {
-                attacked.getLocation().getWorld().playSound(attacked.getLocation(), Sound.HURT_FLESH, 1.0f, 1.0f);
+                attacked.getLocation().getWorld().playSound(attacked.getLocation(), Sound.ENTITY_PLAYER_HURT
+                        , 1.0f, 1.0f);
             }
 
             return;

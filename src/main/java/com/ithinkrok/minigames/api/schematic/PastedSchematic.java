@@ -126,7 +126,7 @@ public class PastedSchematic implements SchematicPaster.BoundsChecker {
         removed();
 
         if (centerBlock != null) {
-            centerBlock.getWorld().playSound(centerBlock, Sound.EXPLODE, 1.0f, 1.0f);
+            centerBlock.getWorld().playSound(centerBlock, Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 1.0f);
         }
 
         for (Location loc : buildingBlocks) {

@@ -12,21 +12,42 @@ import org.bukkit.inventory.ItemStack;
 
 public class ArmorCapture implements EntityEquipment {
 
-    private ItemStack helmet, chestplate, leggings, boots, holding;
+    private ItemStack helmet, chestplate, leggings, boots, mainHand, offHand;
 
     public ArmorCapture(ItemStack[] armorContents){
         setArmorContents(armorContents);
     }
 
     @Override
+    public ItemStack getItemInMainHand() {
+        return mainHand;
+    }
+
+    @Override
+    public void setItemInMainHand(ItemStack stack) {
+        if(InventoryUtils.isEmpty(stack)) stack = null;
+        mainHand = stack;
+    }
+
+    @Override
+    public ItemStack getItemInOffHand() {
+        return offHand;
+    }
+
+    @Override
+    public void setItemInOffHand(ItemStack item) {
+        if(InventoryUtils.isEmpty(item)) item = null;
+        offHand = item;
+    }
+
+    @Override
     public ItemStack getItemInHand() {
-        return holding;
+        return getItemInMainHand();
     }
 
     @Override
     public void setItemInHand(ItemStack stack) {
-        if(InventoryUtils.isEmpty(stack)) stack = null;
-        holding = stack;
+        setItemInMainHand(stack);
     }
 
     @Override
