@@ -5,6 +5,7 @@ import com.ithinkrok.minigames.api.inventory.event.CalculateItemForUserEvent;
 import com.ithinkrok.minigames.api.inventory.event.UserClickItemEvent;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
+import com.ithinkrok.minigames.api.util.NamedSounds;
 import com.ithinkrok.minigames.api.util.SoundEffect;
 import com.ithinkrok.minigames.api.util.math.Calculator;
 import com.ithinkrok.minigames.api.util.math.ExpressionCalculator;
@@ -24,6 +25,7 @@ import java.util.Map;
  */
 public abstract class Buyable extends ClickableItem {
 
+    private final Map<String, Calculator> upgradeOnBuy = new HashMap<>();
     private String teamNoMoneyLocale;
     private String userNoMoneyLocale;
     private String cannotBuyLocale;
@@ -32,10 +34,7 @@ public abstract class Buyable extends ClickableItem {
     private String userDescriptionLocale;
     private Calculator cost;
     private Calculator team;
-
     private Calculator canBuy;
-
-    private final Map<String, Calculator> upgradeOnBuy = new HashMap<>();
 
     public Buyable(ItemStack baseDisplay, int slot) {
         super(baseDisplay, slot);
@@ -54,18 +53,18 @@ public abstract class Buyable extends ClickableItem {
         teamDescriptionLocale = config.getString("team_description_locale", "buyable.team.description");
         userDescriptionLocale = config.getString("user_description_locale", "buyable.user.description");
 
-        if(config.contains("upgrade_on_buy")) configureUpgradeOnBuy(config.getConfigOrNull("upgrade_on_buy"));
+        if (config.contains("upgrade_on_buy")) configureUpgradeOnBuy(config.getConfigOrNull("upgrade_on_buy"));
     }
 
     private void configureUpgradeOnBuy(Config config) {
-        for(String upgrade : config.getKeys(false)) {
+        for (String upgrade : config.getKeys(false)) {
             upgradeOnBuy.put(upgrade, new ExpressionCalculator(config.getString(upgrade)));
         }
     }
 
     @Override
     public void onCalculateItem(CalculateItemForUserEvent event) {
-        if(event.getDisplay() == null) return;
+        if (event.getDisplay() == null) return;
         BuyablePurchaseEvent purchaseEvent = new BuyablePurchaseEvent(event.getUser(), event.getInventory(), this);
 
         if (!canBuy(purchaseEvent)) {
@@ -90,7 +89,7 @@ public abstract class Buyable extends ClickableItem {
 
         ItemStack display = event.getDisplay();
 
-        if(team) {
+        if (team) {
             display = InventoryUtils.addLore(display, lookup.getLocale(teamDescriptionLocale, costString));
         } else {
             display = InventoryUtils.addLore(display, lookup.getLocale(userDescriptionLocale, costString));
@@ -152,19 +151,19 @@ public abstract class Buyable extends ClickableItem {
             userMoney.subtractMoney(cost, true);
         }
 
-        event.getUser().playSound(event.getUser().getLocation(), new SoundEffect(Sound.ENTITY_BLAZE_HURT
-                , 1.0f, 1.0f));
+        event.getUser().playSound(event.getUser().getLocation(),
+                new SoundEffect(NamedSounds.fromName("ENTITY_BLAZE_HURT"), 1.0f, 1.0f));
 
         event.getUser().redoInventory();
     }
 
+    public abstract boolean onPurchase(BuyablePurchaseEvent event);
+
     private void doUpgradesOnBuy(User user) {
-        for(Map.Entry<String, Calculator> upgrades : upgradeOnBuy.entrySet()) {
+        for (Map.Entry<String, Calculator> upgrades : upgradeOnBuy.entrySet()) {
             user.setUpgradeLevel(upgrades.getKey(), (int) upgrades.getValue().calculate(user.getUpgradeLevels()));
         }
     }
-
-    public abstract boolean onPurchase(BuyablePurchaseEvent event);
 
     public boolean buyWithTeamMoney(User user) {
         return team.calculateBoolean(user.getUpgradeLevels());

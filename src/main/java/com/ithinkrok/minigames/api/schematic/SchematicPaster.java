@@ -6,6 +6,7 @@ import com.ithinkrok.minigames.api.task.GameRunnable;
 import com.ithinkrok.minigames.api.task.GameTask;
 import com.ithinkrok.minigames.api.task.TaskScheduler;
 import com.ithinkrok.minigames.api.util.BoundingBox;
+import com.ithinkrok.minigames.api.util.NamedSounds;
 import de.inventivegames.hologram.Hologram;
 import de.inventivegames.hologram.HologramAPI;
 import org.bukkit.Effect;
@@ -229,7 +230,8 @@ public class SchematicPaster {
 
             if (building.getCenterBlock() != null) {
                 building.getCenterBlock().getWorld()
-                        .playSound(building.getCenterBlock(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
+                        .playSound(building.getCenterBlock(),
+                                NamedSounds.fromName("ENTITY_PLAYER_LEVELUP"), 1.0f, 1.0f);
             }
 
             building.setFinished();

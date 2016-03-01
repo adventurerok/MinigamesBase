@@ -8,6 +8,7 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -72,26 +73,6 @@ public class InventoryCapture implements PlayerInventory {
     }
 
     @Override
-    public ItemStack getItemInMainHand() {
-        return equipment().getItemInMainHand();
-    }
-
-    @Override
-    public void setItemInMainHand(ItemStack item) {
-        equipment().setItemInOffHand(item);
-    }
-
-    @Override
-    public ItemStack getItemInOffHand() {
-        return equipment().getItemInOffHand();
-    }
-
-    @Override
-    public void setItemInOffHand(ItemStack item) {
-        equipment().setItemInOffHand(item);
-    }
-
-    @Override
     public ItemStack getItemInHand() {
         return equipment().getItemInHand();
     }
@@ -139,6 +120,45 @@ public class InventoryCapture implements PlayerInventory {
     @Override
     public void setArmorContents(ItemStack[] items) {
         equipment().setArmorContents(items);
+    }
+
+    @SuppressWarnings("unused")
+    public ItemStack getItemInMainHand() {
+        return equipment().getItemInHand();
+    }
+
+    @SuppressWarnings("unused")
+    public void setItemInMainHand(ItemStack item) {
+        equipment().setItemInHand(item);
+    }
+
+    @SuppressWarnings("unused")
+    public ItemStack getItemInOffHand() {
+        try {
+            EntityEquipment equipment = equipment();
+
+            Class<?> clazz = equipment.getClass();
+            Method method = clazz.getMethod("getItemInOffHand");
+
+            return (ItemStack) method.invoke(equipment);
+        } catch (ReflectiveOperationException ignored) {
+            //We are running a version of minecraft that does not support offhand items
+            return null;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public void setItemInOffHand(ItemStack item) {
+        try {
+            EntityEquipment equipment = equipment();
+
+            Class<?> clazz = equipment.getClass();
+            Method method = clazz.getMethod("setItemInOffHand", ItemStack.class);
+
+            method.invoke(equipment, item);
+        } catch (ReflectiveOperationException ignored) {
+            //We are running a version of minecraft that does not support offhand items
+        }
     }
 
     @Override
@@ -266,8 +286,8 @@ public class InventoryCapture implements PlayerInventory {
     @Override
     public int first(Material material) throws IllegalArgumentException {
         for (int i = 0; i < contents.length; ++i) {
-            if ((material == null || material == Material.AIR) && contents[i] == null) return i;
-            else if (contents[i] != null && contents[i].getType() == material) return i;
+            if ((material == null || material == Material.AIR) && contents[i] == null ||
+                    contents[i] != null && contents[i].getType() == material) return i;
         }
 
         return -1;
@@ -347,7 +367,6 @@ public class InventoryCapture implements PlayerInventory {
         throw new UnsupportedOperationException();
     }
 
-    @Override
     public Location getLocation() {
         return null;
     }

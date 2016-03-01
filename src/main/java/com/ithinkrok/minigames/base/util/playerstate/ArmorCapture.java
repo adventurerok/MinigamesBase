@@ -18,23 +18,21 @@ public class ArmorCapture implements EntityEquipment {
         setArmorContents(armorContents);
     }
 
-    @Override
     public ItemStack getItemInMainHand() {
         return mainHand;
     }
 
-    @Override
     public void setItemInMainHand(ItemStack stack) {
         if(InventoryUtils.isEmpty(stack)) stack = null;
         mainHand = stack;
     }
 
-    @Override
+    @SuppressWarnings("unused")
     public ItemStack getItemInOffHand() {
         return offHand;
     }
 
-    @Override
+    @SuppressWarnings("unused")
     public void setItemInOffHand(ItemStack item) {
         if(InventoryUtils.isEmpty(item)) item = null;
         offHand = item;

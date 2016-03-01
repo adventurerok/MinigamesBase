@@ -79,53 +79,53 @@ public class EntityUtils {
     public static Sound getDeathSound(EntityType entityType) {
         switch(entityType) {
             case BAT:
-                return Sound.ENTITY_BAT_DEATH;
+                return NamedSounds.fromName("ENTITY_BAT_DEATH");
             case BLAZE:
-                return Sound.ENTITY_BLAZE_DEATH;
+                return NamedSounds.fromName("ENTITY_BLAZE_DEATH");
             case OCELOT:
-                return Sound.ENTITY_CAT_DEATH;
+                return NamedSounds.fromName("ENTITY_CAT_DEATH");
             case CHICKEN:
-                return Sound.ENTITY_CHICKEN_DEATH;
+                return NamedSounds.fromName("ENTITY_CHICKEN_DEATH");
             case COW:
-                return Sound.ENTITY_COW_DEATH;
+                return NamedSounds.fromName("ENTITY_COW_DEATH");
             case CREEPER:
-                return Sound.ENTITY_CREEPER_DEATH;
+                return NamedSounds.fromName("ENTITY_CREEPER_DEATH");
             case ENDER_DRAGON:
-                return Sound.ENTITY_ENDERDRAGON_DEATH;
+                return NamedSounds.fromName("ENTITY_ENDERDRAGON_DEATH");
             case ENDERMAN:
-                return Sound.ENTITY_ENDERMEN_DEATH;
+                return NamedSounds.fromName("ENTITY_ENDERMEN_DEATH");
             case GHAST:
-                return Sound.ENTITY_GHAST_DEATH;
+                return NamedSounds.fromName("ENTITY_GHAST_DEATH");
             case IRON_GOLEM:
-                return Sound.ENTITY_IRONGOLEM_DEATH;
+                return NamedSounds.fromName("ENTITY_IRONGOLEM_DEATH");
             case MAGMA_CUBE:
-                return Sound.ENTITY_MAGMACUBE_DEATH;
+                return NamedSounds.fromName("ENTITY_MAGMACUBE_DEATH");
             case PIG:
-                return Sound.ENTITY_PIG_DEATH;
+                return NamedSounds.fromName("ENTITY_PIG_DEATH");
             case SHEEP:
-                return Sound.ENTITY_SHEEP_DEATH;
+                return NamedSounds.fromName("ENTITY_SHEEP_DEATH");
             case SILVERFISH:
-                return Sound.ENTITY_SILVERFISH_DEATH;
+                return NamedSounds.fromName("ENTITY_SILVERFISH_DEATH");
             case SKELETON:
-                return Sound.ENTITY_SKELETON_DEATH;
+                return NamedSounds.fromName("ENTITY_SKELETON_DEATH");
             case SLIME:
-                return Sound.ENTITY_SLIME_DEATH;
+                return NamedSounds.fromName("ENTITY_SLIME_DEATH");
             case SPIDER:
-                return Sound.ENTITY_SPIDER_DEATH;
+                return NamedSounds.fromName("ENTITY_SPIDER_DEATH");
             case WITHER:
-                return Sound.ENTITY_WITHER_DEATH;
+                return NamedSounds.fromName("ENTITY_WITHER_DEATH");
             case WOLF:
-                return Sound.ENTITY_WOLF_DEATH;
+                return NamedSounds.fromName("ENTITY_WOLF_DEATH");
             case ZOMBIE:
-                return Sound.ENTITY_ZOMBIE_DEATH;
+                return NamedSounds.fromName("ENTITY_ZOMBIE_DEATH");
             case PIG_ZOMBIE:
-                return Sound.ENTITY_ZOMBIE_PIG_DEATH;
+                return NamedSounds.fromName("ENTITY_ZOMBIE_PIG_DEATH");
             case HORSE:
-                return Sound.ENTITY_HORSE_DEATH;
+                return NamedSounds.fromName("ENTITY_HORSE_DEATH");
             case VILLAGER:
-                return Sound.ENTITY_VILLAGER_DEATH;
+                return NamedSounds.fromName("ENTITY_VILLAGER_DEATH");
             default:
-                return Sound.ENTITY_PLAYER_DEATH;
+                return NamedSounds.fromName("ENTITY_PLAYER_DEATH");
         }
     }
 

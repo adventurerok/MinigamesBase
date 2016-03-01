@@ -3,6 +3,7 @@ package com.ithinkrok.minigames.api.user;
 import com.ithinkrok.minigames.api.event.user.game.UserAbilityCooldownEvent;
 import com.ithinkrok.minigames.api.task.GameTask;
 import com.ithinkrok.minigames.api.task.TaskList;
+import com.ithinkrok.minigames.api.util.NamedSounds;
 import com.ithinkrok.minigames.api.util.SoundEffect;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -23,17 +24,13 @@ public class CooldownHandler {
         this.user = user;
     }
 
-    private long timeInFuture(double secondsInFuture) {
-        return System.nanoTime() + (long)(secondsInFuture * 1000000000);
-    }
-
     public boolean startCoolDown(String ability, double seconds, String coolDownLocale) {
-        if(isCoolingDown(ability)) {
+        if (isCoolingDown(ability)) {
             user.sendLocale("cooldowns.default.wait");
             return false;
         }
 
-        if(seconds <= 0) return true;
+        if (seconds <= 0) return true;
 
         coolingDown.put(ability, timeInFuture(seconds));
 
@@ -44,13 +41,12 @@ public class CooldownHandler {
         return true;
     }
 
-    public void cancelCoolDowns() {
-        coolingDown.clear();
-        coolDownTasks.cancelAllTasks();
-    }
-
     public boolean isCoolingDown(String ability) {
         return coolingDown.containsKey(ability);
+    }
+
+    private long timeInFuture(double secondsInFuture) {
+        return System.nanoTime() + (long) (secondsInFuture * 1000000000);
     }
 
     @SuppressWarnings("unchecked")
@@ -60,12 +56,18 @@ public class CooldownHandler {
         coolingDown.remove(ability);
 
         //if (!isInGame()) return;
-        UserAbilityCooldownEvent event = new UserAbilityCooldownEvent(user, ability, new SoundEffect(Sound
-                .ENTITY_ZOMBIE_VILLAGER_CURE, 1.0f, 2.0f), user.getGameGroup().getLocale(stopLocale));
+        UserAbilityCooldownEvent event = new UserAbilityCooldownEvent(user, ability,
+                new SoundEffect(NamedSounds.fromName("ENTITY_ZOMBIE_VILLAGER_CURE"), 1.0f, 2.0f),
+                user.getGameGroup().getLocale(stopLocale));
 
         user.getGameGroup().userEvent(event);
 
-        if(event.getCoolDownMessage() != null) user.sendMessage(ChatColor.GREEN + event.getCoolDownMessage());
-        if(event.getSoundEffect() != null) user.playSound(user.getLocation(), event.getSoundEffect());
+        if (event.getCoolDownMessage() != null) user.sendMessage(ChatColor.GREEN + event.getCoolDownMessage());
+        if (event.getSoundEffect() != null) user.playSound(user.getLocation(), event.getSoundEffect());
+    }
+
+    public void cancelCoolDowns() {
+        coolingDown.clear();
+        coolDownTasks.cancelAllTasks();
     }
 }

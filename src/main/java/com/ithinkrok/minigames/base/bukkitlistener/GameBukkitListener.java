@@ -26,6 +26,7 @@ import com.ithinkrok.minigames.api.team.TeamIdentifier;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.EntityUtils;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
+import com.ithinkrok.minigames.api.util.NamedSounds;
 import com.ithinkrok.minigames.base.BaseGame;
 import com.ithinkrok.util.command.CommandUtils;
 import com.ithinkrok.util.config.Config;
@@ -389,8 +390,8 @@ public class GameBukkitListener implements Listener {
             if (attacker != null) attacked.setLastAttacker(attacker);
 
             if (attacked.isCloaked() && attacked.isInGame()) {
-                attacked.getLocation().getWorld().playSound(attacked.getLocation(), Sound.ENTITY_PLAYER_HURT
-                        , 1.0f, 1.0f);
+                attacked.getLocation().getWorld()
+                        .playSound(attacked.getLocation(), NamedSounds.fromName("ENTITY_PLAYER_HURT"), 1.0f, 1.0f);
             }
 
             return;

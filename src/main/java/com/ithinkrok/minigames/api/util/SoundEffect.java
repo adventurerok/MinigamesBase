@@ -21,7 +21,7 @@ public class SoundEffect {
     public SoundEffect(String config) {
         String[] parts = config.trim().split(",");
 
-        sound = Sound.valueOf(parts[0].trim().toUpperCase());
+        sound = NamedSounds.fromName(parts[0].trim().toUpperCase());
 
         if(parts.length > 1) volume = Float.parseFloat(parts[1].trim());
         else volume = 1.0f;

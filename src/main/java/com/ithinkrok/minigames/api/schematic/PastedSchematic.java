@@ -5,6 +5,7 @@ import com.ithinkrok.minigames.api.schematic.event.SchematicDestroyedEvent;
 import com.ithinkrok.minigames.api.schematic.event.SchematicFinishedEvent;
 import com.ithinkrok.minigames.api.task.GameTask;
 import com.ithinkrok.minigames.api.util.BoundingBox;
+import com.ithinkrok.minigames.api.util.NamedSounds;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventExecutor;
 import com.ithinkrok.util.event.CustomListener;
@@ -25,10 +26,8 @@ import java.util.*;
  */
 public class PastedSchematic implements SchematicPaster.BoundsChecker {
 
-    private static long nextIdentifier = 0;
-
     private static final Random random = new Random();
-
+    private static long nextIdentifier = 0;
     private final long identifier = nextIdentifier++;
 
     private final String name;
@@ -36,19 +35,15 @@ public class PastedSchematic implements SchematicPaster.BoundsChecker {
     private final Map<Location, BlockState> oldBlocks;
     private final Location centerBlock;
     private final BoundingBox bounds;
-    private boolean finished;
-    private boolean removed;
     private final int rotation;
-
     private final GameMap map;
-
     private final List<CustomListener> listeners = new ArrayList<>();
     private final List<Hologram> holograms = new ArrayList<>();
-    private GameTask buildTask;
-
-    private boolean allowOverlap = false;
-
     private final Schematic schematic;
+    private boolean finished;
+    private boolean removed;
+    private GameTask buildTask;
+    private boolean allowOverlap = false;
 
     public PastedSchematic(String name, Schematic schematic, GameMap map, Location centerBlock, BoundingBox bounds,
                            int rotation, boolean allowOverlap, List<Location> buildingBlocks,
@@ -126,7 +121,7 @@ public class PastedSchematic implements SchematicPaster.BoundsChecker {
         removed();
 
         if (centerBlock != null) {
-            centerBlock.getWorld().playSound(centerBlock, Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 1.0f);
+            centerBlock.getWorld().playSound(centerBlock, NamedSounds.fromName("ENTITY_GENERIC_EXPLODE"), 1.0f, 1.0f);
         }
 
         for (Location loc : buildingBlocks) {
@@ -191,6 +186,13 @@ public class PastedSchematic implements SchematicPaster.BoundsChecker {
     }
 
     @Override
+    public int hashCode() {
+        int result = (int) (identifier ^ (identifier >>> 32));
+        result = 31 * result + name.hashCode();
+        return result;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -200,13 +202,6 @@ public class PastedSchematic implements SchematicPaster.BoundsChecker {
         if (identifier != that.identifier) return false;
         return name.equals(that.name);
 
-    }
-
-    @Override
-    public int hashCode() {
-        int result = (int) (identifier ^ (identifier >>> 32));
-        result = 31 * result + name.hashCode();
-        return result;
     }
 
     @Override

@@ -47,10 +47,18 @@ public class NamedSounds {
         NAMED_SOUNDS.put("ENTITY_EXPERIENCE_ORB_PICKUP", Sound.valueOf("ORB_PICKUP"));
 
         NAMED_SOUNDS.put("ENTITY_PLAYER_HURT", Sound.valueOf("HURT_FLESH"));
+        NAMED_SOUNDS.put("ENTITY_PLAYER_LEVELUP", Sound.valueOf("LEVEL_UP"));
 
         NAMED_SOUNDS.put("ENTITY_ZOMBIE_VILLAGER_CURE", Sound.valueOf("ZOMBIE_UNFECT"));
 
         NAMED_SOUNDS.put("ENTITY_BLAZE_HURT", Sound.valueOf("BLAZE_HIT"));
+
+        NAMED_SOUNDS.put("ENTITY_ARROW_SHOOT", Sound.valueOf("SHOOT_ARROW"));
+
+        NAMED_SOUNDS.put("ENTITY_WITHER_SPAWN", Sound.valueOf("WITHER_SPAWN"));
+        NAMED_SOUNDS.put("ENTITY_WITHER_SHOOT", Sound.valueOf("WITHER_SHOOT"));
+
+        NAMED_SOUNDS.put("ENTITY_FIREWORK_TWINKLE", Sound.valueOf("FIREWORK_TWINKLE"));
     }
 
     public static Sound fromName(String name) {
