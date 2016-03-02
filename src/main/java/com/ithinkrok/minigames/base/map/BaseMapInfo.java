@@ -3,6 +3,7 @@ package com.ithinkrok.minigames.base.map;
 import com.ithinkrok.minigames.api.map.GameMapInfo;
 import com.ithinkrok.minigames.api.map.MapType;
 import com.ithinkrok.minigames.base.util.io.FileLoader;
+import com.ithinkrok.util.StringUtils;
 import com.ithinkrok.util.config.Config;
 import org.bukkit.World;
 
@@ -63,7 +64,8 @@ public class BaseMapInfo implements GameMapInfo {
 
             if(!config.contains(configString)) return result;
 
-            result.add(config.getString(configString));
+            String credit = StringUtils.convertAmpersandToSelectionCharacter(config.getString(configString));
+            result.add(credit);
         }
     }
 
