@@ -641,7 +641,10 @@ public class BaseUser implements Listener, User {
     public boolean teleport(Location location) {
         if(getMap() != null && !getMap().getWorld().getName().equals(location.getWorld().getName())) {
             try{
-                throw new RuntimeException("Tried to teleport user to another Bukkit world");
+                String message = "tried to teleport user to another Bukkit world: game_map="
+                        + getMap().getWorld().getName() + ", world=" + location.getWorld().getName();
+
+                throw new RuntimeException(message);
             } catch (RuntimeException e) {
                 e.printStackTrace();
             }
