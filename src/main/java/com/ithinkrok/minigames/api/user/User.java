@@ -154,15 +154,15 @@ public interface User
 
     boolean teleport(Vector loc);
 
-    @SuppressWarnings("unchecked")
     boolean teleport(Location location);
 
     boolean isViewingClickableInventory();
 
     ClickableInventory getClickableInventory();
 
-    @SuppressWarnings("unchecked")
     void showInventory(ClickableInventory inventory, Location inventoryTether);
+
+    void showInventory(Inventory inventory, Location inventoryTether);
 
     void redoInventory();
 

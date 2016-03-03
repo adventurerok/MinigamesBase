@@ -703,6 +703,17 @@ public class BaseUser implements Listener, User {
     }
 
     @Override
+    public void showInventory(Inventory inventory, Location inventoryTether) {
+        doInFuture(task -> {
+           if(!isPlayer()) return;
+
+            this.inventoryTether = inventoryTether != null ? inventoryTether.toVector() : null;
+
+            getPlayer().openInventory(inventory);
+        });
+    }
+
+    @Override
     public GameTask doInFuture(GameRunnable task) {
         GameTask gameTask = gameGroup.doInFuture(task);
 
