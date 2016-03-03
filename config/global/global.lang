@@ -107,3 +107,6 @@ invisible_user_toggle.name=Show/Hide other spectators
 
 spectate_chooser.name=Spectate Chooser
 spectate_chooser.title=Spectate Chooser
+
+#Map credits starter
+start.map_credits=&6Map credits:
