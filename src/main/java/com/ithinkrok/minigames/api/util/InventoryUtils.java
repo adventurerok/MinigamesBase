@@ -57,7 +57,10 @@ public class InventoryUtils {
     public static ItemStack parseItem(String itemString) {
         String[] parts = itemString.trim().split(",");
 
-        Material material = Material.matchMaterial(parts[0].trim());
+        String materialName = parts[0].trim();
+        Material material = Material.matchMaterial(materialName);
+
+        if(material == null) throw new IllegalArgumentException("Unknown material: " + materialName);
 
         int amount = parts.length >= 2 ? Integer.parseInt(parts[1].trim()) : 1;
         int durability = parts.length >= 3 ? Integer.parseInt(parts[2].trim()) : 0;
