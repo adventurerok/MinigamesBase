@@ -4,6 +4,8 @@
  - Add option to enable death by default
  - No cheat plus blocking block breaks
 
+ - DIDN'T COPY NEW FOLDERS CORRECTLY FOR MINIGAMES RESOURCES
+
 == New Idea ==
 Minigames Plugin:
  - Does everything
