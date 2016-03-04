@@ -673,6 +673,13 @@ public class BaseUser implements Listener, User {
     }
 
     @Override
+    public Inventory getEnderInventory() {
+        if(getPlayer() == null) return null;
+
+        return getPlayer().getEnderChest();
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public void showInventory(ClickableInventory inventory, Location inventoryTether) {
         doInFuture(task -> {

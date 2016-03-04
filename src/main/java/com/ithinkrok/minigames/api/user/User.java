@@ -160,6 +160,8 @@ public interface User
 
     ClickableInventory getClickableInventory();
 
+    Inventory getEnderInventory();
+
     void showInventory(ClickableInventory inventory, Location inventoryTether);
 
     void showInventory(Inventory inventory, Location inventoryTether);
