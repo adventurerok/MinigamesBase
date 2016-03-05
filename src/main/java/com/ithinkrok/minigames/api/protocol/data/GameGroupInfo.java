@@ -4,6 +4,8 @@ import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.ConfigSerializable;
 import com.ithinkrok.util.config.MemoryConfig;
 
+import java.util.List;
+
 /**
  * Created by paul on 16/02/16.
  */
@@ -12,8 +14,8 @@ public class GameGroupInfo implements ConfigSerializable {
     private final ControllerInfo controller;
 
     private final String name;
-
     private final String type;
+    private final List<String> params;
 
     private boolean acceptingPlayers = false;
 
@@ -27,6 +29,7 @@ public class GameGroupInfo implements ConfigSerializable {
         this.controller = controller;
         this.name = config.getString("name");
         this.type = config.getString("type");
+        this.params = config.getStringList("params");
 
         fromConfig(config);
     }
@@ -39,6 +42,10 @@ public class GameGroupInfo implements ConfigSerializable {
         if(config.contains("player_count")) playerCount = config.getInt("player_count");
 
         if(config.contains("max_players")) maxPlayerCount = config.getInt("max_players");
+    }
+
+    public List<String> getParams() {
+        return params;
     }
 
     public ControllerInfo getController() {
@@ -75,6 +82,8 @@ public class GameGroupInfo implements ConfigSerializable {
 
         result.set("name", name);
         result.set("type", type);
+        result.set("params", params);
+
         result.set("accepting", acceptingPlayers);
         result.set("motd", motd);
         result.set("player_count", playerCount);

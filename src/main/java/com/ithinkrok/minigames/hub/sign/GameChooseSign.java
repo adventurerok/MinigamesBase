@@ -35,13 +35,6 @@ public class GameChooseSign extends HubSign {
         notExistsFormat = defaultNotExistsFormat();
     }
 
-    public GameChooseSign(GameGroup gameGroup, Config config, SignController signController) {
-        super(gameGroup, config, signController);
-
-        existsFormat = loadFormatFromConfig(config, "exists_format", defaultExistsFormat());
-        notExistsFormat = loadFormatFromConfig(config, "not_exists_format", defaultNotExistsFormat());
-    }
-
     private String[] defaultExistsFormat() {
         return new String[]{"&8[&3{formatted_type}&8]", "&cSpectate Games", "&8{amount} &0games available",
                 "&9Right click chose"};
@@ -51,6 +44,13 @@ public class GameChooseSign extends HubSign {
         return new String[]{"&8[&3{formatted_type}&8]", "", "&cNo Games", ""};
     }
 
+    public GameChooseSign(GameGroup gameGroup, Config config, SignController signController) {
+        super(gameGroup, config, signController);
+
+        existsFormat = loadFormatFromConfig(config, "exists_format", defaultExistsFormat());
+        notExistsFormat = loadFormatFromConfig(config, "not_exists_format", defaultNotExistsFormat());
+    }
+
     @Override
     protected void updateSign() {
         Config config = new MemoryConfig();
@@ -58,7 +58,14 @@ public class GameChooseSign extends HubSign {
         config.set("type", gameGroupType);
         config.set("formatted_type", WordUtils.capitalizeFully(gameGroupType.replace('_', ' ')));
 
-        Collection<GameGroupInfo> all = gameGroup.getControllerInfo().getGameGroups(gameGroupType);
+        int index = 0;
+        for(String param : gameGroupParams) {
+            config.set("param" + index, param);
+
+            ++index;
+        }
+
+        Collection<GameGroupInfo> all = gameGroup.getControllerInfo().getGameGroups(gameGroupType, gameGroupParams);
 
         config.set("amount", all.size());
 
@@ -86,7 +93,8 @@ public class GameChooseSign extends HubSign {
 
         ClickableInventory inventory = new ClickableInventory(title, runtimeID);
 
-        Collection<GameGroupInfo> allCollection = user.getGameGroup().getControllerInfo().getGameGroups(gameGroupType);
+        Collection<GameGroupInfo> allCollection =
+                user.getGameGroup().getControllerInfo().getGameGroups(gameGroupType, gameGroupParams);
 
         List<GameGroupInfo> all = new ArrayList<>(allCollection);
 

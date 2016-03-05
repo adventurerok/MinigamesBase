@@ -52,8 +52,15 @@ public class JoinLobbySign extends HubSign {
         config.set("type", gameGroupType);
         config.set("formatted_type", WordUtils.capitalizeFully(gameGroupType.replace('_', ' ')));
 
+        int index = 0;
+        for(String param : gameGroupParams) {
+            config.set("param" + index, param);
 
-        Collection<GameGroupInfo> accepting = gameGroup.getControllerInfo().getAcceptingGameGroups(gameGroupType);
+            ++index;
+        }
+
+        Collection<GameGroupInfo> accepting =
+                gameGroup.getControllerInfo().getAcceptingGameGroups(gameGroupType, gameGroupParams);
 
         GameGroupInfo bestMatch = null;
 
@@ -79,7 +86,7 @@ public class JoinLobbySign extends HubSign {
     @Override
     public void onRightClick(User user) {
         Collection<GameGroupInfo> accepting =
-                user.getGameGroup().getControllerInfo().getAcceptingGameGroups(gameGroupType);
+                user.getGameGroup().getControllerInfo().getAcceptingGameGroups(gameGroupType, gameGroupParams);
 
         GameGroupInfo bestMatch = null;
 

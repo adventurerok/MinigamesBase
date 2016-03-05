@@ -4,6 +4,7 @@ import com.ithinkrok.util.config.Config;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -41,11 +42,14 @@ public class ControllerInfo {
         return gameGroupInfoMap.remove(name);
     }
 
-    public Collection<GameGroupInfo> getAcceptingGameGroups(String type) {
+    public Collection<GameGroupInfo> getAcceptingGameGroups(String type, List<String> params) {
         Collection<GameGroupInfo> result = new HashSet<>();
 
         for(GameGroupInfo gameGroupInfo : gameGroupInfoMap.values()) {
-            if(!gameGroupInfo.getType().equals(type)) continue;
+            if(type != null) {
+                if (!gameGroupInfo.getType().equals(type)) continue;
+                if(!params.isEmpty() && !params.equals(gameGroupInfo.getParams())) continue;
+            }
             if(!gameGroupInfo.isAcceptingPlayers()) continue;
 
             result.add(gameGroupInfo);
@@ -54,11 +58,14 @@ public class ControllerInfo {
         return result;
     }
 
-    public Collection<GameGroupInfo> getGameGroups(String type) {
+    public Collection<GameGroupInfo> getGameGroups(String type, List<String> params) {
         Collection<GameGroupInfo> result = new HashSet<>();
 
         for(GameGroupInfo gameGroupInfo : gameGroupInfoMap.values()) {
-            if(!gameGroupInfo.getType().equals(type)) continue;
+            if(type != null) {
+                if (!gameGroupInfo.getType().equals(type)) continue;
+                if(!params.isEmpty() && !params.equals(gameGroupInfo.getParams())) continue;
+            }
 
             result.add(gameGroupInfo);
         }
