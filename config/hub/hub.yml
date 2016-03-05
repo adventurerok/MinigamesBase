@@ -39,10 +39,10 @@ custom_items:
         class: "com.ithinkrok.minigames.hub.item.GameChooseMenu"
         config:
           gamegroups:
-            colony_wars:
+            - type: "colony_wars"
               item: "GOLD_INGOT,1,0,&1&lColony Wars"
               teleport: "387.5,141.05,-357.5,-90,0"
-            tntrun:
+            - type: "tntrun"
               item: "TNT,1,0,&1&lTNT Run"
               teleport: "345.5,141,-399.5,180,0"
           direct_join_enabled_item: "DIAMOND_BLOCK,1,0,&c&lDisable Direct Join"

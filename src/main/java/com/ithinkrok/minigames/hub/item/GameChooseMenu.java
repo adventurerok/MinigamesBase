@@ -16,7 +16,6 @@ import com.ithinkrok.minigames.api.protocol.ClientMinigamesRequestProtocol;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
 import com.ithinkrok.minigames.api.util.MinigamesConfigs;
-import com.ithinkrok.minigames.hub.sign.GameChooseSign;
 import com.ithinkrok.msm.bukkit.util.BukkitConfigUtils;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
@@ -24,15 +23,15 @@ import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by paul on 23/02/16.
  */
 public class GameChooseMenu implements CustomListener {
 
-    private final Map<String, Config> gameGroups = new HashMap<>();
+    private final List<Config> gameGroups = new ArrayList<>();
 
     private ItemStack directJoinOff;
     private ItemStack directJoinOn;
@@ -46,11 +45,7 @@ public class GameChooseMenu implements CustomListener {
     public void onListenerLoaded(ListenerLoadedEvent<?, CustomItem> event) {
         Config config = event.getConfigOrEmpty();
 
-        Config gameGroupsConfig = config.getConfigOrEmpty("gamegroups");
-
-        for(String gameGroupType : gameGroupsConfig.getKeys(false)) {
-            gameGroups.put(gameGroupType, gameGroupsConfig.getConfigOrNull(gameGroupType));
-        }
+        gameGroups.addAll(config.getConfigList("gamegroups"));
 
         directJoinOn = MinigamesConfigs.getItemStack(config, "direct_join_enabled_item");
         directJoinOff = MinigamesConfigs.getItemStack(config, "direct_join_disabled_item");
@@ -68,57 +63,15 @@ public class GameChooseMenu implements CustomListener {
 
         GameChooseMetadata metadata = GameChooseMetadata.getOrCreate(event.getUser());
 
-        for(Map.Entry<String, Config> entry : gameGroups.entrySet()) {
-            ItemStack display = MinigamesConfigs.getItemStack(entry.getValue(), "item");
+        for (Config config : gameGroups) {
+            ItemStack display = MinigamesConfigs.getItemStack(config, "item");
 
-            ClickableItem item = new ClickableItem(display, -1) {
-                @Override
-                public void onClick(UserClickItemEvent event) {
-                    if(metadata.isDirectJoin()) {
-                        event.getUser().sendLocale(transferLocale, entry.getKey());
-                        ClientMinigamesRequestProtocol requestProtocol = event.getUserGameGroup().getRequestProtocol();
-                        requestProtocol.sendJoinGameGroupPacket(event.getUser().getUuid(), entry.getKey(), null);
-                    } else {
-                        Location loc = BukkitConfigUtils.getLocation(entry.getValue(), event.getUser().getLocation()
-                                .getWorld(), "teleport");
-                        event.getUser().teleport(loc);
-                    }
-
-                    event.getUser().closeInventory();
-                }
-            };
+            ClickableItem item = new GameChooseItem(display, config, metadata);
 
             inventory.addItem(item);
         }
 
-        ClickableItem directJoin = new ClickableItem(directJoinOff, 26) {
-
-            @Override
-            public void onCalculateItem(CalculateItemForUserEvent event) {
-                ItemStack item;
-
-                if(metadata.isDirectJoin()) {
-                    item = directJoinOn;
-                } else {
-                    item = directJoinOff;
-                }
-
-                item = InventoryUtils.addIdentifier(item, this.getIdentifier());
-                event.setDisplay(item);
-            }
-
-            @Override
-            public void onClick(UserClickItemEvent event) {
-                metadata.setDirectJoin(!metadata.isDirectJoin());
-                event.getUser().redoInventory();
-
-                if(metadata.isDirectJoin()) {
-                    event.getUser().sendLocale(directJoinOnLocale);
-                } else {
-                    event.getUser().sendLocale(directJoinOffLocale);
-                }
-            }
-        };
+        ClickableItem directJoin = new DirectJoinItem(metadata);
 
         inventory.addItem(directJoin);
 
@@ -141,6 +94,17 @@ public class GameChooseMenu implements CustomListener {
                     user.redoInventory();
                 }, 2);
             }, false);
+        }
+
+        public static GameChooseMetadata getOrCreate(User user) {
+            GameChooseMetadata metadata = user.getMetadata(GameChooseMetadata.class);
+
+            if (metadata == null) {
+                metadata = new GameChooseMetadata(user);
+                user.setMetadata(metadata);
+            }
+
+            return metadata;
         }
 
         public boolean isDirectJoin() {
@@ -168,16 +132,71 @@ public class GameChooseMenu implements CustomListener {
         public boolean removeOnMapChange(MapChangedEvent event) {
             return false;
         }
+    }
 
-        public static GameChooseMetadata getOrCreate(User user) {
-            GameChooseMetadata metadata = user.getMetadata(GameChooseMetadata.class);
+    private class GameChooseItem extends ClickableItem {
 
-            if(metadata == null) {
-                metadata = new GameChooseMetadata(user);
-                user.setMetadata(metadata);
+        private final Config config;
+        private final GameChooseMetadata metadata;
+
+        public GameChooseItem(ItemStack display, Config config, GameChooseMetadata metadata) {
+            super(display, -1);
+            this.config = config;
+            this.metadata = metadata;
+        }
+
+        @Override
+        public void onClick(UserClickItemEvent event) {
+            String ggType = config.getString("type");
+            List<String> ggParams = config.getStringList("params");
+
+            if (metadata.isDirectJoin()) {
+                event.getUser().sendLocale(transferLocale, ggType);
+                ClientMinigamesRequestProtocol requestProtocol = event.getUserGameGroup().getRequestProtocol();
+                requestProtocol.sendJoinGameGroupPacket(event.getUser().getUuid(), ggType, null, ggParams);
+            } else {
+                Location loc =
+                        BukkitConfigUtils.getLocation(config, event.getUser().getLocation().getWorld(), "teleport");
+                event.getUser().teleport(loc);
             }
 
-            return metadata;
+            event.getUser().closeInventory();
+        }
+    }
+
+    private class DirectJoinItem extends ClickableItem {
+
+        private final GameChooseMetadata metadata;
+
+        public DirectJoinItem(GameChooseMetadata metadata) {
+            super(GameChooseMenu.this.directJoinOff, 26);
+            this.metadata = metadata;
+        }
+
+        @Override
+        public void onCalculateItem(CalculateItemForUserEvent event) {
+            ItemStack item;
+
+            if (metadata.isDirectJoin()) {
+                item = directJoinOn;
+            } else {
+                item = directJoinOff;
+            }
+
+            item = InventoryUtils.addIdentifier(item, this.getIdentifier());
+            event.setDisplay(item);
+        }
+
+        @Override
+        public void onClick(UserClickItemEvent event) {
+            metadata.setDirectJoin(!metadata.isDirectJoin());
+            event.getUser().redoInventory();
+
+            if (metadata.isDirectJoin()) {
+                event.getUser().sendLocale(directJoinOnLocale);
+            } else {
+                event.getUser().sendLocale(directJoinOffLocale);
+            }
         }
     }
 }

@@ -59,7 +59,7 @@ public class GameChooseSign extends HubSign {
         config.set("formatted_type", WordUtils.capitalizeFully(gameGroupType.replace('_', ' ')));
 
         int index = 0;
-        for(String param : gameGroupParams) {
+        for (String param : gameGroupParams) {
             config.set("param" + (index + 1), param);
 
             ++index;
@@ -132,7 +132,8 @@ public class GameChooseSign extends HubSign {
                     user.sendMessage("Sending you to gamegroup: " + gameGroup.getName());
 
                     user.getGameGroup().getRequestProtocol()
-                            .sendJoinGameGroupPacket(user.getUuid(), gameGroup.getType(), gameGroup.getName());
+                            .sendJoinGameGroupPacket(user.getUuid(), gameGroup.getType(), gameGroup.getName(),
+                                    gameGroup.getParams());
                 }
             };
 

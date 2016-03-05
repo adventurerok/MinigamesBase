@@ -53,7 +53,7 @@ public class JoinLobbySign extends HubSign {
         config.set("formatted_type", WordUtils.capitalizeFully(gameGroupType.replace('_', ' ')));
 
         int index = 0;
-        for(String param : gameGroupParams) {
+        for (String param : gameGroupParams) {
             config.set("param" + (index + 1), param);
 
             ++index;
@@ -101,7 +101,8 @@ public class JoinLobbySign extends HubSign {
         if (gameGroupName != null) user.sendMessage("Sending you to gamegroup: " + gameGroupName);
         else user.sendMessage("Creating a new " + gameGroupType + " gamegroup for you");
 
-        user.getGameGroup().getRequestProtocol().sendJoinGameGroupPacket(user.getUuid(), gameGroupType, gameGroupName);
+        user.getGameGroup().getRequestProtocol()
+                .sendJoinGameGroupPacket(user.getUuid(), gameGroupType, gameGroupName, gameGroupParams);
     }
 
     @Override
