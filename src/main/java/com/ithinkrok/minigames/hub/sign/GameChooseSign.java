@@ -60,7 +60,7 @@ public class GameChooseSign extends HubSign {
 
         int index = 0;
         for(String param : gameGroupParams) {
-            config.set("param" + index, param);
+            config.set("param" + (index + 1), param);
 
             ++index;
         }
