@@ -138,19 +138,27 @@ public class GameChooseMenu implements CustomListener {
 
         private final Config config;
         private final GameChooseMetadata metadata;
+        private final String ggType;
+        private final List<String> ggParams;
+
+        private final boolean allowTeleport;
+        private final boolean allowDirectJoin;
 
         public GameChooseItem(ItemStack display, Config config, GameChooseMetadata metadata) {
             super(display, -1);
             this.config = config;
             this.metadata = metadata;
+
+            ggType = config.getString("type");
+            ggParams = config.getStringList("params");
+
+            allowDirectJoin = config.getBoolean("direct_join_allow");
+            allowTeleport = config.getBoolean("teleport_location_allow");
         }
 
         @Override
         public void onClick(UserClickItemEvent event) {
-            String ggType = config.getString("type");
-            List<String> ggParams = config.getStringList("params");
-
-            if (metadata.isDirectJoin()) {
+            if ((metadata.isDirectJoin() && allowDirectJoin) || !allowTeleport) {
                 event.getUser().sendLocale(transferLocale, ggType);
                 ClientMinigamesRequestProtocol requestProtocol = event.getUserGameGroup().getRequestProtocol();
                 requestProtocol.sendJoinGameGroupPacket(event.getUser().getUuid(), ggType, null, ggParams);
