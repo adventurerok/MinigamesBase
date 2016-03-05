@@ -45,5 +45,9 @@ custom_items:
             - type: "tntrun"
               item: "TNT,1,0,&1&lTNT Run"
               teleport: "345.5,141,-399.5,180,0"
+            - type: "one_vs_one"
+              params: ["aqualonia"]
+              item: "BLAZE_POWDER,1,0,&1&lOne vs One,&7Map: &aAqualonia"
+              teleport: "303.5,141,-357.5,90,0"
           direct_join_enabled_item: "DIAMOND_BLOCK,1,0,&c&lDisable Direct Join"
           direct_join_disabled_item: "COAL_BLOCK,1,0,&a&lEnable Direct Join"
