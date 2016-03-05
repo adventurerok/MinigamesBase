@@ -72,9 +72,9 @@ public class BaseGame implements Game, FileLoader {
     private final Map<String, BaseGameGroup> nameToGameGroup = new HashMap<>();
 
     /**
-     * Maps player UUID to game group type
+     * Maps player UUID to game group joining data
      */
-    private final Map<UUID, String> playersJoiningGameGroupTypes = new ConcurrentHashMap<>();
+    private final Map<UUID, JoiningGameGroupData> playersJoiningGameGroupTypes = new ConcurrentHashMap<>();
 
     /**
      * Maps player UUID to game group name
@@ -270,7 +270,8 @@ public class BaseGame implements Game, FileLoader {
 
         if (gameGroup == null) {
             if (nameToGameGroup.isEmpty()) {
-                createGameGroup(fallbackConfig);
+                //The fallback gamegroup config must not require parameters
+                createGameGroup(fallbackConfig, new ArrayList<>());
             }
             gameGroup = getSpawnGameGroup();
         }
@@ -280,7 +281,7 @@ public class BaseGame implements Game, FileLoader {
 
         boolean hadUser = user != null;
 
-        if(user == null){
+        if (user == null) {
             user = new BaseUser(gameGroup, null, player.getUniqueId(), player);
         }
 
@@ -293,7 +294,7 @@ public class BaseGame implements Game, FileLoader {
         }
 
         //If the user is rejoining, make them become a player
-        if(hadUser) {
+        if (hadUser) {
             user.becomePlayer(player);
         }
 
@@ -316,19 +317,6 @@ public class BaseGame implements Game, FileLoader {
     }
 
     @Override
-    public BaseGameGroup createGameGroup(String type) {
-        BaseGameGroup gameGroup = new BaseGameGroup(this, nextGameGroupName(type), type, gameGroupConfigMap.get(type));
-
-        nameToGameGroup.put(gameGroup.getName(), gameGroup);
-
-        getLogger().info("Created " + type + " gamegroup: " + gameGroup.getName());
-
-        protocol.sendGameGroupSpawnedPayload(gameGroup);
-
-        return gameGroup;
-    }
-
-    @Override
     public BaseGameGroup getSpawnGameGroup() {
         if (nameToGameGroup.isEmpty()) return null;
 
@@ -341,9 +329,9 @@ public class BaseGame implements Game, FileLoader {
     }
 
     @Override
-    public void preJoinGameGroup(UUID playerUUID, String type, String name) {
+    public void preJoinGameGroup(UUID playerUUID, String type, String name, List<String> params) {
         doInFuture(task -> {
-            playersJoiningGameGroupTypes.put(playerUUID, type);
+            playersJoiningGameGroupTypes.put(playerUUID, new JoiningGameGroupData(type, params));
             if (name != null) playersJoinGameGroups.put(playerUUID, name);
 
             Player player = plugin.getServer().getPlayer(playerUUID);
@@ -364,8 +352,33 @@ public class BaseGame implements Game, FileLoader {
         return gameGroup.getUser(entity.getUniqueId());
     }
 
-    public void removeGameGroupForMap(String mapName) {
-        mapToGameGroup.remove(mapName);
+    @Override
+    public GameTask doInFuture(GameRunnable task) {
+        return doInFuture(task, 1);
+    }
+
+    private BaseGameGroup getGameGroupForJoining(UUID uniqueId) {
+        String gameGroupName = playersJoinGameGroups.remove(uniqueId);
+
+        if (gameGroupName != null && nameToGameGroup.containsKey(gameGroupName)) {
+            return nameToGameGroup.get(gameGroupName);
+        }
+
+        JoiningGameGroupData data = playersJoiningGameGroupTypes.remove(uniqueId);
+
+        if (data != null) {
+            for (BaseGameGroup gameGroup : getGameGroups()) {
+                if (!gameGroup.getType().equals(data.type)) continue;
+                if (!gameGroup.isAcceptingPlayers()) continue;
+                if(!data.params.isEmpty() && !data.params.equals(gameGroup.getParameters())) continue;
+
+                return gameGroup;
+            }
+
+            return createGameGroup(data.type, data.params);
+        }
+
+        return null;
     }
 
     private void hideNonGameGroupPlayers(BaseUser user) {
@@ -376,6 +389,57 @@ public class BaseGame implements Game, FileLoader {
             user.getPlayer().hidePlayer(player);
             player.hidePlayer(user.getPlayer());
         }
+    }
+
+    @Override
+    public GameTask doInFuture(GameRunnable task, int delay) {
+        GameTask gameTask = new GameTask(task);
+
+        gameTask.schedule(plugin, delay);
+        return gameTask;
+    }
+
+    @Override
+    public GameTask repeatInFuture(GameRunnable task, int delay, int period) {
+        GameTask gameTask = new GameTask(task);
+
+        gameTask.schedule(plugin, delay, period);
+        return gameTask;
+    }
+
+    @Override
+    public void cancelAllTasks() {
+        throw new RuntimeException("You cannot cancel all game tasks");
+    }
+
+    @Override
+    public BaseGameGroup createGameGroup(String type, List<String> params) {
+        BaseGameGroup gameGroup =
+                new BaseGameGroup(this, nextGameGroupName(type), type, gameGroupConfigMap.get(type), params);
+
+        nameToGameGroup.put(gameGroup.getName(), gameGroup);
+
+        getLogger().info("Created " + type + " gamegroup: " + gameGroup.getName());
+
+        protocol.sendGameGroupSpawnedPayload(gameGroup);
+
+        return gameGroup;
+    }
+
+    private String nextGameGroupName(String configName) {
+        String result;
+        int counter = 0;
+
+        do {
+            result = name + "_" + configName + "_" + counter;
+            ++counter;
+        } while (nameToGameGroup.containsKey(result));
+
+        return result;
+    }
+
+    public void removeGameGroupForMap(String mapName) {
+        mapToGameGroup.remove(mapName);
     }
 
     @Override
@@ -434,65 +498,14 @@ public class BaseGame implements Game, FileLoader {
         persistence.doTask(task);
     }
 
-    private BaseGameGroup getGameGroupForJoining(UUID uniqueId) {
-        String gameGroupName = playersJoinGameGroups.remove(uniqueId);
+    private static class JoiningGameGroupData {
+        String type;
 
-        if (gameGroupName != null && nameToGameGroup.containsKey(gameGroupName)) {
-            return nameToGameGroup.get(gameGroupName);
+        List<String> params;
+
+        public JoiningGameGroupData(String type, List<String> params) {
+            this.type = type;
+            this.params = params;
         }
-
-        String gameGroupType = playersJoiningGameGroupTypes.remove(uniqueId);
-
-        if (gameGroupType != null) {
-            for (BaseGameGroup gameGroup : getGameGroups()) {
-                if (!gameGroup.getType().equals(gameGroupType)) continue;
-                if (!gameGroup.isAcceptingPlayers()) continue;
-
-                return gameGroup;
-            }
-
-            return createGameGroup(gameGroupType);
-        }
-
-        return null;
     }
-
-    private String nextGameGroupName(String configName) {
-        String result;
-        int counter = 0;
-
-        do {
-            result = name + "_" + configName + "_" + counter;
-            ++counter;
-        } while (nameToGameGroup.containsKey(result));
-
-        return result;
-    }
-
-    @Override
-    public GameTask doInFuture(GameRunnable task) {
-        return doInFuture(task, 1);
-    }
-
-    @Override
-    public GameTask doInFuture(GameRunnable task, int delay) {
-        GameTask gameTask = new GameTask(task);
-
-        gameTask.schedule(plugin, delay);
-        return gameTask;
-    }
-
-    @Override
-    public GameTask repeatInFuture(GameRunnable task, int delay, int period) {
-        GameTask gameTask = new GameTask(task);
-
-        gameTask.schedule(plugin, delay, period);
-        return gameTask;
-    }
-
-    @Override
-    public void cancelAllTasks() {
-        throw new RuntimeException("You cannot cancel all game tasks");
-    }
-
 }

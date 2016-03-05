@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -64,13 +65,13 @@ public interface Game extends TaskScheduler, DatabaseTaskRunner, Nameable {
 
     boolean sendPlayerToHub(Player player);
 
-    GameGroup createGameGroup(String type);
+    GameGroup createGameGroup(String type, List<String> params);
 
     GameGroup getSpawnGameGroup();
 
     Logger getLogger();
 
-    void preJoinGameGroup(UUID playerUUID, String type, String name);
+    void preJoinGameGroup(UUID playerUUID, String type, String name, List<String> params);
 
     BaseUser getUser(Entity entity);
 }

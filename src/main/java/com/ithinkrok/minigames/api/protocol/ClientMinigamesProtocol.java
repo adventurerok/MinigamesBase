@@ -215,10 +215,11 @@ public class ClientMinigamesProtocol implements ClientListener {
     private void handleJoinGameGroup(Config payload) {
         String type = payload.getString("type");
         String name = payload.getString("name"); //This can be null
+        List<String> params = payload.getStringList("params");
 
         UUID playerUUID = UUID.fromString(payload.getString("player"));
 
-        game.preJoinGameGroup(playerUUID, type, name);
+        game.preJoinGameGroup(playerUUID, type, name, params);
 
         if(client == null || Bukkit.getPlayer(playerUUID) != null) return;
 
