@@ -4,8 +4,11 @@ import com.ithinkrok.msm.bukkit.util.BukkitConfigUtils;
 import com.ithinkrok.util.StringUtils;
 import com.ithinkrok.util.config.Config;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+
+import java.util.List;
 
 /**
  * Created by paul on 05/02/16.
@@ -44,9 +47,32 @@ public class MinigamesConfigs {
         String name = config.getString("name", null);
         if(name != null) name = StringUtils.convertAmpersandToSelectionCharacter(name);
 
-        //TODO add more options for ItemStack loading
+        ItemStack item = InventoryUtils.createItemWithNameAndLore(mat, amount, damage, name);
 
-        return InventoryUtils.createItemWithNameAndLore(mat, amount, damage, name);
+        if(config.contains("lore")) {
+            List<String> lore = config.getStringList("lore");
+
+            for(int index = 0; index < lore.size(); ++index) {
+                lore.set(index, StringUtils.convertAmpersandToSelectionCharacter(lore.get(index)));
+            }
+
+            InventoryUtils.addLore(item, lore);
+        }
+
+        if(config.contains("enchantments")) {
+            List<Config> enchantments = config.getConfigList("enchantments");
+
+            for(Config enchantment : enchantments) {
+                Enchantment ench = Enchantment.getByName(enchantment.getString("name").toUpperCase());
+                int level = enchantment.getInt("level", 1);
+
+                item.addUnsafeEnchantment(ench, level);
+            }
+        }
+
+        //TODO attributes support for 1.9
+
+        return item;
     }
 
     public static SoundEffect getSoundEffect(Config config, String path) {
