@@ -138,6 +138,7 @@ public class SignListener implements CustomListener {
             if(sign.update()) return;
 
             signs.remove(sign.getLocation());
+            task1.finish();
         }, sign.getUpdateFrequency(), sign.getUpdateFrequency());
 
         gameGroup.bindTaskToCurrentMap(task);
