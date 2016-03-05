@@ -1,5 +1,3 @@
-chat_prefix: "&7[&3Hub&7] &e"
-
 lang_files:
   - "global/global.lang"
   - "hub/hub.lang"
@@ -15,6 +13,7 @@ shared_objects:
     all_fire: true
     max_players: 250
     default_motd: "Hub sign really"
+    chat_prefix: "&7[&3Hub&7] &e"
 
 game_states:
   hub:
