@@ -110,7 +110,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         defaultAndMapListeners = createDefaultAndMapListeners();
 
         Config baseConfig = game.loadConfig(configFile);
-        chatPrefix = baseConfig.getString("chat_prefix").replace('&', '§');
+
 
         ConfigParser.parseConfig(game, this, this, this, configFile, baseConfig);
 
@@ -121,6 +121,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         Config gameConfig = getSharedObjectOrEmpty("game");
         maxPlayers = gameConfig.getInt("max_players", 40);
         motd = gameConfig.getString("default_motd", "No default motd");
+        chatPrefix = gameConfig.getString("chat_prefix").replace('&', '§');
 
         //Load the start map and start gamestate from the "start_info" shared object
         Config startConfig = getSharedObject("start_info");
