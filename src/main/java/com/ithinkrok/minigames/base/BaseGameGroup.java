@@ -114,12 +114,16 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         if (currentMap != null) defaultAndMapListeners = createDefaultAndMapListeners(currentMap.getListenerMap());
         else defaultAndMapListeners = createDefaultAndMapListeners();
 
-        maxPlayers = baseConfig.getInt("max_players", 40);
-        motd = baseConfig.getString("default_motd", "No default motd");
+        //Load maxPlayers and default motd from the "game" shared object
+        Config gameConfig = getSharedObjectOrEmpty("game");
+        maxPlayers = gameConfig.getInt("max_players", 40);
+        motd = gameConfig.getString("default_motd", "No default motd");
 
-        changeGameState(baseConfig.getString("start_game_state"));
+        //Load the start map and start gamestate from the "start_info" shared object
+        Config startConfig = getSharedObject("start_info");
+        changeGameState(startConfig.getString("game_state"));
 
-        String startMap = baseConfig.getString("start_map");
+        String startMap = startConfig.getString("map");
         if (startMap != null) changeMap(startMap);
     }
 
