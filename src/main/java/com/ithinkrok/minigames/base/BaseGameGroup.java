@@ -97,10 +97,13 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     private boolean acceptingPlayers = true;
     private String motd = "default motd";
 
-    public BaseGameGroup(BaseGame game, String name, String type, String configFile) {
+    private final List<String> parameters;
+
+    public BaseGameGroup(BaseGame game, String name, String type, String configFile, List<String> parameters) {
         this.game = game;
         this.name = name;
         this.type = type;
+        this.parameters = parameters;
         this.database = new Database(this);
 
         gameGroupListener = new GameGroupListener();
@@ -121,10 +124,23 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
         //Load the start map and start gamestate from the "start_info" shared object
         Config startConfig = getSharedObject("start_info");
-        changeGameState(startConfig.getString("game_state"));
+        String startGameState = fillInParameters(startConfig.getString("game_state"));
+        changeGameState(startGameState);
 
         String startMap = startConfig.getString("map");
-        if (startMap != null) changeMap(startMap);
+        if (startMap != null){
+            changeMap(fillInParameters(startMap));
+        }
+    }
+
+    private String fillInParameters(String input) {
+        for(int index = 0; index < parameters.size(); ++index) {
+            String paramCode = "#param" + (index + 1);
+
+            input = input.replace(paramCode, parameters.get(index));
+        }
+
+        return input;
     }
 
     @SuppressWarnings("unchecked")
@@ -140,6 +156,11 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         result.add(gameGroupListener);
 
         return result;
+    }
+
+    @Override
+    public List<String> getParameters() {
+        return parameters;
     }
 
     @SafeVarargs
@@ -170,6 +191,39 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         }
 
         return result;
+    }
+
+    public void sendUpdatePayload() {
+        game.getProtocol().sendGameGroupUpdatePayload(this);
+    }
+
+    @Override
+    public void sendMessage(String message) {
+        sendMessageNoPrefix(getChatPrefix() + message);
+    }
+
+    @Override
+    public void sendMessageNoPrefix(String message) {
+        for (User user : usersInGroup.values()) {
+            user.sendMessageNoPrefix(message);
+        }
+
+        Bukkit.getConsoleSender().sendMessage(message);
+    }
+
+    @Override
+    public void sendLocale(String locale, Object... args) {
+        sendMessage(getLocale(locale, args));
+    }
+
+    @Override
+    public void sendLocaleNoPrefix(String locale, Object... args) {
+        sendMessageNoPrefix(getLocale(locale, args));
+    }
+
+    @Override
+    public LanguageLookup getLanguageLookup() {
+        return this;
     }
 
     @Override
@@ -277,10 +331,6 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         sendUpdatePayload();
     }
 
-    public void sendUpdatePayload() {
-        game.getProtocol().sendGameGroupUpdatePayload(this);
-    }
-
     @Override
     public void changeMap(GameMapInfo mapInfo) {
         BaseMap oldMap = currentMap;
@@ -306,7 +356,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
         sendUpdatePayload();
 
-        for(String credit : mapInfo.getCredit()) {
+        for (String credit : mapInfo.getCredit()) {
             sendMessage(credit);
         }
     }
@@ -363,6 +413,8 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         }
 
         config.set("server", game.getName());
+
+        config.set("params", parameters);
 
         return config;
     }
@@ -687,9 +739,6 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     @Override
     public <B extends Metadata> B getMetadata(Class<? extends B> clazz) {
         return metadataMap.getInstance(clazz);
-    }    @Override
-    public LanguageLookup getLanguageLookup() {
-        return this;
     }
 
     @Override
@@ -779,7 +828,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
         @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
         public void eventUserJoin(UserJoinEvent event) {
-            if (event.getReason() != UserJoinEvent.JoinReason.JOINED_SERVER){
+            if (event.getReason() != UserJoinEvent.JoinReason.JOINED_SERVER) {
                 sendUpdatePayload();
                 return;
             }
@@ -882,36 +931,6 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
                 }
             }
         }
-    }
-
-
-
-
-    @Override
-    public void sendLocale(String locale, Object... args) {
-        sendMessage(getLocale(locale, args));
-    }
-
-
-    @Override
-    public void sendMessage(String message) {
-        sendMessageNoPrefix(getChatPrefix() + message);
-    }
-
-
-    @Override
-    public void sendMessageNoPrefix(String message) {
-        for (User user : usersInGroup.values()) {
-            user.sendMessageNoPrefix(message);
-        }
-
-        Bukkit.getConsoleSender().sendMessage(message);
-    }
-
-
-    @Override
-    public void sendLocaleNoPrefix(String locale, Object... args) {
-        sendMessageNoPrefix(getLocale(locale, args));
     }
 
 

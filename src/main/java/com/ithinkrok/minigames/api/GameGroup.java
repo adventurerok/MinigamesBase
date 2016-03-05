@@ -26,6 +26,7 @@ import com.ithinkrok.util.lang.LanguageLookup;
 import com.ithinkrok.util.lang.Messagable;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,6 +37,8 @@ import java.util.Map;
 public interface GameGroup
         extends LanguageLookup, Messagable, TaskScheduler, SharedObjectAccessor, MetadataHolder<Metadata>,
         SchematicResolver, TeamUserResolver, DatabaseTaskRunner {
+
+    List<String> getParameters();
 
     /**
      * Gets the maximum number of users allowed in this gamegroup
