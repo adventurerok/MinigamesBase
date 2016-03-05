@@ -657,7 +657,7 @@ public class BaseUser implements Listener, User {
         if (event.isCancelled()) return false;
         boolean success = entity.teleport(event.getTo());
 
-        fixCloakedUsers();
+        //fixCloakedUsers();
 
         return revalidateNonPlayer(event.getTo()) || success;
     }
