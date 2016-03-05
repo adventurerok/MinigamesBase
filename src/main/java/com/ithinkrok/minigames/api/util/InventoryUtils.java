@@ -69,7 +69,7 @@ public class InventoryUtils {
         if (name != null) name = StringUtils.convertAmpersandToSelectionCharacter(name);
 
         String[] lore;
-        if (parts.length >= 5) lore = Arrays.copyOfRange(parts, 4, parts.length - 1);
+        if (parts.length >= 5) lore = Arrays.copyOfRange(parts, 4, parts.length);
         else lore = new String[0];
 
         for (int index = 0; index < lore.length; ++index) {
