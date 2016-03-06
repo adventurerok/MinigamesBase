@@ -79,6 +79,8 @@ public class MinigamesConfigs {
 
                     meta.addStoredEnchant(ench, level, true);
                 }
+
+                item.setItemMeta(meta);
             }
         }
 
