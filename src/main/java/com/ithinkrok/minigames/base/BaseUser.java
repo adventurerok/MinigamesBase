@@ -647,9 +647,9 @@ public class BaseUser implements Listener, User {
     public boolean teleport(Location location) {
         if (getMap() != null && !getMap().getWorld().getName().equals(location.getWorld().getName())) {
             try {
-                String message =
-                        "tried to teleport user to another Bukkit world: game_map=" + getMap().getWorld().getName() +
-                                ", world=" + location.getWorld().getName();
+                String message = "tried to teleport user " + name + " to another Bukkit world: game_map=" +
+                        getMap().getWorld().getName() +
+                        ", world=" + location.getWorld().getName();
 
                 throw new RuntimeException(message);
             } catch (RuntimeException e) {
@@ -1079,22 +1079,38 @@ public class BaseUser implements Listener, User {
 
         userTaskList.addTask(gameTask);
         return gameTask;
-    }    @Override
-    public void setVelocity(Vector velocity) {
-        entity.setVelocity(velocity);
     }
 
     @Override
     public void cancelAllTasks() {
         userTaskList.cancelAllTasks();
     }    @Override
-    public Vector getVelocity() {
-        return entity.getVelocity();
+    public void setVelocity(Vector velocity) {
+        entity.setVelocity(velocity);
     }
 
     private void hidePlayer(User other) {
         if (!isPlayer() || !other.isPlayer()) return;
         getPlayer().hidePlayer(other.getPlayer());
+    }
+
+    private void decrementAttackerTimers() {
+        lastAttacker.decreaseAttackerTimer(20);
+        fireAttacker.decreaseAttackerTimer(20);
+        witherAttacker.decreaseAttackerTimer(20);
+    }    @Override
+    public Vector getVelocity() {
+        return entity.getVelocity();
+    }
+
+    private void showPlayer(User other) {
+        if (!isPlayer() || !other.isPlayer()) return;
+        getPlayer().showPlayer(other.getPlayer());
+    }
+
+    @Override
+    public User getUser(UUID uuid) {
+        return gameGroup.getUser(uuid);
     }    @Override
     public void removeFromGameGroup() {
         setScoreboardHandler(null);
@@ -1113,41 +1129,9 @@ public class BaseUser implements Listener, User {
         cancelAllTasks();
     }
 
-    private void decrementAttackerTimers() {
-        lastAttacker.decreaseAttackerTimer(20);
-        fireAttacker.decreaseAttackerTimer(20);
-        witherAttacker.decreaseAttackerTimer(20);
-    }    @Override
-    public EntityType getVisibleEntityType() {
-        if (disguise != null) return disguise.getEntityType();
-        else return entity.getType();
-    }
-
-    private void showPlayer(User other) {
-        if (!isPlayer() || !other.isPlayer()) return;
-        getPlayer().showPlayer(other.getPlayer());
-    }    @Override
-    public String getDisplayName() {
-        return isPlayer() ? getPlayer().getDisplayName() : entity.getCustomName();
-    }
-
-    @Override
-    public User getUser(UUID uuid) {
-        return gameGroup.getUser(uuid);
-    }    @Override
-    public void setDisplayName(String displayName) {
-        if (!isPlayer()) entity.setCustomName(displayName);
-        else getPlayer().setDisplayName(displayName);
-
-        if (disguise != null && disguise.isShowUserNameAboveEntity()) disguise(disguise);
-    }
-
     @Override
     public <B extends UserMetadata> B getMetadata(Class<? extends B> clazz) {
         return metadataMap.getInstance(clazz);
-    }    @Override
-    public Collection<CustomListener> getListeners() {
-        return listeners;
     }
 
     @Override
@@ -1158,6 +1142,10 @@ public class BaseUser implements Listener, User {
             oldMetadata.cancelAllTasks();
             oldMetadata.removed();
         }
+    }    @Override
+    public EntityType getVisibleEntityType() {
+        if (disguise != null) return disguise.getEntityType();
+        else return entity.getType();
     }
 
     @Override
@@ -1168,6 +1156,9 @@ public class BaseUser implements Listener, User {
     @Override
     public boolean hasPermission(String permission) {
         return entity.hasPermission(permission);
+    }    @Override
+    public String getDisplayName() {
+        return isPlayer() ? getPlayer().getDisplayName() : entity.getCustomName();
     }
 
     @Override
@@ -1178,6 +1169,12 @@ public class BaseUser implements Listener, User {
     @Override
     public Config getSharedObject(String name) {
         return gameGroup.getSharedObject(name);
+    }    @Override
+    public void setDisplayName(String displayName) {
+        if (!isPlayer()) entity.setCustomName(displayName);
+        else getPlayer().setDisplayName(displayName);
+
+        if (disguise != null && disguise.isShowUserNameAboveEntity()) disguise(disguise);
     }
 
     @Override
@@ -1291,7 +1288,15 @@ public class BaseUser implements Listener, User {
                 CustomEventExecutor.executeEvent(event, customItem);
             }
         }
+    }    @Override
+    public Collection<CustomListener> getListeners() {
+        return listeners;
     }
+
+
+
+
+
 
 
 
@@ -1307,10 +1312,6 @@ public class BaseUser implements Listener, User {
     public void sendLocale(String locale, Object... args) {
         sendMessage(gameGroup.getLocale(locale, args));
     }
-
-
-
-
 
 
     @Override
