@@ -323,7 +323,7 @@ public class BaseUser implements Listener, User {
         if (isPlayer()) getPlayer().setAllowFlight(allowFlight);
         else playerState.setAllowFlight(allowFlight);
 
-        if(!allowFlight) {
+        if (!allowFlight) {
             setFlying(false);
         }
     }
@@ -502,7 +502,13 @@ public class BaseUser implements Listener, User {
 
     @Override
     public void setSpectator(boolean spectator) {
-        if (spectator == this.spectator) return;
+        if (spectator == this.spectator) {
+            System.out.println(
+                    "setSpectator() called on user " + name + " with same spec state as current: " + spectator);
+            return;
+        }
+
+
         if (spectator && isInGame())
             throw new RuntimeException("You cannot be a spectator when you are already in a game");
 
@@ -639,10 +645,11 @@ public class BaseUser implements Listener, User {
     @Override
     @SuppressWarnings("unchecked")
     public boolean teleport(Location location) {
-        if(getMap() != null && !getMap().getWorld().getName().equals(location.getWorld().getName())) {
-            try{
-                String message = "tried to teleport user to another Bukkit world: game_map="
-                        + getMap().getWorld().getName() + ", world=" + location.getWorld().getName();
+        if (getMap() != null && !getMap().getWorld().getName().equals(location.getWorld().getName())) {
+            try {
+                String message =
+                        "tried to teleport user to another Bukkit world: game_map=" + getMap().getWorld().getName() +
+                                ", world=" + location.getWorld().getName();
 
                 throw new RuntimeException(message);
             } catch (RuntimeException e) {
@@ -674,7 +681,7 @@ public class BaseUser implements Listener, User {
 
     @Override
     public Inventory getEnderInventory() {
-        if(getPlayer() == null) return null;
+        if (getPlayer() == null) return null;
 
         return getPlayer().getEnderChest();
     }
@@ -712,41 +719,12 @@ public class BaseUser implements Listener, User {
     @Override
     public void showInventory(Inventory inventory, Location inventoryTether) {
         doInFuture(task -> {
-           if(!isPlayer()) return;
+            if (!isPlayer()) return;
 
             this.inventoryTether = inventoryTether != null ? inventoryTether.toVector() : null;
 
             getPlayer().openInventory(inventory);
         });
-    }
-
-    @Override
-    public GameTask doInFuture(GameRunnable task) {
-        GameTask gameTask = gameGroup.doInFuture(task);
-
-        userTaskList.addTask(gameTask);
-        return gameTask;
-    }
-
-    @Override
-    public GameTask doInFuture(GameRunnable task, int delay) {
-        GameTask gameTask = gameGroup.doInFuture(task, delay);
-
-        userTaskList.addTask(gameTask);
-        return gameTask;
-    }
-
-    @Override
-    public GameTask repeatInFuture(GameRunnable task, int delay, int period) {
-        GameTask gameTask = gameGroup.repeatInFuture(task, delay, period);
-
-        userTaskList.addTask(gameTask);
-        return gameTask;
-    }
-
-    @Override
-    public void cancelAllTasks() {
-        userTaskList.cancelAllTasks();
     }
 
     @Override
@@ -1069,16 +1047,55 @@ public class BaseUser implements Listener, User {
     }
 
     @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getFormattedName() {
+        String displayName = getDisplayName();
+        return displayName != null ? displayName : getName();
+    }
+
+    @Override
+    public GameTask doInFuture(GameRunnable task) {
+        GameTask gameTask = gameGroup.doInFuture(task);
+
+        userTaskList.addTask(gameTask);
+        return gameTask;
+    }
+
+    @Override
+    public GameTask doInFuture(GameRunnable task, int delay) {
+        GameTask gameTask = gameGroup.doInFuture(task, delay);
+
+        userTaskList.addTask(gameTask);
+        return gameTask;
+    }
+
+    @Override
+    public GameTask repeatInFuture(GameRunnable task, int delay, int period) {
+        GameTask gameTask = gameGroup.repeatInFuture(task, delay, period);
+
+        userTaskList.addTask(gameTask);
+        return gameTask;
+    }    @Override
     public void setVelocity(Vector velocity) {
         entity.setVelocity(velocity);
     }
 
     @Override
+    public void cancelAllTasks() {
+        userTaskList.cancelAllTasks();
+    }    @Override
     public Vector getVelocity() {
         return entity.getVelocity();
     }
 
-    @Override
+    private void hidePlayer(User other) {
+        if (!isPlayer() || !other.isPlayer()) return;
+        getPlayer().hidePlayer(other.getPlayer());
+    }    @Override
     public void removeFromGameGroup() {
         setScoreboardHandler(null);
 
@@ -1096,18 +1113,28 @@ public class BaseUser implements Listener, User {
         cancelAllTasks();
     }
 
-    @Override
+    private void decrementAttackerTimers() {
+        lastAttacker.decreaseAttackerTimer(20);
+        fireAttacker.decreaseAttackerTimer(20);
+        witherAttacker.decreaseAttackerTimer(20);
+    }    @Override
     public EntityType getVisibleEntityType() {
         if (disguise != null) return disguise.getEntityType();
         else return entity.getType();
     }
 
-    @Override
+    private void showPlayer(User other) {
+        if (!isPlayer() || !other.isPlayer()) return;
+        getPlayer().showPlayer(other.getPlayer());
+    }    @Override
     public String getDisplayName() {
         return isPlayer() ? getPlayer().getDisplayName() : entity.getCustomName();
     }
 
     @Override
+    public User getUser(UUID uuid) {
+        return gameGroup.getUser(uuid);
+    }    @Override
     public void setDisplayName(String displayName) {
         if (!isPlayer()) entity.setCustomName(displayName);
         else getPlayer().setDisplayName(displayName);
@@ -1116,45 +1143,11 @@ public class BaseUser implements Listener, User {
     }
 
     @Override
-    public Collection<CustomListener> getListeners() {
-        return listeners;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getFormattedName() {
-        String displayName = getDisplayName();
-        return displayName != null ? displayName : getName();
-    }
-
-    private void hidePlayer(User other) {
-        if (!isPlayer() || !other.isPlayer()) return;
-        getPlayer().hidePlayer(other.getPlayer());
-    }
-
-    private void decrementAttackerTimers() {
-        lastAttacker.decreaseAttackerTimer(20);
-        fireAttacker.decreaseAttackerTimer(20);
-        witherAttacker.decreaseAttackerTimer(20);
-    }
-
-    private void showPlayer(User other) {
-        if (!isPlayer() || !other.isPlayer()) return;
-        getPlayer().showPlayer(other.getPlayer());
-    }
-
-    @Override
-    public User getUser(UUID uuid) {
-        return gameGroup.getUser(uuid);
-    }
-
-    @Override
     public <B extends UserMetadata> B getMetadata(Class<? extends B> clazz) {
         return metadataMap.getInstance(clazz);
+    }    @Override
+    public Collection<CustomListener> getListeners() {
+        return listeners;
     }
 
     @Override
@@ -1185,9 +1178,6 @@ public class BaseUser implements Listener, User {
     @Override
     public Config getSharedObject(String name) {
         return gameGroup.getSharedObject(name);
-    }    @Override
-    public void sendLocale(String locale, Object... args) {
-        sendMessage(gameGroup.getLocale(locale, args));
     }
 
     @Override
@@ -1302,6 +1292,24 @@ public class BaseUser implements Listener, User {
             }
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+    @Override
+    public void sendLocale(String locale, Object... args) {
+        sendMessage(gameGroup.getLocale(locale, args));
+    }
+
+
+
 
 
 
