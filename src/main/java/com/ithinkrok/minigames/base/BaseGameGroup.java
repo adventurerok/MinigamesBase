@@ -99,6 +99,8 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
     private final List<String> parameters;
 
+    private boolean created = false;
+
     public BaseGameGroup(BaseGame game, String name, String type, String configFile, List<String> parameters) {
         this.game = game;
         this.name = name;
@@ -132,6 +134,8 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         if (startMap != null){
             changeMap(fillInParameters(startMap));
         }
+
+        created = true;
     }
 
     private String fillInParameters(String input) {
@@ -195,6 +199,8 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     }
 
     public void sendUpdatePayload() {
+        if(!created) return;
+
         game.getProtocol().sendGameGroupUpdatePayload(this);
     }
 
