@@ -6,6 +6,7 @@ import com.ithinkrok.util.config.Config;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.util.Vector;
 
 import java.util.List;
@@ -62,11 +63,22 @@ public class MinigamesConfigs {
         if(config.contains("enchantments")) {
             List<Config> enchantments = config.getConfigList("enchantments");
 
-            for(Config enchantment : enchantments) {
-                Enchantment ench = Enchantment.getByName(enchantment.getString("name").toUpperCase());
-                int level = enchantment.getInt("level", 1);
+            if(item.getType() != Material.ENCHANTED_BOOK) {
+                for (Config enchantment : enchantments) {
+                    Enchantment ench = Enchantment.getByName(enchantment.getString("name").toUpperCase());
+                    int level = enchantment.getInt("level", 1);
 
-                item.addUnsafeEnchantment(ench, level);
+                    item.addUnsafeEnchantment(ench, level);
+                }
+            } else {
+                EnchantmentStorageMeta meta = (EnchantmentStorageMeta) item.getItemMeta();
+
+                for (Config enchantment : enchantments) {
+                    Enchantment ench = Enchantment.getByName(enchantment.getString("name").toUpperCase());
+                    int level = enchantment.getInt("level", 1);
+
+                    meta.addStoredEnchant(ench, level, true);
+                }
             }
         }
 
