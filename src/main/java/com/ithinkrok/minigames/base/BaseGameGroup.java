@@ -857,12 +857,21 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
                 usersInGroup.remove(event.getUser().getUuid());
 
                 event.getUser().removeFromGameGroup();
+            }
 
-                //GameGroup only referenced by its users. If there are none left we must unload.
-                if (usersInGroup.isEmpty()) kill();
-                else sendUpdatePayload();
-            } else {
+            //Kill the gamegroup if it has no players in it
+            boolean foundPlayer = false;
+            for(User user : getUsers()) {
+                if(!user.isPlayer()) continue;
+
+                foundPlayer = true;
+                break;
+            }
+
+            if(foundPlayer){
                 sendUpdatePayload();
+            } else {
+                kill();
             }
         }
 
