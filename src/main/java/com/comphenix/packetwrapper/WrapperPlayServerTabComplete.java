@@ -27,6 +27,10 @@ public class WrapperPlayServerTabComplete extends AbstractPacket {
         super(new PacketContainer(TYPE), TYPE);
         handle.getModifier().writeDefaults();
     }
+
+    public WrapperPlayServerTabComplete(PacketContainer packet) {
+        super(packet, TYPE);
+    }
     
     /**
      * Retrieve the tab-completed text alternatives.

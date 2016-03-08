@@ -1,6 +1,7 @@
 package com.ithinkrok.minigames.base;
 
 import com.comphenix.packetwrapper.WrapperPlayClientTabComplete;
+import com.comphenix.packetwrapper.WrapperPlayServerTabComplete;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.ListenerPriority;
@@ -520,7 +521,7 @@ public class BaseGame implements Game, FileLoader {
     private class TabCompleteListener extends PacketAdapter {
 
         public TabCompleteListener(Plugin plugin, ListenerPriority listenerPriority) {
-            super(plugin, listenerPriority, PacketType.Play.Client.TAB_COMPLETE);
+            super(plugin, listenerPriority, PacketType.Play.Client.TAB_COMPLETE, PacketType.Play.Server.TAB_COMPLETE);
         }
 
         @Override
@@ -530,6 +531,15 @@ public class BaseGame implements Game, FileLoader {
             WrapperPlayClientTabComplete packet = new WrapperPlayClientTabComplete(event.getPacket());
 
             System.out.println(packet.getText());
+        }
+
+        @Override
+        public void onPacketSending(PacketEvent event) {
+            if(event.getPacketType() != PacketType.Play.Server.TAB_COMPLETE) return;
+
+            WrapperPlayServerTabComplete packet = new WrapperPlayServerTabComplete(event.getPacket());
+
+            System.out.println(Arrays.toString(packet.getText()));
         }
     }
 }
