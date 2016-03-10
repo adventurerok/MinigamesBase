@@ -91,6 +91,7 @@ public class BaseGame implements Game, FileLoader {
     private final Path mapDirectory;
     private final Path assetsDirectory;
     private final Path ramdiskDirectory;
+    private final Path resourceDirectory;
 
     private final ClientMinigamesProtocol protocol;
 
@@ -105,9 +106,19 @@ public class BaseGame implements Game, FileLoader {
 
         fallbackConfig = config.getString("fallback_gamegroup");
 
-        configDirectory = Paths.get(config.getString("directories.config"));
-        mapDirectory = Paths.get(config.getString("directories.maps"));
-        assetsDirectory = Paths.get(config.getString("directories.assets"));
+        if(config.contains("directories.resource")) {
+            resourceDirectory = Paths.get(config.getString("directories.resource"));
+
+            configDirectory = resourceDirectory.resolve("config");
+            mapDirectory = resourceDirectory.resolve("maps");
+            assetsDirectory = resourceDirectory.resolve("assets");
+        } else {
+            configDirectory = Paths.get(config.getString("directories.config"));
+            mapDirectory = Paths.get(config.getString("directories.maps"));
+            assetsDirectory = Paths.get(config.getString("directories.assets"));
+
+            resourceDirectory = configDirectory.getParent();
+        }
 
         ramdiskDirectory =
                 config.getBoolean("ramdisk.enable") ? Paths.get(config.getString("ramdisk.directory")) : null;
@@ -195,6 +206,11 @@ public class BaseGame implements Game, FileLoader {
     @Override
     public Path getMapDirectory() {
         return mapDirectory;
+    }
+
+    @Override
+    public Path getResourceDirectory() {
+        return resourceDirectory;
     }
 
     @Override

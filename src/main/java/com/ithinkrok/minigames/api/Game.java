@@ -37,6 +37,8 @@ public interface Game extends TaskScheduler, DatabaseTaskRunner, Nameable {
 
     Path getMapDirectory();
 
+    Path getResourceDirectory();
+
     void registerListeners();
 
     void registerGameGroupConfig(String name, String configFile);
