@@ -43,9 +43,7 @@ public class ClientMinigamesProtocol implements ClientListener {
     private void sendDataInfoPacket(Channel channel) {
         Config versions = new MemoryConfig('\n');
 
-        addVersionsToConfig(game.getAssetDirectory(), "assets/", versions);
-        addVersionsToConfig(game.getConfigDirectory(), "config/", versions);
-        addVersionsToConfig(game.getMapDirectory(), "maps/", versions);
+        addVersionsToConfig(game.getResourceDirectory(), versions);
 
         Config payload = new MemoryConfig('\n');
 
@@ -55,9 +53,9 @@ public class ClientMinigamesProtocol implements ClientListener {
         channel.write(payload);
     }
 
-    private void addVersionsToConfig(Path path, String prefix, Config config) {
+    private void addVersionsToConfig(Path path, Config config) {
         for(Map.Entry<String, Instant> entry : getVersionsInPath(path).entrySet()) {
-            config.set(prefix + entry.getKey(), entry.getValue().toEpochMilli());
+            config.set(entry.getKey(), entry.getValue().toEpochMilli());
         }
     }
 
@@ -160,23 +158,7 @@ public class ClientMinigamesProtocol implements ClientListener {
     }
 
     private void handleDataUpdate(Config payload) {
-        String type = payload.getString("data_type");
-
-        Path dataDir;
-
-        switch(type) {
-            case "config":
-                dataDir = game.getConfigDirectory();
-                break;
-            case "map":
-                dataDir = game.getMapDirectory();
-                break;
-            case "asset":
-                dataDir = game.getAssetDirectory();
-                break;
-            default:
-                return;
-        }
+        Path dataDir = game.getResourceDirectory();
 
         String dataSubpath = payload.getString("data_path");
 
