@@ -29,7 +29,9 @@ import com.ithinkrok.minigames.base.util.disguise.MinigamesDisguiseController;
 import com.ithinkrok.minigames.base.util.io.FileLoader;
 import com.ithinkrok.msm.bukkit.util.BukkitConfig;
 import com.ithinkrok.msm.client.Client;
+import com.ithinkrok.msm.client.ClientListener;
 import com.ithinkrok.msm.client.impl.MSMClient;
+import com.ithinkrok.msm.client.protocol.ClientUpdateFileProtocol;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.lang.LangFile;
 import org.apache.commons.lang.Validate;
@@ -145,9 +147,12 @@ public class BaseGame implements Game, FileLoader {
 
         //Is this minecraft server the primary server on this server machine
         boolean primary = config.getBoolean("primary", false);
-        protocol = new ClientMinigamesProtocol(this, primary);
+        protocol = new ClientMinigamesProtocol(this, false);
 
         MSMClient.addProtocol("Minigames", protocol);
+
+        ClientListener updateProtocol = new ClientUpdateFileProtocol(primary, resourceDirectory);
+        MSMClient.addProtocol("MinigamesUpdate", updateProtocol);
     }
 
     /**
