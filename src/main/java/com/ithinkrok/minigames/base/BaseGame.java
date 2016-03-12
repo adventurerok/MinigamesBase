@@ -147,7 +147,7 @@ public class BaseGame implements Game, FileLoader {
 
         //Is this minecraft server the primary server on this server machine
         boolean primary = config.getBoolean("primary", false);
-        protocol = new ClientMinigamesProtocol(this, false);
+        protocol = new ClientMinigamesProtocol(this, primary);
 
         MSMClient.addProtocol("Minigames", protocol);
 

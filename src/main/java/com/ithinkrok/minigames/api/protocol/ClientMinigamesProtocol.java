@@ -37,52 +37,6 @@ public class ClientMinigamesProtocol implements ClientListener {
         this.channel = channel;
 
         sendLoginPacket(channel);
-        if(primary) sendDataInfoPacket(channel);
-    }
-
-    private void sendDataInfoPacket(Channel channel) {
-        Config versions = new MemoryConfig('\n');
-
-        addVersionsToConfig(game.getResourceDirectory(), versions);
-
-        Config payload = new MemoryConfig('\n');
-
-        payload.set("versions", versions);
-        payload.set("mode", "DataInfo");
-
-        channel.write(payload);
-    }
-
-    private void addVersionsToConfig(Path path, Config config) {
-        for(Map.Entry<String, Instant> entry : getVersionsInPath(path).entrySet()) {
-            config.set(entry.getKey(), entry.getValue().toEpochMilli());
-        }
-    }
-
-    private Map<String, Instant> getVersionsInPath(Path path) {
-        Map<String, Instant> result = new HashMap<>();
-
-        Set<FileVisitOption> options = new HashSet<>();
-        options.add(FileVisitOption.FOLLOW_LINKS);
-
-        try {
-            Files.walkFileTree(path, options, Integer.MAX_VALUE, new SimpleFileVisitor<Path>(){
-
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    Instant dateModified = Files.getLastModifiedTime(file).toInstant();
-
-                    result.put(path.relativize(file).toString(), dateModified);
-
-                    return FileVisitResult.CONTINUE;
-                }
-            });
-        } catch (IOException e) {
-            System.out.println("Failed to walk file tree for path: " + path);
-            e.printStackTrace();
-        }
-
-        return result;
     }
 
     private void sendLoginPacket(Channel channel) {
@@ -97,42 +51,11 @@ public class ClientMinigamesProtocol implements ClientListener {
         Collection<? extends GameGroup> gameGroups = game.getGameGroups();
         List<Config> gameGroupConfigs = new ArrayList<>();
 
-        for(GameGroup gameGroup : gameGroups) {
+        for (GameGroup gameGroup : gameGroups) {
             gameGroupConfigs.add(gameGroup.toConfig());
         }
 
         payload.set("gamegroups", gameGroupConfigs);
-
-        channel.write(payload);
-    }
-
-    public void sendGameGroupSpawnedPayload(GameGroup gameGroup) {
-        if(channel == null) return;
-
-        Config payload = gameGroup.toConfig();
-
-        payload.set("mode", "GameGroupSpawned");
-
-        channel.write(payload);
-    }
-
-    public void sendGameGroupUpdatePayload(GameGroup gameGroup) {
-        if(channel == null) return;
-
-        Config payload = gameGroup.toConfig();
-
-        payload.set("mode", "GameGroupUpdate");
-
-        channel.write(payload);
-    }
-
-    public void sendGameGroupKilledPayload(GameGroup gameGroup) {
-        if(channel == null) return;
-
-        Config payload = new MemoryConfig();
-
-        payload.set("name", gameGroup.getName());
-        payload.set("mode", "GameGroupKilled");
 
         channel.write(payload);
     }
@@ -146,51 +69,11 @@ public class ClientMinigamesProtocol implements ClientListener {
     @Override
     public void packetRecieved(Client client, Channel channel, Config payload) {
         String mode = payload.getString("mode");
-        if(mode == null) return;
+        if (mode == null) return;
 
-        switch(mode) {
+        switch (mode) {
             case "JoinGameGroup":
                 handleJoinGameGroup(payload);
-                return;
-            case "DataUpdate":
-                handleDataUpdate(payload);
-        }
-    }
-
-    private void handleDataUpdate(Config payload) {
-        Path dataDir = game.getResourceDirectory();
-
-        String dataSubpath = payload.getString("data_path");
-
-        Path filePath = dataDir.resolve(dataSubpath);
-        Path fileDirectory = filePath.getParent();
-
-        if(!Files.exists(fileDirectory)) {
-            try {
-                Files.createDirectories(fileDirectory);
-            } catch (IOException e) {
-                System.out.println("Failed to create directory for data update : " + fileDirectory);
-                e.printStackTrace();
-                return;
-            }
-        }
-
-        byte[] updateBytes = payload.getByteArray("bytes");
-
-        boolean append = payload.getBoolean("append", false);
-
-        try{
-            if(append) Files.write(filePath, updateBytes, StandardOpenOption.APPEND);
-            else Files.write(filePath, updateBytes);
-        } catch (IOException e) {
-            System.out.println("Error while saving minigames config data at:" + filePath);
-            e.printStackTrace();
-        }
-
-        boolean finish = payload.getBoolean("finish", true);
-
-        if(finish) {
-            System.out.println("Updated minigames resource at: " + filePath);
         }
     }
 
@@ -203,9 +86,40 @@ public class ClientMinigamesProtocol implements ClientListener {
 
         game.preJoinGameGroup(playerUUID, type, name, params);
 
-        if(client == null || Bukkit.getPlayer(playerUUID) != null) return;
+        if (client == null || Bukkit.getPlayer(playerUUID) != null) return;
 
         client.changePlayerServer(playerUUID, client.getMinecraftServerInfo().getName());
+    }
+
+    public void sendGameGroupSpawnedPayload(GameGroup gameGroup) {
+        if (channel == null) return;
+
+        Config payload = gameGroup.toConfig();
+
+        payload.set("mode", "GameGroupSpawned");
+
+        channel.write(payload);
+    }
+
+    public void sendGameGroupUpdatePayload(GameGroup gameGroup) {
+        if (channel == null) return;
+
+        Config payload = gameGroup.toConfig();
+
+        payload.set("mode", "GameGroupUpdate");
+
+        channel.write(payload);
+    }
+
+    public void sendGameGroupKilledPayload(GameGroup gameGroup) {
+        if (channel == null) return;
+
+        Config payload = new MemoryConfig();
+
+        payload.set("name", gameGroup.getName());
+        payload.set("mode", "GameGroupKilled");
+
+        channel.write(payload);
     }
 
     public Client getClient() {
