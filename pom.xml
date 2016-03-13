@@ -43,8 +43,8 @@
     <dependencies>
 
         <dependency>
-            <groupId>com.ithinkrok</groupId>
-            <artifactId>MSMBukkit</artifactId>
+            <groupId>com.ithinkrok.gsm</groupId>
+            <artifactId>gsm-bukkit-client</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
