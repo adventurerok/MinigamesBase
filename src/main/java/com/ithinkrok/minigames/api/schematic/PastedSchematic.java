@@ -13,7 +13,6 @@ import de.inventivegames.hologram.Hologram;
 import de.inventivegames.hologram.HologramAPI;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.FallingBlock;

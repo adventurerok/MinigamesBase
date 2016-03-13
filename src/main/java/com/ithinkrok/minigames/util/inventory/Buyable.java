@@ -14,7 +14,6 @@ import com.ithinkrok.minigames.util.metadata.Money;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.lang.LanguageLookup;
 import org.bukkit.ChatColor;
-import org.bukkit.Sound;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;

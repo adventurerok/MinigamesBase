@@ -6,7 +6,6 @@ import com.ithinkrok.minigames.api.task.TaskList;
 import com.ithinkrok.minigames.api.util.NamedSounds;
 import com.ithinkrok.minigames.api.util.SoundEffect;
 import org.bukkit.ChatColor;
-import org.bukkit.Sound;
 
 import java.util.HashMap;
 import java.util.Map;

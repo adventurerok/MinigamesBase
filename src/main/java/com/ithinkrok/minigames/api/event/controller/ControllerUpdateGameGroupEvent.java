@@ -1,7 +1,6 @@
 package com.ithinkrok.minigames.api.event.controller;
 
 import com.ithinkrok.minigames.api.GameGroup;
-import com.ithinkrok.minigames.api.protocol.event.GameGroupSpawnedEvent;
 import com.ithinkrok.minigames.api.protocol.event.GameGroupUpdateEvent;
 
 /**
