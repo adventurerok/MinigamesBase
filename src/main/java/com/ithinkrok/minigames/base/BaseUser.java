@@ -662,9 +662,11 @@ public class BaseUser implements Listener, User {
         gameGroup.userEvent(event);
 
         if (event.isCancelled()) return false;
-        boolean success = entity.teleport(event.getTo());
 
-        //fixCloakedUsers();
+        //Prevent death due to fall damage after teleporting
+        getEntity().setFallDistance(0);
+
+        boolean success = entity.teleport(event.getTo());
 
         return revalidateNonPlayer(event.getTo()) || success;
     }
