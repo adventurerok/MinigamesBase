@@ -1,6 +1,9 @@
 package com.ithinkrok.minigames.api.util;
 
+import com.ithinkrok.minigames.api.GameGroup;
+import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.util.config.Config;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 
 /**
@@ -46,5 +49,15 @@ public class SoundEffect {
 
     public float getPitch() {
         return pitch;
+    }
+
+    public void playToAll(GameGroup gameGroup) {
+        playToAll(gameGroup, gameGroup.getCurrentMap().getSpawn());
+    }
+
+    public void playToAll(GameGroup gameGroup, Location location) {
+        for(User user : gameGroup.getUsers()) {
+            user.playSound(location, this);
+        }
     }
 }

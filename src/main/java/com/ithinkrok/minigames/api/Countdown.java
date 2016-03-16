@@ -4,6 +4,8 @@ import com.ithinkrok.minigames.api.event.game.CountdownFinishedEvent;
 import com.ithinkrok.minigames.api.event.game.CountdownMessageEvent;
 import com.ithinkrok.minigames.api.task.GameTask;
 import com.ithinkrok.minigames.api.user.User;
+import com.ithinkrok.minigames.api.util.CountdownConfig;
+import com.ithinkrok.minigames.api.util.SoundEffect;
 import com.ithinkrok.util.lang.LanguageLookup;
 
 /**
@@ -17,10 +19,24 @@ public class Countdown implements Nameable {
     private GameTask task;
     private int secondsRemaining;
 
+    private SoundEffect tickSound;
+    private SoundEffect finishedSound;
+    private SoundEffect cancelledSound;
+
     public Countdown(String name, String localeStub, int secondsRemaining) {
         this.name = name;
         this.localeStub = localeStub;
         this.secondsRemaining = secondsRemaining + 1;
+    }
+
+    public Countdown(CountdownConfig config) {
+        this.name = config.getName();
+        this.localeStub = config.getLocaleStub();
+        this.secondsRemaining = config.getSeconds() + 1;
+
+        this.tickSound = config.getTickSound();
+        this.finishedSound = config.getFinishedSound();
+        this.cancelledSound = config.getCancelledSound();
     }
 
     public int getSecondsRemaining() {
@@ -54,15 +70,23 @@ public class Countdown implements Nameable {
                 user.setXpLevel(secondsRemaining);
             }
 
-            if (secondsRemaining > 0) return;
+            if (secondsRemaining > 0) {
+                if (tickSound != null) tickSound.playToAll(gameGroup);
+                return;
+            }
 
             CountdownFinishedEvent event = new CountdownFinishedEvent(gameGroup, Countdown.this);
             gameGroup.gameEvent(event);
 
             //The event can change the amount of time left in the countdown
-            if (secondsRemaining > 0) return;
+            if (secondsRemaining > 0) {
+                if (tickSound != null) tickSound.playToAll(gameGroup);
+                return;
+            }
 
             task.finish();
+
+            if (finishedSound != null) finishedSound.playToAll(gameGroup);
         }, 20, 20);
     }
 
@@ -115,5 +139,29 @@ public class Countdown implements Nameable {
     public boolean isFinished() {
         return task.getTaskState() == GameTask.TaskState.FINISHED ||
                 task.getTaskState() == GameTask.TaskState.CANCELLED;
+    }
+
+    public SoundEffect getTickSound() {
+        return tickSound;
+    }
+
+    public void setTickSound(SoundEffect tickSound) {
+        this.tickSound = tickSound;
+    }
+
+    public SoundEffect getFinishedSound() {
+        return finishedSound;
+    }
+
+    public void setFinishedSound(SoundEffect finishedSound) {
+        this.finishedSound = finishedSound;
+    }
+
+    public SoundEffect getCancelledSound() {
+        return cancelledSound;
+    }
+
+    public void setCancelledSound(SoundEffect cancelledSound) {
+        this.cancelledSound = cancelledSound;
     }
 }
