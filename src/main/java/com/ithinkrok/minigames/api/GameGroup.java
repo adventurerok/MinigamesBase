@@ -169,8 +169,6 @@ public interface GameGroup
 
     void startCountdown(CountdownConfig countdownConfig);
 
-    void startCountdown(String name, String localeStub, int seconds);
-
     CustomItem getCustomItem(String name);
 
     CustomItem getCustomItem(int identifier);

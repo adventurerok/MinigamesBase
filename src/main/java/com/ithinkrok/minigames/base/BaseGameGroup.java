@@ -474,14 +474,9 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
     @Override
     public void startCountdown(CountdownConfig countdownConfig) {
-        startCountdown(countdownConfig.getName(), countdownConfig.getLocaleStub(), countdownConfig.getSeconds());
-    }
-
-    @Override
-    public void startCountdown(String name, String localeStub, int seconds) {
         if (countdown != null) countdown.cancel();
 
-        countdown = new Countdown(name, localeStub, seconds);
+        countdown = new Countdown(countdownConfig);
         countdown.start(this);
     }
 

@@ -4,6 +4,7 @@ import com.ithinkrok.minigames.api.Countdown;
 import com.ithinkrok.minigames.api.command.MinigamesCommand;
 import com.ithinkrok.minigames.api.command.MinigamesCommandSender;
 import com.ithinkrok.minigames.api.event.MinigamesCommandEvent;
+import com.ithinkrok.minigames.api.util.CountdownConfig;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
 
@@ -18,14 +19,14 @@ public class CountdownCommand implements CustomListener {
         MinigamesCommandSender sender = event.getCommandSender();
         MinigamesCommand command = event.getCommand();
 
-        if(!command.requireGameGroup(sender)) return;
-        if(!command.requireArgumentCount(sender, 1)){
+        if (!command.requireGameGroup(sender)) return;
+        if (!command.requireArgumentCount(sender, 1)) {
             event.setValidCommand(false);
             return;
         }
 
-        if("start".equals(command.getStringArg(0, null))) {
-            if(!command.requireArgumentCount(sender, 4)) {
+        if ("start".equals(command.getStringArg(0, null))) {
+            if (!command.requireArgumentCount(sender, 4)) {
                 event.setValidCommand(false);
                 return;
             }
@@ -34,12 +35,14 @@ public class CountdownCommand implements CustomListener {
             int seconds = command.getIntArg(2, 30);
             String localeStub = command.getStringArg(3, null);
 
-            command.getGameGroup().startCountdown(name, localeStub, seconds);
+            CountdownConfig countdownConfig = new CountdownConfig(name, seconds, localeStub);
+
+            command.getGameGroup().startCountdown(countdownConfig);
             sender.sendLocale("command.countdown.started", name, seconds);
             return;
         }
 
-        if(!command.getGameGroup().hasActiveCountdown()) {
+        if (!command.getGameGroup().hasActiveCountdown()) {
             sender.sendLocale("commands.countdown.none");
             return;
         }
@@ -48,9 +51,9 @@ public class CountdownCommand implements CustomListener {
 
         int amount = command.getIntArg(1, 1);
 
-        switch(command.getStringArg(0, null)) {
+        switch (command.getStringArg(0, null)) {
             case "add":
-                if(!command.requireArgumentCount(sender, 2)) {
+                if (!command.requireArgumentCount(sender, 2)) {
                     event.setValidCommand(false);
                     return;
                 }
@@ -58,7 +61,7 @@ public class CountdownCommand implements CustomListener {
                 sender.sendLocale("command.countdown.added", amount);
                 return;
             case "set":
-                if(!command.requireArgumentCount(sender, 2)) {
+                if (!command.requireArgumentCount(sender, 2)) {
                     event.setValidCommand(false);
                     return;
                 }

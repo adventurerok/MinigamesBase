@@ -23,12 +23,6 @@ public class Countdown implements Nameable {
     private SoundEffect finishedSound;
     private SoundEffect cancelledSound;
 
-    public Countdown(String name, String localeStub, int secondsRemaining) {
-        this.name = name;
-        this.localeStub = localeStub;
-        this.secondsRemaining = secondsRemaining + 1;
-    }
-
     public Countdown(CountdownConfig config) {
         this.name = config.getName();
         this.localeStub = config.getLocaleStub();
