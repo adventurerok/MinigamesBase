@@ -373,6 +373,8 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         if (countdown == null) return;
         countdown.cancel();
 
+        System.out.println("Stopped countdown: " + countdown.getName());
+
         countdown = null;
 
         //Remove countdown level from Users
@@ -478,6 +480,8 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
         countdown = new Countdown(countdownConfig);
         countdown.start(this);
+
+        System.out.println("Starting countdown " + countdownConfig);
     }
 
     @Override
