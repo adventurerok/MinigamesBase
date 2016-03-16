@@ -62,7 +62,7 @@ public class NamedSounds {
 
         NAMED_SOUNDS.put("BLOCK_NOTE_BASEDRUM", Sound.valueOf("NOTE_BASS_DRUM"));
         NAMED_SOUNDS.put("BLOCK_NOTE_BASS", Sound.valueOf("NOTE_BASS"));
-        NAMED_SOUNDS.put("BLOCK_NOTE_HARP", Sound.valueOf("NOTE_HARP"));
+        NAMED_SOUNDS.put("BLOCK_NOTE_HARP", Sound.valueOf("NOTE_PIANO"));
         NAMED_SOUNDS.put("BLOCK_NOTE_HAT", Sound.valueOf("NOTE_STICKS"));
         NAMED_SOUNDS.put("BLOCK_NOTE_PLING", Sound.valueOf("NOTE_PLING"));
         NAMED_SOUNDS.put("BLOCK_NOTE_SNARE", Sound.valueOf("NOTE_SNARE_DRUM"));
