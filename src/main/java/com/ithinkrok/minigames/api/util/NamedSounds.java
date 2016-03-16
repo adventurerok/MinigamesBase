@@ -59,6 +59,13 @@ public class NamedSounds {
         NAMED_SOUNDS.put("ENTITY_WITHER_SHOOT", Sound.valueOf("WITHER_SHOOT"));
 
         NAMED_SOUNDS.put("ENTITY_FIREWORK_TWINKLE", Sound.valueOf("FIREWORK_TWINKLE"));
+
+        NAMED_SOUNDS.put("BLOCK_NOTE_BASEDRUM", Sound.valueOf("NOTE_BASS_DRUM"));
+        NAMED_SOUNDS.put("BLOCK_NOTE_BASS", Sound.valueOf("NOTE_BASS"));
+        NAMED_SOUNDS.put("BLOCK_NOTE_HARP", Sound.valueOf("NOTE_HARP"));
+        NAMED_SOUNDS.put("BLOCK_NOTE_HAT", Sound.valueOf("NOTE_STICKS"));
+        NAMED_SOUNDS.put("BLOCK_NOTE_PLING", Sound.valueOf("NOTE_PLING"));
+        NAMED_SOUNDS.put("BLOCK_NOTE_SNARE", Sound.valueOf("NOTE_SNARE_DRUM"));
     }
 
     public static Sound fromName(String name) {
