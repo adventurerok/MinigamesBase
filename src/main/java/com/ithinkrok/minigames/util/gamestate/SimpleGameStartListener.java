@@ -76,15 +76,17 @@ public class SimpleGameStartListener implements CustomListener {
 
         event.getGameGroup().changeMap(assignGameMap(event.getGameGroup()));
 
+        postMapLoad(event.getGameGroup());
+
         GameGroup gameGroup = event.getGameGroup();
         gameGroup.getUsers().forEach(this::setupUser);
 
-        postGameSetup();
     }
 
-    protected void postGameSetup() {
+    protected void postMapLoad(GameGroup gameGroup){
 
     }
+
 
     protected void setupUser(User user) {
         user.decloak();
