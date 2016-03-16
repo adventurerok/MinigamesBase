@@ -26,10 +26,10 @@ public class SoundEffect {
 
         sound = NamedSounds.fromName(parts[0].trim().toUpperCase());
 
-        if(parts.length > 1) volume = Float.parseFloat(parts[1].trim());
+        if (parts.length > 1) volume = Float.parseFloat(parts[1].trim());
         else volume = 1.0f;
 
-        if(parts.length > 2) pitch = Float.parseFloat(parts[2].trim());
+        if (parts.length > 2) pitch = Float.parseFloat(parts[2].trim());
         else pitch = 1.0f;
     }
 
@@ -56,8 +56,17 @@ public class SoundEffect {
     }
 
     public void playToAll(GameGroup gameGroup, Location location) {
-        for(User user : gameGroup.getUsers()) {
+        for (User user : gameGroup.getUsers()) {
             user.playSound(location, this);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "SoundEffect{" +
+                "sound=" + sound +
+                ", volume=" + volume +
+                ", pitch=" + pitch +
+                '}';
     }
 }

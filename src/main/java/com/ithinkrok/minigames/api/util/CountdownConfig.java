@@ -63,4 +63,16 @@ public class CountdownConfig {
     public SoundEffect getCancelledSound() {
         return cancelledSound;
     }
+
+    @Override
+    public String toString() {
+        return "CountdownConfig{" +
+                "name='" + name + '\'' +
+                ", seconds=" + seconds +
+                ", localeStub='" + localeStub + '\'' +
+                ", tickSound=" + tickSound +
+                ", finishedSound=" + finishedSound +
+                ", cancelledSound=" + cancelledSound +
+                '}';
+    }
 }
