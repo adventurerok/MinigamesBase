@@ -175,6 +175,7 @@ public class BaseTeam implements Listener, Team {
         return metadataMap.containsKey(clazz);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <B extends Metadata> B removeMetadata(Class<? extends B> clazz) {
         return (B) metadataMap.remove(clazz);

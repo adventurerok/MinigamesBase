@@ -90,15 +90,13 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     private final MultipleLanguageLookup languageLookup = new MultipleLanguageLookup();
     private final Database database;
     private final int maxPlayers;
+    private final List<String> parameters;
     private GameState gameState;
     private BaseMap currentMap;
     private List<CustomListener> defaultAndMapListeners = new ArrayList<>();
     private Countdown countdown;
     private boolean acceptingPlayers = true;
     private String motd = "default motd";
-
-    private final List<String> parameters;
-
     private boolean created = false;
 
     public BaseGameGroup(BaseGame game, String name, String type, String configFile, List<String> parameters) {
@@ -131,21 +129,11 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         changeGameState(startGameState);
 
         String startMap = startConfig.getString("map");
-        if (startMap != null){
+        if (startMap != null) {
             changeMap(fillInParameters(startMap));
         }
 
         created = true;
-    }
-
-    private String fillInParameters(String input) {
-        for(int index = 0; index < parameters.size(); ++index) {
-            String paramCode = "#param" + (index + 1);
-
-            input = input.replace(paramCode, parameters.get(index));
-        }
-
-        return input;
     }
 
     @SuppressWarnings("unchecked")
@@ -163,9 +151,14 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         return result;
     }
 
-    @Override
-    public List<String> getParameters() {
-        return parameters;
+    private String fillInParameters(String input) {
+        for (int index = 0; index < parameters.size(); ++index) {
+            String paramCode = "#param" + (index + 1);
+
+            input = input.replace(paramCode, parameters.get(index));
+        }
+
+        return input;
     }
 
     @SafeVarargs
@@ -199,7 +192,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     }
 
     public void sendUpdatePayload() {
-        if(!created) return;
+        if (!created) return;
 
         game.getProtocol().sendGameGroupUpdatePayload(this);
     }
@@ -231,6 +224,11 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     @Override
     public LanguageLookup getLanguageLookup() {
         return this;
+    }
+
+    @Override
+    public List<String> getParameters() {
+        return parameters;
     }
 
     @Override
@@ -446,8 +444,8 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     @Override
     public void userEvent(UserEvent event) {
         if (event.getUser().getTeam() != null) {
-            CustomEventExecutor.executeEvent(event,
-                    getListeners(event.getUser().getListeners(), event.getUser().getTeam().getListeners()));
+            CustomEventExecutor.executeEvent(event, getListeners(event.getUser().getListeners(),
+                                                                 event.getUser().getTeam().getListeners()));
         } else {
             CustomEventExecutor.executeEvent(event, getListeners(event.getUser().getListeners()));
         }
@@ -762,6 +760,12 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         return metadataMap.containsKey(clazz);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public <B extends Metadata> B removeMetadata(Class<? extends B> clazz) {
+        return (B) metadataMap.remove(clazz);
+    }
+
     @Override
     public void addListener(String name, CustomListener listener) {
         defaultListeners.put(name, listener);
@@ -860,14 +864,14 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
             //Kill the gamegroup if it has no players in it
             boolean foundPlayer = false;
-            for(User user : getUsers()) {
-                if(!user.isPlayer()) continue;
+            for (User user : getUsers()) {
+                if (!user.isPlayer()) continue;
 
                 foundPlayer = true;
                 break;
             }
 
-            if(foundPlayer){
+            if (foundPlayer) {
                 sendUpdatePayload();
             } else {
                 kill();
