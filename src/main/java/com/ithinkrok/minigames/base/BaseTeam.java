@@ -37,11 +37,8 @@ public class BaseTeam implements Listener, Team {
     private final TeamIdentifier teamIdentifier;
     private final ConcurrentMap<UUID, BaseUser> usersInTeam = new ConcurrentHashMap<>();
     private final BaseGameGroup gameGroup;
-
     private final ClassToInstanceMap<Metadata> metadataMap = MutableClassToInstanceMap.create();
-
     private final TaskList teamTaskList = new TaskList();
-
     private final Collection<CustomListener> listeners = new ArrayList<>();
 
     public BaseTeam(TeamIdentifier teamIdentifier, BaseGameGroup gameGroup) {
@@ -51,28 +48,86 @@ public class BaseTeam implements Listener, Team {
         listeners.add(new TeamListener());
     }
 
-    @Override public void makeEntityRepresentTeam(Entity entity) {
+    @Override
+    public void makeEntityRepresentTeam(Entity entity) {
         gameGroup.getGame().makeEntityRepresentTeam(this, entity);
     }
 
-    @Override public Collection<CustomListener> getListeners() {
+    @Override
+    public Collection<CustomListener> getListeners() {
         return listeners;
     }
 
-    @Override public GameGroup getGameGroup() {
+    @Override
+    public GameGroup getGameGroup() {
         return gameGroup;
     }
 
-    @Override public int getUserCount() {
+    @Override
+    public int getUserCount() {
         return getUsers().size();
     }
 
-    @Override public Collection<BaseUser> getUsers() {
+    @Override
+    public Collection<BaseUser> getUsers() {
         return usersInTeam.values();
     }
 
-    @Override public TeamIdentifier getTeamIdentifier() {
+    @Override
+    public TeamIdentifier getTeamIdentifier() {
         return teamIdentifier;
+    }
+
+    @Override
+    public ChatColor getChatColor() {
+        return teamIdentifier.getChatColor();
+    }
+
+    @Override
+    public Color getArmorColor() {
+        return teamIdentifier.getArmorColor();
+    }
+
+    @Override
+    public DyeColor getDyeColor() {
+        return teamIdentifier.getDyeColor();
+    }
+
+    @Override
+    public void addUser(User user) {
+        if (!(user instanceof BaseUser)) {
+            throw new UnsupportedOperationException("Only supports BaseUser");
+        }
+
+        usersInTeam.put(user.getUuid(), (BaseUser) user);
+    }
+
+    @Override
+    public void removeUser(User user) {
+        usersInTeam.remove(user.getUuid());
+    }
+
+    @Override
+    public boolean hasPlayerOfKit(String kitName) {
+        for (User user : getUsers()) {
+            if (kitName.equals(user.getKitName())) return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public void updateUserScoreboards() {
+        getUsers().forEach(User::updateScoreboard);
+    }
+
+    @Override
+    public void removeFromGameGroup() {
+        for (Metadata metadata : metadataMap.values()) {
+            metadata.removed();
+        }
+
+        metadataMap.clear();
     }
 
     @Override
@@ -83,18 +138,6 @@ public class BaseTeam implements Listener, Team {
     @Override
     public String getFormattedName() {
         return teamIdentifier.getFormattedName();
-    }
-
-    @Override public ChatColor getChatColor() {
-        return teamIdentifier.getChatColor();
-    }
-
-    @Override public Color getArmorColor() {
-        return teamIdentifier.getArmorColor();
-    }
-
-    @Override public DyeColor getDyeColor() {
-        return teamIdentifier.getDyeColor();
     }
 
     @Override
@@ -110,26 +153,6 @@ public class BaseTeam implements Listener, Team {
     @Override
     public boolean hasLocale(String name) {
         return gameGroup.hasLocale(name);
-    }
-
-    @Override public void addUser(User user) {
-        if(!(user instanceof BaseUser)) {
-            throw new UnsupportedOperationException("Only supports BaseUser");
-        }
-
-        usersInTeam.put(user.getUuid(), (BaseUser) user);
-    }
-
-    @Override public void removeUser(User user) {
-        usersInTeam.remove(user.getUuid());
-    }
-
-    @Override public boolean hasPlayerOfKit(String kitName) {
-        for(User user : getUsers()) {
-            if(kitName.equals(user.getKitName())) return true;
-        }
-
-        return false;
     }
 
     @Override
@@ -153,6 +176,16 @@ public class BaseTeam implements Listener, Team {
     }
 
     @Override
+    public <B extends Metadata> B removeMetadata(Class<? extends B> clazz) {
+        return (B) metadataMap.remove(clazz);
+    }
+
+    @Override
+    public boolean hasSharedObject(String name) {
+        return gameGroup.hasSharedObject(name);
+    }
+
+    @Override
     public Config getSharedObject(String name) {
         return gameGroup.getSharedObject(name);
     }
@@ -160,11 +193,6 @@ public class BaseTeam implements Listener, Team {
     @Override
     public Config getSharedObjectOrEmpty(String name) {
         return gameGroup.getSharedObjectOrEmpty(name);
-    }
-
-    @Override
-    public boolean hasSharedObject(String name) {
-        return gameGroup.hasSharedObject(name);
     }
 
     @Override
@@ -200,18 +228,6 @@ public class BaseTeam implements Listener, Team {
     public User getUser(UUID uuid) {
         if (uuid == null) return null;
         return usersInTeam.get(uuid);
-    }
-
-    @Override public void updateUserScoreboards() {
-        getUsers().forEach(User::updateScoreboard);
-    }
-
-    @Override public void removeFromGameGroup() {
-        for(Metadata metadata : metadataMap.values()) {
-            metadata.removed();
-        }
-
-        metadataMap.clear();
     }
 
     private class TeamListener implements CustomListener {

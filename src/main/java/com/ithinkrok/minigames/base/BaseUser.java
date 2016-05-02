@@ -1156,6 +1156,11 @@ public class BaseUser implements Listener, User {
     }
 
     @Override
+    public <B extends UserMetadata> B removeMetadata(Class<? extends B> clazz) {
+        return (B) metadataMap.remove(clazz);
+    }
+
+    @Override
     public boolean hasPermission(String permission) {
         return entity.hasPermission(permission);
     }    @Override
