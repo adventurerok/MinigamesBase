@@ -1157,7 +1157,11 @@ public class BaseUser implements Listener, User {
 
     @Override
     public <B extends UserMetadata> B removeMetadata(Class<? extends B> clazz) {
-        return (B) metadataMap.remove(clazz);
+        B metadata = (B) metadataMap.remove(clazz);
+
+        if(metadata != null) metadata.removed();
+
+        return metadata;
     }
 
     @Override
