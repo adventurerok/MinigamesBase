@@ -77,8 +77,8 @@ public class TransportListener implements CustomListener {
             velocity = config.getBoolean("velocity");
 
             xCalc = new ExpressionCalculator(config.getString("func.x", velocity ? "dx" : "x"));
-            yCalc = new ExpressionCalculator(config.getString("func.x", velocity ? "dy" : "y"));
-            zCalc = new ExpressionCalculator(config.getString("func.x", velocity ? "dz" : "z"));
+            yCalc = new ExpressionCalculator(config.getString("func.y", velocity ? "dy" : "y"));
+            zCalc = new ExpressionCalculator(config.getString("func.z", velocity ? "dz" : "z"));
 
             accept = new ExpressionCalculator(config.getString("accept", "true"));
         }
