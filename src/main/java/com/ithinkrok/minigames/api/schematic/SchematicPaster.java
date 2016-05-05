@@ -113,7 +113,7 @@ public class SchematicPaster {
             case SMOOTH_STAIRS:
             case SPRUCE_WOOD_STAIRS:
             case WOOD_STAIRS:
-                return (byte) ((data & 0x4) | Facing.rotateStairs(data & 3, rotation));
+                return (byte) ((data & 12) | Facing.rotateStairs(data & 3, rotation));
             case LADDER:
             case CHEST:
             case TRAPPED_CHEST:

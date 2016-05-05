@@ -4,11 +4,15 @@ import org.bukkit.block.BlockFace;
 
 /**
  * Created by paul on 07/11/15.
- *
+ * <p>
  * Handles building facing and block rotation
- *
  */
 public class Facing {
+
+    public static final int NORTH = 0;
+    public static final int EAST = 1;
+    public static final int SOUTH = 2;
+    public static final int WEST = 3;
 
     /**
      * Returns the facing direction from player yaw for use in building rotations.
@@ -17,57 +21,65 @@ public class Facing {
      * @param yaw The yaw of the player
      * @return The rotation for use in SchematicBuilder.buildSchematic()
      */
-    public static int getFacing(float yaw){
+    public static int getFacing(float yaw) {
         return (floor((yaw + 45f) / 90f) + 2) % 4;
     }
 
-    private static int floor(float f){
+    private static int floor(float f) {
         int i = (int) f;
 
-        if(i > f) return i - 1;
+        if (i > f) return i - 1;
         return i;
     }
 
-    public static int rotateStairs(int data, int rot){
-        int readDir;
+    //Yes I know that East and West should be the other way around, but this way works
+    private static final int STAIR_EAST = 1;
+    private static final int STAIR_WEST = 0;
 
-        switch (data){
-            case 0:
-                readDir = 1;
+    private static final int STAIR_SOUTH = 2;
+    private static final int STAIR_NORTH = 3;
+
+    public static int rotateStairs(int stairRot, int inputRot) {
+        int vcRot;
+
+        switch (stairRot) {
+            case STAIR_NORTH:
+                vcRot = NORTH;
                 break;
-            case 1:
-                readDir = 3;
+            case STAIR_EAST:
+                vcRot = EAST;
                 break;
-            case 2:
-                readDir = 0;
+            case STAIR_SOUTH:
+                vcRot = SOUTH;
                 break;
-            case 3:
-                readDir = 2;
+            case STAIR_WEST:
+                vcRot = WEST;
                 break;
             default:
-                return data;
+                return stairRot;
         }
 
-        readDir = (readDir + rot) % 4;
+        vcRot = (vcRot + inputRot) % 4;
 
-        switch (readDir){
-            case 0:
-                return 3;
-            case 1:
-                return 0;
-            case 2:
-                return 2;
-            case 3:
-                return 1;
+        //North and South are the other way around here to make it work
+        switch (vcRot) {
+            case NORTH:
+                return STAIR_SOUTH;
+            case EAST:
+                return STAIR_EAST;
+            case SOUTH:
+                return STAIR_NORTH;
+            case WEST:
+                return STAIR_WEST;
             default:
-                return data;
+                return stairRot;
         }
     }
 
-    public static int rotateLadderFurnaceChest(int data, int rot){
+    public static int rotateLadderFurnaceChest(int data, int rot) {
         int readDir;
 
-        switch (data){
+        switch (data) {
             case 0:
             case 1:
             case 2:
@@ -88,7 +100,7 @@ public class Facing {
 
         readDir = (readDir + rot) % 4;
 
-        switch (readDir){
+        switch (readDir) {
             case 0:
                 return 2;
             case 1:
@@ -148,9 +160,9 @@ public class Facing {
     }
 
     public static int rotateLogs(int data, int rotation) {
-        if(data == 0 || data == 12 || (rotation % 2) == 0) return data;
+        if (data == 0 || data == 12 || (rotation % 2) == 0) return data;
 
-        if(data == 4) return 8;
+        if (data == 4) return 8;
         else return 4;
     }
 }
