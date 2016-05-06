@@ -22,7 +22,8 @@ public class Facing {
      * @return The rotation for use in SchematicBuilder.buildSchematic()
      */
     public static int getFacing(float yaw) {
-        return (floor((yaw + 45f) / 90f) + 2) % 4;
+        //Use (& 3) instead of (% 4) to prevent returning a negative number
+        return (floor((yaw + 45f) / 90f) + 2) & 3;
     }
 
     private static int floor(float f) {
@@ -32,9 +33,8 @@ public class Facing {
         return i;
     }
 
-    //Yes I know that East and West should be the other way around, but this way works
-    private static final int STAIR_EAST = 1;
-    private static final int STAIR_WEST = 0;
+    private static final int STAIR_EAST = 0;
+    private static final int STAIR_WEST = 1;
 
     private static final int STAIR_SOUTH = 2;
     private static final int STAIR_NORTH = 3;
@@ -59,16 +59,15 @@ public class Facing {
                 return stairRot;
         }
 
-        vcRot = (vcRot + inputRot) % 4;
+        vcRot = (vcRot + inputRot) & 3;
 
-        //North and South are the other way around here to make it work
         switch (vcRot) {
             case NORTH:
-                return STAIR_SOUTH;
+                return STAIR_NORTH;
             case EAST:
                 return STAIR_EAST;
             case SOUTH:
-                return STAIR_NORTH;
+                return STAIR_SOUTH;
             case WEST:
                 return STAIR_WEST;
             default:

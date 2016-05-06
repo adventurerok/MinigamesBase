@@ -35,12 +35,12 @@ public class SchematicRotation {
         this.blocks = schematic.getBlocks();
         this.data = schematic.getData();
 
-        rotation = (rotation + schematic.getBaseRotation()) % 4;
+        rotation = (rotation + schematic.getBaseRotation()) & 3;
         this.rotation = rotation;
 
         if (rotation == 1 || rotation == 3) xzSwap = true;
-        if (rotation == 2 || rotation == 3) xFlip = true;
-        if (rotation == 3 || rotation == 0) zFlip = true;
+        if (rotation == 3 || rotation == 2) xFlip = true;
+        if (rotation == 2 || rotation == 1) zFlip = true;
     }
 
     public int getRotation() {
@@ -102,7 +102,7 @@ public class SchematicRotation {
     public int getOffsetX() {
         int base = xzSwap ? offsetZ : offsetX;
 
-        if (xFlip) base = 1 - base - getWidth();
+        //if (xFlip) base = 1 - base - getWidth();
         return base;
     }
 
@@ -113,7 +113,7 @@ public class SchematicRotation {
     public int getOffsetZ() {
         int base = xzSwap ? offsetX : offsetZ;
 
-        if (zFlip) base = 1 - base - getLength();
+        //if (zFlip) base = 1 - base - getLength();
         return base;
     }
 

@@ -38,6 +38,8 @@ public class SchematicPaster {
                                                  BoundsChecker boundsChecker, TaskScheduler taskScheduler,
                                                  SchematicResolver schematicResolver, int rotation,
                                                  SchematicOptions options) {
+        rotation &= 3;
+
         SchematicRotation schem = schemData.getSchematicRotation(rotation);
 
         BoundingBox bounds = schem.calcBounds(schematicResolver, loc);
@@ -46,6 +48,8 @@ public class SchematicPaster {
             if (boundsChecker != null && !boundsChecker.canPaste(bounds)) return null;
             if (options.doMapBoundsCheck() && !map.canPaste(bounds)) return null;
         }
+
+        System.out.println("Building schematic " + schemData.getName() + " with rotation " + schem.getRotation());
 
         List<Location> locations = new ArrayList<>();
         Location centerBlock = null;
