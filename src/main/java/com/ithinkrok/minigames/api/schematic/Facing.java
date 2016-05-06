@@ -75,41 +75,42 @@ public class Facing {
         }
     }
 
-    public static int rotateLadderFurnaceChest(int data, int rot) {
-        int readDir;
+    private static final int LADDER_NORTH = 2;
+    private static final int LADDER_SOUTH = 3;
+    private static final int LADDER_WEST = 4;
+    private static final int LADDER_EAST = 5;
 
-        switch (data) {
-            case 0:
-            case 1:
-            case 2:
-                readDir = 2;
+    public static int rotateLadderFurnaceChest(int ladderRot, int inputRot) {
+        int vcRot;
+
+        switch (ladderRot) {
+            case LADDER_SOUTH:
+                vcRot = SOUTH;
                 break;
-            case 3:
-                readDir = 0;
+            case LADDER_EAST:
+                vcRot = EAST;
                 break;
-            case 4:
-                readDir = 3;
+            case LADDER_WEST:
+                vcRot = WEST;
                 break;
-            case 5:
-                readDir = 1;
-                break;
+            case LADDER_NORTH:
             default:
-                return data;
+                vcRot = NORTH;
         }
 
-        readDir = (readDir + rot) % 4;
+        vcRot = (vcRot + inputRot) & 3;
 
-        switch (readDir) {
-            case 0:
-                return 2;
-            case 1:
-                return 5;
-            case 2:
-                return 3;
-            case 3:
-                return 4;
+        switch (vcRot) {
+            case NORTH:
+                return LADDER_NORTH;
+            case EAST:
+                return LADDER_EAST;
+            case SOUTH:
+                return LADDER_SOUTH;
+            case WEST:
+                return LADDER_WEST;
             default:
-                return data;
+                throw new IllegalStateException("A number & 3 was not 0-3");
         }
     }
 
@@ -159,7 +160,7 @@ public class Facing {
     }
 
     public static int rotateLogs(int data, int rotation) {
-        if (data == 0 || data == 12 || (rotation % 2) == 0) return data;
+        if (data == 0 || data == 12 || (rotation & 1) == 0) return data;
 
         if (data == 4) return 8;
         else return 4;
