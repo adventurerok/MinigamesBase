@@ -102,7 +102,9 @@ public class SchematicRotation {
     public int getOffsetX() {
         int base = xzSwap ? offsetZ : offsetX;
 
-        //if (xFlip) base = 1 - base - getWidth();
+        boolean flip = xzSwap ? zFlip : xFlip;
+
+        if (flip) base = 1 - base - getWidth();
         return base;
     }
 
@@ -113,7 +115,9 @@ public class SchematicRotation {
     public int getOffsetZ() {
         int base = xzSwap ? offsetX : offsetZ;
 
-        //if (zFlip) base = 1 - base - getLength();
+        boolean flip = xzSwap ? xFlip : zFlip;
+
+        if (flip) base = 1 - base - getLength();
         return base;
     }
 
