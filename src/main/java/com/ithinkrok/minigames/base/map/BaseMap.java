@@ -20,7 +20,7 @@ import com.ithinkrok.minigames.base.BaseGameGroup;
 import com.ithinkrok.minigames.base.command.CommandConfig;
 import com.ithinkrok.minigames.base.util.io.ConfigHolder;
 import com.ithinkrok.minigames.base.util.io.ConfigParser;
-import com.ithinkrok.msm.common.util.ConfigUtils;
+import com.ithinkrok.util.config.ConfigUtils;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomListener;
 import com.ithinkrok.util.lang.LanguageLookup;

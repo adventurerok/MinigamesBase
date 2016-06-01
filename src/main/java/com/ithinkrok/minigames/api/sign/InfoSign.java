@@ -3,7 +3,7 @@ package com.ithinkrok.minigames.api.sign;
 import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.event.user.world.UserEditSignEvent;
 import com.ithinkrok.minigames.api.user.User;
-import com.ithinkrok.msm.common.util.ConfigUtils;
+import com.ithinkrok.util.config.ConfigUtils;
 import com.ithinkrok.util.StringUtils;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;

@@ -5,7 +5,7 @@ import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.JSONBook;
 import com.ithinkrok.minigames.api.util.math.MapVariables;
 import com.ithinkrok.minigames.api.util.math.Variables;
-import com.ithinkrok.msm.common.util.ConfigUtils;
+import com.ithinkrok.util.config.ConfigUtils;
 import com.ithinkrok.util.config.Config;
 import org.bukkit.inventory.ItemStack;
 

@@ -38,7 +38,7 @@ import com.ithinkrok.minigames.base.map.BaseMap;
 import com.ithinkrok.minigames.base.util.io.ConfigHolder;
 import com.ithinkrok.minigames.base.util.io.ConfigParser;
 import com.ithinkrok.minigames.base.util.io.FileLoader;
-import com.ithinkrok.msm.common.util.ConfigUtils;
+import com.ithinkrok.util.config.ConfigUtils;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;
 import com.ithinkrok.util.event.CustomEventExecutor;

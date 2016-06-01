@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.api.event;
 
-import com.ithinkrok.msm.common.util.ConfigUtils;
+import com.ithinkrok.util.config.ConfigUtils;
 import com.ithinkrok.util.config.Config;
 
 /**
