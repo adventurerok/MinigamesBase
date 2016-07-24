@@ -18,6 +18,7 @@ import org.bukkit.block.Skull;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 /**
  * Created by paul on 20/02/16.
@@ -144,7 +145,7 @@ public class HighScoreSign extends InfoSign {
 
     @CustomEventHandler
     public void onControllerGameGroupKilledEvent(ControllerKillGameGroupEvent event) {
-        if(!event.getControllerGameGroup().getType().equals(gameType)) return;
+        if(!(Objects.equals(event.getControllerGameGroup().getType(), gameType))) return;
 
         gameGroup.doInFuture(task -> {
             update();
