@@ -1,5 +1,7 @@
 package com.ithinkrok.minigames.hub.data;
 
+import com.ithinkrok.minigames.api.util.MinigamesConfigs;
+import com.ithinkrok.minigames.api.util.SoundEffect;
 import com.ithinkrok.util.config.Config;
 import org.bukkit.Material;
 
@@ -9,12 +11,25 @@ import org.bukkit.Material;
 public class JumpPad {
 
     private final Material material;
+    private final double power;
+    private final SoundEffect sound;
 
     public JumpPad(Config config) {
-        this.material = Material.matchMaterial(config.getString("material"));
+
+        material = Material.matchMaterial(config.getString("material"));
+        power = config.getDouble("power");
+        sound = MinigamesConfigs.getSoundEffect(config, "sound");
     }
 
     public Material getMaterial() {
         return material;
+    }
+
+    public double getPower() {
+        return power;
+    }
+
+    public SoundEffect getSound() {
+        return sound;
     }
 }

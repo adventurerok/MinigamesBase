@@ -36,9 +36,13 @@ public class JumpPadTask implements GameRunnable {
         Vector velocity = location.getDirection();
 
         velocity.setY(0.4d);
-        velocity.multiply(2.5d);
+        velocity.multiply(pad.getPower());
 
         user.setVelocity(velocity);
+
+        if(pad.getSound() != null) {
+            user.playSound(user.getLocation(), pad.getSound());
+        }
 
     }
 }
