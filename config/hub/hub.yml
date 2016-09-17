@@ -25,6 +25,8 @@ game_states:
           items:
             clear_inventory: false
             custom_items:
+              - name: "super_popper"
+                slot: 0
               - name: "game_chooser"
                 slot: 4
           jump_pads:
@@ -58,3 +60,8 @@ custom_items:
               teleport: "345.5,141,-315.5,0,0"
           direct_join_enabled_item: "DIAMOND_BLOCK,1,0,&c&lDisable Direct Join"
           direct_join_disabled_item: "COAL_BLOCK,1,0,&a&lEnable Direct Join"
+  super_popper:
+    material: "BOW"
+    display_name_locale: "super_popper"
+    enchantments:
+      OXYGEN: 1
