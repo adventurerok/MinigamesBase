@@ -5,13 +5,25 @@ import com.ithinkrok.minigames.api.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserJoinEvent;
 import com.ithinkrok.minigames.api.event.user.state.UserDeathEvent;
 import com.ithinkrok.minigames.api.sign.InfoSigns;
+import com.ithinkrok.minigames.api.task.GameRunnable;
+import com.ithinkrok.minigames.api.task.GameTask;
+import com.ithinkrok.minigames.hub.data.JumpPad;
 import com.ithinkrok.minigames.hub.sign.GameChooseSign;
 import com.ithinkrok.minigames.hub.sign.HighScoreSign;
 import com.ithinkrok.minigames.hub.sign.JoinLobbySign;
+import com.ithinkrok.minigames.hub.task.JumpPadTask;
 import com.ithinkrok.minigames.util.ItemGiver;
 import com.ithinkrok.minigames.util.map.SignListener;
 import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.config.ConfigSerializable;
+import com.ithinkrok.util.config.ConfigUtils;
 import com.ithinkrok.util.event.CustomEventHandler;
+import org.bukkit.Material;
+
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by paul on 20/02/16.
@@ -27,6 +39,8 @@ public class HubListener extends SignListener {
 
     private ItemGiver itemGiver;
 
+    private final Map<Material, JumpPad> jumpPadMap = new EnumMap<>(Material.class);
+
     @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent<GameGroup, ?> event) {
         super.onListenerLoaded(event);
@@ -36,12 +50,26 @@ public class HubListener extends SignListener {
         if(config.contains("items")) {
             itemGiver = new ItemGiver(config.getConfigOrNull("items"));
         }
+
+        if(config.contains("jump_pads")) {
+            List<Config> jumpPadList = config.getConfigList("jump_pads");
+
+            for(Config jumpConfig : jumpPadList) {
+                JumpPad pad = new JumpPad(jumpConfig);
+
+                jumpPadMap.put(pad.getMaterial(), pad);
+            }
+        }
     }
 
     @CustomEventHandler
     public void onUserJoin(UserJoinEvent event) {
         if(itemGiver != null) {
             itemGiver.giveToUser(event.getUser());
+        }
+
+        if(!jumpPadMap.isEmpty()) {
+            event.getUser().repeatInFuture(new JumpPadTask(event.getUser(), jumpPadMap), 3, 3);
         }
     }
 

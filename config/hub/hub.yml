@@ -27,6 +27,8 @@ game_states:
             custom_items:
               - name: "game_chooser"
                 slot: 4
+          jump_pads:
+            - material: "GOLD_PLATE"
 
 custom_items:
   game_chooser:
