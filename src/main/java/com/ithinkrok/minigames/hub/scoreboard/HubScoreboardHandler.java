@@ -23,6 +23,7 @@ public class HubScoreboardHandler implements ScoreboardHandler {
 
     @Override
     public void setupScoreboard(User user, ScoreboardDisplay scoreboard) {
+        scoreboard.resetAndDisplay();
         scoreboard.setTextLineCount(3);
 
         updateScoreboard(user, scoreboard);
