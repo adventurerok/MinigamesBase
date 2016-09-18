@@ -107,8 +107,12 @@ public class HubListener extends SignListener {
 
     @CustomEventHandler
     public void onUserJoin(UserJoinEvent event) {
-        event.getUser().setGameMode(GameMode.ADVENTURE);
         event.getUser().teleport(event.getUserGameGroup().getCurrentMap().getSpawn());
+
+        event.getUser().setGameMode(GameMode.ADVENTURE);
+        event.getUser().setHealth(20);
+        event.getUser().setMaxHealth(20);
+        event.getUser().setFoodLevel(20);
 
         if(itemGiver != null) {
             itemGiver.giveToUser(event.getUser());
