@@ -38,7 +38,7 @@ public class HubScoreboardHandler implements ScoreboardHandler {
         scoreboard.setDisplayLocale(titleLocale);
 
         int gamesInProgress = 0;
-        int lobbys = 0;
+        int lobbyCount = 0;
 
         int playersInGame = 0;
         int playersInLobby = 0;
@@ -53,7 +53,7 @@ public class HubScoreboardHandler implements ScoreboardHandler {
             if(gameGroupInfo.isAcceptingPlayers()){
                 //Lobby
 
-                ++lobbys;
+                ++lobbyCount;
                 playersInLobby += gameGroupInfo.getPlayerCount();
             } else {
                 //Game in progress
@@ -79,7 +79,7 @@ public class HubScoreboardHandler implements ScoreboardHandler {
 
         scoreboard.setTextLine(lc++, "");
         scoreboard.setTextLocale(lc++, lobbyInfoLocale);
-        scoreboard.setTextLine(lc++, playersInLobby + " / " + lobbys);
+        scoreboard.setTextLine(lc++, playersInLobby + " / " + lobbyCount);
 
         scoreboard.setTextLine(lc, "");
     }
