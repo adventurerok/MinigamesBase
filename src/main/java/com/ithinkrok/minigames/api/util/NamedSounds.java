@@ -53,11 +53,14 @@ public class NamedSounds {
 
         NAMED_SOUNDS.put("ENTITY_BLAZE_HURT", Sound.valueOf("BLAZE_HIT"));
 
+        NAMED_SOUNDS.put("ENTITY_ARROW_HIT", Sound.valueOf("SUCCESSFUL_HIT"));
         NAMED_SOUNDS.put("ENTITY_ARROW_SHOOT", Sound.valueOf("SHOOT_ARROW"));
 
         NAMED_SOUNDS.put("ENTITY_WITHER_SPAWN", Sound.valueOf("WITHER_SPAWN"));
         NAMED_SOUNDS.put("ENTITY_WITHER_SHOOT", Sound.valueOf("WITHER_SHOOT"));
 
+        NAMED_SOUNDS.put("ENTITY_FIREWORK_BLAST", Sound.valueOf("FIREWORK_BLAST"));
+        NAMED_SOUNDS.put("ENTITY_FIREWORK_LARGE_BLAST", Sound.valueOf("FIREWORK_LARGE_BLAST"));
         NAMED_SOUNDS.put("ENTITY_FIREWORK_TWINKLE", Sound.valueOf("FIREWORK_TWINKLE"));
 
         NAMED_SOUNDS.put("BLOCK_NOTE_BASEDRUM", Sound.valueOf("NOTE_BASS_DRUM"));
