@@ -7,6 +7,7 @@ import com.ithinkrok.minigames.api.event.user.state.UserAttackedEvent;
 import com.ithinkrok.minigames.api.event.user.state.UserDamagedEvent;
 import com.ithinkrok.minigames.api.event.user.state.UserDeathEvent;
 import com.ithinkrok.minigames.api.event.user.state.UserFoodLevelChangeEvent;
+import com.ithinkrok.minigames.api.event.user.world.UserDropItemEvent;
 import com.ithinkrok.minigames.api.sign.InfoSigns;
 import com.ithinkrok.minigames.api.task.GameRunnable;
 import com.ithinkrok.minigames.api.task.GameTask;
@@ -158,5 +159,10 @@ public class HubListener extends SignListener {
         //Restore food level to max
         event.setFoodLevel(20);
         event.getUser().setSaturation(20);
+    }
+
+    @CustomEventHandler
+    public void onUserDropItem(UserDropItemEvent event) {
+        event.setCancelled(true);
     }
 }
