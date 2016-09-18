@@ -105,7 +105,7 @@ public class HubListener extends SignListener {
         }
 
         if(!jumpPadMap.isEmpty()) {
-            event.getUser().repeatInFuture(new JumpPadTask(event.getUser(), jumpPadMap), 3, 3);
+            event.getUser().repeatInFuture(new JumpPadTask(event.getUser(), jumpPadMap), 2, 2);
         }
 
         if(welcomeTitleLocale != null) {
