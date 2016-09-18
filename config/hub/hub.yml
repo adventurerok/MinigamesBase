@@ -23,7 +23,7 @@ game_states:
         config:
           signs_config_path: "plugins/MinigamesBase/signs.yml"
           items:
-            clear_inventory: false
+            clear_inventory: true
             custom_items:
               - name: "super_popper"
                 slot: 0
