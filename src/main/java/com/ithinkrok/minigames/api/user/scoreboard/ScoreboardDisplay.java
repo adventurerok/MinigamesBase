@@ -37,6 +37,10 @@ public class ScoreboardDisplay {
         if(objective != null) objective.setDisplayName(displayName);
     }
 
+    public void setDisplayLocale(String displayLocale, Object...args) {
+        setDisplayName(user.getLanguageLookup().getLocale(displayLocale, args));
+    }
+
     public boolean isDisplaying() {
         return objective != null;
     }
