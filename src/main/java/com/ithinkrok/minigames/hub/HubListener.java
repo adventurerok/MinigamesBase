@@ -103,6 +103,7 @@ public class HubListener extends SignListener {
     @CustomEventHandler
     public void onUserJoin(UserJoinEvent event) {
         event.getUser().setGameMode(GameMode.ADVENTURE);
+        event.getUser().teleport(event.getUserGameGroup().getCurrentMap().getSpawn());
 
         if(itemGiver != null) {
             itemGiver.giveToUser(event.getUser());
