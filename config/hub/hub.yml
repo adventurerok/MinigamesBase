@@ -43,7 +43,11 @@ game_states:
             title_locale: "welcome.title"
             subtitle_locale: "welcome.subtitle"
           scoreboard:
-            locale: "cow"
+            title_locale: "scoreboard.title"
+            players_online_locale: "scoreboard.players_online"
+            lobby_info_locale: "scoreboard.lobby_info"
+            games_info_locale: "scoreboard.games_info"
+            players_on_hub_locale: "scoreboard.players_on_hub"
 
 custom_items:
   game_chooser:

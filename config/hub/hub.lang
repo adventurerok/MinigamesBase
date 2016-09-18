@@ -11,3 +11,9 @@ super_popper.attacker=&aYou have popped &c%s
 
 welcome.title=&e&lWelcome!
 welcome.subtitle=&5&l%s
+
+scoreboard.title=&5&lMcColony Network
+scoreboard.players_online=&6&lPlayers Online\:
+scoreboard.players_on_hub=&6&lPlayers on Hub\:
+scoreboard.lobby_info=&6&lPlayers in Lobbies\:
+scoreboard.games_info=&6&lPlayers in Games\:
