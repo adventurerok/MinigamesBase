@@ -26,6 +26,7 @@ import com.ithinkrok.util.config.ConfigSerializable;
 import com.ithinkrok.util.config.ConfigUtils;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.lang.LanguageLookup;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.Vector;
@@ -101,6 +102,8 @@ public class HubListener extends SignListener {
 
     @CustomEventHandler
     public void onUserJoin(UserJoinEvent event) {
+        event.getUser().setGameMode(GameMode.ADVENTURE);
+
         if(itemGiver != null) {
             itemGiver.giveToUser(event.getUser());
         }
