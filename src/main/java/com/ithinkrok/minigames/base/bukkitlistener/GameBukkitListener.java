@@ -88,12 +88,17 @@ public class GameBukkitListener implements Listener {
 
         User user = game.getUser(event.getPlayer());
         if (user == null) {
-            System.out.println("Player not in gamegroup: " + event.getPlayer().getName());
+            notInGameGroupError(event.getPlayer());
             return;
         }
 
         UserQuitEvent userEvent = new UserQuitEvent(user, UserQuitEvent.QuitReason.QUIT_SERVER);
         user.getGameGroup().userEvent(userEvent);
+    }
+
+    private void notInGameGroupError(Entity player) {
+        System.out
+                .println("Player not in GG: '" + player.getName() + "' in world '" + player.getWorld().getName() + "'");
     }
 
     @EventHandler
@@ -114,7 +119,7 @@ public class GameBukkitListener implements Listener {
     public void eventPlayerChat(AsyncPlayerChatEvent event) {
         User user = game.getUser(event.getPlayer());
         if (user == null) {
-            System.out.println("Player not in gamegroup: " + event.getPlayer().getName());
+            notInGameGroupError(event.getPlayer());
             return;
         }
 
@@ -203,7 +208,7 @@ public class GameBukkitListener implements Listener {
     public void eventPlayerDropItem(PlayerDropItemEvent event) {
         User user = game.getUser(event.getPlayer());
         if (user == null) {
-            System.out.println("Player not in gamegroup: " + event.getPlayer().getName());
+            notInGameGroupError(event.getPlayer());
             return;
         }
 
@@ -214,7 +219,7 @@ public class GameBukkitListener implements Listener {
     public void eventPlayerPickupItem(PlayerPickupItemEvent event) {
         User user = game.getUser(event.getPlayer());
         if (user == null) {
-            System.out.println("Player not in gamegroup: " + event.getPlayer().getName());
+            notInGameGroupError(event.getPlayer());
             return;
         }
 
@@ -225,7 +230,7 @@ public class GameBukkitListener implements Listener {
     public void eventPlayerInteractWorld(PlayerInteractEvent event) {
         User user = game.getUser(event.getPlayer());
         if (user == null) {
-            System.out.println("Player not in gamegroup: " + event.getPlayer().getName());
+            notInGameGroupError(event.getPlayer());
             return;
         }
 
@@ -238,7 +243,7 @@ public class GameBukkitListener implements Listener {
     public void eventBlockBreak(BlockBreakEvent event) {
         User user = game.getUser(event.getPlayer());
         if (user == null) {
-            System.out.println("Player not in gamegroup: " + event.getPlayer().getName());
+            notInGameGroupError(event.getPlayer());
             return;
         }
 
@@ -249,7 +254,7 @@ public class GameBukkitListener implements Listener {
     public void eventBlockPlace(BlockPlaceEvent event) {
         User user = game.getUser(event.getPlayer());
         if (user == null) {
-            System.out.println("Player not in gamegroup: " + event.getPlayer().getName());
+            notInGameGroupError(event.getPlayer());
             return;
         }
 
@@ -260,7 +265,7 @@ public class GameBukkitListener implements Listener {
     public void eventCommandPreprocess(PlayerCommandPreprocessEvent event) {
         User sender = game.getUser(event.getPlayer());
         if (sender == null) {
-            System.out.println("Player not in gamegroup: " + event.getPlayer().getName());
+            notInGameGroupError(event.getPlayer());
             return;
         }
 
@@ -425,26 +430,25 @@ public class GameBukkitListener implements Listener {
         //Log death messages
         if (attacker != null) {
             System.out.println(attacked.getName() + " died: reason=" + event.getCause() + ", finalDamage=" +
-                    event.getFinalDamage() + ", damage=" + event.getDamage() + ", attacker=" + attacker.getName() +
-                    ", holding=" +
-                    attacker.getInventory().getItemInHand());
+                                       event.getFinalDamage() + ", damage=" + event.getDamage() + ", attacker=" +
+                                       attacker.getName() + ", holding=" + attacker.getInventory().getItemInHand());
         } else {
             System.out.println(attacked.getName() + " died: reason=" + event.getCause() + ", finalDamage=" +
-                    event.getFinalDamage() + ", attacker=null");
+                                       event.getFinalDamage() + ", attacker=null");
         }
 
         if (!deathEvent.getPlayDeathSound() || !attacked.isInGame()) return;
 
         attacked.getLocation().getWorld()
                 .playSound(attacked.getLocation(), EntityUtils.getDeathSound(attacked.getVisibleEntityType()), 1.0f,
-                        1.0f);
+                           1.0f);
     }
 
     @EventHandler
     public void eventPlayerFoodLevelChange(FoodLevelChangeEvent event) {
         User user = game.getUser(event.getEntity());
         if (user == null) {
-            System.out.println("Player not in gamegroup: " + event.getEntity().getName());
+            notInGameGroupError(event.getEntity());
             return;
         }
 
@@ -455,7 +459,7 @@ public class GameBukkitListener implements Listener {
     public void eventPlayerInteractEntity(PlayerInteractEntityEvent event) {
         User user = game.getUser(event.getPlayer());
         if (user == null) {
-            System.out.println("Player not in gamegroup: " + event.getPlayer().getName());
+            notInGameGroupError(event.getPlayer());
             return;
         }
 
@@ -466,7 +470,7 @@ public class GameBukkitListener implements Listener {
     public void eventPlayerInventoryClick(InventoryClickEvent event) {
         User user = game.getUser(event.getWhoClicked());
         if (user == null) {
-            System.out.println("Player not in gamegroup: " + event.getWhoClicked().getName());
+            notInGameGroupError(event.getWhoClicked());
             return;
         }
 
@@ -477,7 +481,7 @@ public class GameBukkitListener implements Listener {
     public void eventPlayerInventoryClose(InventoryCloseEvent event) {
         User user = game.getUser(event.getPlayer());
         if (user == null) {
-            System.out.println("Player not in gamegroup: " + event.getPlayer().getName());
+            notInGameGroupError(event.getPlayer());
             return;
         }
 
@@ -509,7 +513,7 @@ public class GameBukkitListener implements Listener {
     public void eventSignChange(SignChangeEvent event) {
         User user = game.getUser(event.getPlayer());
         if (user == null) {
-            System.out.println("Player not in gamegroup: " + event.getPlayer().getName());
+            notInGameGroupError(event.getPlayer());
             return;
         }
 
