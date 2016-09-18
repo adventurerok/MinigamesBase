@@ -27,6 +27,7 @@ import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.EntityUtils;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
 import com.ithinkrok.minigames.api.util.NamedSounds;
+import com.ithinkrok.msm.bukkit.MSMPlugin;
 import com.ithinkrok.util.command.CommandUtils;
 import com.ithinkrok.util.config.Config;
 import org.bukkit.Bukkit;
@@ -99,6 +100,10 @@ public class GameBukkitListener implements Listener {
     private void notInGameGroupError(Entity player) {
         System.out
                 .println("Player not in GG: '" + player.getName() + "' in world '" + player.getWorld().getName() + "'");
+
+        //Schedule a server restart due to this
+        //Allow 1 player online when restarting as at least 1 player is not in a gamegroup
+        MSMPlugin.getApiProtocol().scheduleRestart(10, 1);
     }
 
     @EventHandler
