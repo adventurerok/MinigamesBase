@@ -23,6 +23,7 @@ import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.ConfigSerializable;
 import com.ithinkrok.util.config.ConfigUtils;
 import com.ithinkrok.util.event.CustomEventHandler;
+import com.ithinkrok.util.lang.LanguageLookup;
 import org.bukkit.Material;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.Vector;
@@ -55,6 +56,9 @@ public class HubListener extends SignListener {
     private SoundEffect superPopperVictimSound;
     private SoundEffect superPopperAttackerSound;
 
+    private String welcomeTitleLocale;
+    private String welcomeSubtitleLocale;
+
     @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent<GameGroup, ?> event) {
         super.onListenerLoaded(event);
@@ -86,6 +90,11 @@ public class HubListener extends SignListener {
             superPopperVictimSound = MinigamesConfigs.getSoundEffect(superPopperConfig, "victim_sound");
             superPopperAttackerSound = MinigamesConfigs.getSoundEffect(superPopperConfig, "attacker_sound");
         }
+
+        if(config.contains("welcome")) {
+            welcomeTitleLocale = config.getString("welcome.title_locale");
+            welcomeSubtitleLocale = config.getString("welcome.subtitle_locale");
+        }
     }
 
     @CustomEventHandler
@@ -96,6 +105,14 @@ public class HubListener extends SignListener {
 
         if(!jumpPadMap.isEmpty()) {
             event.getUser().repeatInFuture(new JumpPadTask(event.getUser(), jumpPadMap), 3, 3);
+        }
+
+        if(welcomeTitleLocale != null) {
+            LanguageLookup lookup = event.getUser().getLanguageLookup();
+            String welcomeTitle = lookup.getLocale(welcomeTitleLocale);
+            String welcomeSubtitle = lookup.getLocale(welcomeSubtitleLocale, event.getUser().getDisplayName());
+
+            event.getUser().showTitle(welcomeTitle, welcomeSubtitle);
         }
     }
 
