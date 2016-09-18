@@ -6,3 +6,5 @@ game_chooser.direct_join.enable=&aDirect join enabled!
 game_chooser.direct_join.disable=&cDirect join disabled!
 
 super_popper.name=&b&lSuper &7Popper
+super_popper.victim=&aYou have been popped by &c%s
+super_popper.attacker=&aYou have popped &c%s

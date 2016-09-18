@@ -33,6 +33,10 @@ game_states:
             - material: "GOLD_PLATE"
               power: 2.5
               sound: "ENTITY_WITHER_SHOOT"
+          super_popper:
+            power: 2.0
+            victim_locale: "super_popper.victim"
+            attacker_locale: "super_popper.attacker"
 
 custom_items:
   game_chooser:
@@ -62,6 +66,6 @@ custom_items:
           direct_join_disabled_item: "COAL_BLOCK,1,0,&a&lEnable Direct Join"
   super_popper:
     material: "BOW"
-    display_name_locale: "super_popper"
+    display_name_locale: "super_popper.name"
     enchantments:
       OXYGEN: 1

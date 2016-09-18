@@ -3,7 +3,10 @@ package com.ithinkrok.minigames.hub;
 import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserJoinEvent;
+import com.ithinkrok.minigames.api.event.user.state.UserAttackedEvent;
+import com.ithinkrok.minigames.api.event.user.state.UserDamagedEvent;
 import com.ithinkrok.minigames.api.event.user.state.UserDeathEvent;
+import com.ithinkrok.minigames.api.event.user.state.UserFoodLevelChangeEvent;
 import com.ithinkrok.minigames.api.sign.InfoSigns;
 import com.ithinkrok.minigames.api.task.GameRunnable;
 import com.ithinkrok.minigames.api.task.GameTask;
@@ -19,6 +22,8 @@ import com.ithinkrok.util.config.ConfigSerializable;
 import com.ithinkrok.util.config.ConfigUtils;
 import com.ithinkrok.util.event.CustomEventHandler;
 import org.bukkit.Material;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.util.Vector;
 
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -41,6 +46,10 @@ public class HubListener extends SignListener {
 
     private final Map<Material, JumpPad> jumpPadMap = new EnumMap<>(Material.class);
 
+    private double superPopperPower;
+    private String superPopperVictimLocale;
+    private String superPopperAttackerLocale;
+
     @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent<GameGroup, ?> event) {
         super.onListenerLoaded(event);
@@ -59,6 +68,15 @@ public class HubListener extends SignListener {
 
                 jumpPadMap.put(pad.getMaterial(), pad);
             }
+        }
+
+        if(config.contains("super_popper")) {
+            Config superPopperConfig = config.getConfigOrEmpty("super_popper");
+
+            superPopperPower = superPopperConfig.getDouble("power");
+
+            superPopperVictimLocale = superPopperConfig.getString("victim_locale");
+            superPopperAttackerLocale = superPopperConfig.getString("attacker_locale");
         }
     }
 
@@ -79,4 +97,33 @@ public class HubListener extends SignListener {
     }
 
 
+    @CustomEventHandler
+    public void onUserAttackedByUser(UserAttackedEvent event) {
+        if(!event.wasAttackedByUser()) return;
+
+        if(event.getDamageCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
+            Vector velocity = event.getUser().getLocation().getDirection();
+            velocity.setY(0.5f);
+            velocity.multiply(superPopperPower);
+
+            event.getUser().setVelocity(velocity);
+
+            event.getUser().sendLocale(superPopperVictimLocale, event.getAttackerUser().getDisplayName());
+            event.getAttackerUser().sendLocale(superPopperAttackerLocale, event.getUser().getDisplayName());
+
+            event.setCancelled(true);
+        }
+    }
+
+    @CustomEventHandler(priority = CustomEventHandler.HIGH)
+    public void onUserDamaged(UserDamagedEvent event) {
+        event.setCancelled(true);
+    }
+
+    @CustomEventHandler
+    public void onUserHunger(UserFoodLevelChangeEvent event) {
+        //Restore food level to max
+        event.setFoodLevel(20);
+        event.getUser().setSaturation(20);
+    }
 }
