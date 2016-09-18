@@ -80,6 +80,8 @@ public class ClientMinigamesRequestProtocol implements ClientListener {
     private void handleEventGameGroupKilled(Config payload) {
         GameGroupInfo gameGroup = controllerInfo.removeGameGroup(payload.getString("name"));
 
+        if(gameGroup == null) return;
+
         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
             GameGroupKilledEvent event = new GameGroupKilledEvent(gameGroup);
             plugin.getServer().getPluginManager().callEvent(event);

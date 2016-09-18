@@ -12,6 +12,10 @@ public abstract class GameGroupEvent extends Event implements CustomEvent {
     private final GameGroupInfo gameGroupInfo;
 
     public GameGroupEvent(GameGroupInfo gameGroupInfo) {
+        if(gameGroupInfo == null) {
+            throw new NullPointerException("gameGroupInfo cannot be null");
+        }
+
         this.gameGroupInfo = gameGroupInfo;
     }
 
