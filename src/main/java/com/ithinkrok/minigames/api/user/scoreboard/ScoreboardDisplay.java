@@ -68,7 +68,7 @@ public class ScoreboardDisplay {
             Team fake = scoreboard.registerNewTeam(emptyString(fakeTeams.size()));
             fake.addEntry(emptyString(fakeTeams.size()));
 
-            objective.getScore(emptyString(fakeTeams.size())).setScore(fakeTeams.size());
+            objective.getScore(emptyString(fakeTeams.size())).setScore(99 - fakeTeams.size());
 
             fakeTeams.add(fake);
         }
