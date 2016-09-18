@@ -10,6 +10,8 @@ import com.ithinkrok.minigames.api.event.user.state.UserFoodLevelChangeEvent;
 import com.ithinkrok.minigames.api.sign.InfoSigns;
 import com.ithinkrok.minigames.api.task.GameRunnable;
 import com.ithinkrok.minigames.api.task.GameTask;
+import com.ithinkrok.minigames.api.util.MinigamesConfigs;
+import com.ithinkrok.minigames.api.util.SoundEffect;
 import com.ithinkrok.minigames.hub.data.JumpPad;
 import com.ithinkrok.minigames.hub.sign.GameChooseSign;
 import com.ithinkrok.minigames.hub.sign.HighScoreSign;
@@ -50,6 +52,9 @@ public class HubListener extends SignListener {
     private String superPopperVictimLocale;
     private String superPopperAttackerLocale;
 
+    private SoundEffect superPopperVictimSound;
+    private SoundEffect superPopperAttackerSound;
+
     @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent<GameGroup, ?> event) {
         super.onListenerLoaded(event);
@@ -77,6 +82,9 @@ public class HubListener extends SignListener {
 
             superPopperVictimLocale = superPopperConfig.getString("victim_locale");
             superPopperAttackerLocale = superPopperConfig.getString("attacker_locale");
+
+            superPopperVictimSound = MinigamesConfigs.getSoundEffect(superPopperConfig, "victim_sound");
+            superPopperAttackerSound = MinigamesConfigs.getSoundEffect(superPopperConfig, "attacker_sound");
         }
     }
 
@@ -110,6 +118,14 @@ public class HubListener extends SignListener {
 
             event.getUser().sendLocale(superPopperVictimLocale, event.getAttackerUser().getDisplayName());
             event.getAttackerUser().sendLocale(superPopperAttackerLocale, event.getUser().getDisplayName());
+
+            if(superPopperVictimSound != null) {
+                event.getUser().playSound(event.getUser().getLocation(), superPopperVictimSound);
+            }
+
+            if(superPopperAttackerSound != null) {
+                event.getAttackerUser().playSound(event.getAttackerUser().getLocation(), superPopperAttackerSound);
+            }
 
             event.setCancelled(true);
         }

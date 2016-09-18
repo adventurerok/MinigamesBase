@@ -37,6 +37,8 @@ game_states:
             power: 2.0
             victim_locale: "super_popper.victim"
             attacker_locale: "super_popper.attacker"
+            victim_sound: "ENTITY_FIREWORK_LARGE_BLAST"
+            attacker_sound: "ENTITY_ARROW_HIT"
 
 custom_items:
   game_chooser:
