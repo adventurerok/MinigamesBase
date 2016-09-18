@@ -13,7 +13,7 @@ welcome.title=&e&lWelcome!
 welcome.subtitle=&5&l%s
 
 scoreboard.title=&5&lMcColony Network
-scoreboard.players_online=&6&lPlayers Online\:
-scoreboard.players_on_hub=&6&lPlayers on Hub\:
-scoreboard.lobby_info=&6&lPlayers in Lobbies\:
-scoreboard.games_info=&6&lPlayers in Games\:
+scoreboard.players_online=&6&lOnline\:
+scoreboard.players_on_hub=&6&lOn Hub\:
+scoreboard.lobby_info=&6&lIn Lobbies\:
+scoreboard.games_info=&6&lIn Games\:
