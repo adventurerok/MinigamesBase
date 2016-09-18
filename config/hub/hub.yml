@@ -71,3 +71,7 @@ custom_items:
     display_name_locale: "super_popper.name"
     enchantments:
       OXYGEN: 1
+    listeners:
+      super_popper:
+        events: ["rightClick"]
+        class: "com.ithinkrok.minigames.hub.item.SuperPopper"
