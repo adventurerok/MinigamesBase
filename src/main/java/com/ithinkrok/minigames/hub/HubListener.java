@@ -15,6 +15,7 @@ import com.ithinkrok.minigames.api.task.GameTask;
 import com.ithinkrok.minigames.api.util.MinigamesConfigs;
 import com.ithinkrok.minigames.api.util.SoundEffect;
 import com.ithinkrok.minigames.hub.data.JumpPad;
+import com.ithinkrok.minigames.hub.scoreboard.HubScoreboardHandler;
 import com.ithinkrok.minigames.hub.sign.GameChooseSign;
 import com.ithinkrok.minigames.hub.sign.HighScoreSign;
 import com.ithinkrok.minigames.hub.sign.JoinLobbySign;
@@ -62,6 +63,8 @@ public class HubListener extends SignListener {
     private String welcomeTitleLocale;
     private String welcomeSubtitleLocale;
 
+    private Config scoreboardConfig;
+
     @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent<GameGroup, ?> event) {
         super.onListenerLoaded(event);
@@ -98,6 +101,8 @@ public class HubListener extends SignListener {
             welcomeTitleLocale = config.getString("welcome.title_locale");
             welcomeSubtitleLocale = config.getString("welcome.subtitle_locale");
         }
+
+        scoreboardConfig = config.getConfigOrNull("scoreboard");
     }
 
     @CustomEventHandler
@@ -119,6 +124,12 @@ public class HubListener extends SignListener {
             String welcomeSubtitle = lookup.getLocale(welcomeSubtitleLocale, event.getUser().getDisplayName());
 
             event.getUser().showTitle(welcomeTitle, welcomeSubtitle);
+        }
+
+        if(scoreboardConfig != null) {
+            HubScoreboardHandler scoreboardHandler = new HubScoreboardHandler(scoreboardConfig);
+
+            event.getUser().setScoreboardHandler(scoreboardHandler);
         }
     }
 

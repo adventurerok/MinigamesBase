@@ -42,6 +42,8 @@ game_states:
           welcome:
             title_locale: "welcome.title"
             subtitle_locale: "welcome.subtitle"
+          scoreboard:
+            locale: "cow"
 
 custom_items:
   game_chooser:
