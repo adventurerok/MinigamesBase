@@ -30,7 +30,7 @@ public class ScoreboardDisplay {
 
     private String displayName = "Set display name";
 
-    private List<Team> fakeTeams = new ArrayList<>();
+    private final List<Team> fakeTeams = new ArrayList<>();
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
@@ -110,7 +110,7 @@ public class ScoreboardDisplay {
         StringBuilder result = new StringBuilder(Integer.toHexString(number));
 
         result.insert(0, ChatColor.COLOR_CHAR);
-        result.insert(2, ChatColor.COLOR_CHAR);
+        if(number > 0xf) result.insert(2, ChatColor.COLOR_CHAR);
 
         return result.toString();
     }
