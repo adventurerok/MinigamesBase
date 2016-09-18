@@ -28,6 +28,7 @@ import com.ithinkrok.minigames.api.util.EntityUtils;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
 import com.ithinkrok.minigames.api.util.NamedSounds;
 import com.ithinkrok.msm.bukkit.MSMPlugin;
+import com.ithinkrok.msm.bukkit.protocol.ClientAPIProtocol;
 import com.ithinkrok.util.command.CommandUtils;
 import com.ithinkrok.util.config.Config;
 import org.bukkit.Bukkit;
@@ -103,7 +104,15 @@ public class GameBukkitListener implements Listener {
 
         //Schedule a server restart due to this
         //Allow 1 player online when restarting as at least 1 player is not in a gamegroup
-        MSMPlugin.getApiProtocol().scheduleRestart(10, 1);
+        ClientAPIProtocol apiProtocol = MSMPlugin.getApiProtocol();
+        if (apiProtocol.isRestartScheduled()) return;
+
+        apiProtocol.scheduleRestart(10, 1);
+
+        Bukkit.broadcastMessage("Server restart scheduled due to a NOT-IN-GAMEGROUP error");
+        Bukkit.broadcastMessage("The server will restart if 1 or less players are online");
+        Bukkit.broadcastMessage(
+                "If you believe you are glitched please move to another server in the network or disconnect");
     }
 
     @EventHandler
