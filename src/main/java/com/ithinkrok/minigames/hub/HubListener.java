@@ -130,6 +130,11 @@ public class HubListener extends SignListener {
             HubScoreboardHandler scoreboardHandler = new HubScoreboardHandler(scoreboardConfig);
 
             event.getUser().setScoreboardHandler(scoreboardHandler);
+
+            //Update the scoreboard once per second
+            event.getUser().repeatInFuture(task -> {
+                event.getUser().updateScoreboard();
+            }, 20, 20);
         }
     }
 
