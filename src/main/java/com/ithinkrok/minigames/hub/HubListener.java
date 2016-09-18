@@ -8,6 +8,7 @@ import com.ithinkrok.minigames.api.event.user.state.UserDamagedEvent;
 import com.ithinkrok.minigames.api.event.user.state.UserDeathEvent;
 import com.ithinkrok.minigames.api.event.user.state.UserFoodLevelChangeEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserDropItemEvent;
+import com.ithinkrok.minigames.api.event.user.world.UserPickupItemEvent;
 import com.ithinkrok.minigames.api.sign.InfoSigns;
 import com.ithinkrok.minigames.api.task.GameRunnable;
 import com.ithinkrok.minigames.api.task.GameTask;
@@ -163,6 +164,11 @@ public class HubListener extends SignListener {
 
     @CustomEventHandler
     public void onUserDropItem(UserDropItemEvent event) {
+        event.setCancelled(true);
+    }
+
+    @CustomEventHandler
+    public void onUserPickupItem(UserPickupItemEvent event) {
         event.setCancelled(true);
     }
 }
