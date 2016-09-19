@@ -2,6 +2,7 @@ package com.ithinkrok.minigames.hub;
 
 import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.event.ListenerLoadedEvent;
+import com.ithinkrok.minigames.api.event.controller.ControllerSpawnGameGroupEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserJoinEvent;
 import com.ithinkrok.minigames.api.event.user.state.UserAttackedEvent;
 import com.ithinkrok.minigames.api.event.user.state.UserDamagedEvent;
@@ -63,6 +64,8 @@ public class HubListener extends SignListener {
     private String welcomeTitleLocale;
     private String welcomeSubtitleLocale;
 
+    private String lobbyCreatedLocale;
+
     private Config scoreboardConfig;
 
     @CustomEventHandler
@@ -103,6 +106,8 @@ public class HubListener extends SignListener {
         }
 
         scoreboardConfig = config.getConfigOrNull("scoreboard");
+
+        lobbyCreatedLocale = config.getString("lobby_created_locale");
     }
 
     @CustomEventHandler
@@ -190,5 +195,13 @@ public class HubListener extends SignListener {
     @CustomEventHandler
     public void onUserPickupItem(UserPickupItemEvent event) {
         event.setCancelled(true);
+    }
+
+    @CustomEventHandler
+    public void onGameGroupCreated(ControllerSpawnGameGroupEvent event) {
+        String type = event.getControllerGameGroup().getType();
+        if(type.equals("hub")) return;
+
+        event.getGameGroup().sendLocale(lobbyCreatedLocale, type);
     }
 }

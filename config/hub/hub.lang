@@ -17,3 +17,5 @@ scoreboard.players_online=&6&lOnline\:
 scoreboard.players_on_hub=&6&lOn Hub\:
 scoreboard.lobby_info=&6&lIn Lobbies\:
 scoreboard.games_info=&6&lIn Games\:
+
+hub.lobby_created=&6A new &c%s &6lobby was created\!
