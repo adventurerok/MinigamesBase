@@ -142,13 +142,9 @@ public class HubListener extends SignListener {
         }
     }
 
-    @CustomEventHandler
-    public void onUserDeath(UserDeathEvent event) {
-        event.setCancelled(false);
-    }
 
 
-    @CustomEventHandler
+    @CustomEventHandler(ignoreCancelled = true)
     public void onUserAttackedByUser(UserAttackedEvent event) {
         if(!event.wasAttackedByUser()) return;
 
