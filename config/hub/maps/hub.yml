@@ -3,3 +3,45 @@ description: "The hub"
 environment: normal
 enable_weather: false
 type: saved
+
+listeners:
+  spleef:
+    class: "com.ithinkrok.minigames.util.lobbygames.SpleefMinigame"
+    config:
+      arenas:
+        arena1:
+          queue_buttons:
+            - x: 334
+              y: 125
+              z: -378
+            - x: 325
+              y: 125
+              z: -387
+            - x: 316
+              y: 125
+              z: -378
+            - x: 325
+              y: 125
+              z: -369
+          spawn_locations:
+            - x: 331.5
+              y: 125.1
+              z: -371.5
+            - x: 319.5
+              y: 125.1
+              z: -383.5
+          exit_location:
+            x: 335.5
+            y: 125.1
+            z: -367.5
+          snow:
+            min:
+              x: 318
+              y: 124
+              z: -385
+            max:
+              x: 332
+              y: 124
+              z: -371
+          extra_radius: 3
+      spade: "IRON_SPADE"
