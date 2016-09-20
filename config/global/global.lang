@@ -110,3 +110,16 @@ spectate_chooser.title=Spectate Chooser
 
 #Map credits starter
 start.map_credits=&6Map credits:
+
+#Lobby Minigames
+spleef.queue.remove=&cYou were removed from another spleef queue!
+spleef.queue.join=&aYou have joined this spleef queue!
+spleef.queue.already_joined=&cYou are already in this spleef queue!
+spleef.queue.need_more=&a%s &eplayers in spleef queue! Need &c%s more to start!
+spleef.winner=%s &6has won a game of spleef!
+spleef.loser=%s &6was eliminated from a spleef game!
+spleef.begin=&6A new spleef game has started!
+
+wool_head.initial=&3%s &dwas given the wool!
+wool_head.transfer=&3%s &dtransferred the wool to &3%s!
+wool_head.given=&dYou now have the wool. Right click someone to transfer it to them!
