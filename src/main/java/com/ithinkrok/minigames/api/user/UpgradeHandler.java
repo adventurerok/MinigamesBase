@@ -1,8 +1,8 @@
 package com.ithinkrok.minigames.api.user;
 
 import com.ithinkrok.minigames.api.event.user.game.UserUpgradeEvent;
-import com.ithinkrok.minigames.api.util.math.ExpressionCalculator;
-import com.ithinkrok.minigames.api.util.math.Variables;
+import com.ithinkrok.util.math.ExpressionCalculator;
+import com.ithinkrok.util.math.Variables;
 
 import java.util.HashMap;
 import java.util.Map;
