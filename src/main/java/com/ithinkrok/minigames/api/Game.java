@@ -2,6 +2,7 @@ package com.ithinkrok.minigames.api;
 
 import com.ithinkrok.minigames.api.database.DatabaseTaskRunner;
 import com.ithinkrok.minigames.api.protocol.ClientMinigamesProtocol;
+import com.ithinkrok.minigames.api.task.GameTask;
 import com.ithinkrok.minigames.api.task.TaskScheduler;
 import com.ithinkrok.minigames.api.team.Team;
 import com.ithinkrok.minigames.api.user.User;
@@ -73,4 +74,9 @@ public interface Game extends TaskScheduler, DatabaseTaskRunner, Nameable {
     void preJoinGameGroup(UUID playerUUID, String type, String name, List<String> params);
 
     BaseUser getUser(Entity entity);
+
+    /**
+     * Check if the server should restart due to low resources
+     */
+    void checkResourcesRestart();
 }

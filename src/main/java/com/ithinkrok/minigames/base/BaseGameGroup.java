@@ -601,7 +601,6 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
             cancelAllTasks();
             unload();
         });
-
     }
 
     @Override

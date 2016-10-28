@@ -27,6 +27,8 @@ import com.ithinkrok.minigames.base.util.InvisiblePlayerAttacker;
 import com.ithinkrok.minigames.base.util.disguise.LDDisguiseController;
 import com.ithinkrok.minigames.base.util.disguise.MinigamesDisguiseController;
 import com.ithinkrok.minigames.base.util.io.FileLoader;
+import com.ithinkrok.msm.bukkit.MSMPlugin;
+import com.ithinkrok.msm.bukkit.protocol.ClientAPIProtocol;
 import com.ithinkrok.msm.bukkit.util.BukkitConfig;
 import com.ithinkrok.msm.client.Client;
 import com.ithinkrok.msm.client.ClientListener;
@@ -108,7 +110,7 @@ public class BaseGame implements Game, FileLoader {
 
         fallbackConfig = config.getString("fallback_gamegroup");
 
-        if(config.contains("directories.resource")) {
+        if (config.contains("directories.resource")) {
             resourceDirectory = Paths.get(config.getString("directories.resource"));
 
             configDirectory = resourceDirectory.resolve("config");
@@ -397,6 +399,26 @@ public class BaseGame implements Game, FileLoader {
     }
 
     @Override
+    public void checkResourcesRestart() {
+        if (!Bukkit.getOnlinePlayers().isEmpty()) return;
+
+        //Garbage collect first
+        System.gc();
+
+
+        long allocatedMemory = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
+        long actualFreeMemory = Runtime.getRuntime().maxMemory() - allocatedMemory;
+
+        long freeMemoryMB = actualFreeMemory / (1024 * 1024);
+
+        //400+ MB is a good amount apparently. This should really be put in a config
+        if(freeMemoryMB > 400) return;
+
+        ClientAPIProtocol apiProtocol = MSMPlugin.getApiProtocol();
+        apiProtocol.scheduleRestart(1, 0);
+    }
+
+    @Override
     public GameTask doInFuture(GameRunnable task) {
         return doInFuture(task, 1);
     }
@@ -556,7 +578,7 @@ public class BaseGame implements Game, FileLoader {
 
         @Override
         public void onPacketSending(PacketEvent event) {
-            if(event.getPacketType() != PacketType.Play.Server.TAB_COMPLETE) return;
+            if (event.getPacketType() != PacketType.Play.Server.TAB_COMPLETE) return;
 
             WrapperPlayServerTabComplete packet = new WrapperPlayServerTabComplete(event.getPacket());
 

@@ -96,6 +96,8 @@ public class GameBukkitListener implements Listener {
 
         UserQuitEvent userEvent = new UserQuitEvent(user, UserQuitEvent.QuitReason.QUIT_SERVER);
         user.getGameGroup().userEvent(userEvent);
+
+        game.doInFuture(task -> game.checkResourcesRestart());
     }
 
     private void notInGameGroupError(Entity player) {
