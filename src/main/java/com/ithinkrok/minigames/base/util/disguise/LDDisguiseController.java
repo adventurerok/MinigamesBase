@@ -22,11 +22,16 @@ public class LDDisguiseController implements DisguiseController {
         } else if (disguiseType.isMob()) {
             libsDisguise = new MobDisguise(disguiseType);
 
-            if(disguise.isShowUserNameAboveEntity()) {
+            if (disguise.isShowUserNameAboveEntity()) {
                 libsDisguise.getWatcher().setCustomName(user.getName());
             }
         } else if (disguiseType.isMisc()) {
-            libsDisguise = new MiscDisguise(disguiseType);
+            if (disguise.getBlockMaterial() == null) {
+                libsDisguise = new MiscDisguise(disguiseType);
+            } else {
+                libsDisguise =
+                        new MiscDisguise(disguiseType, disguise.getBlockMaterial().getId(), disguise.getBlockData());
+            }
         } else throw new RuntimeException("Unsupported disguise: " + disguiseType);
 
         libsDisguise.setViewSelfDisguise(disguise.isViewSelfDisguise());

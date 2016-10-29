@@ -1,5 +1,6 @@
 package com.ithinkrok.minigames.api.util.disguise;
 
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
 /**
@@ -18,6 +19,9 @@ public class Disguise {
 
     private boolean showUserNameAboveEntity = false;
     private boolean showName = false;
+
+    private Material blockMaterial = null;
+    private int blockData = 0;
 
     public Disguise(EntityType entityType) {
         this.entityType = entityType;
@@ -95,5 +99,18 @@ public class Disguise {
 
     public void setReplaceSounds(boolean replaceSounds) {
         this.replaceSounds = replaceSounds;
+    }
+
+    public void setBlockInfo(Material blockMaterial, int blockData) {
+        this.blockMaterial = blockMaterial;
+        this.blockData = blockData;
+    }
+
+    public Material getBlockMaterial() {
+        return blockMaterial;
+    }
+
+    public int getBlockData() {
+        return blockData;
     }
 }
