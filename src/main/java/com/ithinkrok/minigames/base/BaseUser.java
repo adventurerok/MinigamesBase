@@ -1151,6 +1151,11 @@ public class BaseUser implements Listener, User {
     }
 
     @Override
+    public Disguise getDisguise() {
+        return disguise;
+    }
+
+    @Override
     public boolean hasMetadata(Class<? extends UserMetadata> clazz) {
         return metadataMap.containsKey(clazz);
     }

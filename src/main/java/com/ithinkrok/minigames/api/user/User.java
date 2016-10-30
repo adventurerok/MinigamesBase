@@ -71,6 +71,8 @@ public interface User
 
     void disguise(Disguise disguise);
 
+    Disguise getDisguise();
+
     void unDisguise();
 
     void setAllowFlight(boolean allowFlight);
