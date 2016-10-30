@@ -41,7 +41,7 @@ public class LDDisguiseController implements DisguiseController {
         libsDisguise.setShowName(disguise.isShowName());
 
 
-        DisguiseAPI.disguiseEntity(user.getEntity(), libsDisguise);
+        DisguiseAPI.disguiseToAll(user.getEntity(), libsDisguise);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class LDDisguiseController implements DisguiseController {
 
         Disguise disguise = disguiseType.isMob() ? new MobDisguise(disguiseType) : new MiscDisguise(disguiseType);
 
-        DisguiseAPI.disguiseEntity(user.getEntity(), disguise);
+        DisguiseAPI.disguiseToAll(user.getEntity(), disguise);
     }
 
     @Override
