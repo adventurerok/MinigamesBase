@@ -99,6 +99,8 @@ public class SimpleGameStartListener implements CustomListener {
             user.setKit(assignUserKit(user.getGameGroup()));
         }
 
+        System.out.println("User " + user.getName() + " playing on " + user.getTeamName() + " team as " + user.getKitName());
+
         if(teamInfoLocale != null && user.getTeam() != null) {
             user.sendLocale(teamInfoLocale, user.getTeamIdentifier().getFormattedName());
         }
