@@ -15,14 +15,37 @@ public class UpgradeHandler implements Variables {
     private final User user;
     private final Map<String, Integer> upgradeLevels = new HashMap<>();
 
+    private final Map<String, Variables> customLookupHandlers = new HashMap<>();
+
     public UpgradeHandler(User user) {
         this.user = user;
     }
 
     public int getUpgradeLevel(String upgrade) {
+        if(upgrade.startsWith("@")) {
+            int hashTagIndex = upgrade.indexOf('#');
+
+            if(hashTagIndex > 1 && hashTagIndex < upgrade.length() - 1) {
+                String handlerName = upgrade.substring(1, hashTagIndex);
+                String varName = upgrade.substring(hashTagIndex + 1);
+
+                if(customLookupHandlers.containsKey(handlerName)) {
+                     return (int) customLookupHandlers.get(handlerName).getVariable(varName);
+                } else return 0;
+            }
+        }
+
         Integer level = upgradeLevels.get(upgrade);
 
         return level == null ? 0 : level;
+    }
+
+    public void addCustomLevelLookup(String name, Variables variables) {
+        customLookupHandlers.put(name, variables);
+    }
+
+    public void removeCustomLevelLookup(String name) {
+        customLookupHandlers.remove(name);
     }
 
     @SuppressWarnings("unchecked")
