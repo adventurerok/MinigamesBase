@@ -27,6 +27,8 @@ game_states:
             custom_items:
               - name: "super_popper"
                 slot: 0
+              - name: "pvp_sword"
+                slot: 1
               - name: "game_chooser"
                 slot: 4
               - name: "gamegroups_menu"
@@ -88,6 +90,19 @@ custom_items:
         class: "com.ithinkrok.minigames.hub.item.GameGroupsMenu"
         config:
           gamegroup_type: ""
+  pvp_sword:
+    material: "DIAMOND_SWORD"
+    display_name_locale: "pvp_sword.name"
+    description_locale: "pvp_sword.desc"
+    listeners:
+      pvp_sword:
+        class: "com.ithinkrok.minigames.hub.item.PvpSword"
+        config:
+          armor:
+            helmet: "DIAMOND_HELMET"
+            chestplate: "DIAMOND_CHESTPLATE"
+            leggings: "DIAMOND_LEGGINGS"
+            boots: "DIAMOND_BOOTS"
   super_popper:
     material: "BOW"
     display_name_locale: "super_popper.name"
