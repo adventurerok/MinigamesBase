@@ -41,6 +41,7 @@ game_states:
             power: 2.0
             victim_locale: "super_popper.victim"
             attacker_locale: "super_popper.attacker"
+            pvp_locale: "super_popper.pvp"
             victim_sound: "ENTITY_FIREWORK_LARGE_BLAST"
             attacker_sound: "ENTITY_ARROW_HIT"
           pvp_sword:

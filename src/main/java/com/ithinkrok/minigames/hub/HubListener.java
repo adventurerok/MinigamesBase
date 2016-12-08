@@ -60,6 +60,7 @@ public class HubListener extends SignListener {
     private double superPopperPower;
     private String superPopperVictimLocale;
     private String superPopperAttackerLocale;
+    private String superPopperPvpLocale;
 
     private SoundEffect superPopperVictimSound;
     private SoundEffect superPopperAttackerSound;
@@ -101,6 +102,7 @@ public class HubListener extends SignListener {
 
             superPopperVictimLocale = superPopperConfig.getString("victim_locale");
             superPopperAttackerLocale = superPopperConfig.getString("attacker_locale");
+            superPopperPvpLocale = superPopperConfig.getString("pvp_locale");
 
             superPopperVictimSound = MinigamesConfigs.getSoundEffect(superPopperConfig, "victim_sound");
             superPopperAttackerSound = MinigamesConfigs.getSoundEffect(superPopperConfig, "attacker_sound");
@@ -168,6 +170,16 @@ public class HubListener extends SignListener {
         if(!event.wasAttackedByUser()) return;
 
         if(event.getDamageCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
+
+            //Prevent pvp users from being affected by the super popper
+            int userHeldId = InventoryUtils.getIdentifier(event.getUser().getInventory().getItemInHand());
+            CustomItem item = event.getUserGameGroup().getCustomItem(userHeldId);
+
+            if(item != null && item.getName().equals(pvpSwordItem)) {
+                event.getAttackerUser().sendLocale(superPopperPvpLocale);
+                return;
+            }
+
             Vector velocity = event.getUser().getLocation().getDirection();
             velocity.setY(0.5f);
             velocity.multiply(superPopperPower);
