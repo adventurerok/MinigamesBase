@@ -10,9 +10,12 @@ import com.ithinkrok.minigames.api.event.user.state.UserDeathEvent;
 import com.ithinkrok.minigames.api.event.user.state.UserFoodLevelChangeEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserDropItemEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserPickupItemEvent;
+import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.sign.InfoSigns;
 import com.ithinkrok.minigames.api.task.GameRunnable;
 import com.ithinkrok.minigames.api.task.GameTask;
+import com.ithinkrok.minigames.api.user.User;
+import com.ithinkrok.minigames.api.util.InventoryUtils;
 import com.ithinkrok.minigames.api.util.MinigamesConfigs;
 import com.ithinkrok.minigames.api.util.SoundEffect;
 import com.ithinkrok.minigames.hub.data.JumpPad;
@@ -68,6 +71,9 @@ public class HubListener extends SignListener {
 
     private Config scoreboardConfig;
 
+    private String pvpSwordItem = "";
+    private String pvpWinLocale;
+
     @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent<GameGroup, ?> event) {
         super.onListenerLoaded(event);
@@ -98,6 +104,14 @@ public class HubListener extends SignListener {
 
             superPopperVictimSound = MinigamesConfigs.getSoundEffect(superPopperConfig, "victim_sound");
             superPopperAttackerSound = MinigamesConfigs.getSoundEffect(superPopperConfig, "attacker_sound");
+        }
+
+        if(config.contains("pvp_sword")) {
+            Config pvpSwordConfig = config.getConfigOrEmpty("pvp_sword");
+
+            pvpSwordItem = pvpSwordConfig.getString("custom_item", "pvp_sword");
+
+            pvpWinLocale = pvpSwordConfig.getString("win_locale", "pvp_sword.pvp_win");
         }
 
         if(config.contains("welcome")) {
@@ -172,12 +186,44 @@ public class HubListener extends SignListener {
             }
 
             event.setCancelled(true);
+        } else if(event.getDamageCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+
+            //Prevent users attacking other users if they are not using the pvp sword
+            int attackerWeaponId = InventoryUtils.getIdentifier(event.getWeapon());
+
+            CustomItem item = event.getUserGameGroup().getCustomItem(attackerWeaponId);
+            if(item == null || !pvpSwordItem.equals(item.getName())) {
+                event.setCancelled(true);
+            }
         }
     }
 
     @CustomEventHandler(priority = CustomEventHandler.HIGH)
     public void onUserDamaged(UserDamagedEvent event) {
-        event.setCancelled(true);
+
+        //Only cancel damage if it is done while not in pvp
+        int userHeldId = InventoryUtils.getIdentifier(event.getUser().getInventory().getItemInHand());
+
+        CustomItem item = event.getUserGameGroup().getCustomItem(userHeldId);
+        if(item == null || !pvpSwordItem.equals(item.getName())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @CustomEventHandler
+    public void onUserDeath(UserDeathEvent event) {
+        User died = event.getUser();
+
+        //Unset pvp mode for the user
+        died.getInventory().setHeldItemSlot((died.getInventory().getHeldItemSlot() + 8) % 9);
+        died.clearArmor();
+        died.resetUserStats(true);
+
+        if(!event.hasKillerUser() && !event.hasAssistUser()) return;
+
+        User killer = event.hasKillerUser() ? event.getKillerUser() : event.getAssistUser();
+
+        event.getUserGameGroup().sendLocale(pvpWinLocale, killer.getFormattedName(), died.getFormattedName());
     }
 
     @CustomEventHandler

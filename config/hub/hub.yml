@@ -43,6 +43,8 @@ game_states:
             attacker_locale: "super_popper.attacker"
             victim_sound: "ENTITY_FIREWORK_LARGE_BLAST"
             attacker_sound: "ENTITY_ARROW_HIT"
+          pvp_sword:
+            custom_item: "pvp_sword"
           welcome:
             title_locale: "welcome.title"
             subtitle_locale: "welcome.subtitle"
