@@ -6,12 +6,8 @@
 
  - DIDN'T COPY NEW FOLDERS CORRECTLY FOR MINIGAMES RESOURCES
 
-== New Idea ==
-Minigames Plugin:
- - Does everything
-
-Minigames controller:
- - Keeps track of which servers are running which minigames, and commands them
- - Provides stats for all minigames (num players, etc...)
- - Manipulates bungee servers
- - Records minigame errors
+== New Ideas ==
+ - PVP in hub (with hiscores)
+ - Item to show all games in progress and lobbies
+ - Item to join other players / friends
+ - Parkour (timed 1/2 player minigame first, then hub)
