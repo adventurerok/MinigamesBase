@@ -7,7 +7,10 @@
  - DIDN'T COPY NEW FOLDERS CORRECTLY FOR MINIGAMES RESOURCES
 
 == New Ideas ==
- - PVP in hub (with hiscores)
+ - PVP in hub
+    - Hiscores
+    - Sound/particle effects
  - Item to show all games in progress and lobbies
+    - Different icons for different types of games, with enchanted showing lobbies
  - Item to join other players / friends
  - Parkour (timed 1/2 player minigame first, then hub)

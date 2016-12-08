@@ -38,6 +38,12 @@ public class GameChooseInventory extends ClickableInventory {
         });
 
         for (GameGroupInfo gameGroup : orderedGGs) {
+
+            //Skip hubs unless we are specifically for them
+            if((gameGroupType == null || gameGroupType.isEmpty()) && "hub".equals(gameGroup.getType())) {
+                continue;
+            }
+
             Material mat = gameGroup.isAcceptingPlayers() ? Material.GOLD_BLOCK : Material.IRON_BLOCK;
 
             List<String> lore = new ArrayList<>();
