@@ -46,6 +46,8 @@ game_states:
             attacker_sound: "ENTITY_ARROW_HIT"
           pvp_sword:
             custom_item: "pvp_sword"
+            win_sound: "ENTITY_ZOMBIE_VILLAGER_CURE"
+            loss_sound: "ENTITY_IRONGOLEM_DEATH"
           welcome:
             title_locale: "welcome.title"
             subtitle_locale: "welcome.subtitle"
@@ -106,6 +108,8 @@ custom_items:
             chestplate: "DIAMOND_CHESTPLATE"
             leggings: "DIAMOND_LEGGINGS"
             boots: "DIAMOND_BOOTS"
+          start_sound: "ENTITY_BLAZE_HURT"
+          end_sound: "ENTITY_CHICKEN_HURT"
   super_popper:
     material: "BOW"
     display_name_locale: "super_popper.name"

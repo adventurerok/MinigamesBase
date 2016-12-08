@@ -36,32 +36,9 @@ public class NamedSounds {
     private static void load1_8Sounds() {
 
         NAMED_SOUNDS.put("AMBIENT_CAVE", Sound.valueOf("AMBIENCE_CAVE"));
-        NAMED_SOUNDS.put("WEATHER_RAIN", Sound.valueOf("AMBIENCE_RAIN"));
-        NAMED_SOUNDS.put("ENTITY_LIGHTNING_THUNDER", Sound.valueOf("AMBIENCE_THUNDER"));
 
         NAMED_SOUNDS.put("BLOCK_ANVIL_BREAK", Sound.valueOf("ANVIL_BREAK"));
         NAMED_SOUNDS.put("BLOCK_ANVIL_LAND", Sound.valueOf("ANVIL_LAND"));
-
-        NAMED_SOUNDS.put("ENTITY_GENERIC_EXPLODE", Sound.valueOf("EXPLODE"));
-
-        NAMED_SOUNDS.put("ENTITY_EXPERIENCE_ORB_PICKUP", Sound.valueOf("ORB_PICKUP"));
-
-        NAMED_SOUNDS.put("ENTITY_PLAYER_HURT", Sound.valueOf("HURT_FLESH"));
-        NAMED_SOUNDS.put("ENTITY_PLAYER_LEVELUP", Sound.valueOf("LEVEL_UP"));
-
-        NAMED_SOUNDS.put("ENTITY_ZOMBIE_VILLAGER_CURE", Sound.valueOf("ZOMBIE_UNFECT"));
-
-        NAMED_SOUNDS.put("ENTITY_BLAZE_HURT", Sound.valueOf("BLAZE_HIT"));
-
-        NAMED_SOUNDS.put("ENTITY_ARROW_HIT", Sound.valueOf("SUCCESSFUL_HIT"));
-        NAMED_SOUNDS.put("ENTITY_ARROW_SHOOT", Sound.valueOf("SHOOT_ARROW"));
-
-        NAMED_SOUNDS.put("ENTITY_WITHER_SPAWN", Sound.valueOf("WITHER_SPAWN"));
-        NAMED_SOUNDS.put("ENTITY_WITHER_SHOOT", Sound.valueOf("WITHER_SHOOT"));
-
-        NAMED_SOUNDS.put("ENTITY_FIREWORK_BLAST", Sound.valueOf("FIREWORK_BLAST"));
-        NAMED_SOUNDS.put("ENTITY_FIREWORK_LARGE_BLAST", Sound.valueOf("FIREWORK_LARGE_BLAST"));
-        NAMED_SOUNDS.put("ENTITY_FIREWORK_TWINKLE", Sound.valueOf("FIREWORK_TWINKLE"));
 
         NAMED_SOUNDS.put("BLOCK_NOTE_BASEDRUM", Sound.valueOf("NOTE_BASS_DRUM"));
         NAMED_SOUNDS.put("BLOCK_NOTE_BASS", Sound.valueOf("NOTE_BASS"));
@@ -69,6 +46,35 @@ public class NamedSounds {
         NAMED_SOUNDS.put("BLOCK_NOTE_HAT", Sound.valueOf("NOTE_STICKS"));
         NAMED_SOUNDS.put("BLOCK_NOTE_PLING", Sound.valueOf("NOTE_PLING"));
         NAMED_SOUNDS.put("BLOCK_NOTE_SNARE", Sound.valueOf("NOTE_SNARE_DRUM"));
+
+        NAMED_SOUNDS.put("ENTITY_ARROW_HIT", Sound.valueOf("SUCCESSFUL_HIT"));
+        NAMED_SOUNDS.put("ENTITY_ARROW_SHOOT", Sound.valueOf("SHOOT_ARROW"));
+
+        NAMED_SOUNDS.put("ENTITY_BLAZE_HURT", Sound.valueOf("BLAZE_HIT"));
+
+        NAMED_SOUNDS.put("ENTITY_CHICKEN_HURT", Sound.valueOf("CHICKEN_HURT"));
+
+        NAMED_SOUNDS.put("ENTITY_EXPERIENCE_ORB_PICKUP", Sound.valueOf("ORB_PICKUP"));
+
+        NAMED_SOUNDS.put("ENTITY_FIREWORK_BLAST", Sound.valueOf("FIREWORK_BLAST"));
+        NAMED_SOUNDS.put("ENTITY_FIREWORK_LARGE_BLAST", Sound.valueOf("FIREWORK_LARGE_BLAST"));
+        NAMED_SOUNDS.put("ENTITY_FIREWORK_TWINKLE", Sound.valueOf("FIREWORK_TWINKLE"));
+
+        NAMED_SOUNDS.put("ENTITY_GENERIC_EXPLODE", Sound.valueOf("EXPLODE"));
+
+        NAMED_SOUNDS.put("ENTITY_IRONGOLEM_DEATH", Sound.valueOf("IRONGOLEM_DEATH"));
+
+        NAMED_SOUNDS.put("ENTITY_LIGHTNING_THUNDER", Sound.valueOf("AMBIENCE_THUNDER"));
+
+        NAMED_SOUNDS.put("ENTITY_PLAYER_HURT", Sound.valueOf("HURT_FLESH"));
+        NAMED_SOUNDS.put("ENTITY_PLAYER_LEVELUP", Sound.valueOf("LEVEL_UP"));
+
+        NAMED_SOUNDS.put("ENTITY_WITHER_SPAWN", Sound.valueOf("WITHER_SPAWN"));
+        NAMED_SOUNDS.put("ENTITY_WITHER_SHOOT", Sound.valueOf("WITHER_SHOOT"));
+
+        NAMED_SOUNDS.put("ENTITY_ZOMBIE_VILLAGER_CURE", Sound.valueOf("ZOMBIE_UNFECT"));
+
+        NAMED_SOUNDS.put("WEATHER_RAIN", Sound.valueOf("AMBIENCE_RAIN"));
     }
 
     public static Sound fromName(String name) {

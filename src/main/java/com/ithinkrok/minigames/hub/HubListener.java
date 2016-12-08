@@ -75,6 +75,8 @@ public class HubListener extends SignListener {
     private String pvpSwordItem = "";
     private String pvpWinLocale;
 
+    private SoundEffect pvpWinSound, pvpLossSound;
+
     @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent<GameGroup, ?> event) {
         super.onListenerLoaded(event);
@@ -114,6 +116,9 @@ public class HubListener extends SignListener {
             pvpSwordItem = pvpSwordConfig.getString("custom_item", "pvp_sword");
 
             pvpWinLocale = pvpSwordConfig.getString("win_locale", "pvp_sword.pvp_win");
+
+            pvpWinSound = MinigamesConfigs.getSoundEffect(pvpSwordConfig, "win_sound");
+            pvpLossSound = MinigamesConfigs.getSoundEffect(pvpSwordConfig, "loss_sound");
         }
 
         if(config.contains("welcome")) {
@@ -231,9 +236,17 @@ public class HubListener extends SignListener {
         died.clearArmor();
         died.resetUserStats(true);
 
+        if(pvpLossSound != null) {
+            died.playSound(died.getLocation(), pvpLossSound);
+        }
+
         if(!event.hasKillerUser() && !event.hasAssistUser()) return;
 
         User killer = event.hasKillerUser() ? event.getKillerUser() : event.getAssistUser();
+
+        if(pvpWinSound != null) {
+            killer.playSound(killer.getLocation(), pvpWinSound);
+        }
 
         event.getUserGameGroup().sendLocale(pvpWinLocale, killer.getFormattedName(), died.getFormattedName());
     }

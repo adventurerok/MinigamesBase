@@ -6,6 +6,7 @@ import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
 import com.ithinkrok.minigames.api.util.MinigamesConfigs;
+import com.ithinkrok.minigames.api.util.SoundEffect;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
@@ -24,6 +25,8 @@ public class PvpSword implements CustomListener {
 
     private String pvpStartLocale, pvpEndLocale;
 
+    private SoundEffect startSound, endSound;
+
     @CustomEventHandler
     public void onListenerLoadedEvent(ListenerLoadedEvent<?, CustomItem> event) {
         customItemId = event.getRepresenting().getIdentifier();
@@ -37,6 +40,9 @@ public class PvpSword implements CustomListener {
 
         pvpStartLocale = config.getString("pvp_start_locale", "pvp_sword.pvp_start");
         pvpEndLocale = config.getString("pvp_end_locale", "pvp_sword.pvp_end");
+
+        startSound = MinigamesConfigs.getSoundEffect(config, "start_sound");
+        endSound = MinigamesConfigs.getSoundEffect(config, "end_sound");
     }
 
     @CustomEventHandler
@@ -51,6 +57,10 @@ public class PvpSword implements CustomListener {
             user.clearArmor();
 
             user.sendLocale(pvpEndLocale);
+
+            if(endSound != null) {
+                user.playSound(user.getLocation(), endSound);
+            }
         } else if(InventoryUtils.getIdentifier(event.getNewHeldItem()) == customItemId) {
             //Give the user diamond armor
 
@@ -62,6 +72,10 @@ public class PvpSword implements CustomListener {
             user.resetUserStats(true);
 
             user.sendLocale(pvpStartLocale);
+
+            if(startSound != null) {
+                user.playSound(user.getLocation(), startSound);
+            }
         }
     }
 }
