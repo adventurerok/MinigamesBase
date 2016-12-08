@@ -19,6 +19,10 @@ public abstract class ClickableItem implements Identifiable {
 
     private final int slot;
 
+    public ClickableItem(ItemStack baseDisplay) {
+        this(baseDisplay, -1);
+    }
+
     public ClickableItem(ItemStack baseDisplay, int slot) {
         this.slot = slot;
         if(baseDisplay != null) this.baseDisplay = InventoryUtils.addIdentifier(baseDisplay.clone(), identifier);

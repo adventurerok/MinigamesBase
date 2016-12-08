@@ -9,6 +9,7 @@ import com.ithinkrok.minigames.api.protocol.data.GameGroupInfo;
 import com.ithinkrok.minigames.api.sign.SignController;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
+import com.ithinkrok.minigames.hub.inventory.GameChooseInventory;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;
 import org.apache.commons.lang.WordUtils;
@@ -22,8 +23,6 @@ import java.util.*;
  * Created by paul on 20/02/16.
  */
 public class GameChooseSign extends HubSign {
-
-    private final String runtimeID = UUID.randomUUID().toString();
 
     private final String[] existsFormat;
     private final String[] notExistsFormat;
@@ -76,8 +75,8 @@ public class GameChooseSign extends HubSign {
         }
 
         for (User user : gameGroup.getUsers()) {
-            if (user.getClickableInventory() == null || !user.getClickableInventory().getIdentifier().equals(runtimeID))
-                continue;
+            if (user.getClickableInventory() == null ||
+                    !user.getClickableInventory().getIdentifier().equals(GameChooseInventory.ID)) continue;
 
             updateInventory(user);
         }
@@ -91,54 +90,7 @@ public class GameChooseSign extends HubSign {
     private void updateInventory(final User user) {
         String title = WordUtils.capitalizeFully(gameGroupType.replace('_', ' ')) + " Games";
 
-        ClickableInventory inventory = new ClickableInventory(title, runtimeID);
-
-        Collection<GameGroupInfo> allCollection =
-                user.getGameGroup().getControllerInfo().getGameGroups(gameGroupType, gameGroupParams);
-
-        List<GameGroupInfo> all = new ArrayList<>(allCollection);
-
-        Collections.sort(all, (o1, o2) -> {
-            if (o1.isAcceptingPlayers() && !o2.isAcceptingPlayers()) return 1;
-            else if (o2.isAcceptingPlayers() && !o1.isAcceptingPlayers()) return -1;
-            return o1.getName().compareTo(o2.getName());
-        });
-
-        for (GameGroupInfo gameGroup : all) {
-            Material mat = gameGroup.isAcceptingPlayers() ? Material.GOLD_BLOCK : Material.IRON_BLOCK;
-
-            List<String> lore = new ArrayList<>();
-
-            if (gameGroup.isAcceptingPlayers()) {
-                lore.add(ChatColor.GREEN + "Join Lobby");
-            } else {
-                lore.add(ChatColor.RED + "Spectate Game");
-            }
-
-            lore.add(ChatColor.WHITE + gameGroup.getMotd());
-
-            lore.add(ChatColor.RED + "Type: " + ChatColor.GRAY + gameGroupType);
-            lore.add(ChatColor.RED + "Players: " + ChatColor.DARK_GRAY + "[" + ChatColor.GRAY +
-                    gameGroup.getPlayerCount() + ChatColor.DARK_GRAY + "/" + ChatColor.GRAY +
-                    gameGroup.getMaxPlayerCount() + ChatColor.DARK_GRAY +
-                    "]");
-
-            ItemStack item = InventoryUtils
-                    .createItemWithNameAndLore(mat, 1, 0, gameGroup.getName(), lore.toArray(new String[lore.size()]));
-
-            ClickableItem clickableItem = new ClickableItem(item, updateFrequency) {
-                @Override
-                public void onClick(UserClickItemEvent event) {
-                    user.sendMessage("Sending you to gamegroup: " + gameGroup.getName());
-
-                    user.getGameGroup().getRequestProtocol()
-                            .sendJoinGameGroupPacket(user.getUuid(), gameGroup.getType(), gameGroup.getName(),
-                                    gameGroup.getParams());
-                }
-            };
-
-            inventory.addItem(clickableItem);
-        }
+        ClickableInventory inventory = new GameChooseInventory(title, user, gameGroupType, gameGroupParams);
 
         user.showInventory(inventory, location);
     }

@@ -62,7 +62,7 @@ public class ControllerInfo {
         Collection<GameGroupInfo> result = new HashSet<>();
 
         for(GameGroupInfo gameGroupInfo : gameGroupInfoMap.values()) {
-            if(type != null) {
+            if(type != null && !type.isEmpty()) {
                 if (!gameGroupInfo.getType().equals(type)) continue;
                 if(!params.isEmpty() && !params.equals(gameGroupInfo.getParams())) continue;
             }
