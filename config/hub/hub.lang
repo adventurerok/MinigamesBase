@@ -5,6 +5,10 @@ game_chooser.transfer=&6Sending you to game type &c%s
 game_chooser.direct_join.enable=&aDirect join enabled!
 game_chooser.direct_join.disable=&cDirect join disabled!
 
+gamegroups_menu.name=&b&lCurrent &7Games
+gamegroups_menu.desc=&aSee games in progress and lobbies!
+gamegroups_menu.title=Current Games
+
 super_popper.name=&b&lSuper &7Popper
 super_popper.victim=&aYou have been popped by &c%s
 super_popper.attacker=&aYou have popped &c%s

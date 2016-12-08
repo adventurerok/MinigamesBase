@@ -29,6 +29,8 @@ game_states:
                 slot: 0
               - name: "game_chooser"
                 slot: 4
+              - name: "gamegroups_menu"
+                slot: 5
           jump_pads:
             - material: "GOLD_PLATE"
               power: 2.5
@@ -76,6 +78,16 @@ custom_items:
               teleport: "345.5,141,-315.5,0,0"
           direct_join_enabled_item: "DIAMOND_BLOCK,1,0,&c&lDisable Direct Join"
           direct_join_disabled_item: "COAL_BLOCK,1,0,&a&lEnable Direct Join"
+  gamegroups_menu:
+    material: "WATCH"
+    display_name_locale: "gamegroups_menu.name"
+    description_locale: "gamegroups_menu.desc"
+    listeners:
+      gamegroups_menu:
+        events: ["rightClick"]
+        class: "com.ithinkrok.minigames.hub.item.GameGroupsMenu"
+        config:
+          gamegroup_type: ""
   super_popper:
     material: "BOW"
     display_name_locale: "super_popper.name"
