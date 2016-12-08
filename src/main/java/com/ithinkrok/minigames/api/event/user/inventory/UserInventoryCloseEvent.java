@@ -3,7 +3,6 @@ package com.ithinkrok.minigames.api.event.user.inventory;
 import com.ithinkrok.minigames.api.user.User;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryView;
 
 /**
  * Created by paul on 02/01/16.
@@ -22,8 +21,4 @@ public class UserInventoryCloseEvent extends UserInventoryEvent {
         return event.getInventory();
     }
 
-    @Override
-    public InventoryView getInventoryView() {
-        return event.getView();
-    }
 }

@@ -16,5 +16,4 @@ public abstract class UserInventoryEvent extends UserEvent {
     }
 
     public abstract Inventory getInventory();
-    public abstract InventoryView getInventoryView();
 }

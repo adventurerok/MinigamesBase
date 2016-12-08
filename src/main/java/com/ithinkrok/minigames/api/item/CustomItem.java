@@ -2,6 +2,7 @@ package com.ithinkrok.minigames.api.item;
 
 import com.ithinkrok.minigames.api.Nameable;
 import com.ithinkrok.minigames.api.event.user.game.UserAbilityCooldownEvent;
+import com.ithinkrok.minigames.api.event.user.inventory.UserItemHeldEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserAttackEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.api.item.event.CustomItemLoreCalculateEvent;
@@ -131,6 +132,11 @@ public class CustomItem implements Identifiable, CustomListener, Nameable {
 
         CustomEventExecutor.executeEvent(event, timeoutActions);
         startRightClickCooldown(event.getUser());
+    }
+
+    @CustomEventHandler
+    public void onUserChangeItemHeld(UserItemHeldEvent event) {
+        CustomEventExecutor.executeEvent(event, allListeners);
     }
 
     @CustomEventHandler

@@ -12,6 +12,7 @@ import com.ithinkrok.minigames.api.event.user.game.UserCommandEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserQuitEvent;
 import com.ithinkrok.minigames.api.event.user.inventory.UserInventoryClickEvent;
 import com.ithinkrok.minigames.api.event.user.inventory.UserInventoryCloseEvent;
+import com.ithinkrok.minigames.api.event.user.inventory.UserItemHeldEvent;
 import com.ithinkrok.minigames.api.event.user.state.UserAttackedEvent;
 import com.ithinkrok.minigames.api.event.user.state.UserDamagedEvent;
 import com.ithinkrok.minigames.api.event.user.state.UserDeathEvent;
@@ -240,6 +241,17 @@ public class GameBukkitListener implements Listener {
         }
 
         user.getGameGroup().userEvent(new UserPickupItemEvent(user, event));
+    }
+
+    @EventHandler
+    public void eventPlayerItemHeld(PlayerItemHeldEvent event) {
+        User user = game.getUser(event.getPlayer());
+        if (user == null) {
+            notInGameGroupError(event.getPlayer());
+            return;
+        }
+
+        user.getGameGroup().userEvent(new UserItemHeldEvent(user, event));
     }
 
     @EventHandler

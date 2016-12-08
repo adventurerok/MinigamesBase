@@ -10,6 +10,7 @@ import com.ithinkrok.minigames.api.event.game.MapChangedEvent;
 import com.ithinkrok.minigames.api.event.user.game.*;
 import com.ithinkrok.minigames.api.event.user.inventory.UserInventoryClickEvent;
 import com.ithinkrok.minigames.api.event.user.inventory.UserInventoryCloseEvent;
+import com.ithinkrok.minigames.api.event.user.inventory.UserItemHeldEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.api.inventory.ClickableInventory;
 import com.ithinkrok.minigames.api.item.CustomItem;
@@ -143,21 +144,217 @@ public class BaseUser implements Listener, User {
         }
     }
 
+    private void decrementAttackerTimers() {
+        lastAttacker.decreaseAttackerTimer(20);
+        fireAttacker.decreaseAttackerTimer(20);
+        witherAttacker.decreaseAttackerTimer(20);
+    }
+
+    private void showPlayer(User other) {
+        if (!isPlayer() || !other.isPlayer()) return;
+        getPlayer().showPlayer(other.getPlayer());
+    }
+
     @Override
+    public User getUser(UUID uuid) {
+        return gameGroup.getUser(uuid);
+    }
+
+    @Override
+    public <B extends UserMetadata> B getMetadata(Class<? extends B> clazz) {
+        return metadataMap.getInstance(clazz);
+    }    @Override
     public boolean isPlayer() {
         return entity instanceof Player;
     }
 
     @Override
+    public <B extends UserMetadata> void setMetadata(B metadata) {
+        UserMetadata oldMetadata = metadataMap.put(metadata.getMetadataClass(), metadata);
+
+        if (oldMetadata != null && oldMetadata != metadata) {
+            oldMetadata.cancelAllTasks();
+            oldMetadata.removed();
+        }
+    }
+
+    @Override
+    public boolean hasMetadata(Class<? extends UserMetadata> clazz) {
+        return metadataMap.containsKey(clazz);
+    }
+
+    @Override
+    public <B extends UserMetadata> B removeMetadata(Class<? extends B> clazz) {
+        B metadata = (B) metadataMap.remove(clazz);
+
+        if (metadata != null) metadata.removed();
+
+        return metadata;
+    }
+
+    @Override
+    public boolean hasPermission(String permission) {
+        return entity.hasPermission(permission);
+    }    @Override
     public Player getPlayer() {
         if (!isPlayer()) throw new RuntimeException("You have no player");
         return (Player) entity;
     }
 
     @Override
+    public boolean hasSharedObject(String name) {
+        return gameGroup.hasSharedObject(name);
+    }
+
+    @Override
+    public Config getSharedObject(String name) {
+        return gameGroup.getSharedObject(name);
+    }
+
+    @Override
+    public Config getSharedObjectOrEmpty(String name) {
+        return gameGroup.getSharedObjectOrEmpty(name);
+    }
+
+    private class UserListener implements CustomListener {
+
+        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
+        public void eventInGameChange(UserInGameChangeEvent event) {
+            Iterator<UserMetadata> iterator = metadataMap.values().iterator();
+
+            while (iterator.hasNext()) {
+                UserMetadata metadata = iterator.next();
+
+                if (metadata.removeOnInGameChange(event)) {
+                    metadata.cancelAllTasks();
+                    metadata.removed();
+                    iterator.remove();
+                }
+            }
+        }
+
+        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
+        public void eventGameStateChange(GameStateChangedEvent event) {
+            Iterator<UserMetadata> iterator = metadataMap.values().iterator();
+
+            while (iterator.hasNext()) {
+                UserMetadata metadata = iterator.next();
+
+                if (metadata.removeOnGameStateChange(event)) {
+                    metadata.cancelAllTasks();
+                    metadata.removed();
+                    iterator.remove();
+                }
+            }
+        }
+
+        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
+        public void eventMapChange(MapChangedEvent event) {
+            Iterator<UserMetadata> iterator = metadataMap.values().iterator();
+
+            while (iterator.hasNext()) {
+                UserMetadata metadata = iterator.next();
+
+                if (metadata.removeOnMapChange(event)) {
+                    metadata.cancelAllTasks();
+                    metadata.removed();
+                    iterator.remove();
+                }
+            }
+        }
+
+        @CustomEventHandler
+        public void eventInventoryClick(UserInventoryClickEvent event) {
+            if (!isViewingClickableInventory()) return;
+
+            getClickableInventory().inventoryClick(event);
+        }
+
+        @CustomEventHandler
+        public void eventUpgrade(UserUpgradeEvent event) {
+            PlayerInventory inv = getInventory();
+
+            for (int index = 0; index < inv.getSize(); ++index) {
+                ItemStack old = inv.getItem(index);
+
+                int id = InventoryUtils.getIdentifier(old);
+                if (id < 0) continue;
+
+                CustomItem customItem = gameGroup.getCustomItem(id);
+                if (!customItem.replaceOnUpgrade()) continue;
+
+                ItemStack replace = customItem.createForUser(BaseUser.this);
+                if (replace.isSimilar(old)) continue;
+
+                replace.setAmount(old.getAmount());
+
+                inv.setItem(index, replace);
+            }
+        }
+
+        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
+        public void eventInventoryClose(UserInventoryCloseEvent event) {
+            if (!isViewingClickableInventory()) return;
+
+            openInventory = null;
+        }
+
+        @CustomEventHandler(priority = CustomEventHandler.HIGH)
+        public void eventInteract(UserInteractEvent event) {
+            ItemStack item = getInventory().getItemInHand();
+            int identifier = InventoryUtils.getIdentifier(item);
+            if (identifier < 0) return;
+
+            CustomItem customItem = gameGroup.getCustomItem(identifier);
+
+            //If event is a UserAttackEvent this will call both event handler methods in CustomItem
+            CustomEventExecutor.executeEvent(event, customItem);
+        }
+
+        @CustomEventHandler(priority = CustomEventHandler.HIGH)
+        public void eventItemHeld(UserItemHeldEvent event) {
+
+            //Notify old item that it is no longer held
+            ItemStack oldItem = event.getOldHeldItem();
+            int oldIdentifier = InventoryUtils.getIdentifier(oldItem);
+            if(oldIdentifier > 0) {
+                CustomItem customItem = gameGroup.getCustomItem(oldIdentifier);
+
+                CustomEventExecutor.executeEvent(event, customItem);
+            }
+
+            //Notify new item that it is held
+            ItemStack newItem = event.getNewHeldItem();
+            int newIdentifier = InventoryUtils.getIdentifier(newItem);
+            if(newIdentifier > 0) {
+                CustomItem customItem = gameGroup.getCustomItem(newIdentifier);
+
+                CustomEventExecutor.executeEvent(event, customItem);
+            }
+        }
+
+        @CustomEventHandler
+        public void eventAbilityCooldown(UserAbilityCooldownEvent event) {
+            for (ItemStack item : getInventory()) {
+                int identifier = InventoryUtils.getIdentifier(item);
+                if (identifier < 0) continue;
+
+                CustomItem customItem = gameGroup.getCustomItem(identifier);
+
+                CustomEventExecutor.executeEvent(event, customItem);
+            }
+        }
+
+    }    @Override
     public ClickableInventory getOpenInventory() {
         return openInventory;
     }
+
+
+
+
+
+
 
     @Override
     public void setShowCloakedUsers(boolean showCloakedPlayers) {
@@ -173,6 +370,7 @@ public class BaseUser implements Listener, User {
         }
     }
 
+
     @Override
     public void becomeEntity(EntityType entityType) {
         if (!isPlayer()) return;
@@ -184,6 +382,7 @@ public class BaseUser implements Listener, User {
 
         revalidateTask = repeatInFuture(task -> revalidateNonPlayer(entity.getLocation()), 100, 100);
     }
+
 
     private void makeEntityFromEntity(LivingEntity from, Location location, EntityType entityType) {
         if (playerState == null) playerState = new PlayerState();
@@ -205,6 +404,7 @@ public class BaseUser implements Listener, User {
         if (disguise != null) disguise(disguise);
     }
 
+
     private boolean revalidateNonPlayer(Location loc) {
         if (isPlayer() || entity.isValid()) return false;
 
@@ -216,10 +416,12 @@ public class BaseUser implements Listener, User {
         return true;
     }
 
+
     @Override
     public Location getLocation() {
         return entity.getLocation();
     }
+
 
     @Override
     public void launchVictoryFirework() {
@@ -237,6 +439,7 @@ public class BaseUser implements Listener, User {
                         .build());
         firework.setFireworkMeta(meta);
     }
+
 
     @Override
     public void becomePlayer(Player player) {
@@ -261,10 +464,12 @@ public class BaseUser implements Listener, User {
         if (disguise != null) disguise(disguise);
     }
 
+
     @Override
     public boolean isCloaked() {
         return cloaked;
     }
+
 
     @Override
     public void cloak() {
@@ -637,7 +842,7 @@ public class BaseUser implements Listener, User {
     public boolean teleport(Vector loc) {
         Location target =
                 new Location(getLocation().getWorld(), loc.getX(), loc.getY(), loc.getZ(), getLocation().getYaw(),
-                        getLocation().getPitch());
+                             getLocation().getPitch());
         return teleport(target);
 
     }
@@ -648,8 +853,7 @@ public class BaseUser implements Listener, User {
         if (getMap() != null && !getMap().getWorld().getName().equals(location.getWorld().getName())) {
             try {
                 String message = "tried to teleport user " + name + " to another Bukkit world: game_map=" +
-                        getMap().getWorld().getName() +
-                        ", world=" + location.getWorld().getName();
+                        getMap().getWorld().getName() + ", world=" + location.getWorld().getName();
 
                 throw new RuntimeException(message);
             } catch (RuntimeException e) {
@@ -1086,7 +1290,9 @@ public class BaseUser implements Listener, User {
     @Override
     public void cancelAllTasks() {
         userTaskList.cancelAllTasks();
-    }    @Override
+    }
+
+    @Override
     public void setVelocity(Vector velocity) {
         entity.setVelocity(velocity);
     }
@@ -1096,24 +1302,14 @@ public class BaseUser implements Listener, User {
         getPlayer().hidePlayer(other.getPlayer());
     }
 
-    private void decrementAttackerTimers() {
-        lastAttacker.decreaseAttackerTimer(20);
-        fireAttacker.decreaseAttackerTimer(20);
-        witherAttacker.decreaseAttackerTimer(20);
-    }    @Override
+
+    @Override
     public Vector getVelocity() {
         return entity.getVelocity();
     }
 
-    private void showPlayer(User other) {
-        if (!isPlayer() || !other.isPlayer()) return;
-        getPlayer().showPlayer(other.getPlayer());
-    }
 
     @Override
-    public User getUser(UUID uuid) {
-        return gameGroup.getUser(uuid);
-    }    @Override
     public void removeFromGameGroup() {
         setScoreboardHandler(null);
 
@@ -1131,20 +1327,8 @@ public class BaseUser implements Listener, User {
         cancelAllTasks();
     }
 
-    @Override
-    public <B extends UserMetadata> B getMetadata(Class<? extends B> clazz) {
-        return metadataMap.getInstance(clazz);
-    }
 
     @Override
-    public <B extends UserMetadata> void setMetadata(B metadata) {
-        UserMetadata oldMetadata = metadataMap.put(metadata.getMetadataClass(), metadata);
-
-        if (oldMetadata != null && oldMetadata != metadata) {
-            oldMetadata.cancelAllTasks();
-            oldMetadata.removed();
-        }
-    }    @Override
     public EntityType getVisibleEntityType() {
         if (disguise != null) return disguise.getEntityType();
         else return entity.getType();
@@ -1155,37 +1339,14 @@ public class BaseUser implements Listener, User {
         return disguise;
     }
 
-    @Override
-    public boolean hasMetadata(Class<? extends UserMetadata> clazz) {
-        return metadataMap.containsKey(clazz);
-    }
 
     @Override
-    public <B extends UserMetadata> B removeMetadata(Class<? extends B> clazz) {
-        B metadata = (B) metadataMap.remove(clazz);
-
-        if(metadata != null) metadata.removed();
-
-        return metadata;
-    }
-
-    @Override
-    public boolean hasPermission(String permission) {
-        return entity.hasPermission(permission);
-    }    @Override
     public String getDisplayName() {
         return isPlayer() ? getPlayer().getDisplayName() : entity.getCustomName();
     }
 
-    @Override
-    public boolean hasSharedObject(String name) {
-        return gameGroup.hasSharedObject(name);
-    }
 
     @Override
-    public Config getSharedObject(String name) {
-        return gameGroup.getSharedObject(name);
-    }    @Override
     public void setDisplayName(String displayName) {
         if (!isPlayer()) entity.setCustomName(displayName);
         else getPlayer().setDisplayName(displayName);
@@ -1193,135 +1354,11 @@ public class BaseUser implements Listener, User {
         if (disguise != null && disguise.isShowUserNameAboveEntity()) disguise(disguise);
     }
 
+
     @Override
-    public Config getSharedObjectOrEmpty(String name) {
-        return gameGroup.getSharedObjectOrEmpty(name);
-    }
-
-    private class UserListener implements CustomListener {
-
-        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
-        public void eventInGameChange(UserInGameChangeEvent event) {
-            Iterator<UserMetadata> iterator = metadataMap.values().iterator();
-
-            while (iterator.hasNext()) {
-                UserMetadata metadata = iterator.next();
-
-                if (metadata.removeOnInGameChange(event)) {
-                    metadata.cancelAllTasks();
-                    metadata.removed();
-                    iterator.remove();
-                }
-            }
-        }
-
-        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
-        public void eventGameStateChange(GameStateChangedEvent event) {
-            Iterator<UserMetadata> iterator = metadataMap.values().iterator();
-
-            while (iterator.hasNext()) {
-                UserMetadata metadata = iterator.next();
-
-                if (metadata.removeOnGameStateChange(event)) {
-                    metadata.cancelAllTasks();
-                    metadata.removed();
-                    iterator.remove();
-                }
-            }
-        }
-
-        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
-        public void eventMapChange(MapChangedEvent event) {
-            Iterator<UserMetadata> iterator = metadataMap.values().iterator();
-
-            while (iterator.hasNext()) {
-                UserMetadata metadata = iterator.next();
-
-                if (metadata.removeOnMapChange(event)) {
-                    metadata.cancelAllTasks();
-                    metadata.removed();
-                    iterator.remove();
-                }
-            }
-        }
-
-        @CustomEventHandler
-        public void eventInventoryClick(UserInventoryClickEvent event) {
-            if (!isViewingClickableInventory()) return;
-
-            getClickableInventory().inventoryClick(event);
-        }
-
-        @CustomEventHandler
-        public void eventUpgrade(UserUpgradeEvent event) {
-            PlayerInventory inv = getInventory();
-
-            for (int index = 0; index < inv.getSize(); ++index) {
-                ItemStack old = inv.getItem(index);
-
-                int id = InventoryUtils.getIdentifier(old);
-                if (id < 0) continue;
-
-                CustomItem customItem = gameGroup.getCustomItem(id);
-                if (!customItem.replaceOnUpgrade()) continue;
-
-                ItemStack replace = customItem.createForUser(BaseUser.this);
-                if (replace.isSimilar(old)) continue;
-
-                replace.setAmount(old.getAmount());
-
-                inv.setItem(index, replace);
-            }
-        }
-
-        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
-        public void eventInventoryClose(UserInventoryCloseEvent event) {
-            if (!isViewingClickableInventory()) return;
-
-            openInventory = null;
-        }
-
-        @CustomEventHandler(priority = CustomEventHandler.HIGH)
-        public void eventInteract(UserInteractEvent event) {
-            ItemStack item = getInventory().getItemInHand();
-            int identifier = InventoryUtils.getIdentifier(item);
-            if (identifier < 0) return;
-
-            CustomItem customItem = gameGroup.getCustomItem(identifier);
-
-            //If event is a UserAttackEvent this will call both event handler methods in CustomItem
-            CustomEventExecutor.executeEvent(event, customItem);
-        }
-
-        @CustomEventHandler
-        public void eventAbilityCooldown(UserAbilityCooldownEvent event) {
-            for (ItemStack item : getInventory()) {
-                int identifier = InventoryUtils.getIdentifier(item);
-                if (identifier < 0) continue;
-
-                CustomItem customItem = gameGroup.getCustomItem(identifier);
-
-                CustomEventExecutor.executeEvent(event, customItem);
-            }
-        }
-    }    @Override
     public Collection<CustomListener> getListeners() {
         return listeners;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     @Override

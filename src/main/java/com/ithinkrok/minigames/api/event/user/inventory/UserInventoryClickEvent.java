@@ -7,7 +7,6 @@ import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -45,11 +44,6 @@ public class UserInventoryClickEvent extends UserInventoryEvent implements Cance
     @Override
     public Inventory getInventory() {
         return event.getInventory();
-    }
-
-    @Override
-    public InventoryView getInventoryView() {
-        return event.getView();
     }
 
     public int getSlot() {
