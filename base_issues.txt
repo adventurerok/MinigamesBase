@@ -7,9 +7,11 @@
  - DIDN'T COPY NEW FOLDERS CORRECTLY FOR MINIGAMES RESOURCES
 
 == New Ideas ==
+ - Hub show more info on join (big game)
+    - Auto join big game?
  - PVP in hub
     - Hiscores
-    - Sound/particle effects
+    - Particle effects
  - Item to show all games in progress and lobbies
     - Different icons for different types of games, with enchanted showing lobbies
  - Item to join other players / friends
