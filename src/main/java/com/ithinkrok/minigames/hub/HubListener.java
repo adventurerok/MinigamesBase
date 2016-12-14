@@ -182,6 +182,7 @@ public class HubListener extends SignListener {
 
             if(item != null && item.getName().equals(pvpSwordItem)) {
                 event.getAttackerUser().sendLocale(superPopperPvpLocale);
+                event.setCancelled(true);
                 return;
             }
 
