@@ -73,6 +73,12 @@ custom_items:
             - type: "colony_wars"
               item: "GOLD_INGOT,1,0,&1&lColony Wars"
               teleport: "387.5,141.05,-357.5,-90,0"
+              query:
+                require_accepting: true
+                ranks:
+                  - type: "colony_wars"
+                  - type: "2x_colony_wars"
+                  - type: "12x_colony_wars"
             - type: "tntrun"
               item: "TNT,1,0,&1&lTNT Run"
               teleport: "345.5,141,-399.5,180,0"
