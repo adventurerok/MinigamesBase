@@ -108,12 +108,20 @@ public class ClientMinigamesRequestProtocol implements ClientListener {
     }
 
     public void sendJoinGameGroupPacket(UUID playerUUID, String type, String name, List<String> params) {
+        sendJoinGameGroupPacket(playerUUID, type, name, params, null);
+    }
+
+    public void sendJoinGameGroupPacket(UUID playerUUID, String type, String name, List<String> params, Config query) {
         if(channel == null) return;
         Config payload = new MemoryConfig();
 
         payload.set("name", name);
         payload.set("type", type);
         payload.set("params", params);
+
+        if(query != null) {
+            payload.set("query", query);
+        }
 
         payload.set("player", playerUUID.toString());
 

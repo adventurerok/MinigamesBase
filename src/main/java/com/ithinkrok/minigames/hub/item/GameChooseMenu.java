@@ -141,6 +141,8 @@ public class GameChooseMenu implements CustomListener {
         private final String ggType;
         private final List<String> ggParams;
 
+        private final Config query;
+
         private final boolean allowTeleport;
         private final boolean allowDirectJoin;
 
@@ -152,6 +154,8 @@ public class GameChooseMenu implements CustomListener {
             ggType = config.getString("type");
             ggParams = config.getStringList("params");
 
+            query = config.getConfigOrNull("query");
+
             allowDirectJoin = config.getBoolean("direct_join_allow");
             allowTeleport = config.getBoolean("teleport_location_allow");
         }
@@ -161,7 +165,7 @@ public class GameChooseMenu implements CustomListener {
             if ((metadata.isDirectJoin() && allowDirectJoin) || !allowTeleport) {
                 event.getUser().sendLocale(transferLocale, ggType);
                 ClientMinigamesRequestProtocol requestProtocol = event.getUserGameGroup().getRequestProtocol();
-                requestProtocol.sendJoinGameGroupPacket(event.getUser().getUuid(), ggType, null, ggParams);
+                requestProtocol.sendJoinGameGroupPacket(event.getUser().getUuid(), ggType, null, ggParams, query);
             } else {
                 Location loc =
                         BukkitConfigUtils.getLocation(config, event.getUser().getLocation().getWorld(), "teleport");
