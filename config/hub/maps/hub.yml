@@ -4,6 +4,13 @@ environment: normal
 enable_weather: false
 type: saved
 
+spawn:
+  x: 348.5
+  y: 135.1
+  z: -357.5
+  yaw: -90
+  pitch: -15
+
 listeners:
   spleef:
     class: "com.ithinkrok.minigames.util.lobbygames.SpleefMinigame"
