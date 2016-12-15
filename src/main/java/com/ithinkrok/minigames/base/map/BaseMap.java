@@ -16,10 +16,13 @@ import com.ithinkrok.minigames.api.team.TeamIdentifier;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.BoundingBox;
 import com.ithinkrok.minigames.api.util.JSONBook;
+import com.ithinkrok.minigames.api.util.MinigamesConfigs;
 import com.ithinkrok.minigames.base.BaseGameGroup;
 import com.ithinkrok.minigames.base.command.CommandConfig;
 import com.ithinkrok.minigames.base.util.io.ConfigHolder;
 import com.ithinkrok.minigames.base.util.io.ConfigParser;
+import com.ithinkrok.msm.bukkit.util.BukkitConfig;
+import com.ithinkrok.msm.bukkit.util.BukkitConfigUtils;
 import com.ithinkrok.util.config.ConfigUtils;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomListener;
@@ -54,6 +57,7 @@ public class BaseMap implements GameMap, ConfigHolder {
     private final List<PastedSchematic> pastedSchematics = new ArrayList<>();
     private final WorldHandler worldHandler;
     private World world;
+    private Location spawn;
 
 
     public BaseMap(BaseGameGroup gameGroup, GameMapInfo gameMapInfo) {
@@ -79,6 +83,7 @@ public class BaseMap implements GameMap, ConfigHolder {
 
     private void loadMap(GameGroup gameGroup) {
         world = worldHandler.loadWorld(gameGroup, this);
+        spawn = world.getSpawnLocation();
 
         configureWorld();
     }
@@ -86,6 +91,16 @@ public class BaseMap implements GameMap, ConfigHolder {
 
     private void configureWorld() {
         Config config = gameMapInfo.getConfig();
+
+        if(config.contains("spawn")) {
+            spawn = BukkitConfigUtils.getLocation(config, world, "spawn");
+            if(spawn == null) {
+                System.err.println("Invalid map spawn for map " + gameMapInfo.getName());
+                spawn = world.getSpawnLocation();
+            } else {
+                world.setSpawnLocation(spawn.getBlockX(), spawn.getBlockY(), spawn.getBlockZ());
+            }
+        }
 
         if (config.contains("start_time")) {
             world.setTime(config.getLong("start_time"));
@@ -170,7 +185,7 @@ public class BaseMap implements GameMap, ConfigHolder {
     @Override
     public void teleportUser(User user) {
         if (user.getLocation().getWorld().equals(world)) return;
-        user.teleport(world.getSpawnLocation());
+        user.teleport(getSpawn());
     }
 
     @Override
@@ -226,7 +241,7 @@ public class BaseMap implements GameMap, ConfigHolder {
 
     @Override
     public Location getSpawn() {
-        return world.getSpawnLocation();
+        return spawn;
     }
 
     @Override
