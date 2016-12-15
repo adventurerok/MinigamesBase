@@ -8,6 +8,7 @@ import com.ithinkrok.minigames.api.util.MinigamesConfigs;
 import com.ithinkrok.msm.bukkit.util.BukkitConfigUtils;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
+import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.util.Vector;
 
@@ -19,7 +20,7 @@ import java.util.Set;
 /**
  * Created by paul on 15/12/16.
  */
-public class RespawnZoneListener {
+public class RespawnZoneListener implements CustomListener {
 
     private final List<RespawnZone> zones = new ArrayList<>();
 
