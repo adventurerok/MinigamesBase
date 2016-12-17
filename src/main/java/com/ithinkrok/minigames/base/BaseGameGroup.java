@@ -199,7 +199,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
     @Override
     public void sendMessage(String message) {
-        sendMessageNoPrefix(getChatPrefix() + message);
+        sendMessageNoPrefix(getMessagePrefix() + message);
     }
 
     @Override
@@ -209,6 +209,13 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         }
 
         Bukkit.getConsoleSender().sendMessage(message);
+    }
+
+    @Override
+    public void sendMessageNoPrefix(Config message) {
+        for (User user : usersInGroup.values()) {
+            user.sendMessageNoPrefix(message);
+        }
     }
 
     @Override
@@ -643,7 +650,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     }
 
     @Override
-    public String getChatPrefix() {
+    public String getMessagePrefix() {
         return chatPrefix;
     }
 

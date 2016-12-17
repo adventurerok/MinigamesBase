@@ -203,7 +203,5 @@ public interface GameGroup
 
     Map<String, CommandConfig> getCommands();
 
-    String getChatPrefix();
-
 
 }

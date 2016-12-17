@@ -32,6 +32,7 @@ import com.ithinkrok.minigames.api.util.SoundEffect;
 import com.ithinkrok.minigames.api.util.disguise.Disguise;
 import com.ithinkrok.minigames.base.util.playerstate.PlayerState;
 import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.config.JsonConfigIO;
 import com.ithinkrok.util.event.CustomEventExecutor;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
@@ -1369,15 +1370,26 @@ public class BaseUser implements Listener, User {
 
     @Override
     public void sendMessage(String message) {
-        sendMessageNoPrefix(gameGroup.getChatPrefix() + message);
+        sendMessageNoPrefix(gameGroup.getMessagePrefix() + message);
     }
 
+    @Override
+    public void sendMessageNoPrefix(Config message) {
+        Player player = getPlayer();
+        if(player == null) return;
+
+        player.sendRawMessage(JsonConfigIO.dumpConfig(message));
+    }
 
     @Override
     public void sendMessageNoPrefix(String message) {
         entity.sendMessage(message);
     }
 
+    @Override
+    public String getMessagePrefix() {
+        return gameGroup.getMessagePrefix();
+    }
 
     @Override
     public void sendLocaleNoPrefix(String locale, Object... args) {
@@ -1389,6 +1401,5 @@ public class BaseUser implements Listener, User {
     public LanguageLookup getLanguageLookup() {
         return gameGroup.getLanguageLookup();
     }
-
 
 }

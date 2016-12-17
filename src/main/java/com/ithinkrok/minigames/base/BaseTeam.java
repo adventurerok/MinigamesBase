@@ -277,7 +277,7 @@ public class BaseTeam implements Listener, Team {
 
     @Override
     public void sendMessage(String message) {
-        sendMessageNoPrefix(gameGroup.getChatPrefix() + message);
+        sendMessageNoPrefix(gameGroup.getMessagePrefix() + message);
     }
 
 
@@ -288,6 +288,18 @@ public class BaseTeam implements Listener, Team {
         }
     }
 
+    @Override
+    public void sendMessageNoPrefix(Config message) {
+        for (User user : getUsers()) {
+            user.sendMessageNoPrefix(message);
+        }
+
+    }
+
+    @Override
+    public String getMessagePrefix() {
+        return "";
+    }
 
     @Override
     public void sendLocaleNoPrefix(String locale, Object... args) {
