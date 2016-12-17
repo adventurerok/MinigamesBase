@@ -31,6 +31,7 @@ import com.ithinkrok.minigames.api.util.InventoryUtils;
 import com.ithinkrok.minigames.api.util.SoundEffect;
 import com.ithinkrok.minigames.api.util.disguise.Disguise;
 import com.ithinkrok.minigames.base.util.playerstate.PlayerState;
+import com.ithinkrok.msm.bukkit.util.PlayerMessageSender;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.JsonConfigIO;
 import com.ithinkrok.util.event.CustomEventExecutor;
@@ -1378,7 +1379,7 @@ public class BaseUser implements Listener, User {
         Player player = getPlayer();
         if(player == null) return;
 
-        player.sendRawMessage(JsonConfigIO.dumpConfig(message));
+        PlayerMessageSender.sendMessage(message, Collections.singleton(player));
     }
 
     @Override

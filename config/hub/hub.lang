@@ -31,3 +31,5 @@ scoreboard.lobby_info=&6&lIn Lobbies\:
 scoreboard.games_info=&6&lIn Games\:
 
 hub.lobby_created=&6A new &c%s &6lobby was created\!
+
+hub.click_join_builder=&6Click {join:&7[&aHere&7]} &6to join it

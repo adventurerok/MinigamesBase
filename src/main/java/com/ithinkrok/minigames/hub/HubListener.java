@@ -12,8 +12,6 @@ import com.ithinkrok.minigames.api.event.user.world.UserDropItemEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserPickupItemEvent;
 import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.sign.InfoSigns;
-import com.ithinkrok.minigames.api.task.GameRunnable;
-import com.ithinkrok.minigames.api.task.GameTask;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
 import com.ithinkrok.minigames.api.util.MinigamesConfigs;
@@ -26,9 +24,9 @@ import com.ithinkrok.minigames.hub.sign.JoinLobbySign;
 import com.ithinkrok.minigames.hub.task.JumpPadTask;
 import com.ithinkrok.minigames.util.ItemGiver;
 import com.ithinkrok.minigames.util.map.SignListener;
+import com.ithinkrok.msm.common.message.ConfigMessageBuilder;
+import com.ithinkrok.msm.common.message.ConfigMessageFactory;
 import com.ithinkrok.util.config.Config;
-import com.ithinkrok.util.config.ConfigSerializable;
-import com.ithinkrok.util.config.ConfigUtils;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.lang.LanguageLookup;
 import org.bukkit.GameMode;
@@ -37,7 +35,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.Vector;
 
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -69,6 +66,7 @@ public class HubListener extends SignListener {
     private String welcomeSubtitleLocale;
 
     private String lobbyCreatedLocale;
+    private ConfigMessageFactory clickJoinMessageFactory;
 
     private Config scoreboardConfig;
 
@@ -129,6 +127,9 @@ public class HubListener extends SignListener {
         scoreboardConfig = config.getConfigOrNull("scoreboard");
 
         lobbyCreatedLocale = config.getString("lobby_created_locale");
+
+        String clickJoinLocale = event.getCreator().getLocale(config.getString("click_join_locale"));
+        clickJoinMessageFactory = new ConfigMessageFactory(clickJoinLocale);
     }
 
     @CustomEventHandler
@@ -275,5 +276,11 @@ public class HubListener extends SignListener {
         if(type.equals("hub")) return;
 
         event.getGameGroup().sendLocale(lobbyCreatedLocale, type);
+
+        ConfigMessageBuilder builder = clickJoinMessageFactory.newBuilder();
+        builder.setClickAction("join", ConfigMessageBuilder.CLICK_RUN_COMMAND, "/join " + event
+                .getControllerGameGroup().getName());
+
+        event.getGameGroup().sendMessageNoPrefix(builder.getResult());
     }
 }
