@@ -350,6 +350,8 @@ public class BaseGame implements Game, FileLoader {
 
     @Override
     public BaseGameGroup createGameGroup(String type, List<String> params) {
+        getLogger().info("Create game group " + type + " with params " + params);
+
         BaseGameGroup gameGroup =
                 new BaseGameGroup(this, nextGameGroupName(type), type, gameGroupConfigMap.get(type), params);
 
