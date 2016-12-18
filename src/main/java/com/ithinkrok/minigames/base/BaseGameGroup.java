@@ -130,7 +130,19 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
         String startMap = startConfig.getString("map");
         if (startMap != null) {
-            changeMap(fillInParameters(startMap));
+            String resolvedMap = fillInParameters(startMap);
+            try {
+                changeMap(resolvedMap);
+            } catch (Exception ignored) {
+                System.err.println(
+                        "Bad map \"" + resolvedMap + "\" provided for GameGroup " + name + ", " + "trying fallback");
+
+                String fallbackMap = startConfig.getString("backup_map");
+                if (fallbackMap != null) {
+                    changeMap(fallbackMap);
+                    System.out.println("Success! Using fallback map");
+                }
+            }
         }
 
         created = true;
@@ -151,6 +163,24 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         return result;
     }
 
+    @Override
+    public Config getSharedObjectOrEmpty(String name) {
+        Config result = null;
+
+        if (currentMap != null) result = currentMap.getSharedObject(name);
+        if (result != null) return result;
+
+        result = sharedObjectMap.get(name);
+        return result != null ? result : ConfigUtils.EMPTY_CONFIG;
+    }
+
+    @Override
+    public Config getSharedObject(String name) {
+        Config result = null;
+        if (currentMap != null) result = currentMap.getSharedObject(name);
+        return result != null ? result : sharedObjectMap.get(name);
+    }
+
     private String fillInParameters(String input) {
         for (int index = 0; index < parameters.size(); ++index) {
             String paramCode = "#param" + (index + 1);
@@ -159,130 +189,6 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         }
 
         return input;
-    }
-
-    @SafeVarargs
-    private final Collection<Collection<CustomListener>> getListeners(Collection<CustomListener>... extras) {
-        Collection<Collection<CustomListener>> listeners = new ArrayList<>(4);
-        if (gameState != null) listeners.add(gameStateListeners);
-        listeners.add(defaultAndMapListeners);
-        Collections.addAll(listeners, extras);
-
-        return listeners;
-    }
-
-    private Collection<CustomListener> getAllUserListeners() {
-        ArrayList<CustomListener> result = new ArrayList<>(usersInGroup.size());
-
-        for (BaseUser user : usersInGroup.values()) {
-            result.addAll(user.getListeners());
-        }
-
-        return result;
-    }
-
-    private Collection<CustomListener> getAllTeamListeners() {
-        ArrayList<CustomListener> result = new ArrayList<>(teamsInGroup.size());
-
-        for (Team team : teamsInGroup.values()) {
-            result.addAll(team.getListeners());
-        }
-
-        return result;
-    }
-
-    public void sendUpdatePayload() {
-        if (!created) return;
-
-        game.getProtocol().sendGameGroupUpdatePayload(this);
-    }
-
-    @Override
-    public void sendMessage(String message) {
-        sendMessageNoPrefix(getMessagePrefix() + message);
-    }
-
-    @Override
-    public void sendMessageNoPrefix(String message) {
-        for (User user : usersInGroup.values()) {
-            user.sendMessageNoPrefix(message);
-        }
-
-        Bukkit.getConsoleSender().sendMessage(message);
-    }
-
-    @Override
-    public void sendMessageNoPrefix(Config message) {
-        for (User user : usersInGroup.values()) {
-            user.sendMessageNoPrefix(message);
-        }
-    }
-
-    @Override
-    public void sendLocale(String locale, Object... args) {
-        sendMessage(getLocale(locale, args));
-    }
-
-    @Override
-    public void sendLocaleNoPrefix(String locale, Object... args) {
-        sendMessageNoPrefix(getLocale(locale, args));
-    }
-
-    @Override
-    public LanguageLookup getLanguageLookup() {
-        return this;
-    }
-
-    @Override
-    public List<String> getParameters() {
-        return parameters;
-    }
-
-    @Override
-    public int getMaxPlayers() {
-        return maxPlayers;
-    }
-
-    @Override
-    public String getMotd() {
-        return motd;
-    }
-
-    @Override
-    public void setMotd(String motd) {
-        if (motd.equals(this.motd)) return;
-
-        this.motd = motd;
-
-        sendUpdatePayload();
-    }
-
-    @Override
-    public Database getDatabase() {
-        return database;
-    }
-
-    @Override
-    public String getType() {
-        return type;
-    }
-
-    @Override
-    public boolean isAcceptingPlayers() {
-        return acceptingPlayers;
-    }
-
-    /**
-     * Sets acceptingPlayers. This boolean is used to determine if players can join this gamegroup to play the game.
-     * It should be set to false if players cannot join this gamegroup to play the game, even if spectators are allowed.
-     *
-     * @param acceptingPlayers The accepting players boolean
-     */
-    @Override
-    public void setAcceptingPlayers(boolean acceptingPlayers) {
-        this.acceptingPlayers = acceptingPlayers;
-
-        sendUpdatePayload();
     }
 
     @Override
@@ -296,29 +202,10 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     @Override
     public void changeMap(String mapName) {
         GameMapInfo mapInfo = gameMapInfoMap.get(mapName);
+
         Validate.notNull(mapInfo, "The map " + mapName + " does not exist");
 
         changeMap(mapInfo);
-    }
-
-    @Override
-    public ClientMinigamesRequestProtocol getRequestProtocol() {
-        return BasePlugin.getRequestProtocol();
-    }
-
-    @Override
-    public ControllerInfo getControllerInfo() {
-        return getRequestProtocol().getControllerInfo();
-    }
-
-    @Override
-    public void requestControllerInfo() {
-        getRequestProtocol().enableControllerInfo();
-    }
-
-    @Override
-    public GameMapInfo getMap(String mapName) {
-        return gameMapInfoMap.get(mapName);
     }
 
     @Override
@@ -388,9 +275,100 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         }
     }
 
+    @SafeVarargs
+    private final Collection<Collection<CustomListener>> getListeners(Collection<CustomListener>... extras) {
+        Collection<Collection<CustomListener>> listeners = new ArrayList<>(4);
+        if (gameState != null) listeners.add(gameStateListeners);
+        listeners.add(defaultAndMapListeners);
+        Collections.addAll(listeners, extras);
+
+        return listeners;
+    }
+
+    private Collection<CustomListener> getAllUserListeners() {
+        ArrayList<CustomListener> result = new ArrayList<>(usersInGroup.size());
+
+        for (BaseUser user : usersInGroup.values()) {
+            result.addAll(user.getListeners());
+        }
+
+        return result;
+    }
+
+    private Collection<CustomListener> getAllTeamListeners() {
+        ArrayList<CustomListener> result = new ArrayList<>(teamsInGroup.size());
+
+        for (Team team : teamsInGroup.values()) {
+            result.addAll(team.getListeners());
+        }
+
+        return result;
+    }
+
+    public void sendUpdatePayload() {
+        if (!created) return;
+
+        game.getProtocol().sendGameGroupUpdatePayload(this);
+    }
+
+    @Override
+    public void sendMessage(String message) {
+        sendMessageNoPrefix(getMessagePrefix() + message);
+    }
+
     @Override
     public Collection<BaseUser> getUsers() {
         return usersInGroup.values();
+    }
+
+    @Override
+    public void sendMessageNoPrefix(String message) {
+        for (User user : usersInGroup.values()) {
+            user.sendMessageNoPrefix(message);
+        }
+
+        Bukkit.getConsoleSender().sendMessage(message);
+    }
+
+    @Override
+    public void sendMessageNoPrefix(Config message) {
+        for (User user : usersInGroup.values()) {
+            user.sendMessageNoPrefix(message);
+        }
+    }
+
+    @Override
+    public String getMessagePrefix() {
+        return chatPrefix;
+    }
+
+    @Override
+    public void sendLocale(String locale, Object... args) {
+        sendMessage(getLocale(locale, args));
+    }
+
+    @Override
+    public void sendLocaleNoPrefix(String locale, Object... args) {
+        sendMessageNoPrefix(getLocale(locale, args));
+    }
+
+    @Override
+    public LanguageLookup getLanguageLookup() {
+        return this;
+    }
+
+    @Override
+    public String getLocale(String name, Object... args) {
+        if (currentMap != null && currentMap.hasLocale(name)) return currentMap.getLocale(name, args);
+        else return languageLookup.getLocale(name, args);
+    }
+
+    @Override
+    public boolean hasLocale(String name) {
+        return (currentMap != null && currentMap.hasLocale(name) || languageLookup.hasLocale(name));
+    }    @Override
+    public ClientMinigamesRequestProtocol getRequestProtocol() {
+        return BasePlugin.getRequestProtocol();
     }
 
     @Override
@@ -431,16 +409,25 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         config.set("params", parameters);
 
         return config;
+    }    @Override
+    public ControllerInfo getControllerInfo() {
+        return getRequestProtocol().getControllerInfo();
     }
 
     @Override
     public String getName() {
         return name;
+    }    @Override
+    public void requestControllerInfo() {
+        getRequestProtocol().enableControllerInfo();
     }
 
     @Override
     public BaseMap getCurrentMap() {
         return currentMap;
+    }    @Override
+    public GameMapInfo getMap(String mapName) {
+        return gameMapInfoMap.get(mapName);
     }
 
     @Override
@@ -509,6 +496,56 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     }
 
     @Override
+    public List<String> getParameters() {
+        return parameters;
+    }
+
+    @Override
+    public int getMaxPlayers() {
+        return maxPlayers;
+    }
+
+    @Override
+    public String getMotd() {
+        return motd;
+    }
+
+    @Override
+    public void setMotd(String motd) {
+        if (motd.equals(this.motd)) return;
+
+        this.motd = motd;
+
+        sendUpdatePayload();
+    }
+
+    @Override
+    public Database getDatabase() {
+        return database;
+    }
+
+    @Override
+    public String getType() {
+        return type;
+    }
+
+    @Override
+    public boolean isAcceptingPlayers() {
+        return acceptingPlayers;
+    }
+
+    /**
+     * Sets acceptingPlayers. This boolean is used to determine if players can join this gamegroup to play the game.
+     * It should be set to false if players cannot join this gamegroup to play the game, even if spectators are allowed.
+     *
+     * @param acceptingPlayers The accepting players boolean
+     */
+    @Override
+    public void setAcceptingPlayers(boolean acceptingPlayers) {
+        this.acceptingPlayers = acceptingPlayers;
+
+        sendUpdatePayload();
+    }    @Override
     public void unload() {
         if (currentMap == null) return;
 
@@ -519,52 +556,82 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     }
 
     @Override
+    public void doDatabaseTask(DatabaseTask databaseTask) {
+        game.doDatabaseTask(databaseTask);
+    }    @Override
     public void bindTaskToCurrentGameState(GameTask task) {
         gameStateTaskList.addTask(task);
     }
 
     @Override
+    public boolean hasSharedObject(String name) {
+        return getSharedObject(name) != null;
+    }    @Override
     public void bindTaskToCurrentMap(GameTask task) {
         if (currentMap == null) throw new RuntimeException("No GameMap to bind task to");
         currentMap.bindTaskToMap(task);
     }
 
     @Override
+    public Team getTeam(String name) {
+        return getTeam(getTeamIdentifier(name));
+    }    @Override
     public Game getGame() {
         return game;
     }
 
     @Override
+    public Team getTeam(TeamIdentifier identifier) {
+        return teamsInGroup.get(identifier);
+    }    @Override
     public boolean hasActiveCountdown() {
         return countdown != null;
     }
 
     @Override
+    public TeamIdentifier getTeamIdentifier(String name) {
+        return teamIdentifiers.get(name);
+    }    @Override
     public boolean hasActiveCountdown(String name) {
         return countdown != null && countdown.getName().equals(name);
     }
 
     @Override
+    public BaseUser getUser(UUID uuid) {
+        return usersInGroup.get(uuid);
+    }    @Override
     public int getUserCount() {
         return getUsers().size();
     }
 
     @Override
+    public Config loadConfig(String name) {
+        return game.loadConfig(name);
+    }    @Override
     public Kit getKit(String name) {
         return kits.get(name);
     }
 
     @Override
+    public LangFile loadLangFile(String path) {
+        return game.loadLangFile(path);
+    }    @Override
     public GameState getGameState(String gameStateName) {
         return gameStates.get(gameStateName);
     }
 
     @Override
+    public JSONBook loadBook(String name, String path) {
+        return game.loadBook(name, path);
+    }    @Override
     public Collection<TeamIdentifier> getTeamIdentifiers() {
         return teamIdentifiers.values();
     }
 
     @Override
+    public Path getAssetDirectory() {
+        return game.getAssetDirectory();
+    }    @Override
     public JSONBook getBook(String name) {
         if (currentMap == null) return bookMap.get(name);
         JSONBook book = currentMap.getBook(name);
@@ -573,6 +640,11 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     }
 
     @Override
+    public Schematic getSchematic(String name) {
+        Schematic schem = null;
+        if (currentMap != null) schem = currentMap.getSchematic(name);
+        return schem != null ? schem : schematicMap.get(name);
+    }    @Override
     public void kill() {
         List<User> users = new ArrayList<>(getUsers());
 
@@ -611,6 +683,10 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     }
 
     @Override
+    public String getLocale(String name) {
+        if (currentMap != null && currentMap.hasLocale(name)) return currentMap.getLocale(name);
+        else return languageLookup.getLocale(name);
+    }    @Override
     public GameTask doInFuture(GameRunnable task) {
         GameTask gameTask = game.doInFuture(task);
 
@@ -619,136 +695,14 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     }
 
     @Override
+    public <B extends Metadata> B getMetadata(Class<? extends B> clazz) {
+        return metadataMap.getInstance(clazz);
+    }    @Override
     public GameTask doInFuture(GameRunnable task, int delay) {
         GameTask gameTask = game.doInFuture(task, delay);
 
         gameGroupTaskList.addTask(gameTask);
         return gameTask;
-    }
-
-    @Override
-    public GameTask repeatInFuture(GameRunnable task, int delay, int period) {
-        GameTask gameTask = game.repeatInFuture(task, delay, period);
-
-        gameGroupTaskList.addTask(gameTask);
-        return gameTask;
-    }
-
-    @Override
-    public void cancelAllTasks() {
-        gameGroupTaskList.cancelAllTasks();
-    }
-
-    @Override
-    public CommandConfig getCommand(String name) {
-        return name != null ? commandAliasesMap.get(name.toLowerCase()) : null;
-    }
-
-    @Override
-    public Map<String, CommandConfig> getCommands() {
-        return commandMap;
-    }
-
-    @Override
-    public String getMessagePrefix() {
-        return chatPrefix;
-    }
-
-    @Override
-    public void doDatabaseTask(DatabaseTask databaseTask) {
-        game.doDatabaseTask(databaseTask);
-    }
-
-    @Override
-    public boolean hasSharedObject(String name) {
-        return getSharedObject(name) != null;
-    }
-
-    @Override
-    public Config getSharedObject(String name) {
-        Config result = null;
-        if (currentMap != null) result = currentMap.getSharedObject(name);
-        return result != null ? result : sharedObjectMap.get(name);
-    }
-
-    @Override
-    public Config getSharedObjectOrEmpty(String name) {
-        Config result = null;
-
-        if (currentMap != null) result = currentMap.getSharedObject(name);
-        if (result != null) return result;
-
-        result = sharedObjectMap.get(name);
-        return result != null ? result : ConfigUtils.EMPTY_CONFIG;
-    }
-
-    @Override
-    public Team getTeam(String name) {
-        return getTeam(getTeamIdentifier(name));
-    }
-
-    @Override
-    public Team getTeam(TeamIdentifier identifier) {
-        return teamsInGroup.get(identifier);
-    }
-
-    @Override
-    public TeamIdentifier getTeamIdentifier(String name) {
-        return teamIdentifiers.get(name);
-    }
-
-    @Override
-    public BaseUser getUser(UUID uuid) {
-        return usersInGroup.get(uuid);
-    }
-
-    @Override
-    public Config loadConfig(String name) {
-        return game.loadConfig(name);
-    }
-
-    @Override
-    public LangFile loadLangFile(String path) {
-        return game.loadLangFile(path);
-    }
-
-    @Override
-    public JSONBook loadBook(String name, String path) {
-        return game.loadBook(name, path);
-    }
-
-    @Override
-    public Path getAssetDirectory() {
-        return game.getAssetDirectory();
-    }
-
-    @Override
-    public Schematic getSchematic(String name) {
-        Schematic schem = null;
-        if (currentMap != null) schem = currentMap.getSchematic(name);
-        return schem != null ? schem : schematicMap.get(name);
-    }
-
-    @Override
-    public String getLocale(String name) {
-        if (currentMap != null && currentMap.hasLocale(name)) return currentMap.getLocale(name);
-        else return languageLookup.getLocale(name);
-    }
-
-    @Override
-    public String getLocale(String name, Object... args) {
-        if (currentMap != null && currentMap.hasLocale(name)) return currentMap.getLocale(name, args);
-        else return languageLookup.getLocale(name, args);
-    }
-
-    @Override
-    public boolean hasLocale(String name) {
-        return (currentMap != null && currentMap.hasLocale(name) || languageLookup.hasLocale(name));
-    }
-
-    @Override
-    public <B extends Metadata> B getMetadata(Class<? extends B> clazz) {
-        return metadataMap.getInstance(clazz);
     }
 
     @Override
@@ -759,11 +713,20 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
             oldMetadata.cancelAllTasks();
             oldMetadata.removed();
         }
+    }    @Override
+    public GameTask repeatInFuture(GameRunnable task, int delay, int period) {
+        GameTask gameTask = game.repeatInFuture(task, delay, period);
+
+        gameGroupTaskList.addTask(gameTask);
+        return gameTask;
     }
 
     @Override
     public boolean hasMetadata(Class<? extends Metadata> clazz) {
         return metadataMap.containsKey(clazz);
+    }    @Override
+    public void cancelAllTasks() {
+        gameGroupTaskList.cancelAllTasks();
     }
 
     @SuppressWarnings("unchecked")
@@ -771,9 +734,12 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     public <B extends Metadata> B removeMetadata(Class<? extends B> clazz) {
         B metadata = (B) metadataMap.remove(clazz);
 
-        if(metadata != null) metadata.removed();
+        if (metadata != null) metadata.removed();
 
         return metadata;
+    }    @Override
+    public CommandConfig getCommand(String name) {
+        return name != null ? commandAliasesMap.get(name.toLowerCase()) : null;
     }
 
     @Override
@@ -781,6 +747,9 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         defaultListeners.put(name, listener);
 
         createDefaultAndMapListeners();
+    }    @Override
+    public Map<String, CommandConfig> getCommands() {
+        return commandMap;
     }
 
     @Override
@@ -961,6 +930,50 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
             }
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }
