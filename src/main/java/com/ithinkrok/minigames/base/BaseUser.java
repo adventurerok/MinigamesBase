@@ -442,7 +442,7 @@ public class BaseUser implements Listener, User {
         entity.remove();
         entity = player;
 
-        if (isCloaked()) cloak();
+        fixCloakedUsers();
 
         scoreboardDisplay = new ScoreboardDisplay(this, player);
         updateScoreboard();
