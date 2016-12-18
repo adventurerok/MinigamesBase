@@ -298,6 +298,8 @@ public class GameBukkitListener implements Listener {
         }
 
         List<String> correctedArgs = CommandUtils.splitStringIntoArguments(event.getMessage());
+        if(correctedArgs.isEmpty()) return;
+
         String commandName = correctedArgs.get(0).toLowerCase();
         correctedArgs.remove(0);
 
