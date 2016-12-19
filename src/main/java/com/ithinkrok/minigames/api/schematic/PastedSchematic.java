@@ -123,25 +123,32 @@ public class PastedSchematic implements SchematicPaster.BoundsChecker {
             centerBlock.getWorld().playSound(centerBlock, NamedSounds.fromName("ENTITY_GENERIC_EXPLODE"), 1.0f, 1.0f);
         }
 
-        for (Location loc : buildingBlocks) {
-            if (loc.equals(centerBlock)) continue;
+        if(!buildingBlocks.isEmpty()) {
+            //To prevent too many falling blocks being created, which causes lag
+            double fallingBlockChance = Math.min(1, 30 / buildingBlocks.size());
 
-            Block b = loc.getBlock();
-            if (b.getType() == Material.AIR) continue;
+            for (Location loc : buildingBlocks) {
+                if (loc.equals(centerBlock)) continue;
 
-            Material oldType = b.getType();
-            byte oldData = b.getData();
+                Block b = loc.getBlock();
+                if (b.getType() == Material.AIR) continue;
 
-            b.setType(Material.AIR);
+                Material oldType = b.getType();
+                byte oldData = b.getData();
 
-            if (!oldType.isSolid()) continue;
+                b.setType(Material.AIR);
 
-            FallingBlock block = loc.getWorld().spawnFallingBlock(loc, oldType, oldData);
-            float xv = -0.3f + (random.nextFloat() * 0.6f);
-            float yv = (random.nextFloat() * 0.5f);
-            float zv = -0.3f + (random.nextFloat() * 0.6f);
+                if (!oldType.isSolid()) continue;
 
-            block.setVelocity(new Vector(xv, yv, zv));
+                if(random.nextDouble() > fallingBlockChance) continue;
+
+                FallingBlock block = loc.getWorld().spawnFallingBlock(loc, oldType, oldData);
+                float xv = -0.3f + (random.nextFloat() * 0.6f);
+                float yv = (random.nextFloat() * 0.5f);
+                float zv = -0.3f + (random.nextFloat() * 0.6f);
+
+                block.setVelocity(new Vector(xv, yv, zv));
+            }
         }
 
         SchematicDestroyedEvent destroyedEvent = new SchematicDestroyedEvent(this);
