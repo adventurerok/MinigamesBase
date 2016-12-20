@@ -33,7 +33,6 @@ import com.ithinkrok.minigames.api.util.disguise.Disguise;
 import com.ithinkrok.minigames.base.util.playerstate.PlayerState;
 import com.ithinkrok.msm.bukkit.util.PlayerMessageSender;
 import com.ithinkrok.util.config.Config;
-import com.ithinkrok.util.config.JsonConfigIO;
 import com.ithinkrok.util.event.CustomEventExecutor;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
@@ -149,9 +148,6 @@ public class BaseUser implements Listener, User {
     @Override
     public <B extends UserMetadata> B getMetadata(Class<? extends B> clazz) {
         return metadataMap.getInstance(clazz);
-    }    @Override
-    public boolean isPlayer() {
-        return entity instanceof Player;
     }
 
     @Override
@@ -162,6 +158,9 @@ public class BaseUser implements Listener, User {
             oldMetadata.cancelAllTasks();
             oldMetadata.removed();
         }
+    }    @Override
+    public boolean isPlayer() {
+        return entity instanceof Player;
     }
 
     @Override
@@ -181,10 +180,6 @@ public class BaseUser implements Listener, User {
     @Override
     public boolean hasPermission(String permission) {
         return entity.hasPermission(permission);
-    }    @Override
-    public Player getPlayer() {
-        if (!isPlayer()) throw new RuntimeException("You have no player");
-        return (Player) entity;
     }
 
     @Override
@@ -195,11 +190,20 @@ public class BaseUser implements Listener, User {
     @Override
     public Config getSharedObject(String name) {
         return gameGroup.getSharedObject(name);
+    }    @Override
+    public Player getPlayer() {
+        if (!isPlayer()) throw new RuntimeException("You have no player");
+        return (Player) entity;
     }
 
     @Override
     public Config getSharedObjectOrEmpty(String name) {
         return gameGroup.getSharedObjectOrEmpty(name);
+    }
+
+    private void hidePlayer(User other) {
+        if (!isPlayer() || !other.isPlayer()) return;
+        getPlayer().hidePlayer(other.getPlayer());
     }
 
     private class UserListener implements CustomListener {
@@ -303,7 +307,7 @@ public class BaseUser implements Listener, User {
             //Notify old item that it is no longer held
             ItemStack oldItem = event.getOldHeldItem();
             int oldIdentifier = InventoryUtils.getIdentifier(oldItem);
-            if(oldIdentifier > 0) {
+            if (oldIdentifier > 0) {
                 CustomItem customItem = gameGroup.getCustomItem(oldIdentifier);
 
                 CustomEventExecutor.executeEvent(event, customItem);
@@ -312,7 +316,7 @@ public class BaseUser implements Listener, User {
             //Notify new item that it is held
             ItemStack newItem = event.getNewHeldItem();
             int newIdentifier = InventoryUtils.getIdentifier(newItem);
-            if(newIdentifier > 0) {
+            if (newIdentifier > 0) {
                 CustomItem customItem = gameGroup.getCustomItem(newIdentifier);
 
                 CustomEventExecutor.executeEvent(event, customItem);
@@ -331,15 +335,14 @@ public class BaseUser implements Listener, User {
             }
         }
 
-    }    @Override
-    public ClickableInventory getOpenInventory() {
-        return openInventory;
     }
 
 
 
-
-
+    @Override
+    public ClickableInventory getOpenInventory() {
+        return openInventory;
+    }
 
 
     @Override
@@ -792,6 +795,11 @@ public class BaseUser implements Listener, User {
     @Override
     public boolean isCoolingDown(String ability) {
         return cooldownHandler.isCoolingDown(ability);
+    }
+
+    @Override
+    public int getCooldownSeconds(String ability) {
+        return cooldownHandler.getCooldownSeconds(ability);
     }
 
     @Override
@@ -1283,10 +1291,7 @@ public class BaseUser implements Listener, User {
         entity.setVelocity(velocity);
     }
 
-    private void hidePlayer(User other) {
-        if (!isPlayer() || !other.isPlayer()) return;
-        getPlayer().hidePlayer(other.getPlayer());
-    }
+
 
 
     @Override
@@ -1361,7 +1366,7 @@ public class BaseUser implements Listener, User {
     @Override
     public void sendMessageNoPrefix(Config message) {
         Player player = getPlayer();
-        if(player == null) return;
+        if (player == null) return;
 
         PlayerMessageSender.sendMessage(message, Collections.singleton(player));
     }

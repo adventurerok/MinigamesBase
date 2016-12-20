@@ -142,6 +142,8 @@ public interface User
 
     boolean isCoolingDown(String ability);
 
+    int getCooldownSeconds(String ability);
+
     int getUpgradeLevel(String upgrade);
 
     void setUpgradeLevel(String upgrade, int level);

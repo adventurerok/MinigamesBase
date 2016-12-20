@@ -153,11 +153,11 @@ public class CustomItem implements Identifiable, CustomListener, Nameable {
         }
 
         if(isTimingOut(event.getUser())){
-            event.getUser().showAboveHotbarLocale("timeouts.default.wait");
+            event.getUser().showAboveHotbarLocale("timeouts.default.wait", event.getUser().getCooldownSeconds(timeoutAbility));
             return;
         }
         if(isCoolingDown(event.getUser())) {
-            event.getUser().showAboveHotbarLocale("cooldowns.default.wait");
+            event.getUser().showAboveHotbarLocale("cooldowns.default.wait", event.getUser().getCooldownSeconds(rightClickCooldownAbility));
             return;
         }
 

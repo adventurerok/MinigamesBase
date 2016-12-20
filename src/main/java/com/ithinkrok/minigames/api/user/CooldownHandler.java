@@ -44,6 +44,13 @@ public class CooldownHandler {
         return coolingDown.containsKey(ability);
     }
 
+    public int getCooldownSeconds(String ability) {
+        Long endNanos = coolingDown.get(ability);
+        if(endNanos == null) return 0;
+
+        return (int) Math.ceil((endNanos - System.nanoTime()) / 1_000_000_000d);
+    }
+
     private long timeInFuture(double secondsInFuture) {
         return System.nanoTime() + (long) (secondsInFuture * 1000000000);
     }
