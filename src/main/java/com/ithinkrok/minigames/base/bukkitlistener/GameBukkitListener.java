@@ -415,6 +415,7 @@ public class GameBukkitListener implements Listener {
         }
 
         //Skip playing the sound if you take no damage
+        //TODO maybe check if the event is cancelled?
         if (event.getFinalDamage() < 0.01) {
             return;
         }
