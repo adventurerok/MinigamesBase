@@ -233,6 +233,19 @@ public class GameBukkitListener implements Listener {
     }
 
     @EventHandler
+    public void eventEntityExplode(EntityExplodeEvent event) {
+        String mapName = event.getEntity().getWorld().getName();
+        GameGroup gameGroup = game.getGameGroupFromMapName(mapName);
+        if (gameGroup == null) return;
+
+        GameMap map = gameGroup.getCurrentMap();
+        if (!map.getWorld().getName().equals(mapName))
+            throw new RuntimeException("Map still registered to old GameGroup");
+
+        gameGroup.gameEvent(new MapEntityExplodeEvent(gameGroup, map, event));
+    }
+
+    @EventHandler
     public void eventPlayerDropItem(PlayerDropItemEvent event) {
         User user = game.getUser(event.getPlayer());
         if (user == null) {
