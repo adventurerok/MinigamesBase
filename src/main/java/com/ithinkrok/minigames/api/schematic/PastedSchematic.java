@@ -125,7 +125,7 @@ public class PastedSchematic implements SchematicPaster.BoundsChecker {
 
         if(!buildingBlocks.isEmpty()) {
             //To prevent too many falling blocks being created, which causes lag
-            double fallingBlockChance = Math.min(1, 30 / buildingBlocks.size());
+            double fallingBlockChance = Math.min(1, 30 / (double) buildingBlocks.size());
 
             for (Location loc : buildingBlocks) {
                 if (loc.equals(centerBlock)) continue;
