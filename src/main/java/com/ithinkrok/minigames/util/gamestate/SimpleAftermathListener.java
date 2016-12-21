@@ -6,12 +6,15 @@ import com.ithinkrok.minigames.api.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.api.event.game.CountdownFinishedEvent;
 import com.ithinkrok.minigames.api.event.game.CountdownMessageEvent;
 import com.ithinkrok.minigames.api.event.game.GameStateChangedEvent;
+import com.ithinkrok.minigames.api.event.game.MapChangedEvent;
 import com.ithinkrok.minigames.api.event.map.MapCreatureSpawnEvent;
 import com.ithinkrok.minigames.api.event.user.UserEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserJoinEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserQuitEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserChatEvent;
+import com.ithinkrok.minigames.api.metadata.Metadata;
 import com.ithinkrok.minigames.api.task.GameTask;
+import com.ithinkrok.minigames.api.team.TeamIdentifier;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.CountdownConfig;
 import com.ithinkrok.minigames.api.util.MinigamesConfigs;
@@ -113,7 +116,15 @@ public class SimpleAftermathListener implements CustomListener {
     }
 
     protected boolean shouldLaunchFireworksForUser(User user) {
-        return user.isInGame();
+        if(!user.isInGame()) return false;
+
+        if(user.getGameGroup().hasMetadata(WinningTeamHolder.class)) {
+            if(!user.getGameGroup().getMetadata(WinningTeamHolder.class).getWinner().equals(user.getTeamIdentifier())) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @CustomEventHandler(priority = CustomEventHandler.MONITOR)
@@ -134,5 +145,28 @@ public class SimpleAftermathListener implements CustomListener {
         int maxPlayers = event.getUserGameGroup().getMaxPlayers();
 
         event.getUserGameGroup().sendLocale(joinLocale, name, currentPlayers, maxPlayers);
+    }
+
+    public static class WinningTeamHolder extends Metadata {
+
+        private final TeamIdentifier winner;
+
+        public WinningTeamHolder(TeamIdentifier winner) {
+            this.winner = winner;
+        }
+
+        public TeamIdentifier getWinner() {
+            return winner;
+        }
+
+        @Override
+        public boolean removeOnGameStateChange(GameStateChangedEvent event) {
+            return false;
+        }
+
+        @Override
+        public boolean removeOnMapChange(MapChangedEvent event) {
+            return true;
+        }
     }
 }
