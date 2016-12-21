@@ -147,7 +147,7 @@ public class GameChooseMenu implements CustomListener {
         private final boolean allowDirectJoin;
 
         public GameChooseItem(ItemStack display, Config config, GameChooseMetadata metadata) {
-            super(display, -1);
+            super(display, config.getInt("slot", -1));
             this.config = config;
             this.metadata = metadata;
 
