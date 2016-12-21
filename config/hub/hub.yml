@@ -117,7 +117,7 @@ custom_items:
     display_name_locale: "pvp_sword.name"
     description_locale: "pvp_sword.desc"
     enchantments:
-      DAMAGE_ALL: 1
+      DAMAGE_ALL: 3
     listeners:
       pvp_sword:
         class: "com.ithinkrok.minigames.hub.item.PvpSword"
