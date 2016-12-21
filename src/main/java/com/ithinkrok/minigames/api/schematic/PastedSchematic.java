@@ -130,7 +130,7 @@ public class PastedSchematic implements SchematicPaster.BoundsChecker {
             for (Location loc : buildingBlocks) {
                 if (loc.equals(centerBlock)) continue;
 
-                if(centerBlock != null && loc.getY() < centerBlock.getY()) continue;
+                if(centerBlock != null && loc.getY() < centerBlock.getY() + schematic.getFloorOffset()) continue;
 
                 Block b = loc.getBlock();
                 if (b.getType() == Material.AIR) continue;

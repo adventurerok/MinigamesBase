@@ -44,6 +44,8 @@ public class Schematic implements Nameable {
 
     private final boolean allowOverlap;
 
+    private final int floorOffset;
+
     public BlockEntity getBlockEntity(Vector location) {
         return blockEntityMap.get(location);
     }
@@ -53,6 +55,7 @@ public class Schematic implements Nameable {
         this.formattedName = config.getString("formatted_name", name);
         this.config = config.getConfigOrEmpty("config");
         this.baseRotation = config.getInt("rotation", 0);
+        this.floorOffset = config.getInt("floor_offset", 0);
 
         this.allowOverlap = config.getBoolean("allow_overlap");
 
@@ -167,5 +170,9 @@ public class Schematic implements Nameable {
 
     public Config getConfig() {
         return config;
+    }
+
+    public int getFloorOffset() {
+        return floorOffset;
     }
 }
