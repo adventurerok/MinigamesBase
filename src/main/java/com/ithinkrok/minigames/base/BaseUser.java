@@ -122,10 +122,26 @@ public class BaseUser implements Listener, User {
             if (this == u) continue;
 
             if (u.isCloaked()) hidePlayer(u);
-            else showPlayer(u);
+            else {
+                hidePlayer(u);
+
+                doInFuture(task -> {
+                    if (!u.isCloaked()) {
+                        showPlayer(u);
+                    }
+                });
+            }
 
             if (isCloaked()) u.hidePlayer(this);
-            else u.showPlayer(this);
+            else {
+                u.hidePlayer(this);
+
+                doInFuture(task -> {
+                    if (!isCloaked()) {
+                        u.showPlayer(this);
+                    }
+                });
+            }
         }
     }
 
