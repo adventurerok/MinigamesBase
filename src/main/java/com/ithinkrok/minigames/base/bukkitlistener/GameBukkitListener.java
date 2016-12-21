@@ -12,11 +12,9 @@ import com.ithinkrok.minigames.api.event.user.game.UserCommandEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserQuitEvent;
 import com.ithinkrok.minigames.api.event.user.inventory.UserInventoryClickEvent;
 import com.ithinkrok.minigames.api.event.user.inventory.UserInventoryCloseEvent;
+import com.ithinkrok.minigames.api.event.user.inventory.UserItemConsumeEvent;
 import com.ithinkrok.minigames.api.event.user.inventory.UserItemHeldEvent;
-import com.ithinkrok.minigames.api.event.user.state.UserAttackedEvent;
-import com.ithinkrok.minigames.api.event.user.state.UserDamagedEvent;
-import com.ithinkrok.minigames.api.event.user.state.UserDeathEvent;
-import com.ithinkrok.minigames.api.event.user.state.UserFoodLevelChangeEvent;
+import com.ithinkrok.minigames.api.event.user.state.*;
 import com.ithinkrok.minigames.api.event.user.world.*;
 import com.ithinkrok.minigames.api.map.GameMap;
 import com.ithinkrok.minigames.api.protocol.event.GameGroupKilledEvent;
@@ -278,6 +276,28 @@ public class GameBukkitListener implements Listener {
         user.getGameGroup().userEvent(new UserInteractWorldEvent(user, event));
 
         if (event.isCancelled() && InventoryUtils.isArmor(event.getItem())) event.getPlayer().updateInventory();
+    }
+
+    @EventHandler
+    public void eventPlayerRespawn(PlayerRespawnEvent event) {
+        User user = game.getUser(event.getPlayer());
+        if (user == null) {
+            notInGameGroupError(event.getPlayer());
+            return;
+        }
+
+        user.getGameGroup().userEvent(new UserRespawnEvent(user, event));
+    }
+
+    @EventHandler
+    public void eventPlayerItemConsume(PlayerItemConsumeEvent event) {
+        User user = game.getUser(event.getPlayer());
+        if (user == null) {
+            notInGameGroupError(event.getPlayer());
+            return;
+        }
+
+        user.getGameGroup().userEvent(new UserItemConsumeEvent(user, event));
     }
 
     @EventHandler
