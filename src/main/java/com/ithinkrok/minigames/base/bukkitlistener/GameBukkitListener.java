@@ -395,6 +395,7 @@ public class GameBukkitListener implements Listener {
         boolean friendlyFire = gameConfig.getBoolean("friendly_fire");
         boolean noTeamFire = gameConfig.getBoolean("no_team_fire");
         boolean notInGameFire = gameConfig.getBoolean("not_in_game_fire");
+        boolean mobFire = gameConfig.getBoolean("mob_fire", true);
 
         if (gameConfig.getBoolean("all_fire")) {
             friendlyFire = noTeamFire = notInGameFire = true;
@@ -411,7 +412,7 @@ public class GameBukkitListener implements Listener {
             return;
         }
 
-        if (attackerTeam == null && !noTeamFire) {
+        if ((attackerTeam == null && !noTeamFire) && (event.getDamager() instanceof Player || !mobFire)) {
             event.setCancelled(true);
             return;
         }
@@ -462,7 +463,7 @@ public class GameBukkitListener implements Listener {
 
         //Skip playing the sound if you take no damage
         //TODO maybe check if the event is cancelled?
-        if (event.getFinalDamage() < 0.01) {
+        if (event.getFinalDamage() < 0.01 || event.isCancelled()) {
             return;
         }
 
