@@ -2,6 +2,7 @@ package com.ithinkrok.minigames.base.util.io;
 
 import com.ithinkrok.minigames.api.GameState;
 import com.ithinkrok.minigames.api.Kit;
+import com.ithinkrok.minigames.api.entity.CustomEntity;
 import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.schematic.Schematic;
 import com.ithinkrok.minigames.api.team.TeamIdentifier;
@@ -55,6 +56,7 @@ public final class ConfigParser {
         if (config.contains("shared_objects")) loadSharedObjects(config.getConfigOrNull("shared_objects"));
 
         if (config.contains("custom_items")) loadCustomItems(config.getConfigOrNull("custom_items"));
+        if (config.contains("custom_entities")) loadCustomEntities(config.getConfigOrNull("custom_entities"));
         if (config.contains("schematics")) loadSchematics(config.getConfigOrNull("schematics"));
 
         if (config.contains("kits")) loadKits(config.getConfigOrNull("kits"));
@@ -195,6 +197,15 @@ public final class ConfigParser {
 
             CustomItem item = new CustomItem(name, itemConfig);
             holder.addCustomItem(item);
+        }
+    }
+
+    private void loadCustomEntities(Config config) {
+        for (String name : config.getKeys(false)) {
+            Config entityConfig = config.getConfigOrNull(name);
+
+            CustomEntity entity = new CustomEntity(name, entityConfig);
+            holder.addCustomEntity(entity);
         }
     }
 
