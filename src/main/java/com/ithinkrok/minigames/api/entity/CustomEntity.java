@@ -120,4 +120,7 @@ public class CustomEntity implements Nameable {
         }
     }
 
+    public EntityType getType() {
+        return type;
+    }
 }
