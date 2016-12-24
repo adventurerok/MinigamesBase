@@ -66,23 +66,42 @@ public class WeightedInventory {
             //Skip if we do not pass the base chance test
             if(random.nextDouble() > baseChance) continue;
 
-            double weightIndex = random.nextDouble() * totalWeight;
-
-            WeightedItem selected = null;
-
-            for(WeightedItem item : items) {
-                weightIndex -= item.weight;
-
-                if(weightIndex > 0) continue;
-
-                selected = item;
-                break;
-            }
-
-            if(selected == null) selected = items.get(items.size() - 1);
-
-            inventory.setItem(index, selected.createRandomStack());
+            ItemStack randomStack = getRandomStack();
+            inventory.setItem(index, randomStack);
         }
+    }
+
+    private ItemStack getRandomStack() {
+        double weightIndex = random.nextDouble() * totalWeight;
+
+        WeightedItem selected = null;
+
+        for(WeightedItem item : items) {
+            weightIndex -= item.weight;
+
+            if(weightIndex > 0) continue;
+
+            selected = item;
+            break;
+        }
+
+        if(selected == null) selected = items.get(items.size() - 1);
+
+        return selected.createRandomStack();
+    }
+
+    public List<ItemStack> generateStacks(int count, boolean ignoreBaseChance) {
+        List<ItemStack> result = new ArrayList<>();
+
+        for(int index = 0; index < count; ++index) {
+
+            if(!ignoreBaseChance && random.nextDouble() > baseChance) continue;
+
+            ItemStack randomStack = getRandomStack();
+            result.add(randomStack);
+        }
+
+        return result;
     }
 
     /**
