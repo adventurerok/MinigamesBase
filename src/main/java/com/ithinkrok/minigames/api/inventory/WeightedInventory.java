@@ -1,11 +1,11 @@
-package com.ithinkrok.minigames.util.inventory;
+package com.ithinkrok.minigames.api.inventory;
 
 import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.util.MinigamesConfigs;
+import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.math.MapVariables;
 import com.ithinkrok.util.math.Variables;
-import com.ithinkrok.util.config.Config;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -37,7 +37,7 @@ public class WeightedInventory {
 
         double totalWeight = 0;
 
-        for(Config itemConfig : itemConfigs) {
+        for (Config itemConfig : itemConfigs) {
             WeightedItem item = new WeightedItem(gameGroup, itemConfig);
 
             items.add(item);
@@ -54,7 +54,7 @@ public class WeightedInventory {
 
         double totalWeight = 0;
 
-        for(WeightedItem item : items) {
+        for (WeightedItem item : items) {
             totalWeight += item.weight;
         }
 
@@ -62,9 +62,9 @@ public class WeightedInventory {
     }
 
     public void populateInventory(Inventory inventory) {
-        for(int index = 0; index < inventory.getSize(); ++index) {
+        for (int index = 0; index < inventory.getSize(); ++index) {
             //Skip if we do not pass the base chance test
-            if(random.nextDouble() > baseChance) continue;
+            if (random.nextDouble() > baseChance) continue;
 
             ItemStack randomStack = getRandomStack();
             inventory.setItem(index, randomStack);
@@ -76,16 +76,16 @@ public class WeightedInventory {
 
         WeightedItem selected = null;
 
-        for(WeightedItem item : items) {
+        for (WeightedItem item : items) {
             weightIndex -= item.weight;
 
-            if(weightIndex > 0) continue;
+            if (weightIndex > 0) continue;
 
             selected = item;
             break;
         }
 
-        if(selected == null) selected = items.get(items.size() - 1);
+        if (selected == null) selected = items.get(items.size() - 1);
 
         return selected.createRandomStack();
     }
@@ -93,9 +93,9 @@ public class WeightedInventory {
     public List<ItemStack> generateStacks(int count, boolean ignoreBaseChance) {
         List<ItemStack> result = new ArrayList<>();
 
-        for(int index = 0; index < count; ++index) {
+        for (int index = 0; index < count; ++index) {
 
-            if(!ignoreBaseChance && random.nextDouble() > baseChance) continue;
+            if (!ignoreBaseChance && random.nextDouble() > baseChance) continue;
 
             ItemStack randomStack = getRandomStack();
             result.add(randomStack);
@@ -105,7 +105,6 @@ public class WeightedInventory {
     }
 
     /**
-     *
      * @param multiply The amount to increase each weight away from the average
      * @return A new WeightedInventory with a difference in min and max weight equal to this ones times the multiply
      */
@@ -119,7 +118,7 @@ public class WeightedInventory {
 
         List<WeightedItem> newItems = new ArrayList<>();
 
-        for(WeightedItem item : items) {
+        for (WeightedItem item : items) {
             double differ = item.weight - averageWeight;
 
             differ *= weightMultiply;
@@ -127,7 +126,7 @@ public class WeightedInventory {
             WeightedItem copy = new WeightedItem(item);
             copy.weight = averageWeight + differ;
 
-            if(extraMod > 0) {
+            if (extraMod > 0) {
                 copy.extraChance += (1 - copy.extraChance) * extraMod;
             } else {
                 copy.extraChance *= -extraMod;
@@ -172,7 +171,7 @@ public class WeightedInventory {
 
             if (config.contains("item")) {
                 item = MinigamesConfigs.getItemStack(config, "item");
-            } else if(config.contains("custom_item")) {
+            } else if (config.contains("custom_item")) {
                 String customName = config.getString("custom_item");
 
                 CustomItem customItem = gameGroup.getCustomItem(customName);
@@ -201,10 +200,10 @@ public class WeightedInventory {
 
             int tries = max - min;
 
-            for(int attempt = 0; attempt < tries; ++attempt) {
-                if(random.nextDouble() < extraChance) {
+            for (int attempt = 0; attempt < tries; ++attempt) {
+                if (random.nextDouble() < extraChance) {
                     ++amount;
-                } else if(random.nextDouble() > retryChance) {
+                } else if (random.nextDouble() > retryChance) {
                     break;
                 }
             }

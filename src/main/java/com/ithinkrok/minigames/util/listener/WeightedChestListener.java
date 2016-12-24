@@ -11,7 +11,7 @@ import com.ithinkrok.minigames.api.map.GameMap;
 import com.ithinkrok.minigames.api.task.GameTask;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.EntityUtils;
-import com.ithinkrok.minigames.util.inventory.WeightedInventory;
+import com.ithinkrok.minigames.api.inventory.WeightedInventory;
 import com.ithinkrok.msm.bukkit.util.BukkitConfigUtils;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
