@@ -233,6 +233,22 @@ public class GameBukkitListener implements Listener {
     }
 
     @EventHandler
+    public void eventEntityDeath(EntityDeathEvent event) {
+        String mapName = event.getEntity().getWorld().getName();
+        GameGroup gameGroup = game.getGameGroupFromMapName(mapName);
+        if (gameGroup == null) return;
+
+        //Don't send entity death events for users
+        if(EntityUtils.getActualUser(gameGroup, event.getEntity()) != null) return;
+
+        GameMap map = gameGroup.getCurrentMap();
+        if (!map.getWorld().getName().equals(mapName))
+            throw new RuntimeException("Map still registered to old GameGroup");
+
+        gameGroup.gameEvent(new MapEntityDeathEvent(gameGroup, map, event));
+    }
+
+    @EventHandler
     public void eventBlockIgnite(BlockIgniteEvent event) {
         String mapName = event.getBlock().getWorld().getName();
         GameGroup gameGroup = game.getGameGroupFromMapName(mapName);
