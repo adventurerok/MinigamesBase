@@ -2,6 +2,7 @@ package com.ithinkrok.minigames.base.util.io;
 
 import com.ithinkrok.minigames.api.GameState;
 import com.ithinkrok.minigames.api.Kit;
+import com.ithinkrok.minigames.api.entity.CustomEntity;
 import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.map.GameMapInfo;
 import com.ithinkrok.minigames.api.schematic.Schematic;
@@ -22,6 +23,8 @@ public interface ConfigHolder {
     void addListener(String name, CustomListener listener);
 
     void addCustomItem(CustomItem customItem);
+
+    void addCustomEntity(CustomEntity customEntity);
 
     void addLanguageLookup(LanguageLookup languageLookup);
 

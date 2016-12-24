@@ -114,7 +114,7 @@ public class WeaponModifier implements CustomListener {
         }
     }
 
-    private class EffectModifier {
+    private static class EffectModifier {
         private final PotionEffectType effectType;
         private final Calculator durationCalculator;
         private final Calculator levelCalculator;

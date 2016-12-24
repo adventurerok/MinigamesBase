@@ -3,6 +3,7 @@ package com.ithinkrok.minigames.base.map;
 import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.GameState;
 import com.ithinkrok.minigames.api.Kit;
+import com.ithinkrok.minigames.api.entity.CustomEntity;
 import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.item.IdentifierMap;
 import com.ithinkrok.minigames.api.map.GameMap;
@@ -16,15 +17,13 @@ import com.ithinkrok.minigames.api.team.TeamIdentifier;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.BoundingBox;
 import com.ithinkrok.minigames.api.util.JSONBook;
-import com.ithinkrok.minigames.api.util.MinigamesConfigs;
 import com.ithinkrok.minigames.base.BaseGameGroup;
 import com.ithinkrok.minigames.base.command.CommandConfig;
 import com.ithinkrok.minigames.base.util.io.ConfigHolder;
 import com.ithinkrok.minigames.base.util.io.ConfigParser;
-import com.ithinkrok.msm.bukkit.util.BukkitConfig;
 import com.ithinkrok.msm.bukkit.util.BukkitConfigUtils;
-import com.ithinkrok.util.config.ConfigUtils;
 import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.config.ConfigUtils;
 import com.ithinkrok.util.event.CustomListener;
 import com.ithinkrok.util.lang.LanguageLookup;
 import com.ithinkrok.util.lang.MultipleLanguageLookup;
@@ -53,6 +52,7 @@ public class BaseMap implements GameMap, ConfigHolder {
     private final Map<String, JSONBook> bookMap = new HashMap<>();
     private final TaskList mapTaskList = new TaskList();
     private final IdentifierMap<CustomItem> customItemIdentifierMap = new IdentifierMap<>();
+    private final Map<String, CustomEntity> customEntityMap = new HashMap<>();
     private final HashMap<String, Config> sharedObjects = new HashMap<>();
     private final List<PastedSchematic> pastedSchematics = new ArrayList<>();
     private final WorldHandler worldHandler;
@@ -92,9 +92,9 @@ public class BaseMap implements GameMap, ConfigHolder {
     private void configureWorld() {
         Config config = gameMapInfo.getConfig();
 
-        if(config.contains("spawn")) {
+        if (config.contains("spawn")) {
             spawn = BukkitConfigUtils.getLocation(config, world, "spawn");
-            if(spawn == null) {
+            if (spawn == null) {
                 System.err.println("Invalid map spawn for map " + gameMapInfo.getName());
                 spawn = world.getSpawnLocation();
             } else {
@@ -164,6 +164,11 @@ public class BaseMap implements GameMap, ConfigHolder {
     @Override
     public CustomItem getCustomItem(int identifier) {
         return customItemIdentifierMap.get(identifier);
+    }
+
+    @Override
+    public CustomEntity getCustomEntity(String name) {
+        return customEntityMap.get(name);
     }
 
     @Override
@@ -255,25 +260,21 @@ public class BaseMap implements GameMap, ConfigHolder {
     }
 
     @Override
+    public String getLocale(String name) {
+        return languageLookup.getLocale(name);
+    }    @Override
     public Config getSharedObject(String name) {
         return sharedObjects.get(name);
     }
 
     @Override
+    public String getLocale(String name, Object... args) {
+        return languageLookup.getLocale(name, args);
+    }    @Override
     public Config getSharedObjectOrEmpty(String name) {
         Config sharedObject = getSharedObject(name);
 
         return sharedObject != null ? sharedObject : ConfigUtils.EMPTY_CONFIG;
-    }
-
-    @Override
-    public String getLocale(String name) {
-        return languageLookup.getLocale(name);
-    }
-
-    @Override
-    public String getLocale(String name, Object... args) {
-        return languageLookup.getLocale(name, args);
     }
 
     @Override
@@ -290,6 +291,11 @@ public class BaseMap implements GameMap, ConfigHolder {
     @Override
     public void addCustomItem(CustomItem item) {
         customItemIdentifierMap.put(item.getName(), item);
+    }
+
+    @Override
+    public void addCustomEntity(CustomEntity customEntity) {
+        customEntityMap.put(customEntity.getName(), customEntity);
     }
 
     @Override
@@ -345,4 +351,8 @@ public class BaseMap implements GameMap, ConfigHolder {
 
         return true;
     }
+
+
+
+
 }

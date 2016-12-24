@@ -2,6 +2,7 @@ package com.ithinkrok.minigames.api;
 
 import com.ithinkrok.minigames.api.database.Database;
 import com.ithinkrok.minigames.api.database.DatabaseTaskRunner;
+import com.ithinkrok.minigames.api.entity.CustomEntity;
 import com.ithinkrok.minigames.api.event.game.GameEvent;
 import com.ithinkrok.minigames.api.event.team.TeamEvent;
 import com.ithinkrok.minigames.api.event.user.UserEvent;
@@ -172,6 +173,8 @@ public interface GameGroup
     CustomItem getCustomItem(String name);
 
     CustomItem getCustomItem(int identifier);
+
+    CustomEntity getCustomEntity(String name);
 
     void gameEvent(GameEvent event);
 

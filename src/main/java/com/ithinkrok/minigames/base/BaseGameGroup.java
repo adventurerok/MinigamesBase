@@ -6,6 +6,7 @@ import com.ithinkrok.minigames.api.*;
 import com.ithinkrok.minigames.api.command.MinigamesCommand;
 import com.ithinkrok.minigames.api.database.Database;
 import com.ithinkrok.minigames.api.database.DatabaseTask;
+import com.ithinkrok.minigames.api.entity.CustomEntity;
 import com.ithinkrok.minigames.api.event.MinigamesCommandEvent;
 import com.ithinkrok.minigames.api.event.MinigamesEvent;
 import com.ithinkrok.minigames.api.event.game.CountdownFinishedEvent;
@@ -38,8 +39,8 @@ import com.ithinkrok.minigames.base.map.BaseMap;
 import com.ithinkrok.minigames.base.util.io.ConfigHolder;
 import com.ithinkrok.minigames.base.util.io.ConfigParser;
 import com.ithinkrok.minigames.base.util.io.FileLoader;
-import com.ithinkrok.util.config.ConfigUtils;
 import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.config.ConfigUtils;
 import com.ithinkrok.util.config.MemoryConfig;
 import com.ithinkrok.util.event.CustomEventExecutor;
 import com.ithinkrok.util.event.CustomEventHandler;
@@ -78,6 +79,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     //Loaded from config
     private final HashMap<String, CustomListener> defaultListeners = new HashMap<>();
     private final IdentifierMap<CustomItem> customItemIdentifierMap = new IdentifierMap<>();
+    private final Map<String, CustomEntity> customEntityMap = new HashMap<>();
     private final Map<String, Config> sharedObjectMap = new HashMap<>();
     private final Map<String, Schematic> schematicMap = new HashMap<>();
     private final Map<String, JSONBook> bookMap = new HashMap<>();
@@ -483,6 +485,12 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         return item != null ? item : customItemIdentifierMap.get(name);
     }
 
+    public CustomEntity getCustomEntity(String name) {
+        CustomEntity entity = null;
+        if(currentMap != null) entity = currentMap.getCustomEntity(name);
+        return entity != null ? entity : customEntityMap.get(name);
+    }
+
     @Override
     public CustomItem getCustomItem(int identifier) {
         CustomItem item = null;
@@ -755,6 +763,11 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     @Override
     public void addCustomItem(CustomItem customItem) {
         customItemIdentifierMap.put(customItem.getName(), customItem);
+    }
+
+    @Override
+    public void addCustomEntity(CustomEntity customEntity) {
+        customEntityMap.put(customEntity.getName(), customEntity);
     }
 
     @Override

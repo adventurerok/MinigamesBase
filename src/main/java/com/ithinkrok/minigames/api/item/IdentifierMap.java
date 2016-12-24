@@ -8,8 +8,8 @@ import java.util.Map;
  */
 public class IdentifierMap<I extends Identifiable> {
 
-    private Map<String, I> namedMap = new HashMap<>();
-    private Map<Integer, I> idMap = new HashMap<>();
+    private final Map<String, I> namedMap = new HashMap<>();
+    private final Map<Integer, I> idMap = new HashMap<>();
 
     public void put(String name, I value) {
         namedMap.put(name, value);

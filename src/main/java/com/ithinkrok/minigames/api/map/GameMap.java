@@ -1,6 +1,7 @@
 package com.ithinkrok.minigames.api.map;
 
 import com.ithinkrok.minigames.api.SharedObjectAccessor;
+import com.ithinkrok.minigames.api.entity.CustomEntity;
 import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.schematic.PastedSchematic;
 import com.ithinkrok.minigames.api.schematic.Schematic;
@@ -35,6 +36,8 @@ public interface GameMap extends LanguageLookup, SchematicPaster.BoundsChecker, 
     CustomItem getCustomItem(String name);
 
     CustomItem getCustomItem(int identifier);
+
+    CustomEntity getCustomEntity(String name);
 
     void bindTaskToMap(GameTask task);
 
