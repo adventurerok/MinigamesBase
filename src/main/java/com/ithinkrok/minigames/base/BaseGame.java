@@ -266,6 +266,11 @@ public class BaseGame implements Game, FileLoader {
     }
 
     @Override
+    public void setCustomEntityName(Entity entity, String name) {
+        entity.setMetadata("custom_name", new FixedMetadataValue(plugin, name));
+    }
+
+    @Override
     public void setGameGroupForMap(GameGroup gameGroup, String mapName) {
         Validate.notNull(gameGroup, "gameGroup cannot be null");
 

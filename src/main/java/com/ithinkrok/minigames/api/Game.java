@@ -79,4 +79,6 @@ public interface Game extends TaskScheduler, DatabaseTaskRunner, Nameable {
      * Check if the server should restart due to low resources
      */
     void checkResourcesRestart();
+
+    void setCustomEntityName(Entity entity, String name);
 }

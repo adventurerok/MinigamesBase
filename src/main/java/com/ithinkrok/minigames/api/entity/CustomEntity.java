@@ -53,6 +53,8 @@ public class CustomEntity implements Nameable {
     public Entity spawnEntity(GameGroup gameGroup, Location location, Variables variables) {
         Entity entity = location.getWorld().spawnEntity(location, type);
 
+        gameGroup.getGame().setCustomEntityName(entity, name);
+
         if (config.contains("age")) {
             ((Ageable) entity).setAge((int) calculate(variables, config, "age"));
         }

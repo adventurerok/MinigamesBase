@@ -76,6 +76,14 @@ public class EntityUtils {
         return resolver.getUser(player.getUniqueId());
     }
 
+    public static String getCustomEntityName(Entity entity) {
+        List<MetadataValue> customNames = entity.getMetadata("custom_name");
+
+        if(customNames == null || customNames.isEmpty()) return null;
+
+        return customNames.get(0).asString();
+    }
+
     public static Sound getDeathSound(EntityType entityType) {
         switch(entityType) {
             case BAT:
