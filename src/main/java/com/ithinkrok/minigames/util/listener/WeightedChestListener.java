@@ -16,6 +16,8 @@ import com.ithinkrok.msm.bukkit.util.BukkitConfigUtils;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
+import com.ithinkrok.util.math.Calculator;
+import com.ithinkrok.util.math.ExpressionCalculator;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -60,9 +62,9 @@ public class WeightedChestListener implements CustomListener {
 
         chestInventory = new WeightedInventory(event.getCreator(), config.getConfigOrNull("inventories.chest"));
 
-        double enderBalance = config.getDouble("inventories.ender_chest.adjust_balance");
-        double enderChance = config.getDouble("inventories.ender_chest.base_chance");
-        double enderExtra = config.getDouble("inventories.ender_chest.extra_mod");
+        Calculator enderBalance = new ExpressionCalculator(config.getString("inventories.ender_chest.adjust_balance"));
+        Calculator enderChance = new ExpressionCalculator(config.getString("inventories.ender_chest.base_chance", "1"));
+        Calculator enderExtra = new ExpressionCalculator(config.getString("inventories.ender_chest.extra_mod", "0"));
 
         enderInventory = chestInventory.adjust(enderChance, enderBalance, enderExtra);
 
@@ -156,7 +158,7 @@ public class WeightedChestListener implements CustomListener {
 
         openedChests.add(event.getClickedBlock().getLocation());
 
-        if(chestDuration > 0) {
+        if (chestDuration > 0) {
             GameTask task = event.getUserGameGroup().doInFuture(task1 -> {
                 openedChests.remove(event.getClickedBlock().getLocation());
             }, chestDuration);

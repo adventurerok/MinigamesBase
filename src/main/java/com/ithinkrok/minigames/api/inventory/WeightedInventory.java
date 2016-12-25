@@ -4,8 +4,7 @@ import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.util.MinigamesConfigs;
 import com.ithinkrok.util.config.Config;
-import com.ithinkrok.util.math.MapVariables;
-import com.ithinkrok.util.math.Variables;
+import com.ithinkrok.util.math.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -19,65 +18,86 @@ import java.util.Random;
  */
 public class WeightedInventory {
 
+    private static final Variables nullVariables = new SingleValueVariables(0);
+
     private static final Random random = new Random();
 
     /**
      * The chance that a particular slot will have an item
      */
-    private final double baseChance;
+    private final Calculator baseChance;
+
+    private final Calculator weightMultiplier;
+
+    private final Calculator extraMod;
 
     private final List<WeightedItem> items = new ArrayList<>();
 
-    private final double totalWeight;
-
     public WeightedInventory(GameGroup gameGroup, Config config) {
-        baseChance = config.getDouble("base_chance");
+        baseChance = new ExpressionCalculator(config.getString("base_chance"));
 
         List<Config> itemConfigs = config.getConfigList("items");
-
-        double totalWeight = 0;
 
         for (Config itemConfig : itemConfigs) {
             WeightedItem item = new WeightedItem(gameGroup, itemConfig);
 
             items.add(item);
-            totalWeight += item.weight;
         }
 
-        this.totalWeight = totalWeight;
+        this.weightMultiplier = new ExpressionCalculator(config.getString("adjust_balance", "1"));
+        this.extraMod = new ExpressionCalculator(config.getString("extra_mod", "0"));
     }
 
-    private WeightedInventory(double baseChance, Collection<WeightedItem> weightedItems) {
-        this.baseChance = baseChance;
-
-        items.addAll(weightedItems);
-
+    private double calculateTotalWeight(Variables variables) {
         double totalWeight = 0;
 
         for (WeightedItem item : items) {
-            totalWeight += item.weight;
+            totalWeight += item.weight.calculate(variables);
         }
 
-        this.totalWeight = totalWeight;
+        return totalWeight;
+    }
+
+    private WeightedInventory(Calculator baseChance, Calculator weightMultiplier, Calculator extraMod,
+                              Collection<WeightedItem> weightedItems) {
+        this.baseChance = baseChance;
+        this.weightMultiplier = weightMultiplier;
+        this.extraMod = extraMod;
+
+        items.addAll(weightedItems);
     }
 
     public void populateInventory(Inventory inventory) {
+        populateInventory(inventory, nullVariables);
+    }
+
+    public void populateInventory(Inventory inventory, Variables variables) {
+        double baseChance = this.baseChance.calculate(variables);
+        double totalWeight = calculateTotalWeight(variables);
+
         for (int index = 0; index < inventory.getSize(); ++index) {
             //Skip if we do not pass the base chance test
             if (random.nextDouble() > baseChance) continue;
 
-            ItemStack randomStack = getRandomStack();
+            ItemStack randomStack = getRandomStack(totalWeight, variables);
             inventory.setItem(index, randomStack);
         }
     }
 
-    private ItemStack getRandomStack() {
+    private ItemStack getRandomStack(double totalWeight, Variables variables) {
         double weightIndex = random.nextDouble() * totalWeight;
+
+        double averageWeight = totalWeight / items.size();
+
+        double weightDeviator = this.weightMultiplier.calculate(variables);
 
         WeightedItem selected = null;
 
         for (WeightedItem item : items) {
-            weightIndex -= item.weight;
+            double weight = item.weight.calculate(variables);
+            weight = averageWeight + (weight - averageWeight) * weightDeviator;
+
+            weightIndex -= weight;
 
             if (weightIndex > 0) continue;
 
@@ -87,87 +107,63 @@ public class WeightedInventory {
 
         if (selected == null) selected = items.get(items.size() - 1);
 
-        return selected.createRandomStack();
+        double extraMod = this.extraMod.calculate(variables);
+
+        return selected.createRandomStack(variables, extraMod);
     }
 
-    public List<ItemStack> generateStacks(int count, boolean ignoreBaseChance) {
+    public List<ItemStack> generateStacks(int count, boolean ignoreBaseChance, Variables variables) {
+        double baseChance = this.baseChance.calculate(variables);
+        double totalWeight = calculateTotalWeight(variables);
+
         List<ItemStack> result = new ArrayList<>();
 
         for (int index = 0; index < count; ++index) {
 
             if (!ignoreBaseChance && random.nextDouble() > baseChance) continue;
 
-            ItemStack randomStack = getRandomStack();
+            ItemStack randomStack = getRandomStack(totalWeight, variables);
             result.add(randomStack);
         }
 
         return result;
     }
 
-    /**
-     * @param multiply The amount to increase each weight away from the average
-     * @return A new WeightedInventory with a difference in min and max weight equal to this ones times the multiply
-     */
-    public WeightedInventory adjustBalance(double multiply) {
-        return adjust(baseChance, multiply, 0);
-    }
-
-
-    public WeightedInventory adjust(double baseChance, double weightMultiply, double extraMod) {
-        double averageWeight = totalWeight / items.size();
-
-        List<WeightedItem> newItems = new ArrayList<>();
-
-        for (WeightedItem item : items) {
-            double differ = item.weight - averageWeight;
-
-            differ *= weightMultiply;
-
-            WeightedItem copy = new WeightedItem(item);
-            copy.weight = averageWeight + differ;
-
-            if (extraMod > 0) {
-                copy.extraChance += (1 - copy.extraChance) * extraMod;
-            } else {
-                copy.extraChance *= -extraMod;
-            }
-
-            newItems.add(copy);
-        }
-
-        return new WeightedInventory(baseChance, newItems);
-    }
-
-    public WeightedInventory adjustBaseChance(double baseChance) {
-        return new WeightedInventory(baseChance, items);
+    public WeightedInventory adjust(Calculator baseChance, Calculator weightMultiply, Calculator extraMod) {
+        return new WeightedInventory(baseChance, weightMultiply, extraMod, items);
     }
 
     private static class WeightedItem implements Cloneable {
+
         ItemStack item;
-        double weight;
-        int min;
-        int max;
+        Calculator weight;
+        Calculator min;
+        Calculator max;
 
         /**
          * The chance of adding another item to the stack (up to a maximum of {@code max} items)
          */
-        double extraChance;
+        Calculator extraChance;
 
         /**
          * If extraChance fails, and retryChance succeeds, we try again.
          */
-        double retryChance;
+        Calculator retryChance;
 
         public WeightedItem(GameGroup gameGroup, Config config) {
-            weight = config.getDouble("weight");
-            min = config.getInt("min", 1);
-            max = config.getInt("max", 1);
+            weight = new ExpressionCalculator(config.getString("weight"));
+            min = new ExpressionCalculator(config.getString("min", "1"));
+            max = new ExpressionCalculator(config.getString("max", "1"));
 
             //Roughly 1/2 of the items average. Add 1 to prevent division by 1, and to prevent the power being
             // greater than one
-            extraChance = config.getDouble("extra_chance", Math.pow(0.5, 1 / (max - min + 1)));
+            double defaultExtraChance =
+                    Math.pow(0.5, 1 / (max.calculate(nullVariables) - min.calculate(nullVariables) + 1));
 
-            retryChance = config.getDouble("retry_chance", 0);
+            extraChance =
+                    new ExpressionCalculator(config.getString("extra_chance", Double.toString(defaultExtraChance)));
+
+            retryChance = new ExpressionCalculator(config.getString("retry_chance", "0"));
 
             if (config.contains("item")) {
                 item = MinigamesConfigs.getItemStack(config, "item");
@@ -195,10 +191,20 @@ public class WeightedInventory {
             item = copy.item.clone();
         }
 
-        public ItemStack createRandomStack() {
-            int amount = min;
+        public ItemStack createRandomStack(Variables variables, double extraMod) {
+            int amount = (int) min.calculate(variables);
 
-            int tries = max - min;
+            int tries = (int) (max.calculate(variables) - amount);
+
+            double extraChance = this.extraChance.calculate(variables);
+
+            if (extraMod > 0) {
+                extraChance += (1 - extraChance) * extraMod;
+            } else {
+                extraChance *= (1 + extraMod);
+            }
+
+            double retryChance = this.retryChance.calculate(variables);
 
             for (int attempt = 0; attempt < tries; ++attempt) {
                 if (random.nextDouble() < extraChance) {
