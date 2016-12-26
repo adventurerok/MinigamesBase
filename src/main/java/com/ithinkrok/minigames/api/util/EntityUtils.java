@@ -86,7 +86,7 @@ public class EntityUtils {
     }
 
     public static Variables getCustomEntityVariables(Entity entity) {
-        List<MetadataValue> customVariables = entity.getMetadata("custom_name");
+        List<MetadataValue> customVariables = entity.getMetadata("custom_vars");
 
         if(customVariables == null || customVariables.isEmpty()) return null;
 
