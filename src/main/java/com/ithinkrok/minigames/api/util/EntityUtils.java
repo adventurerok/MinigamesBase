@@ -4,6 +4,7 @@ import com.ithinkrok.minigames.api.team.Team;
 import com.ithinkrok.minigames.api.team.TeamUserResolver;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.user.UserResolver;
+import com.ithinkrok.util.math.Variables;
 import org.bukkit.Sound;
 import org.bukkit.entity.*;
 import org.bukkit.metadata.MetadataValue;
@@ -82,6 +83,14 @@ public class EntityUtils {
         if(customNames == null || customNames.isEmpty()) return null;
 
         return customNames.get(0).asString();
+    }
+
+    public static Variables getCustomEntityVariables(Entity entity) {
+        List<MetadataValue> customVariables = entity.getMetadata("custom_name");
+
+        if(customVariables == null || customVariables.isEmpty()) return null;
+
+        return (Variables) customVariables.get(0).value();
     }
 
     public static Sound getDeathSound(EntityType entityType) {

@@ -14,6 +14,7 @@ import com.ithinkrok.minigames.api.event.game.GameEvent;
 import com.ithinkrok.minigames.api.event.game.GameStateChangedEvent;
 import com.ithinkrok.minigames.api.event.game.MapChangedEvent;
 import com.ithinkrok.minigames.api.event.map.MapBlockBreakNaturallyEvent;
+import com.ithinkrok.minigames.api.event.map.MapEntityDeathEvent;
 import com.ithinkrok.minigames.api.event.team.TeamEvent;
 import com.ithinkrok.minigames.api.event.user.UserEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserJoinEvent;
@@ -33,6 +34,7 @@ import com.ithinkrok.minigames.api.team.Team;
 import com.ithinkrok.minigames.api.team.TeamIdentifier;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.CountdownConfig;
+import com.ithinkrok.minigames.api.util.EntityUtils;
 import com.ithinkrok.minigames.api.util.JSONBook;
 import com.ithinkrok.minigames.base.command.CommandConfig;
 import com.ithinkrok.minigames.base.map.BaseMap;
@@ -843,6 +845,16 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
             currentMap.teleportUser(event.getUser());
 
             sendUpdatePayload();
+        }
+
+        @CustomEventHandler(priority = CustomEventHandler.HIGH)
+        public void eventMapEntityDeath(MapEntityDeathEvent event) {
+            String customName = EntityUtils.getCustomEntityName(event.getEntity());
+            if(customName == null) return;
+
+            CustomEntity customEntity = getCustomEntity(customName);
+
+            CustomEventExecutor.executeEvent(event, customEntity);
         }
 
         @CustomEventHandler(priority = CustomEventHandler.INTERNAL_LAST)

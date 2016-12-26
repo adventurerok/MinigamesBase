@@ -36,6 +36,7 @@ import com.ithinkrok.msm.client.impl.MSMClient;
 import com.ithinkrok.msm.client.protocol.ClientUpdateFileProtocol;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.lang.LangFile;
+import com.ithinkrok.util.math.Variables;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -266,8 +267,9 @@ public class BaseGame implements Game, FileLoader {
     }
 
     @Override
-    public void setCustomEntityName(Entity entity, String name) {
+    public void setupCustomEntity(Entity entity, String name, Variables variables) {
         entity.setMetadata("custom_name", new FixedMetadataValue(plugin, name));
+        entity.setMetadata("custom_vars", new FixedMetadataValue(plugin, variables));
     }
 
     @Override

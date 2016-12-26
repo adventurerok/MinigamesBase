@@ -8,6 +8,7 @@ import com.ithinkrok.minigames.api.team.Team;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.disguise.Disguise;
 import com.ithinkrok.minigames.base.BaseUser;
+import com.ithinkrok.util.math.Variables;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -80,5 +81,5 @@ public interface Game extends TaskScheduler, DatabaseTaskRunner, Nameable {
      */
     void checkResourcesRestart();
 
-    void setCustomEntityName(Entity entity, String name);
+    void setupCustomEntity(Entity entity, String name, Variables variables);
 }
