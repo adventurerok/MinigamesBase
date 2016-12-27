@@ -24,7 +24,7 @@ public class LightningWand implements CustomListener {
     public void onListenerEnabled(ListenerLoadedEvent<?, ?> event) {
         Config config = event.getConfig();
 
-        maxRange = config.getInt("max_range");
+        maxRange = config.getInt("max_range", 200);
         lightingMultiplier = new ExpressionCalculator(config.getString("damage_multiplier", "1"));
     }
 

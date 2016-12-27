@@ -12,6 +12,7 @@ import com.ithinkrok.minigames.base.command.CommandConfig;
 import com.ithinkrok.minigames.base.map.BaseMapInfo;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomListener;
+import com.ithinkrok.util.math.expression.Expression;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
@@ -164,9 +165,14 @@ public final class ConfigParser {
     private void loadSchematics(Config config) {
         for (String name : config.getKeys(false)) {
             Config schemConfig = config.getConfigOrNull(name);
-            Schematic schem = new Schematic(name, loader.getAssetDirectory(), schemConfig);
 
-            holder.addSchematic(schem);
+            try {
+                Schematic schem = new Schematic(name, loader.getAssetDirectory(), schemConfig);
+                holder.addSchematic(schem);
+            } catch (Exception e) {
+                System.err.println("Failed to load Schematic " + name);
+                e.printStackTrace();
+            }
         }
     }
 
@@ -195,8 +201,13 @@ public final class ConfigParser {
         for (String name : config.getKeys(false)) {
             Config itemConfig = config.getConfigOrNull(name);
 
-            CustomItem item = new CustomItem(name, itemConfig);
-            holder.addCustomItem(item);
+            try {
+                CustomItem item = new CustomItem(name, itemConfig);
+                holder.addCustomItem(item);
+            } catch (Exception e) {
+                System.err.println("Failed to load CustomItem " + name);
+                e.printStackTrace();
+            }
         }
     }
 
