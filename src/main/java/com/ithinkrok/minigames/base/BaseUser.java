@@ -283,19 +283,38 @@ public class BaseUser implements Listener, User {
             for (int index = 0; index < inv.getSize(); ++index) {
                 ItemStack old = inv.getItem(index);
 
-                int id = InventoryUtils.getIdentifier(old);
-                if (id < 0) continue;
-
-                CustomItem customItem = gameGroup.getCustomItem(id);
-                if (!customItem.replaceOnUpgrade()) continue;
-
-                ItemStack replace = customItem.createForUser(BaseUser.this);
-                if (replace.isSimilar(old)) continue;
-
-                replace.setAmount(old.getAmount());
+                ItemStack replace = upgradeItem(old);
+                if (replace == null) continue;
 
                 inv.setItem(index, replace);
             }
+
+            ItemStack[] armor = inv.getArmorContents();
+
+            for(int index = 0; index < armor.length; ++index) {
+                ItemStack old = armor[index];
+
+                ItemStack replace = upgradeItem(old);
+                if (replace == null) continue;
+
+                armor[index] = replace;
+            }
+
+            inv.setArmorContents(armor);
+        }
+
+        private ItemStack upgradeItem(ItemStack old) {
+            int id = InventoryUtils.getIdentifier(old);
+            if (id < 0) return null;
+
+            CustomItem customItem = gameGroup.getCustomItem(id);
+            if (!customItem.replaceOnUpgrade()) return null;
+
+            ItemStack replace = customItem.createForUser(BaseUser.this);
+            if (replace.isSimilar(old)) return null;
+
+            replace.setAmount(old.getAmount());
+            return replace;
         }
 
         @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
