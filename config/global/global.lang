@@ -36,7 +36,7 @@ money.balance.user.subtract=&c$%s &ewas deducted from your Account!
 money.balance.user.add=&a$%s &ewas added to your Account!
 
 #Global custom_item defaults
-cooldowns.default.wait=&cPlease wait for this ability to cool down!
+cooldowns.default.wait=&cPlease wait %s seconds for this ability to cool down!
 timeouts.default.wait=&cYou are already using this ability!
 
 lore.cooldown=Cooldown\: %s seconds
