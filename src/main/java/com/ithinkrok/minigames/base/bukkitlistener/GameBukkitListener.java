@@ -434,8 +434,11 @@ public class GameBukkitListener implements Listener {
         Team targetTeam = EntityUtils.getRepresentingTeam(gameGroup, event.getEntity());
 
         User attacker = EntityUtils.getRepresentingUser(gameGroup, event.getDamager());
+
         if (attacker == null) {
-            if (Objects.equals(attackerTeam, targetTeam) && !friendlyFire) {
+            User targetRepresenting = EntityUtils.getRepresentingUser(gameGroup, event.getEntity());
+
+            if (Objects.equals(attackerTeam, targetTeam) && !friendlyFire && targetRepresenting != null) {
                 event.setCancelled(true);
             }
             return;
