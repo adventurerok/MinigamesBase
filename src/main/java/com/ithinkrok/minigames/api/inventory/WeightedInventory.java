@@ -39,9 +39,16 @@ public class WeightedInventory {
         List<Config> itemConfigs = config.getConfigList("items");
 
         for (Config itemConfig : itemConfigs) {
-            WeightedItem item = new WeightedItem(gameGroup, itemConfig);
+            try {
+                WeightedItem item = new WeightedItem(gameGroup, itemConfig);
 
-            items.add(item);
+                items.add(item);
+            } catch (Exception e) {
+                System.err.println("Error while creating WeightedItem for WeightedInventory with base chance " +
+                                           config.getString("base_chance"));
+
+                e.printStackTrace();
+            }
         }
 
         this.weightMultiplier = new ExpressionCalculator(config.getString("adjust_balance", "1"));
@@ -171,6 +178,10 @@ public class WeightedInventory {
                 String customName = config.getString("custom_item");
 
                 CustomItem customItem = gameGroup.getCustomItem(customName);
+
+                if(customItem == null) {
+                    throw new IllegalArgumentException("No custom item with name " + customName);
+                }
 
                 Config variableConfig = config.getConfigOrEmpty("variables");
 
