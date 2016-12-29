@@ -21,12 +21,13 @@ import com.ithinkrok.util.math.ExpressionCalculator;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
+import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.util.Vector;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by paul on 22/12/16.
@@ -156,11 +157,24 @@ public class WeightedChestListener implements CustomListener {
 
         chest.update();
 
+        Collection<Location> removeLocations = new HashSet<>();
+
         openedChests.add(event.getClickedBlock().getLocation());
+
+        if(inventory instanceof DoubleChestInventory) {
+            BlockState leftSide = (BlockState) ((DoubleChestInventory) inventory).getLeftSide().getHolder();
+            BlockState rightSide = (BlockState) ((DoubleChestInventory) inventory).getRightSide().getHolder();
+
+            openedChests.add(leftSide.getLocation());
+            openedChests.add(rightSide.getLocation());
+
+            removeLocations.add(leftSide.getLocation());
+            removeLocations.add(rightSide.getLocation());
+        }
 
         if (chestDuration > 0) {
             GameTask task = event.getUserGameGroup().doInFuture(task1 -> {
-                openedChests.remove(event.getClickedBlock().getLocation());
+                openedChests.removeAll(removeLocations);
             }, chestDuration);
 
             event.getUserGameGroup().bindTaskToCurrentGameState(task);
