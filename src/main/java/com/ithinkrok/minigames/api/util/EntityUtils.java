@@ -78,6 +78,8 @@ public class EntityUtils {
     }
 
     public static String getCustomEntityName(Entity entity) {
+        if(entity == null) return null;
+
         List<MetadataValue> customNames = entity.getMetadata("custom_name");
 
         if(customNames == null || customNames.isEmpty()) return null;
