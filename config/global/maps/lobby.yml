@@ -2,3 +2,7 @@ folder: "global_lobby"
 description: "The default lobby map"
 environment: "normal"
 enable_weather: false
+
+border:
+  center: "-17.5,0,35.5"
+  size: 180
