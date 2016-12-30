@@ -29,6 +29,7 @@ import com.ithinkrok.util.lang.LanguageLookup;
 import com.ithinkrok.util.lang.MultipleLanguageLookup;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.WorldBorder;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -133,6 +134,16 @@ public class BaseMap implements GameMap, ConfigHolder {
             for (String rule : gameRules.getKeys(false)) {
                 world.setGameRuleValue(rule, gameRules.getString("rule"));
             }
+        }
+
+        if(config.contains("border")) {
+            WorldBorder worldBorder = world.getWorldBorder();
+
+            Vector center = BukkitConfigUtils.getVector(config, "border.center");
+            if(center != null) worldBorder.setCenter(center.getX(), center.getZ());
+
+            double size = config.getDouble("border.size");
+            worldBorder.setSize(size);
         }
     }
 
