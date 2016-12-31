@@ -533,6 +533,8 @@ public class GameBukkitListener implements Listener {
             creature.setTarget(null);
         }
 
+        boolean attackedInGame = attacked.isInGame();
+
 
         UserDeathEvent deathEvent = new UserDeathEvent(attacked, event, attacker, assist);
         attacked.getGameGroup().userEvent(deathEvent);
@@ -547,7 +549,7 @@ public class GameBukkitListener implements Listener {
                                        event.getFinalDamage() + ", attacker=null");
         }
 
-        if (!deathEvent.getPlayDeathSound() || !attacked.isInGame()) return;
+        if (!deathEvent.getPlayDeathSound() || !attackedInGame) return;
 
         attacked.getLocation().getWorld()
                 .playSound(attacked.getLocation(), EntityUtils.getDeathSound(attacked.getVisibleEntityType()), 1.0f,

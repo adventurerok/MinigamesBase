@@ -144,7 +144,7 @@ public class EntityUtils {
             case VILLAGER:
                 return NamedSounds.fromName("ENTITY_VILLAGER_DEATH");
             default:
-                return NamedSounds.fromName("ENTITY_PLAYER_DEATH");
+                return NamedSounds.fromName("ENTITY_PLAYER_HURT");
         }
     }
 
