@@ -44,18 +44,18 @@ public class CooldownHandler {
         return coolingDown.containsKey(ability);
     }
 
-    public int getCooldownSeconds(String ability) {
+    public double getCooldownSeconds(String ability) {
         Long endNanos = coolingDown.get(ability);
         if(endNanos == null) return 0;
 
-        return (int) Math.ceil((endNanos - System.nanoTime()) / 1_000_000_000d);
+        //To the nearest tick
+        return Math.ceil((endNanos - System.nanoTime()) / 50_000_000d) * 20;
     }
 
     private long timeInFuture(double secondsInFuture) {
         return System.nanoTime() + (long) (secondsInFuture * 1000000000);
     }
 
-    @SuppressWarnings("unchecked")
     public void stopCoolDown(String ability, String stopLocale) {
         if (!isCoolingDown(ability)) return;
 

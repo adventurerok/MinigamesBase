@@ -833,7 +833,7 @@ public class BaseUser implements Listener, User {
     }
 
     @Override
-    public int getCooldownSeconds(String ability) {
+    public double getCooldownSeconds(String ability) {
         return cooldownHandler.getCooldownSeconds(ability);
     }
 
