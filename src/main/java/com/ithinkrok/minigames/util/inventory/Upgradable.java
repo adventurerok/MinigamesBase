@@ -15,7 +15,7 @@ public class Upgradable extends Buyable {
 
     private String upgradeName;
     private String upgradeDisplayLang;
-    private int minLevel, maxLevel;
+    private double minLevel, maxLevel;
     private String customItem;
     private boolean giveItem = true;
 
@@ -29,8 +29,8 @@ public class Upgradable extends Buyable {
         upgradeName = config.getString("upgrade_name");
         upgradeDisplayLang = config.getString("upgrade_display_locale");
 
-        minLevel = config.getInt("min_level", 1);
-        maxLevel = config.getInt("max_level", Integer.MAX_VALUE);
+        minLevel = config.getDouble("min_level", 1);
+        maxLevel = config.getDouble("max_level", Integer.MAX_VALUE);
 
         customItem = config.getString("upgrade_item", null);
         giveItem = config.getBoolean("give_upgrade_item", true);
@@ -38,7 +38,7 @@ public class Upgradable extends Buyable {
 
     @Override
     public void onCalculateItem(CalculateItemForUserEvent event) {
-        int nextLevel = event.getUser().getUpgradeLevel(upgradeName) + 1;
+        double nextLevel = event.getUser().getUpgradeLevel(upgradeName) + 1;
         if (nextLevel > maxLevel) {
             event.setDisplay(null);
             return;
@@ -68,7 +68,7 @@ public class Upgradable extends Buyable {
     @Override
     public boolean canBuy(BuyablePurchaseEvent event) {
         if(!super.canBuy(event)) return false;
-        int level = event.getUser().getUpgradeLevel(upgradeName) + 1;
+        double level = event.getUser().getUpgradeLevel(upgradeName) + 1;
 
         return minLevel <= level && maxLevel >= level;
     }

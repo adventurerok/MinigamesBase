@@ -838,12 +838,12 @@ public class BaseUser implements Listener, User {
     }
 
     @Override
-    public int getUpgradeLevel(String upgrade) {
+    public double getUpgradeLevel(String upgrade) {
         return upgradeHandler.getUpgradeLevel(upgrade);
     }
 
     @Override
-    public void setUpgradeLevel(String upgrade, int level) {
+    public void setUpgradeLevel(String upgrade, double level) {
         upgradeHandler.setUpgradeLevel(upgrade, level);
     }
 

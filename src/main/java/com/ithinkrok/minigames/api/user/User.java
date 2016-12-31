@@ -144,9 +144,9 @@ public interface User
 
     double getCooldownSeconds(String ability);
 
-    int getUpgradeLevel(String upgrade);
+    double getUpgradeLevel(String upgrade);
 
-    void setUpgradeLevel(String upgrade, int level);
+    void setUpgradeLevel(String upgrade, double level);
 
     ItemStack createCustomItemForUser(CustomItem item);
 

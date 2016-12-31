@@ -13,7 +13,7 @@ import java.util.Map;
 public class UpgradeHandler implements Variables {
 
     private final User user;
-    private final Map<String, Integer> upgradeLevels = new HashMap<>();
+    private final Map<String, Double> upgradeLevels = new HashMap<>();
 
     private final Map<String, Variables> customLookupHandlers = new HashMap<>();
 
@@ -21,7 +21,7 @@ public class UpgradeHandler implements Variables {
         this.user = user;
     }
 
-    public int getUpgradeLevel(String upgrade) {
+    public double getUpgradeLevel(String upgrade) {
         if(upgrade.startsWith("@")) {
             int hashTagIndex = upgrade.indexOf('#');
 
@@ -35,7 +35,7 @@ public class UpgradeHandler implements Variables {
             }
         }
 
-        Integer level = upgradeLevels.get(upgrade);
+        Double level = upgradeLevels.get(upgrade);
 
         return level == null ? 0 : level;
     }
@@ -49,13 +49,13 @@ public class UpgradeHandler implements Variables {
     }
 
     @SuppressWarnings("unchecked")
-    public void setUpgradeLevel(String upgrade, int level) {
+    public void setUpgradeLevel(String upgrade, double level) {
         if(ExpressionCalculator.isNumber(upgrade))
             throw new RuntimeException("Please do not use numbers as upgrade names");
         if(ExpressionCalculator.isOperatorOrFunction(upgrade))
             throw new RuntimeException(upgrade + " is an operator or function name. It cannot be used for upgrades");
 
-        int oldLevel = getUpgradeLevel(upgrade);
+        double oldLevel = getUpgradeLevel(upgrade);
         if (oldLevel == level && upgradeLevels.containsKey(upgrade)) return;
 
         upgradeLevels.put(upgrade, level);

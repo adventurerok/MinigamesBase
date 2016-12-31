@@ -9,9 +9,9 @@ import com.ithinkrok.minigames.api.user.User;
 public class UserUpgradeEvent extends UserEvent {
 
     private final String upgradeName;
-    private final int oldLevel, newLevel;
+    private final double oldLevel, newLevel;
 
-    public UserUpgradeEvent(User user, String upgradeName, int oldLevel, int newLevel) {
+    public UserUpgradeEvent(User user, String upgradeName, double oldLevel, double newLevel) {
         super(user);
         this.upgradeName = upgradeName;
         this.oldLevel = oldLevel;
@@ -22,11 +22,11 @@ public class UserUpgradeEvent extends UserEvent {
         return upgradeName;
     }
 
-    public int getOldLevel() {
+    public double getOldLevel() {
         return oldLevel;
     }
 
-    public int getNewLevel() {
+    public double getNewLevel() {
         return newLevel;
     }
 }
