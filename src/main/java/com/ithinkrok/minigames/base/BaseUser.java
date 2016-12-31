@@ -811,7 +811,7 @@ public class BaseUser implements Listener, User {
     }
 
     @Override
-    public boolean startCoolDown(String ability, int seconds, String coolDownLocale) {
+    public boolean startCoolDown(String ability, double seconds, String coolDownLocale) {
         return cooldownHandler.startCoolDown(ability, seconds, coolDownLocale);
     }
 

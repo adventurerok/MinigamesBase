@@ -134,7 +134,7 @@ public interface User
 
     void setWitherTicks(User witherAttacker, int witherTicks, int witherAmplifier);
 
-    boolean startCoolDown(String ability, int seconds, String coolDownLocale);
+    boolean startCoolDown(String ability, double seconds, String coolDownLocale);
 
     void stopCoolDown(String ability, String stopLocale);
 

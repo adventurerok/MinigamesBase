@@ -187,7 +187,7 @@ public class CustomItem implements Identifiable, CustomListener, Nameable {
     private void startRightClickCooldown(User user) {
         if(rightClickCooldown == null) return;
 
-        int cooldown = (int) rightClickCooldown.calculate(user.getUserVariables());
+        double cooldown = calculateRightClickCooldown(user.getUserVariables());
         user.startCoolDown(rightClickCooldownAbility, cooldown, rightClickCooldownFinishedLocale);
     }
 
