@@ -165,7 +165,7 @@ public class CustomItem implements Identifiable, CustomListener, Nameable {
         if(!event.getStartCooldownAfterAction()) return;
 
         if(timeoutCalculator != null) {
-            int timeout = (int) timeoutCalculator.calculate(event.getUser().getUpgradeLevels());
+            int timeout = (int) timeoutCalculator.calculate(event.getUser().getUserVariables());
             event.getUser().startCoolDown(timeoutAbility, timeout, timeoutFinishedLocale);
         } else {
             startRightClickCooldown(event.getUser());
@@ -187,7 +187,7 @@ public class CustomItem implements Identifiable, CustomListener, Nameable {
     private void startRightClickCooldown(User user) {
         if(rightClickCooldown == null) return;
 
-        int cooldown = (int) rightClickCooldown.calculate(user.getUpgradeLevels());
+        int cooldown = (int) rightClickCooldown.calculate(user.getUserVariables());
         user.startCoolDown(rightClickCooldownAbility, cooldown, rightClickCooldownFinishedLocale);
     }
 
@@ -201,7 +201,7 @@ public class CustomItem implements Identifiable, CustomListener, Nameable {
     }
 
     public ItemStack createForUser(User user) {
-        return createWithVariables(user.getLanguageLookup(), user.getUpgradeLevels());
+        return createWithVariables(user.getLanguageLookup(), user.getUserVariables());
     }
 
     public boolean replaceOnUpgrade() {

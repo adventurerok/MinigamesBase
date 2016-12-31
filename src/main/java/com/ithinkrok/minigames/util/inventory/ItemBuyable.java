@@ -51,7 +51,7 @@ public class ItemBuyable extends Buyable {
         if (event.getDisplay() == null && customItem != null) {
             ItemStack item = event.getUserGameGroup().getCustomItem(customItem).createForUser(event.getUser());
 
-            item.setAmount((int) (item.getAmount() * amount.calculate(event.getUser().getUpgradeLevels())));
+            item.setAmount((int) (item.getAmount() * amount.calculate(event.getUser().getUserVariables())));
 
             item = InventoryUtils.removeIdentifier(item);
 
@@ -68,7 +68,7 @@ public class ItemBuyable extends Buyable {
             CustomItem customItem = event.getUserGameGroup().getCustomItem(this.customItem);
             ItemStack item = customItem.createForUser(event.getUser());
 
-            item.setAmount((int) (item.getAmount() * amount.calculate(event.getUser().getUpgradeLevels())));
+            item.setAmount((int) (item.getAmount() * amount.calculate(event.getUser().getUserVariables())));
 
             return giveUserItem(event.getUser(), item);
         }

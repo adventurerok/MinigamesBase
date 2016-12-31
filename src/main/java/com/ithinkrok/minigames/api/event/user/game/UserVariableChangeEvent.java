@@ -6,12 +6,12 @@ import com.ithinkrok.minigames.api.user.User;
 /**
  * Created by paul on 03/01/16.
  */
-public class UserUpgradeEvent extends UserEvent {
+public class UserVariableChangeEvent extends UserEvent {
 
     private final String upgradeName;
     private final double oldLevel, newLevel;
 
-    public UserUpgradeEvent(User user, String upgradeName, double oldLevel, double newLevel) {
+    public UserVariableChangeEvent(User user, String upgradeName, double oldLevel, double newLevel) {
         super(user);
         this.upgradeName = upgradeName;
         this.oldLevel = oldLevel;

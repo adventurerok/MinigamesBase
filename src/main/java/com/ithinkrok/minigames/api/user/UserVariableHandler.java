@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.api.user;
 
-import com.ithinkrok.minigames.api.event.user.game.UserUpgradeEvent;
+import com.ithinkrok.minigames.api.event.user.game.UserVariableChangeEvent;
 import com.ithinkrok.util.math.ExpressionCalculator;
 import com.ithinkrok.util.math.Variables;
 
@@ -10,18 +10,19 @@ import java.util.Map;
 /**
  * Created by paul on 03/01/16.
  */
-public class UpgradeHandler implements Variables {
+public class UserVariableHandler implements Variables {
 
     private final User user;
-    private final Map<String, Double> upgradeLevels = new HashMap<>();
+    private final Map<String, Double> variables = new HashMap<>();
 
     private final Map<String, Variables> customLookupHandlers = new HashMap<>();
 
-    public UpgradeHandler(User user) {
+    public UserVariableHandler(User user) {
         this.user = user;
     }
 
-    public double getUpgradeLevel(String upgrade) {
+    @Override
+    public double getVariable(String upgrade) {
         if(upgrade.startsWith("@")) {
             int hashTagIndex = upgrade.indexOf('#');
 
@@ -35,42 +36,38 @@ public class UpgradeHandler implements Variables {
             }
         }
 
-        Double level = upgradeLevels.get(upgrade);
+        Double level = variables.get(upgrade);
 
         return level == null ? 0 : level;
     }
 
-    public void addCustomLevelLookup(String name, Variables variables) {
+    public void addCustomVariableLookup(String name, Variables variables) {
         customLookupHandlers.put(name, variables);
     }
 
-    public void removeCustomLevelLookup(String name) {
+    public void removeCustomVariableLookup(String name) {
         customLookupHandlers.remove(name);
     }
 
     @SuppressWarnings("unchecked")
-    public void setUpgradeLevel(String upgrade, double level) {
+    public void setVariable(String upgrade, double level) {
         if(ExpressionCalculator.isNumber(upgrade))
-            throw new RuntimeException("Please do not use numbers as upgrade names");
+            throw new RuntimeException("Please do not use numbers as variable names");
         if(ExpressionCalculator.isOperatorOrFunction(upgrade))
-            throw new RuntimeException(upgrade + " is an operator or function name. It cannot be used for upgrades");
+            throw new RuntimeException(upgrade + " is an operator or function name. It cannot be used for variables");
 
-        double oldLevel = getUpgradeLevel(upgrade);
-        if (oldLevel == level && upgradeLevels.containsKey(upgrade)) return;
+        double oldLevel = getVariable(upgrade);
+        if (oldLevel == level && variables.containsKey(upgrade)) return;
 
-        upgradeLevels.put(upgrade, level);
+        variables.put(upgrade, level);
 
-        UserUpgradeEvent event = new UserUpgradeEvent(user, upgrade, oldLevel, level);
+        UserVariableChangeEvent event = new UserVariableChangeEvent(user, upgrade, oldLevel, level);
 
         user.getGameGroup().userEvent(event);
     }
 
     public void clearUpgrades() {
-        upgradeLevels.clear();
+        variables.clear();
     }
 
-    @Override
-    public double getVariable(String name) {
-        return getUpgradeLevel(name);
-    }
 }

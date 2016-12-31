@@ -33,7 +33,7 @@ public class LightningWand implements CustomListener {
         if(event.getInteractType() != UserInteractEvent.InteractType.REPRESENTING) return;
 
         if(event.getDamageCause() == EntityDamageEvent.DamageCause.LIGHTNING) {
-            event.setDamage(event.getDamage() * lightingMultiplier.calculate(event.getUser().getUpgradeLevels()));
+            event.setDamage(event.getDamage() * lightingMultiplier.calculate(event.getUser().getUserVariables()));
         }
     }
 

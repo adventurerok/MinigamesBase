@@ -93,11 +93,11 @@ public class WeaponModifier implements CustomListener {
         if (attack.getDamageCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
 
         if (damageCalculator != null) {
-            attack.setDamage(damageCalculator.calculate(attack.getUser().getUpgradeLevels()) * HEALTH_PER_HEART);
+            attack.setDamage(damageCalculator.calculate(attack.getUser().getUserVariables()) * HEALTH_PER_HEART);
         }
 
         if (fireCalculator != null) {
-            int fireTicks = (int) (fireCalculator.calculate(attack.getUser().getUpgradeLevels()) * TICKS_PER_SECOND);
+            int fireTicks = (int) (fireCalculator.calculate(attack.getUser().getUserVariables()) * TICKS_PER_SECOND);
 
             if (fireTicks > 0) {
                 if (attack.isAttackingUser()) attack.getTargetUser().setFireTicks(attack.getUser(), fireTicks);
@@ -133,8 +133,8 @@ public class WeaponModifier implements CustomListener {
 
         @SuppressWarnings("unchecked")
         public void modifyAttack(UserAttackEvent attack, boolean addToAttacker) {
-            int duration = (int) (durationCalculator.calculate(attack.getUser().getUpgradeLevels()) * TICKS_PER_SECOND);
-            int amp = (int) (levelCalculator.calculate(attack.getUser().getUpgradeLevels()) - 1);
+            int duration = (int) (durationCalculator.calculate(attack.getUser().getUserVariables()) * TICKS_PER_SECOND);
+            int amp = (int) (levelCalculator.calculate(attack.getUser().getUserVariables()) - 1);
 
             if (duration <= 0 || amp < 0) return;
 

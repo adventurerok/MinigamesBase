@@ -23,7 +23,7 @@ import com.ithinkrok.minigames.api.team.Team;
 import com.ithinkrok.minigames.api.team.TeamIdentifier;
 import com.ithinkrok.minigames.api.user.AttackerTracker;
 import com.ithinkrok.minigames.api.user.CooldownHandler;
-import com.ithinkrok.minigames.api.user.UpgradeHandler;
+import com.ithinkrok.minigames.api.user.UserVariableHandler;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.user.scoreboard.ScoreboardDisplay;
 import com.ithinkrok.minigames.api.user.scoreboard.ScoreboardHandler;
@@ -72,7 +72,7 @@ public class BaseUser implements Listener, User {
     private final AttackerTracker fireAttacker = new AttackerTracker(this);
     private final AttackerTracker witherAttacker = new AttackerTracker(this);
     private final AttackerTracker lastAttacker = new AttackerTracker(this);
-    private final UpgradeHandler upgradeHandler = new UpgradeHandler(this);
+    private final UserVariableHandler userVariableHandler = new UserVariableHandler(this);
     private final CooldownHandler cooldownHandler = new CooldownHandler(this);
     private final ClassToInstanceMap<UserMetadata> metadataMap = MutableClassToInstanceMap.create();
     private final String name;
@@ -277,7 +277,7 @@ public class BaseUser implements Listener, User {
         }
 
         @CustomEventHandler
-        public void eventUpgrade(UserUpgradeEvent event) {
+        public void eventUpgrade(UserVariableChangeEvent event) {
             PlayerInventory inv = getInventory();
 
             for (int index = 0; index < inv.getSize(); ++index) {
@@ -715,7 +715,7 @@ public class BaseUser implements Listener, User {
         inGameTaskList.cancelAllTasks();
 
         if (!inGame) {
-            upgradeHandler.clearUpgrades();
+            userVariableHandler.clearUpgrades();
             cooldownHandler.cancelCoolDowns();
 
             inventoryTether = null;
@@ -838,18 +838,18 @@ public class BaseUser implements Listener, User {
     }
 
     @Override
-    public double getUpgradeLevel(String upgrade) {
-        return upgradeHandler.getUpgradeLevel(upgrade);
+    public double getUserVariable(String upgrade) {
+        return userVariableHandler.getVariable(upgrade);
     }
 
     @Override
-    public void setUpgradeLevel(String upgrade, double level) {
-        upgradeHandler.setUpgradeLevel(upgrade, level);
+    public void setUserVariable(String upgrade, double level) {
+        userVariableHandler.setVariable(upgrade, level);
     }
 
     @Override
     public ItemStack createCustomItemForUser(CustomItem item) {
-        return item.createWithVariables(gameGroup, upgradeHandler);
+        return item.createWithVariables(gameGroup, userVariableHandler);
     }
 
     @Override
@@ -858,8 +858,8 @@ public class BaseUser implements Listener, User {
     }
 
     @Override
-    public UpgradeHandler getUpgradeLevels() {
-        return upgradeHandler;
+    public UserVariableHandler getUserVariables() {
+        return userVariableHandler;
     }
 
     @Override

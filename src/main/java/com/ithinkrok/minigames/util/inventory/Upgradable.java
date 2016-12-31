@@ -38,7 +38,7 @@ public class Upgradable extends Buyable {
 
     @Override
     public void onCalculateItem(CalculateItemForUserEvent event) {
-        double nextLevel = event.getUser().getUpgradeLevel(upgradeName) + 1;
+        double nextLevel = event.getUser().getUserVariable(upgradeName) + 1;
         if (nextLevel > maxLevel) {
             event.setDisplay(null);
             return;
@@ -68,14 +68,14 @@ public class Upgradable extends Buyable {
     @Override
     public boolean canBuy(BuyablePurchaseEvent event) {
         if(!super.canBuy(event)) return false;
-        double level = event.getUser().getUpgradeLevel(upgradeName) + 1;
+        double level = event.getUser().getUserVariable(upgradeName) + 1;
 
         return minLevel <= level && maxLevel >= level;
     }
 
     @Override
     public boolean onPurchase(BuyablePurchaseEvent event) {
-        event.getUser().setUpgradeLevel(upgradeName, event.getUser().getUpgradeLevel(upgradeName) + 1);
+        event.getUser().setUserVariable(upgradeName, event.getUser().getUserVariable(upgradeName) + 1);
 
         if (customItem != null && giveItem) {
             CustomItem cust = event.getUserGameGroup().getCustomItem(customItem);

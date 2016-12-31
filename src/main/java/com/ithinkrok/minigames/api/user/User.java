@@ -144,15 +144,15 @@ public interface User
 
     double getCooldownSeconds(String ability);
 
-    double getUpgradeLevel(String upgrade);
+    double getUserVariable(String upgrade);
 
-    void setUpgradeLevel(String upgrade, double level);
+    void setUserVariable(String upgrade, double level);
 
     ItemStack createCustomItemForUser(CustomItem item);
 
     <T extends Projectile> T launchProjectile(Class<? extends T> projectileClass);
 
-    UpgradeHandler getUpgradeLevels();
+    UserVariableHandler getUserVariables();
 
     UUID getUuid();
 

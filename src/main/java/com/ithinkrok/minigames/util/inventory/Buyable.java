@@ -76,7 +76,7 @@ public abstract class Buyable extends ClickableItem {
         int cost = getCost(event.getUser());
         boolean hasMoney = true;
 
-        boolean team = this.team.calculateBoolean(event.getUser().getUpgradeLevels());
+        boolean team = this.team.calculateBoolean(event.getUser().getUserVariables());
 
         if (team) {
             Money teamMoney = Money.getOrCreate(event.getUser().getTeam());
@@ -98,11 +98,11 @@ public abstract class Buyable extends ClickableItem {
     }
 
     public boolean canBuy(BuyablePurchaseEvent event) {
-        return canBuy.calculateBoolean(event.getUser().getUpgradeLevels());
+        return canBuy.calculateBoolean(event.getUser().getUserVariables());
     }
 
     public int getCost(User user) {
-        return (int) cost.calculate(user.getUpgradeLevels());
+        return (int) cost.calculate(user.getUserVariables());
     }
 
     @Override
@@ -112,7 +112,7 @@ public abstract class Buyable extends ClickableItem {
 
         int cost = getCost(event.getUser());
 
-        boolean team = this.team.calculateBoolean(event.getUser().getUpgradeLevels());
+        boolean team = this.team.calculateBoolean(event.getUser().getUserVariables());
 
         if (team) {
             teamMoney = Money.getOrCreate(event.getUser().getTeam());
@@ -160,12 +160,12 @@ public abstract class Buyable extends ClickableItem {
 
     private void doUpgradesOnBuy(User user) {
         for (Map.Entry<String, Calculator> upgrades : upgradeOnBuy.entrySet()) {
-            user.setUpgradeLevel(upgrades.getKey(), (int) upgrades.getValue().calculate(user.getUpgradeLevels()));
+            user.setUserVariable(upgrades.getKey(), (int) upgrades.getValue().calculate(user.getUserVariables()));
         }
     }
 
     public boolean buyWithTeamMoney(User user) {
-        return team.calculateBoolean(user.getUpgradeLevels());
+        return team.calculateBoolean(user.getUserVariables());
     }
 
 }
