@@ -165,7 +165,7 @@ public class CustomItem implements Identifiable, CustomListener, Nameable {
         if(!event.getStartCooldownAfterAction()) return;
 
         if(timeoutCalculator != null) {
-            int timeout = (int) timeoutCalculator.calculate(event.getUser().getUserVariables());
+            double timeout = calculateRightClickTimeout(event.getUser().getUserVariables());
             event.getUser().startCoolDown(timeoutAbility, timeout, timeoutFinishedLocale);
         } else {
             startRightClickCooldown(event.getUser());
