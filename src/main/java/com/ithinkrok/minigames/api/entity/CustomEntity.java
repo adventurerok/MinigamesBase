@@ -95,6 +95,12 @@ public class CustomEntity implements Nameable, CustomListener {
             }
         }
 
+        if(config.contains("wither")) {
+            if(Math.floor(calculate(variables, config, "wither")) != 0) {
+                ((Skeleton) entity).setSkeletonType(Skeleton.SkeletonType.WITHER);
+            }
+        }
+
         if (config.contains("effects")) {
             addEntityEffects(variables, (LivingEntity) entity);
         }
