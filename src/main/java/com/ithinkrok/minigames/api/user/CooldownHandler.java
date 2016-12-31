@@ -49,7 +49,7 @@ public class CooldownHandler {
         if(endNanos == null) return 0;
 
         //To the nearest tick
-        return Math.ceil((endNanos - System.nanoTime()) / 50_000_000d) * 20;
+        return Math.ceil((endNanos - System.nanoTime()) / 50_000_000d) / 20d;
     }
 
     private long timeInFuture(double secondsInFuture) {
