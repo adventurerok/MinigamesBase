@@ -98,6 +98,7 @@ public class CustomEntity implements Nameable, CustomListener {
 
         gameGroup.getGame().setupCustomEntity(entity, name, variables);
 
+        //Handle entities with ages
         if (config.contains("age")) {
             ((Ageable) entity).setAge((int) calculate(variables, config, "age"));
         }
@@ -114,16 +115,33 @@ public class CustomEntity implements Nameable, CustomListener {
             }
         }
 
+        //Make a skeleton a wither skeleton
         if (config.contains("wither")) {
             if (Math.floor(calculate(variables, config, "wither")) != 0) {
                 ((Skeleton) entity).setSkeletonType(Skeleton.SkeletonType.WITHER);
             }
         }
 
+        //Charge a creeper
+        if(config.contains("charged")) {
+            if(Math.floor(calculate(variables, config, "charged")) != 0) {
+                ((Creeper) entity).setPowered(true);
+            }
+        }
+
+        //Strike lightning at the new entity
+        if(config.contains("strike_lightning")) {
+            if(Math.floor(calculate(variables, config, "strike_lightning")) != 0) {
+                location.getWorld().strikeLightningEffect(location);
+            }
+        }
+
+        //Give potion effects to the entity
         if (config.contains("effects")) {
             addEntityEffects(variables, (LivingEntity) entity);
         }
 
+        //Set the max health and initial health of the entity
         if (config.contains("max_health")) {
             int maxHealth = (int) (calculate(variables, config, "max_health") * HEALTH_PER_HEART);
 
@@ -131,10 +149,13 @@ public class CustomEntity implements Nameable, CustomListener {
             ((Damageable) entity).setHealth(maxHealth);
         }
 
+        //Show a name above the entity
         if (config.contains("name")) {
             entity.setCustomName(config.getString("name"));
+            entity.setCustomNameVisible(true);
         }
 
+        //Give the entity weapons and armor
         if (config.contains("equipment")) {
             addEntityEquipment(gameGroup, variables, (LivingEntity) entity);
         }
