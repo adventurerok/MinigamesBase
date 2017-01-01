@@ -5,21 +5,11 @@ import com.ithinkrok.minigames.api.event.MinigamesEvent;
 import com.ithinkrok.minigames.api.user.User;
 
 /**
- * Created by paul on 31/12/15.
+ * Created by paul on 01/01/17.
  */
-public class UserEvent implements MinigamesEvent {
+public interface UserEvent extends MinigamesEvent {
 
-    private final User user;
+    User getUser();
 
-    public UserEvent(User user) {
-        this.user = user;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public GameGroup getGameGroup() {
-        return user.getGameGroup();
-    }
+    GameGroup getGameGroup();
 }

@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.api.event.user.state;
 
-import com.ithinkrok.minigames.api.event.user.UserEvent;
+import com.ithinkrok.minigames.api.event.user.BaseUserEvent;
 import com.ithinkrok.minigames.api.user.User;
 import org.bukkit.Location;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -8,7 +8,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 /**
  * Created by paul on 21/12/16.
  */
-public class UserRespawnEvent extends UserEvent {
+public class UserRespawnEvent extends BaseUserEvent {
 
 
     private final PlayerRespawnEvent event;

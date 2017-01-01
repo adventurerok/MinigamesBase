@@ -9,7 +9,7 @@ import org.bukkit.event.block.BlockBurnEvent;
 /**
  * Created by paul on 17/01/16.
  */
-public class MapBlockBurnEvent extends MapEvent implements Cancellable {
+public class MapBlockBurnEvent extends BaseMapEvent implements Cancellable {
 
     private final BlockBurnEvent event;
 

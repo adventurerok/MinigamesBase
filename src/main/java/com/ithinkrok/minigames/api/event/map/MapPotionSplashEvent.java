@@ -14,7 +14,7 @@ import java.util.Collection;
 /**
  * Created by paul on 17/01/16.
  */
-public class MapPotionSplashEvent extends MapEvent implements Cancellable {
+public class MapPotionSplashEvent extends BaseMapEvent implements Cancellable {
 
     private final PotionSplashEvent event;
     private final User thrower;

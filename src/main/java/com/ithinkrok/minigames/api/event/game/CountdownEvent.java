@@ -7,7 +7,7 @@ import com.ithinkrok.minigames.api.event.InfoSignEvent;
 /**
  * Created by paul on 17/02/16.
  */
-public abstract class CountdownEvent extends GameEvent implements InfoSignEvent {
+public abstract class CountdownEvent extends BaseGameEvent implements InfoSignEvent {
 
     private final Countdown countdown;
 

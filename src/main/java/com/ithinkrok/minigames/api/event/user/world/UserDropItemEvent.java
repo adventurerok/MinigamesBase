@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.api.event.user.world;
 
-import com.ithinkrok.minigames.api.event.user.UserEvent;
+import com.ithinkrok.minigames.api.event.user.BaseUserEvent;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.util.event.Cancellable;
 import org.bukkit.entity.Item;
@@ -9,7 +9,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 /**
  * Created by paul on 02/01/16.
  */
-public class UserDropItemEvent extends UserEvent implements Cancellable {
+public class UserDropItemEvent extends BaseUserEvent implements Cancellable {
 
     private final PlayerDropItemEvent event;
 

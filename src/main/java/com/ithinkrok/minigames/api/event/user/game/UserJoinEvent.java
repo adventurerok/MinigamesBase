@@ -1,12 +1,12 @@
 package com.ithinkrok.minigames.api.event.user.game;
 
-import com.ithinkrok.minigames.api.event.user.UserEvent;
+import com.ithinkrok.minigames.api.event.user.BaseUserEvent;
 import com.ithinkrok.minigames.api.user.User;
 
 /**
  * Created by paul on 31/12/15.
  */
-public class UserJoinEvent extends UserEvent {
+public class UserJoinEvent extends BaseUserEvent {
 
     private final JoinReason reason;
 

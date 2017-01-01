@@ -1,14 +1,13 @@
 package com.ithinkrok.minigames.api.event.user.inventory;
 
-import com.ithinkrok.minigames.api.event.user.UserEvent;
+import com.ithinkrok.minigames.api.event.user.BaseUserEvent;
 import com.ithinkrok.minigames.api.user.User;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryView;
 
 /**
  * Created by paul on 02/01/16.
  */
-public abstract class UserInventoryEvent extends UserEvent {
+public abstract class UserInventoryEvent extends BaseUserEvent {
 
 
     public UserInventoryEvent(User user) {

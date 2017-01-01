@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.api.event.user.world;
 
-import com.ithinkrok.minigames.api.event.user.UserEvent;
+import com.ithinkrok.minigames.api.event.user.BaseUserEvent;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.util.event.Cancellable;
 import org.bukkit.entity.Player;
@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * Created by paul on 17/01/16.
  */
-public class UserChatEvent extends UserEvent implements Cancellable {
+public class UserChatEvent extends BaseUserEvent implements Cancellable {
 
     private final AsyncPlayerChatEvent event;
 

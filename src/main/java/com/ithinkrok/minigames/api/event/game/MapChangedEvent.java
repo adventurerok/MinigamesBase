@@ -7,7 +7,7 @@ import com.ithinkrok.minigames.api.map.GameMap;
 /**
  * Created by paul on 02/01/16.
  */
-public class MapChangedEvent extends GameEvent implements InfoSignEvent {
+public class MapChangedEvent extends BaseGameEvent implements InfoSignEvent {
 
     private final GameMap oldMap;
     private final GameMap newMap;

@@ -9,7 +9,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 /**
  * Created by paul on 01/01/17.
  */
-public class MapProjectileLaunchEvent extends MapEvent implements Cancellable {
+public class MapProjectileLaunchEvent extends BaseMapEvent implements Cancellable {
 
     private final ProjectileLaunchEvent event;
 

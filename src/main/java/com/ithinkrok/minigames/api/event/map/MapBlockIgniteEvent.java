@@ -12,7 +12,7 @@ import org.bukkit.event.block.BlockIgniteEvent;
 /**
  * Created by paul on 21/12/16.
  */
-public class MapBlockIgniteEvent extends MapEvent implements Cancellable {
+public class MapBlockIgniteEvent extends BaseMapEvent implements Cancellable {
 
 
     private final BlockIgniteEvent event;

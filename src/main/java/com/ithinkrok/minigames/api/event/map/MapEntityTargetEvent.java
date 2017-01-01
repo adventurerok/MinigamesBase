@@ -9,7 +9,7 @@ import org.bukkit.event.entity.EntityTargetEvent;
 /**
  * Created by paul on 23/12/16.
  */
-public class MapEntityTargetEvent extends MapEvent implements Cancellable {
+public class MapEntityTargetEvent extends BaseMapEvent implements Cancellable {
 
 
     private final EntityTargetEvent event;

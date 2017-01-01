@@ -9,7 +9,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 /**
  * Created by paul on 14/01/16.
  */
-public class MapCreatureSpawnEvent extends MapEvent implements Cancellable {
+public class MapCreatureSpawnEvent extends BaseMapEvent implements Cancellable {
 
     private final CreatureSpawnEvent event;
 

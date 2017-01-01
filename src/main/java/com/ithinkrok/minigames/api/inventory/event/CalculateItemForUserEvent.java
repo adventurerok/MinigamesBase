@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.api.inventory.event;
 
-import com.ithinkrok.minigames.api.event.user.UserEvent;
+import com.ithinkrok.minigames.api.event.user.BaseUserEvent;
 import com.ithinkrok.minigames.api.inventory.ClickableInventory;
 import com.ithinkrok.minigames.api.inventory.ClickableItem;
 import com.ithinkrok.minigames.api.user.User;
@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 /**
  * Created by paul on 02/01/16.
  */
-public class CalculateItemForUserEvent extends UserEvent {
+public class CalculateItemForUserEvent extends BaseUserEvent {
 
     private final ClickableInventory inventory;
     private final ClickableItem item;

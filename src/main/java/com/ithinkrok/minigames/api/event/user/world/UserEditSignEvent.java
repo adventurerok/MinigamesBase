@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.api.event.user.world;
 
-import com.ithinkrok.minigames.api.event.user.UserEvent;
+import com.ithinkrok.minigames.api.event.user.BaseUserEvent;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.util.event.Cancellable;
 import org.bukkit.block.Block;
@@ -9,7 +9,7 @@ import org.bukkit.event.block.SignChangeEvent;
 /**
  * Created by paul on 20/02/16.
  */
-public class UserEditSignEvent extends UserEvent implements Cancellable {
+public class UserEditSignEvent extends BaseUserEvent implements Cancellable {
 
     private final SignChangeEvent event;
 

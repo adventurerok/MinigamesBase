@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.api.event.user.world;
 
-import com.ithinkrok.minigames.api.event.user.UserEvent;
+import com.ithinkrok.minigames.api.event.user.BaseUserEvent;
 import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack;
 /**
  * Created by paul on 01/01/16.
  */
-public abstract class UserInteractEvent extends UserEvent implements Cancellable {
+public abstract class UserInteractEvent extends BaseUserEvent implements Cancellable {
 
     private boolean cooldown = false;
 

@@ -26,6 +26,8 @@ import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.EntityUtils;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
 import com.ithinkrok.minigames.api.util.NamedSounds;
+import com.ithinkrok.minigames.base.event.map.BaseMapEntityAttackedEvent;
+import com.ithinkrok.minigames.base.event.map.BaseMapEntityDamagedEvent;
 import com.ithinkrok.msm.bukkit.MSMPlugin;
 import com.ithinkrok.msm.bukkit.protocol.ClientAPIProtocol;
 import com.ithinkrok.util.command.CommandUtils;
@@ -239,7 +241,7 @@ public class GameBukkitListener implements Listener {
         if (gameGroup == null) return;
 
         //Don't send entity death events for users
-        if(EntityUtils.getActualUser(gameGroup, event.getEntity()) != null) return;
+        if (EntityUtils.getActualUser(gameGroup, event.getEntity()) != null) return;
 
         GameMap map = gameGroup.getCurrentMap();
         if (!map.getWorld().getName().equals(mapName))
@@ -255,7 +257,7 @@ public class GameBukkitListener implements Listener {
         if (gameGroup == null) return;
 
         //Don't send entity death events for users
-        if(EntityUtils.getActualUser(gameGroup, event.getEntity()) != null) return;
+        if (EntityUtils.getActualUser(gameGroup, event.getEntity()) != null) return;
 
         GameMap map = gameGroup.getCurrentMap();
         if (!map.getWorld().getName().equals(mapName))
@@ -389,7 +391,7 @@ public class GameBukkitListener implements Listener {
         }
 
         List<String> correctedArgs = CommandUtils.splitStringIntoArguments(event.getMessage());
-        if(correctedArgs.isEmpty()) return;
+        if (correctedArgs.isEmpty()) return;
 
         String commandName = correctedArgs.get(0).toLowerCase();
         correctedArgs.remove(0);
@@ -495,9 +497,12 @@ public class GameBukkitListener implements Listener {
 
             if (event instanceof EntityDamageByEntityEvent) {
                 attacker = EntityUtils.getRepresentingUser(gameGroup, ((EntityDamageByEntityEvent) event).getDamager());
+
+                gameGroup.gameEvent(new BaseMapEntityAttackedEvent(gameGroup, gameGroup.getCurrentMap(),
+                                                                   (EntityDamageByEntityEvent) event, attacker));
             }
 
-            gameGroup.gameEvent(new MapEntityDamagedEvent(gameGroup, gameGroup.getCurrentMap(), event, attacker));
+            gameGroup.gameEvent(new BaseMapEntityDamagedEvent(gameGroup, gameGroup.getCurrentMap(), event));
             return;
         }
 

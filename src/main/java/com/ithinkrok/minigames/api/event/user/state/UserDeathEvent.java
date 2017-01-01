@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.api.event.user.state;
 
-import com.ithinkrok.minigames.api.event.user.UserEvent;
+import com.ithinkrok.minigames.api.event.user.BaseUserEvent;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.util.event.Cancellable;
 import org.bukkit.entity.Entity;
@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 /**
  * Created by paul on 16/01/16.
  */
-public class UserDeathEvent extends UserEvent implements Cancellable {
+public class UserDeathEvent extends BaseUserEvent implements Cancellable {
 
     private final EntityDamageEvent event;
     private final User killer, assist;

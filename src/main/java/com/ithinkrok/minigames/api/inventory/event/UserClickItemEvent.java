@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.api.inventory.event;
 
-import com.ithinkrok.minigames.api.event.user.UserEvent;
+import com.ithinkrok.minigames.api.event.user.BaseUserEvent;
 import com.ithinkrok.minigames.api.inventory.ClickableInventory;
 import com.ithinkrok.minigames.api.inventory.ClickableItem;
 import com.ithinkrok.minigames.api.user.User;
@@ -11,7 +11,7 @@ import org.bukkit.event.inventory.ClickType;
  *
  * Called when a user clicks on a ClickableItem in an inventory
  */
-public class UserClickItemEvent extends UserEvent {
+public class UserClickItemEvent extends BaseUserEvent {
 
     private final ClickableInventory inventory;
     private final ClickableItem clicked;

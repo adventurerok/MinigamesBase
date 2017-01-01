@@ -9,7 +9,7 @@ import org.bukkit.event.entity.ItemSpawnEvent;
 /**
  * Created by paul on 05/01/16.
  */
-public class MapItemSpawnEvent extends MapEvent implements Cancellable {
+public class MapItemSpawnEvent extends BaseMapEvent implements Cancellable {
 
     private final ItemSpawnEvent event;
 

@@ -1,12 +1,12 @@
 package com.ithinkrok.minigames.api.event.user.game;
 
-import com.ithinkrok.minigames.api.event.user.UserEvent;
+import com.ithinkrok.minigames.api.event.user.BaseUserEvent;
 import com.ithinkrok.minigames.api.user.User;
 
 /**
  * Created by paul on 16/01/16.
  */
-public class UserSpectatorChangeEvent extends UserEvent {
+public class UserSpectatorChangeEvent extends BaseUserEvent {
 
     private final boolean isSpectator;
 

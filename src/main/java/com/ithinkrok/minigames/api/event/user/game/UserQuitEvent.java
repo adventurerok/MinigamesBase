@@ -1,12 +1,12 @@
 package com.ithinkrok.minigames.api.event.user.game;
 
-import com.ithinkrok.minigames.api.event.user.UserEvent;
+import com.ithinkrok.minigames.api.event.user.BaseUserEvent;
 import com.ithinkrok.minigames.api.user.User;
 
 /**
  * Created by paul on 02/01/16.
  */
-public class UserQuitEvent extends UserEvent {
+public class UserQuitEvent extends BaseUserEvent {
 
     private final QuitReason reason;
     private boolean removeUser = true;

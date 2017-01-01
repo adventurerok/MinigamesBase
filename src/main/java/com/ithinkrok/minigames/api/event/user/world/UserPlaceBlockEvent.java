@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.api.event.user.world;
 
-import com.ithinkrok.minigames.api.event.user.UserEvent;
+import com.ithinkrok.minigames.api.event.user.BaseUserEvent;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.util.event.Cancellable;
 import org.bukkit.block.Block;
@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
 /**
  * Created by paul on 31/12/15.
  */
-public class UserPlaceBlockEvent extends UserEvent implements Cancellable {
+public class UserPlaceBlockEvent extends BaseUserEvent implements Cancellable {
 
     private final BlockPlaceEvent event;
 

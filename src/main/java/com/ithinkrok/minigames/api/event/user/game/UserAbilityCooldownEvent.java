@@ -1,13 +1,13 @@
 package com.ithinkrok.minigames.api.event.user.game;
 
-import com.ithinkrok.minigames.api.event.user.UserEvent;
+import com.ithinkrok.minigames.api.event.user.BaseUserEvent;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.SoundEffect;
 
 /**
  * Created by paul on 03/01/16.
  */
-public class UserAbilityCooldownEvent extends UserEvent {
+public class UserAbilityCooldownEvent extends BaseUserEvent {
 
     private final String ability;
 

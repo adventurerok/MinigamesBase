@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by paul on 24/12/16.
  */
-public class MapEntityDeathEvent extends MapEvent {
+public class MapEntityDeathEvent extends BaseMapEvent {
 
     private final EntityDeathEvent event;
 

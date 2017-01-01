@@ -12,7 +12,7 @@ import org.bukkit.event.block.BlockSpreadEvent;
 /**
  * Created by paul on 17/01/16.
  */
-public class MapBlockGrowEvent extends MapEvent implements Cancellable {
+public class MapBlockGrowEvent extends BaseMapEvent implements Cancellable {
 
     private final BlockGrowEvent event;
 

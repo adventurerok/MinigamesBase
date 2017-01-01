@@ -1,6 +1,6 @@
 package com.ithinkrok.minigames.api.event.user.state;
 
-import com.ithinkrok.minigames.api.event.user.UserEvent;
+import com.ithinkrok.minigames.api.event.user.BaseUserEvent;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.util.event.Cancellable;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
@@ -8,7 +8,7 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 /**
  * Created by paul on 02/01/16.
  */
-public class UserFoodLevelChangeEvent extends UserEvent implements Cancellable {
+public class UserFoodLevelChangeEvent extends BaseUserEvent implements Cancellable {
 
     private final FoodLevelChangeEvent event;
 

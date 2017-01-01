@@ -7,7 +7,7 @@ import com.ithinkrok.minigames.api.event.InfoSignEvent;
 /**
  * Created by paul on 02/01/16.
  */
-public class GameStateChangedEvent extends GameEvent implements InfoSignEvent {
+public class GameStateChangedEvent extends BaseGameEvent implements InfoSignEvent {
 
     private final GameState oldGameState;
     private final GameState newGameState;

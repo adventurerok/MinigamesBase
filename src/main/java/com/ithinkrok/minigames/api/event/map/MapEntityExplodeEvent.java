@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Created by paul on 21/12/16.
  */
-public class MapEntityExplodeEvent extends MapEvent implements Cancellable {
+public class MapEntityExplodeEvent extends BaseMapEvent implements Cancellable {
 
 
     private final EntityExplodeEvent event;

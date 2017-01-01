@@ -1,61 +1,20 @@
 package com.ithinkrok.minigames.api.event.map;
 
-import com.ithinkrok.minigames.api.GameGroup;
-import com.ithinkrok.minigames.api.map.GameMap;
-import com.ithinkrok.minigames.api.user.User;
 import org.bukkit.entity.Entity;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 
 /**
- * Created by paul on 19/02/16.
+ * Created by paul on 01/01/17.
  */
-public class MapEntityDamagedEvent extends MapEvent {
+public interface MapEntityDamagedEvent extends MapEvent {
 
-    private final EntityDamageEvent event;
+    Entity getEntity();
 
-    private final User attackerUser;
+    EntityDamageEvent.DamageCause getDamageCause();
 
-    public MapEntityDamagedEvent(GameGroup gameGroup, GameMap map, EntityDamageEvent event, User attackerUser) {
-        super(gameGroup, map);
-        this.event = event;
-        this.attackerUser = attackerUser;
-    }
+    double getDamage();
 
-    public Entity getEntity() {
-        return event.getEntity();
-    }
+    double getFinalDamage();
 
-    public Entity getAttacker() {
-        if(hasAttacker()) return ((EntityDamageByEntityEvent)event).getDamager();
-        else return null;
-    }
-
-    public boolean hasAttacker() {
-        return event instanceof EntityDamageByEntityEvent;
-    }
-
-    public EntityDamageEvent.DamageCause getDamageCause() {
-        return event.getCause();
-    }
-
-    public double getDamage() {
-        return event.getDamage();
-    }
-
-    public double getFinalDamage() {
-        return event.getFinalDamage();
-    }
-
-    public void setDamage(double damage) {
-        event.setDamage(damage);
-    }
-
-    public boolean hasAttackerUser() {
-        return attackerUser != null;
-    }
-
-    public User getAttackerUser() {
-        return attackerUser;
-    }
+    void setDamage(double damage);
 }

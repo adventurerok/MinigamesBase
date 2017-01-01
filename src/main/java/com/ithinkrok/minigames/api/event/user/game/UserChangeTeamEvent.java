@@ -1,13 +1,13 @@
 package com.ithinkrok.minigames.api.event.user.game;
 
-import com.ithinkrok.minigames.api.event.user.UserEvent;
+import com.ithinkrok.minigames.api.event.user.BaseUserEvent;
 import com.ithinkrok.minigames.api.team.Team;
 import com.ithinkrok.minigames.api.user.User;
 
 /**
  * Created by paul on 06/01/16.
  */
-public class UserChangeTeamEvent extends UserEvent {
+public class UserChangeTeamEvent extends BaseUserEvent {
 
     private final Team oldTeam;
     private final Team newTeam;

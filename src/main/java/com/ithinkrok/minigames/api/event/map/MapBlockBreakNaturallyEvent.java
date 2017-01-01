@@ -11,7 +11,7 @@ import org.bukkit.event.block.BlockExpEvent;
  * Called when a block is broken naturally (i.e. not through a user breaking it).
  * This includes explosions, leaves decaying, etc...
  */
-public class MapBlockBreakNaturallyEvent extends MapEvent {
+public class MapBlockBreakNaturallyEvent extends BaseMapEvent {
 
     private final BlockExpEvent event;
 

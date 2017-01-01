@@ -1,14 +1,17 @@
 package com.ithinkrok.minigames.api.event.user.state;
 
-import com.ithinkrok.minigames.api.event.user.UserEvent;
+import com.ithinkrok.minigames.api.event.map.MapEntityDamagedEvent;
+import com.ithinkrok.minigames.api.event.user.BaseUserEvent;
+import com.ithinkrok.minigames.api.map.GameMap;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.util.event.Cancellable;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntityDamageEvent;
 
 /**
  * Created by paul on 02/01/16.
  */
-public class UserDamagedEvent extends UserEvent implements Cancellable {
+public class UserDamagedEvent extends BaseUserEvent implements Cancellable, MapEntityDamagedEvent {
 
     private final EntityDamageEvent event;
 
@@ -27,6 +30,11 @@ public class UserDamagedEvent extends UserEvent implements Cancellable {
         event.setCancelled(cancel);
     }
 
+    @Override
+    public Entity getEntity() {
+        return event.getEntity();
+    }
+
     public EntityDamageEvent.DamageCause getDamageCause() {
         return event.getCause();
     }
@@ -41,5 +49,10 @@ public class UserDamagedEvent extends UserEvent implements Cancellable {
 
     public void setDamage(double damage) {
         event.setDamage(damage);
+    }
+
+    @Override
+    public GameMap getMap() {
+        return getGameGroup().getCurrentMap();
     }
 }
