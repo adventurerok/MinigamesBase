@@ -443,6 +443,7 @@ public class GameBukkitListener implements Listener {
         boolean noTeamFire = gameConfig.getBoolean("no_team_fire");
         boolean notInGameFire = gameConfig.getBoolean("not_in_game_fire");
         boolean mobFire = gameConfig.getBoolean("mob_fire", true);
+        boolean selfHarm = gameConfig.getBoolean("self_harm", true);
 
         if (gameConfig.getBoolean("all_fire")) {
             friendlyFire = noTeamFire = notInGameFire = true;
@@ -476,7 +477,10 @@ public class GameBukkitListener implements Listener {
         }
 
         if (Objects.equals(attackerTeam, targetTeam)) {
-            if (!(representing && attacker == target) && !friendlyFire) {
+            //You can hurt yourself if you are representing (you didn't hit yourself, you got your arrow or whatever
+            // to hit you) and you are your target, and self harm is enabled
+            boolean willAttackSelf = representing && attacker == target && selfHarm;
+            if (!willAttackSelf && !friendlyFire) {
                 event.setCancelled(true);
                 return;
             }
