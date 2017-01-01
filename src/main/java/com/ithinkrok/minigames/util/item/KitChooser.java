@@ -45,7 +45,7 @@ public class KitChooser implements CustomListener {
 
 
         for (String kitName : choosableKits) {
-            Kit kit = event.getUserGameGroup().getKit(kitName);
+            Kit kit = event.getGameGroup().getKit(kitName);
             ItemStack display = kit.getItem().clone();
 
             ClickableItem item = new ClickableItem(display, -1) {

@@ -48,7 +48,7 @@ public class WoolMinigame implements CustomListener {
     public void onUserQuit(UserQuitEvent event) {
         if (!Objects.equals(woolUser, event.getUser())) return;
 
-        GameGroup gameGroup = event.getUserGameGroup();
+        GameGroup gameGroup = event.getGameGroup();
 
         if (gameGroup.getUserCount() <= 1) {
             woolUser = null;

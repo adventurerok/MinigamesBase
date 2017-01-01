@@ -49,7 +49,7 @@ public class TeamChooser implements CustomListener {
         ClickableInventory inventory = new ClickableInventory(user.getLanguageLookup().getLocale(titleLocale));
 
         for(String teamName : choosable) {
-            TeamIdentifier identifier = event.getUserGameGroup().getTeamIdentifier(teamName);
+            TeamIdentifier identifier = event.getGameGroup().getTeamIdentifier(teamName);
             ItemStack display = InventoryUtils.createItemWithNameAndLore(chooserMaterial, 1, identifier.getDyeColor().getWoolData(),
                     identifier.getFormattedName());
 
@@ -62,7 +62,7 @@ public class TeamChooser implements CustomListener {
                         return;
                     }
 
-                    Team team = event.getUserGameGroup().getTeam(teamName);
+                    Team team = event.getGameGroup().getTeam(teamName);
                     if(!checkTeamJoinAllowed(event.getUser(), team)){
                         event.getUser().sendLocale(fullLocale, identifier.getFormattedName());
                         return;

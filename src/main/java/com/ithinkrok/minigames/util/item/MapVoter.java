@@ -57,9 +57,9 @@ public class MapVoter implements CustomListener {
             List<String> credit = Collections.emptyList();
 
             if(mapName.equals(randomMapName)){
-                description = event.getUserGameGroup().getLocale(randomMapDescriptionLocale);
+                description = event.getGameGroup().getLocale(randomMapDescriptionLocale);
             } else {
-                GameMapInfo mapInfo = event.getUserGameGroup().getMap(mapName);
+                GameMapInfo mapInfo = event.getGameGroup().getMap(mapName);
                 if(mapInfo != null) {
                     description = mapInfo.getDescription();
                     credit = mapInfo.getCredit();
@@ -93,7 +93,7 @@ public class MapVoter implements CustomListener {
                     }
                     event.getUser().setMetadata(new MapVote(event.getUser(), mapName));
 
-                    for (User user : event.getUserGameGroup().getUsers()) {
+                    for (User user : event.getGameGroup().getUsers()) {
                         user.updateScoreboard();
                     }
                 }

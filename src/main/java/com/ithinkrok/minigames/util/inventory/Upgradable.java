@@ -49,7 +49,7 @@ public class Upgradable extends Buyable {
         if (customItem != null) {
             MapVariables variables = new MapVariables();
             variables.setVariable(upgradeName, nextLevel);
-            display = event.getUserGameGroup().getCustomItem(customItem)
+            display = event.getGameGroup().getCustomItem(customItem)
                     .createWithVariables(event.getUser().getLanguageLookup(), variables);
 
             display = InventoryUtils.removeIdentifier(display);
@@ -78,7 +78,7 @@ public class Upgradable extends Buyable {
         event.getUser().setUserVariable(upgradeName, event.getUser().getUserVariable(upgradeName) + 1);
 
         if (customItem != null && giveItem) {
-            CustomItem cust = event.getUserGameGroup().getCustomItem(customItem);
+            CustomItem cust = event.getGameGroup().getCustomItem(customItem);
             boolean found = false;
 
             for (ItemStack item : event.getUser().getInventory()) {

@@ -45,7 +45,7 @@ public class PlayerCompass implements CustomListener {
             double minDist = 9999999999999d;
             String closestName = null;
 
-            for (User user : event.getUserGameGroup().getUsers()) {
+            for (User user : event.getGameGroup().getUsers()) {
                 if (!user.isInGame()) continue;
 
                 boolean sameTeam = Objects.equals(event.getUser().getTeamIdentifier(), user.getTeamIdentifier());

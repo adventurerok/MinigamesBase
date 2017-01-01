@@ -46,7 +46,7 @@ public abstract class UserInteractEvent extends UserEvent implements Cancellable
 
         int identifier = InventoryUtils.getIdentifier(getItem());
         if (identifier < 0) return null;
-        return getUserGameGroup().getCustomItem(identifier);
+        return getGameGroup().getCustomItem(identifier);
     }
 
     public boolean hasItem() {

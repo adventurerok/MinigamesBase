@@ -25,7 +25,7 @@ public class UserChatEvent extends UserEvent implements Cancellable {
         Set<User> result = new HashSet<>();
 
         for(Player player : event.getRecipients()) {
-            result.add(getUserGameGroup().getUser(player.getUniqueId()));
+            result.add(getGameGroup().getUser(player.getUniqueId()));
         }
 
         return result;

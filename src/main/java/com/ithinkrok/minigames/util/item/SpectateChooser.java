@@ -33,9 +33,9 @@ public class SpectateChooser implements CustomListener {
     @CustomEventHandler
     public void onUserInteract(UserInteractEvent event) {
 
-        ClickableInventory inv = new ClickableInventory(event.getUserGameGroup().getLocale(titleLocale));
+        ClickableInventory inv = new ClickableInventory(event.getGameGroup().getLocale(titleLocale));
 
-        for(User user : event.getUserGameGroup().getUsers()) {
+        for(User user : event.getGameGroup().getUsers()) {
             if(!user.isInGame()) continue;
 
             ItemStack item = InventoryUtils.createItemWithNameAndLore(Material.SKULL_ITEM, 1, 3, user
@@ -49,7 +49,7 @@ public class SpectateChooser implements CustomListener {
             inv.addItem(new ClickableItem(item, -1) {
                 @Override
                 public void onClick(UserClickItemEvent event) {
-                    User clicked = event.getUserGameGroup().getUser(userUUID);
+                    User clicked = event.getGameGroup().getUser(userUUID);
 
                     if(clicked == null){
                         event.getUser().redoInventory();

@@ -134,7 +134,7 @@ public class HubListener extends SignListener {
 
     @CustomEventHandler
     public void onUserJoin(UserJoinEvent event) {
-        event.getUser().teleport(event.getUserGameGroup().getCurrentMap().getSpawn());
+        event.getUser().teleport(event.getGameGroup().getCurrentMap().getSpawn());
 
         event.getUser().setGameMode(GameMode.ADVENTURE);
         event.getUser().setHealth(20);
@@ -179,7 +179,7 @@ public class HubListener extends SignListener {
 
             //Prevent pvp users from being affected by the super popper
             int userHeldId = InventoryUtils.getIdentifier(event.getUser().getInventory().getItemInHand());
-            CustomItem item = event.getUserGameGroup().getCustomItem(userHeldId);
+            CustomItem item = event.getGameGroup().getCustomItem(userHeldId);
 
             if(item != null && item.getName().equals(pvpSwordItem)) {
                 event.getAttackerUser().sendLocale(superPopperPvpLocale);
@@ -210,7 +210,7 @@ public class HubListener extends SignListener {
             //Prevent users attacking other users if they are not using the pvp sword
             int attackerWeaponId = InventoryUtils.getIdentifier(event.getWeapon());
 
-            CustomItem item = event.getUserGameGroup().getCustomItem(attackerWeaponId);
+            CustomItem item = event.getGameGroup().getCustomItem(attackerWeaponId);
             if(item == null || !pvpSwordItem.equals(item.getName())) {
                 event.setCancelled(true);
             }
@@ -223,7 +223,7 @@ public class HubListener extends SignListener {
         //Only cancel damage if it is done while not in pvp
         int userHeldId = InventoryUtils.getIdentifier(event.getUser().getInventory().getItemInHand());
 
-        CustomItem item = event.getUserGameGroup().getCustomItem(userHeldId);
+        CustomItem item = event.getGameGroup().getCustomItem(userHeldId);
         if(item == null || !pvpSwordItem.equals(item.getName())) {
             event.setCancelled(true);
         }
@@ -250,7 +250,7 @@ public class HubListener extends SignListener {
             killer.playSound(killer.getLocation(), pvpWinSound);
         }
 
-        event.getUserGameGroup().sendLocale(pvpWinLocale, killer.getFormattedName(), died.getFormattedName());
+        event.getGameGroup().sendLocale(pvpWinLocale, killer.getFormattedName(), died.getFormattedName());
     }
 
     @CustomEventHandler

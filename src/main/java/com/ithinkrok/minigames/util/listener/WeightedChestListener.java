@@ -125,7 +125,7 @@ public class WeightedChestListener implements CustomListener {
             handleChestOpen(event);
         } else if (rightClick && event.hasEntity() && event.hasItem() &&
                 event.getItem().getType() == Material.FLINT_AND_STEEL) {
-            User user = EntityUtils.getActualUser(event.getUserGameGroup(), event.getClickedEntity());
+            User user = EntityUtils.getActualUser(event.getGameGroup(), event.getClickedEntity());
 
             if (user != null) {
                 user.setFireTicks(event.getUser(), 100);
@@ -173,11 +173,11 @@ public class WeightedChestListener implements CustomListener {
         }
 
         if (chestDuration > 0) {
-            GameTask task = event.getUserGameGroup().doInFuture(task1 -> {
+            GameTask task = event.getGameGroup().doInFuture(task1 -> {
                 openedChests.removeAll(removeLocations);
             }, chestDuration);
 
-            event.getUserGameGroup().bindTaskToCurrentGameState(task);
+            event.getGameGroup().bindTaskToCurrentGameState(task);
         }
     }
 

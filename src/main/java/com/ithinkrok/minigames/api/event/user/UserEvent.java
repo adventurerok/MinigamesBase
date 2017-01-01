@@ -9,7 +9,7 @@ import com.ithinkrok.minigames.api.user.User;
  */
 public class UserEvent implements MinigamesEvent {
 
-    private User user;
+    private final User user;
 
     public UserEvent(User user) {
         this.user = user;
@@ -19,7 +19,7 @@ public class UserEvent implements MinigamesEvent {
         return user;
     }
 
-    public GameGroup getUserGameGroup() {
+    public GameGroup getGameGroup() {
         return user.getGameGroup();
     }
 }

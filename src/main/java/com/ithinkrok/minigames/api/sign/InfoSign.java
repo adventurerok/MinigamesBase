@@ -30,7 +30,7 @@ public abstract class InfoSign implements CustomListener {
     public InfoSign(UserEditSignEvent event, SignController signController) {
         this.signController = signController;
         location = event.getBlock().getLocation();
-        gameGroup = event.getUserGameGroup();
+        gameGroup = event.getGameGroup();
     }
 
     public InfoSign(GameGroup gameGroup, Config config, SignController signController) {

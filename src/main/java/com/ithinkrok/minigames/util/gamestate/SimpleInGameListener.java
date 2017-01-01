@@ -40,11 +40,11 @@ public class SimpleInGameListener implements CustomListener {
     public void onUserJoined(UserJoinEvent event) {
         if(event.getUser().isInGame()) return;
 
-        event.getUser().teleport(event.getUserGameGroup().getCurrentMap().getSpawn());
+        event.getUser().teleport(event.getGameGroup().getCurrentMap().getSpawn());
 
         makeUserSpectator(event.getUser());
 
-        List<String> credits = event.getUserGameGroup().getCurrentMap().getInfo().getCredit();
+        List<String> credits = event.getGameGroup().getCurrentMap().getInfo().getCredit();
 
         if(!credits.isEmpty()) {
             event.getUser().sendLocale(mapCreditsLocale);
@@ -55,7 +55,7 @@ public class SimpleInGameListener implements CustomListener {
         }
 
         for (int counter = 0; ; ++counter) {
-            String message = event.getUserGameGroup().getLocale(spectatorJoinLocaleStub + "." + counter);
+            String message = event.getGameGroup().getLocale(spectatorJoinLocaleStub + "." + counter);
             if (message == null) break;
 
             event.getUser().sendMessage(message);

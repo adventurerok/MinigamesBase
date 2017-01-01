@@ -58,7 +58,7 @@ public class GameChooseMenu implements CustomListener {
 
     @CustomEventHandler
     public void onRightClick(UserInteractEvent event) {
-        String inventoryTitle = event.getUserGameGroup().getLocale(inventoryTitleLocale);
+        String inventoryTitle = event.getGameGroup().getLocale(inventoryTitleLocale);
         ClickableInventory inventory = new ClickableInventory(inventoryTitle);
 
         GameChooseMetadata metadata = GameChooseMetadata.getOrCreate(event.getUser());
@@ -164,7 +164,7 @@ public class GameChooseMenu implements CustomListener {
         public void onClick(UserClickItemEvent event) {
             if ((metadata.isDirectJoin() && allowDirectJoin) || !allowTeleport) {
                 event.getUser().sendLocale(transferLocale, ggType);
-                ClientMinigamesRequestProtocol requestProtocol = event.getUserGameGroup().getRequestProtocol();
+                ClientMinigamesRequestProtocol requestProtocol = event.getGameGroup().getRequestProtocol();
                 requestProtocol.sendJoinGameGroupPacket(event.getUser().getUuid(), ggType, null, ggParams, query);
             } else {
                 Location loc =

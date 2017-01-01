@@ -112,16 +112,16 @@ public class SimpleLobbyListener implements CustomListener {
     public void onUserJoin(UserJoinEvent event) {
         userJoinLobby(event.getUser());
 
-        updateMotd(event.getUserGameGroup());
+        updateMotd(event.getGameGroup());
 
-        if (event.getUserGameGroup().hasActiveCountdown()) return;
+        if (event.getGameGroup().hasActiveCountdown()) return;
 
-        resetCountdown(event.getUserGameGroup());
+        resetCountdown(event.getGameGroup());
     }
 
     @CustomEventHandler(priority = CustomEventHandler.HIGH)
     public void onUserQuit(UserQuitEvent event) {
-        updateMotd(event.getUserGameGroup());
+        updateMotd(event.getGameGroup());
     }
 
     @CustomEventHandler
@@ -301,18 +301,18 @@ public class SimpleLobbyListener implements CustomListener {
     @CustomEventHandler(priority = CustomEventHandler.MONITOR)
     public void sendQuitMessageOnUserQuit(UserQuitEvent event) {
         String name = event.getUser().getFormattedName();
-        int currentPlayers = event.getUserGameGroup().getUserCount() - 1;
-        int maxPlayers = event.getUserGameGroup().getMaxPlayers();
+        int currentPlayers = event.getGameGroup().getUserCount() - 1;
+        int maxPlayers = event.getGameGroup().getMaxPlayers();
 
-        event.getUserGameGroup().sendLocale(quitLocale, name, currentPlayers, maxPlayers);
+        event.getGameGroup().sendLocale(quitLocale, name, currentPlayers, maxPlayers);
     }
 
     @CustomEventHandler(priority = CustomEventHandler.FIRST)
     public void sendJoinMessageOnUserJoin(UserJoinEvent event) {
         String name = event.getUser().getFormattedName();
-        int currentPlayers = event.getUserGameGroup().getUserCount();
-        int maxPlayers = event.getUserGameGroup().getMaxPlayers();
+        int currentPlayers = event.getGameGroup().getUserCount();
+        int maxPlayers = event.getGameGroup().getMaxPlayers();
 
-        event.getUserGameGroup().sendLocale(joinLocale, name, currentPlayers, maxPlayers);
+        event.getGameGroup().sendLocale(joinLocale, name, currentPlayers, maxPlayers);
     }
 }

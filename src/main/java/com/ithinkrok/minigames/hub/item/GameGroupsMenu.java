@@ -33,7 +33,7 @@ public class GameGroupsMenu implements CustomListener {
 
     @CustomEventHandler
     public void onRightClick(UserInteractEvent event) {
-        String title = event.getUserGameGroup().getLocale(inventoryTitleLocale);
+        String title = event.getGameGroup().getLocale(inventoryTitleLocale);
 
         ClickableInventory inventory = new GameChooseInventory(title, event.getUser(), gameGroupType, gameGroupParams);
 

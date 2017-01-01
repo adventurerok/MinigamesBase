@@ -49,7 +49,7 @@ public class ItemBuyable extends Buyable {
     @Override
     public void onCalculateItem(CalculateItemForUserEvent event) {
         if (event.getDisplay() == null && customItem != null) {
-            ItemStack item = event.getUserGameGroup().getCustomItem(customItem).createForUser(event.getUser());
+            ItemStack item = event.getGameGroup().getCustomItem(customItem).createForUser(event.getUser());
 
             item.setAmount((int) (item.getAmount() * amount.calculate(event.getUser().getUserVariables())));
 
@@ -65,7 +65,7 @@ public class ItemBuyable extends Buyable {
     public boolean onPurchase(BuyablePurchaseEvent event) {
         if (customItem == null) return giveUserItem(event.getUser(), purchase);
         else {
-            CustomItem customItem = event.getUserGameGroup().getCustomItem(this.customItem);
+            CustomItem customItem = event.getGameGroup().getCustomItem(this.customItem);
             ItemStack item = customItem.createForUser(event.getUser());
 
             item.setAmount((int) (item.getAmount() * amount.calculate(event.getUser().getUserVariables())));

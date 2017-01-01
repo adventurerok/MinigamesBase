@@ -59,7 +59,7 @@ public class ArmorBuyable extends Buyable {
         ItemStack helmet = this.helmet;
 
         if(customHelmet != null) {
-            CustomItem customItem = event.getUserGameGroup().getCustomItem(customHelmet);
+            CustomItem customItem = event.getGameGroup().getCustomItem(customHelmet);
             helmet = customItem.createForUser(event.getUser());
         }
 
@@ -71,7 +71,7 @@ public class ArmorBuyable extends Buyable {
         ItemStack chestplate = this.chestplate;
 
         if(customChestplate != null) {
-            CustomItem customItem = event.getUserGameGroup().getCustomItem(customChestplate);
+            CustomItem customItem = event.getGameGroup().getCustomItem(customChestplate);
             chestplate = customItem.createForUser(event.getUser());
         }
 
@@ -83,7 +83,7 @@ public class ArmorBuyable extends Buyable {
         ItemStack leggings = this.leggings;
 
         if(customLeggings != null) {
-            CustomItem customItem = event.getUserGameGroup().getCustomItem(customLeggings);
+            CustomItem customItem = event.getGameGroup().getCustomItem(customLeggings);
             leggings = customItem.createForUser(event.getUser());
         }
 
@@ -94,7 +94,7 @@ public class ArmorBuyable extends Buyable {
         ItemStack boots = this.boots;
 
         if(customBoots != null) {
-            CustomItem customItem = event.getUserGameGroup().getCustomItem(customBoots);
+            CustomItem customItem = event.getGameGroup().getCustomItem(customBoots);
             boots = customItem.createForUser(event.getUser());
         }
 
