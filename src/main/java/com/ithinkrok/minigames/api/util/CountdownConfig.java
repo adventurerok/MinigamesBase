@@ -36,6 +36,16 @@ public class CountdownConfig {
         }
     }
 
+    public CountdownConfig(CountdownConfig base, int newSeconds) {
+        this.name = base.name;
+        this.seconds = newSeconds;
+        this.localeStub = base.localeStub;
+
+        this.tickSound = base.tickSound;
+        this.finishedSound = base.finishedSound;
+        this.cancelledSound = base.cancelledSound;
+    }
+
     public CountdownConfig(Config config) {
         this(config, null, 0, null);
     }
