@@ -1,11 +1,14 @@
 package com.ithinkrok.minigames.api.entity;
 
+import com.ithinkrok.minigames.api.Game;
 import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.Nameable;
 import com.ithinkrok.minigames.api.event.map.MapEntityDeathEvent;
 import com.ithinkrok.minigames.api.inventory.WeightedInventory;
 import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.util.EntityUtils;
+import com.ithinkrok.minigames.api.util.MinigamesConfigs;
+import com.ithinkrok.msm.bukkit.util.BukkitConfigUtils;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
@@ -127,15 +130,35 @@ public class CustomEntity implements Nameable, CustomListener {
 
     private void addEntityEquipment(GameGroup gameGroup, Variables variables, LivingEntity entity) {
         Config equipConfig = config.getConfigOrEmpty("equipment");
+        EntityEquipment equipment = entity.getEquipment();
 
-        if (equipConfig.contains("hand")) {
-            String hand = equipConfig.getString("hand");
+        ItemStack hand = equipmentItemStack("hand", equipConfig, gameGroup, variables);
+        if(hand != null) equipment.setItemInHand(hand);
+
+        ItemStack helmet = equipmentItemStack("helmet", equipConfig, gameGroup, variables);
+        if(helmet != null) equipment.setHelmet(helmet);
+
+        ItemStack chestplate = equipmentItemStack("chestplate", equipConfig, gameGroup, variables);
+        if(chestplate != null) equipment.setChestplate(chestplate);
+
+        ItemStack leggings = equipmentItemStack("leggings", equipConfig, gameGroup, variables);
+        if(leggings != null) equipment.setLeggings(leggings);
+
+        ItemStack boots = equipmentItemStack("boots", equipConfig, gameGroup, variables);
+        if(boots != null) equipment.setBoots(boots);
+    }
+    
+    private ItemStack equipmentItemStack(String path, Config equipConfig, GameGroup gameGroup, Variables variables) {
+        if (equipConfig.contains("custom_" + path)) {
+            String hand = equipConfig.getString("custom_" + path);
             CustomItem handCustom = gameGroup.getCustomItem(hand);
-
-            EntityEquipment equipment = entity.getEquipment();
-            ItemStack handItem = handCustom.createWithVariables(gameGroup.getLanguageLookup(), variables);
-            equipment.setItemInHand(handItem);
+            
+            return handCustom.createWithVariables(gameGroup.getLanguageLookup(), variables);
+        } else if(equipConfig.contains(path)) {
+            return MinigamesConfigs.getItemStack(equipConfig, "hand");
         }
+        
+        return null;
     }
 
     private void addEntityEffects(Variables variables, LivingEntity entity) {
