@@ -27,6 +27,8 @@ import java.util.Map;
  */
 public class CustomEntity implements Nameable, CustomListener {
 
+    private static final double HEALTH_PER_HEART = 2;
+
     private final String name;
 
     private final EntityType type;
@@ -106,7 +108,7 @@ public class CustomEntity implements Nameable, CustomListener {
         }
 
         if (config.contains("max_health")) {
-            int maxHealth = (int) calculate(variables, config, "max_health");
+            int maxHealth = (int) (calculate(variables, config, "max_health") * HEALTH_PER_HEART);
 
             ((Damageable) entity).setMaxHealth(maxHealth);
             ((Damageable) entity).setHealth(maxHealth);
