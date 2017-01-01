@@ -1,15 +1,19 @@
 package com.ithinkrok.minigames.util.item;
 
+import com.ithinkrok.minigames.api.event.DamageEvent;
 import com.ithinkrok.minigames.api.event.ListenerLoadedEvent;
+import com.ithinkrok.minigames.api.event.map.MapEntityAttackedEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserAttackEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.api.item.event.CustomItemLoreCalculateEvent;
-import com.ithinkrok.util.math.Calculator;
-import com.ithinkrok.util.math.ExpressionCalculator;
+import com.ithinkrok.minigames.api.user.User;
+import com.ithinkrok.minigames.api.util.EntityUtils;
+import com.ithinkrok.util.math.*;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
 import com.ithinkrok.util.lang.LanguageLookup;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
@@ -25,16 +29,13 @@ public class WeaponModifier implements CustomListener {
 
     private static final double HEALTH_PER_HEART = 2;
     private static final double TICKS_PER_SECOND = 20;
-
+    private final List<EffectModifier> enemyEffects = new ArrayList<>();
+    private final List<EffectModifier> selfEffects = new ArrayList<>();
     /**
      * Calculates damage in hearts
      */
     private Calculator damageCalculator;
-
     private Calculator fireCalculator;
-
-    private final List<EffectModifier> enemyEffects = new ArrayList<>();
-    private final List<EffectModifier> selfEffects = new ArrayList<>();
 
     @CustomEventHandler
     public void onListenerEnable(ListenerLoadedEvent<?, ?> event) {
@@ -74,7 +75,7 @@ public class WeaponModifier implements CustomListener {
             lore.add(lang.getLocale("weapon_modifier.fire", fireCalculator.calculate(event.getVariables())));
 
         for (EffectModifier modifier : enemyEffects) {
-            if(!modifier.showInLore.calculateBoolean(event.getVariables())) continue;
+            if (!modifier.showInLore.calculateBoolean(event.getVariables())) continue;
 
             double duration = ((int) modifier.durationCalculator.calculate(event.getVariables()) * TICKS_PER_SECOND) /
                     TICKS_PER_SECOND;
@@ -86,31 +87,46 @@ public class WeaponModifier implements CustomListener {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @CustomEventHandler
     public void onUserAttack(UserAttackEvent attack) {
         if (attack.getInteractType() == UserInteractEvent.InteractType.REPRESENTING) return;
         if (attack.getDamageCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
 
+        attack(attack, attack.getUser().getEntity(), attack.getUser(), attack
+                       .getClickedEntity(), attack.getTargetUser(), attack.getUser().getUserVariables());
+    }
+
+    @CustomEventHandler
+    public void onMapEntityAttacked(MapEntityAttackedEvent event) {
+        //Dealt with in onUserAttack
+        if(event.getAttackerUser() != null) return;
+
+        User targetUser = EntityUtils.getActualUser(event.getGameGroup(), event.getEntity());
+        Variables variables = EntityUtils.getCustomEntityVariables(event.getAttacker());
+
+        attack(event, event.getAttacker(), event.getAttackerUser(), event.getEntity(), targetUser, variables);
+    }
+
+    private void attack(DamageEvent attack, Entity attacker, User attackUser, Entity target, User targetUser, Variables variables) {
         if (damageCalculator != null) {
-            attack.setDamage(damageCalculator.calculate(attack.getUser().getUserVariables()) * HEALTH_PER_HEART);
+            attack.setDamage(damageCalculator.calculate(variables) * HEALTH_PER_HEART);
         }
 
         if (fireCalculator != null) {
-            int fireTicks = (int) (fireCalculator.calculate(attack.getUser().getUserVariables()) * TICKS_PER_SECOND);
+            int fireTicks = (int) (fireCalculator.calculate(variables) * TICKS_PER_SECOND);
 
             if (fireTicks > 0) {
-                if (attack.isAttackingUser()) attack.getTargetUser().setFireTicks(attack.getUser(), fireTicks);
-                else attack.getClickedEntity().setFireTicks(fireTicks);
+                if (targetUser != null) targetUser.setFireTicks(attackUser, fireTicks);
+                else target.setFireTicks(fireTicks);
             }
         }
 
         for (EffectModifier effectModifier : enemyEffects) {
-            effectModifier.modifyAttack(attack, false);
+            effectModifier.modifyAttack(attacker, attackUser, target, targetUser, variables, false);
         }
 
-        for(EffectModifier effectModifier : selfEffects) {
-            effectModifier.modifyAttack(attack, true);
+        for (EffectModifier effectModifier : selfEffects) {
+            effectModifier.modifyAttack(attacker, attackUser, target, targetUser, variables, true);
         }
     }
 
@@ -132,18 +148,20 @@ public class WeaponModifier implements CustomListener {
 
 
         @SuppressWarnings("unchecked")
-        public void modifyAttack(UserAttackEvent attack, boolean addToAttacker) {
-            int duration = (int) (durationCalculator.calculate(attack.getUser().getUserVariables()) * TICKS_PER_SECOND);
-            int amp = (int) (levelCalculator.calculate(attack.getUser().getUserVariables()) - 1);
+        public void modifyAttack(Entity attacker, User attackerUser, Entity target, User targetUser, Variables variables, boolean addToAttacker) {
+            int duration = (int) (durationCalculator.calculate(variables) * TICKS_PER_SECOND);
+            int amp = (int) (levelCalculator.calculate(variables) - 1);
 
             if (duration <= 0 || amp < 0) return;
 
-            if(addToAttacker) {
-                attack.getUser().addPotionEffect(new PotionEffect(effectType, duration, amp));
-            } else if (attack.isAttackingUser() && effectType == PotionEffectType.WITHER) {
-                attack.getTargetUser().setWitherTicks(attack.getUser(), duration, amp);
-            } else {
-                ((LivingEntity) attack.getClickedEntity()).addPotionEffect(new PotionEffect(effectType, duration, amp));
+            if (addToAttacker) {
+                if(attacker instanceof LivingEntity) {
+                    ((LivingEntity)attacker).addPotionEffect(new PotionEffect(effectType, duration, amp));
+                }
+            } else if (targetUser != null && effectType == PotionEffectType.WITHER) {
+                targetUser.setWitherTicks(attackerUser, duration, amp);
+            } else if(target instanceof LivingEntity){
+                ((LivingEntity) target).addPotionEffect(new PotionEffect(effectType, duration, amp));
             }
         }
     }

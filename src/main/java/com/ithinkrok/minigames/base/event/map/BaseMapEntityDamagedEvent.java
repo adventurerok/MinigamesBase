@@ -43,4 +43,14 @@ public class BaseMapEntityDamagedEvent extends BaseMapEvent implements MapEntity
     public void setDamage(double damage) {
         event.setDamage(damage);
     }
+
+    @Override
+    public boolean isCancelled() {
+        return event.isCancelled();
+    }
+
+    @Override
+    public void setCancelled(boolean cancel) {
+        event.setCancelled(cancel);
+    }
 }
