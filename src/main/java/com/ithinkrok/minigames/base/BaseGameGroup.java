@@ -14,6 +14,7 @@ import com.ithinkrok.minigames.api.event.game.GameEvent;
 import com.ithinkrok.minigames.api.event.game.GameStateChangedEvent;
 import com.ithinkrok.minigames.api.event.game.MapChangedEvent;
 import com.ithinkrok.minigames.api.event.map.MapBlockBreakNaturallyEvent;
+import com.ithinkrok.minigames.api.event.map.MapEntityAttackedEvent;
 import com.ithinkrok.minigames.api.event.map.MapEntityDeathEvent;
 import com.ithinkrok.minigames.api.event.team.TeamEvent;
 import com.ithinkrok.minigames.api.event.user.UserEvent;
@@ -860,7 +861,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         }
 
         @CustomEventHandler
-        public void eventUserAttacked(UserAttackedEvent event) {
+        public void eventEntityAttacked(MapEntityAttackedEvent event) {
             String customName = EntityUtils.getCustomEntityName(event.getAttacker());
             if(customName == null) return;
 

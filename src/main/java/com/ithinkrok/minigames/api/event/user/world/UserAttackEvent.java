@@ -1,5 +1,6 @@
 package com.ithinkrok.minigames.api.event.user.world;
 
+import com.ithinkrok.minigames.api.event.DamageEvent;
 import com.ithinkrok.minigames.api.user.User;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -11,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 /**
  * Created by paul on 03/01/16.
  */
-public class UserAttackEvent extends UserInteractEvent {
+public class UserAttackEvent extends UserInteractEvent implements DamageEvent {
 
     private final EntityDamageByEntityEvent event;
     private final User target;
@@ -24,18 +25,22 @@ public class UserAttackEvent extends UserInteractEvent {
         this.representing = representing;
     }
 
+    @Override
     public double getDamage() {
         return event.getDamage();
     }
 
+    @Override
     public double getFinalDamage() {
         return event.getFinalDamage();
     }
 
+    @Override
     public void setDamage(double damage) {
         event.setDamage(damage);
     }
 
+    @Override
     public EntityDamageEvent.DamageCause getDamageCause() {
         return event.getCause();
     }
