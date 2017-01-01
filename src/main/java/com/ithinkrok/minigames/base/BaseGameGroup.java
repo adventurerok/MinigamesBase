@@ -19,6 +19,8 @@ import com.ithinkrok.minigames.api.event.team.TeamEvent;
 import com.ithinkrok.minigames.api.event.user.UserEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserJoinEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserQuitEvent;
+import com.ithinkrok.minigames.api.event.user.state.UserAttackedEvent;
+import com.ithinkrok.minigames.api.event.user.state.UserDamagedEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserBreakBlockEvent;
 import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.item.IdentifierMap;
@@ -854,7 +856,17 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
             CustomEntity customEntity = getCustomEntity(customName);
 
-            CustomEventExecutor.executeEvent(event, customEntity);
+            CustomEventExecutor.executeEvent(event, customEntity.getListeners());
+        }
+
+        @CustomEventHandler
+        public void eventUserAttacked(UserAttackedEvent event) {
+            String customName = EntityUtils.getCustomEntityName(event.getAttacker());
+            if(customName == null) return;
+
+            CustomEntity customEntity = getCustomEntity(customName);
+
+            CustomEventExecutor.executeEvent(event, customEntity.getListeners());
         }
 
         @CustomEventHandler(priority = CustomEventHandler.INTERNAL_LAST)

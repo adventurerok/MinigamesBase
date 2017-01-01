@@ -1,6 +1,5 @@
 package com.ithinkrok.minigames.api.entity;
 
-import com.ithinkrok.minigames.api.Game;
 import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.Nameable;
 import com.ithinkrok.minigames.api.event.map.MapEntityDeathEvent;
@@ -8,7 +7,7 @@ import com.ithinkrok.minigames.api.inventory.WeightedInventory;
 import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.util.EntityUtils;
 import com.ithinkrok.minigames.api.util.MinigamesConfigs;
-import com.ithinkrok.msm.bukkit.util.BukkitConfigUtils;
+import com.ithinkrok.minigames.api.util.io.ListenerLoader;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
@@ -22,7 +21,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,7 +42,7 @@ public class CustomEntity implements Nameable, CustomListener {
     private final boolean doDefaultDrops;
     private final Calculator expDrop;
     private final Map<WeightedInventory, Calculator> customDrops = new HashMap<>();
-
+    private final List<CustomListener> allListeners = new ArrayList<>();
     private boolean loadedDrops = false;
 
     public CustomEntity(String name, Config config) {
@@ -54,10 +55,31 @@ public class CustomEntity implements Nameable, CustomListener {
         Config dropConfig = config.getConfigOrEmpty("drops");
         doDefaultDrops = dropConfig.getBoolean("do_default", true);
 
-        if(dropConfig.contains("exp")) {
+        if (dropConfig.contains("exp")) {
             expDrop = new ExpressionCalculator(dropConfig.getString("exp"));
         } else {
             expDrop = null;
+        }
+
+        if (config.contains("listeners")) {
+            configureListeners(config.getConfigOrEmpty("listeners"));
+        }
+
+        allListeners.add(this);
+    }
+
+    private void configureListeners(Config config) {
+        for (String name : config.getKeys(false)) {
+            Config listenerInfo = config.getConfigOrNull(name);
+            try {
+                CustomListener listener = ListenerLoader.loadListener(this, this, listenerInfo);
+
+                allListeners.add(listener);
+            } catch (Exception e) {
+                System.out
+                        .println("Failed while creating CustomEntity \"" + this.name + "\" listener for key: " + name);
+                e.printStackTrace();
+            }
         }
     }
 
@@ -69,14 +91,6 @@ public class CustomEntity implements Nameable, CustomListener {
     @Override
     public String getFormattedName() {
         return name;
-    }
-
-    private double calculate(Variables variables, Config config, String path) {
-        return calculate(variables, config, path, null);
-    }
-
-    private double calculate(Variables variables, Config config, String path, String def) {
-        return new ExpressionCalculator(config.getString(path, def)).calculate(variables);
     }
 
     public Entity spawnEntity(GameGroup gameGroup, Location location, Variables variables) {
@@ -100,8 +114,8 @@ public class CustomEntity implements Nameable, CustomListener {
             }
         }
 
-        if(config.contains("wither")) {
-            if(Math.floor(calculate(variables, config, "wither")) != 0) {
+        if (config.contains("wither")) {
+            if (Math.floor(calculate(variables, config, "wither")) != 0) {
                 ((Skeleton) entity).setSkeletonType(Skeleton.SkeletonType.WITHER);
             }
         }
@@ -128,37 +142,8 @@ public class CustomEntity implements Nameable, CustomListener {
         return entity;
     }
 
-    private void addEntityEquipment(GameGroup gameGroup, Variables variables, LivingEntity entity) {
-        Config equipConfig = config.getConfigOrEmpty("equipment");
-        EntityEquipment equipment = entity.getEquipment();
-
-        ItemStack hand = equipmentItemStack("hand", equipConfig, gameGroup, variables);
-        if(hand != null) equipment.setItemInHand(hand);
-
-        ItemStack helmet = equipmentItemStack("helmet", equipConfig, gameGroup, variables);
-        if(helmet != null) equipment.setHelmet(helmet);
-
-        ItemStack chestplate = equipmentItemStack("chestplate", equipConfig, gameGroup, variables);
-        if(chestplate != null) equipment.setChestplate(chestplate);
-
-        ItemStack leggings = equipmentItemStack("leggings", equipConfig, gameGroup, variables);
-        if(leggings != null) equipment.setLeggings(leggings);
-
-        ItemStack boots = equipmentItemStack("boots", equipConfig, gameGroup, variables);
-        if(boots != null) equipment.setBoots(boots);
-    }
-    
-    private ItemStack equipmentItemStack(String path, Config equipConfig, GameGroup gameGroup, Variables variables) {
-        if (equipConfig.contains("custom_" + path)) {
-            String hand = equipConfig.getString("custom_" + path);
-            CustomItem handCustom = gameGroup.getCustomItem(hand);
-            
-            return handCustom.createWithVariables(gameGroup.getLanguageLookup(), variables);
-        } else if(equipConfig.contains(path)) {
-            return MinigamesConfigs.getItemStack(equipConfig, "hand");
-        }
-        
-        return null;
+    private double calculate(Variables variables, Config config, String path) {
+        return calculate(variables, config, path, null);
     }
 
     private void addEntityEffects(Variables variables, LivingEntity entity) {
@@ -177,43 +162,84 @@ public class CustomEntity implements Nameable, CustomListener {
         }
     }
 
+    private void addEntityEquipment(GameGroup gameGroup, Variables variables, LivingEntity entity) {
+        Config equipConfig = config.getConfigOrEmpty("equipment");
+        EntityEquipment equipment = entity.getEquipment();
+
+        ItemStack hand = equipmentItemStack("hand", equipConfig, gameGroup, variables);
+        if (hand != null) equipment.setItemInHand(hand);
+
+        ItemStack helmet = equipmentItemStack("helmet", equipConfig, gameGroup, variables);
+        if (helmet != null) equipment.setHelmet(helmet);
+
+        ItemStack chestplate = equipmentItemStack("chestplate", equipConfig, gameGroup, variables);
+        if (chestplate != null) equipment.setChestplate(chestplate);
+
+        ItemStack leggings = equipmentItemStack("leggings", equipConfig, gameGroup, variables);
+        if (leggings != null) equipment.setLeggings(leggings);
+
+        ItemStack boots = equipmentItemStack("boots", equipConfig, gameGroup, variables);
+        if (boots != null) equipment.setBoots(boots);
+    }
+
+    private double calculate(Variables variables, Config config, String path, String def) {
+        return new ExpressionCalculator(config.getString(path, def)).calculate(variables);
+    }
+
+    private ItemStack equipmentItemStack(String path, Config equipConfig, GameGroup gameGroup, Variables variables) {
+        if (equipConfig.contains("custom_" + path)) {
+            String hand = equipConfig.getString("custom_" + path);
+            CustomItem handCustom = gameGroup.getCustomItem(hand);
+
+            return handCustom.createWithVariables(gameGroup.getLanguageLookup(), variables);
+        } else if (equipConfig.contains(path)) {
+            return MinigamesConfigs.getItemStack(equipConfig, "hand");
+        }
+
+        return null;
+    }
+
     public EntityType getType() {
         return type;
     }
 
-    @CustomEventHandler
+    @CustomEventHandler(priority = CustomEventHandler.LOW)
     public void onMapEntityDeath(MapEntityDeathEvent event) {
         //TODO call listeners
 
         loadDrops(event.getGameGroup());
 
-        if(!doDefaultDrops) {
+        if (!doDefaultDrops) {
             event.getDrops().clear();
         }
 
         Variables variables = EntityUtils.getCustomEntityVariables(event.getEntity());
 
-        if(expDrop != null) {
+        if (expDrop != null) {
             event.setDroppedExp((int) expDrop.calculate(variables));
         }
 
         for (Map.Entry<WeightedInventory, Calculator> entry : customDrops.entrySet()) {
             int amount = (int) entry.getValue().calculate(variables);
 
-            if(amount <= 0) continue;
+            if (amount <= 0) continue;
 
             event.getDrops().addAll(entry.getKey().generateStacks(amount, false, variables));
         }
 
     }
 
+    public List<CustomListener> getListeners() {
+        return allListeners;
+    }
+
     private void loadDrops(GameGroup gameGroup) {
-        if(loadedDrops) return;
+        if (loadedDrops) return;
         loadedDrops = true;
 
         Config dropConfig = config.getConfigOrEmpty("drops");
 
-        for(Config inventoryConfig : dropConfig.getConfigList("inventories")) {
+        for (Config inventoryConfig : dropConfig.getConfigList("inventories")) {
             WeightedInventory inventory = new WeightedInventory(gameGroup, inventoryConfig);
 
             Calculator count = new ExpressionCalculator(inventoryConfig.getString("count", "1"));
