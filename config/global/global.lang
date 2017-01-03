@@ -92,6 +92,7 @@ countdowns.end.start=&e&lTeleporting back to the lobby in %s seconds!
 countdowns.end.minutes=&e&lGame ending in&c&l %s minutes!
 countdowns.end.seconds=&e&lGame ending in&c&l %s seconds!
 countdowns.end.final=&e&lGame ending in&c&l %s seconds!
+countdowns.end.title=&6Return to Hub
 
 # Commonly used items
 map_voter.name=Map Voter
