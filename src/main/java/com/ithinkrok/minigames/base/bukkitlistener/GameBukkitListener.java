@@ -28,6 +28,7 @@ import com.ithinkrok.minigames.api.util.InventoryUtils;
 import com.ithinkrok.minigames.api.util.NamedSounds;
 import com.ithinkrok.minigames.base.event.map.BaseMapEntityAttackedEvent;
 import com.ithinkrok.minigames.base.event.map.BaseMapEntityDamagedEvent;
+import com.ithinkrok.minigames.base.event.map.BaseMapEntityRegenHealthEvent;
 import com.ithinkrok.msm.bukkit.MSMPlugin;
 import com.ithinkrok.msm.bukkit.protocol.ClientAPIProtocol;
 import com.ithinkrok.util.command.CommandUtils;
@@ -248,6 +249,25 @@ public class GameBukkitListener implements Listener {
             throw new RuntimeException("Map still registered to old GameGroup");
 
         gameGroup.gameEvent(new MapEntityDeathEvent(gameGroup, map, event));
+    }
+
+    @EventHandler
+    public void eventRegainHealth(EntityRegainHealthEvent event) {
+        String mapName = event.getEntity().getWorld().getName();
+        GameGroup gameGroup = game.getGameGroupFromMapName(mapName);
+        if (gameGroup == null) return;
+
+        //Don't send entity death events for users
+        User user = EntityUtils.getActualUser(gameGroup, event.getEntity());
+        if (user != null) {
+            gameGroup.userEvent(new UserRegainHealthEvent(user, event));
+        } else {
+            GameMap map = gameGroup.getCurrentMap();
+            if (!map.getWorld().getName().equals(mapName))
+                throw new RuntimeException("Map still registered to old GameGroup");
+
+            gameGroup.gameEvent(new BaseMapEntityRegenHealthEvent(gameGroup, map, event));
+        }
     }
 
     @EventHandler
