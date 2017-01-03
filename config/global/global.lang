@@ -50,8 +50,8 @@ buyable.team.description=&7Cost\: &3$%s &7(&6Team Money&7)
 buyable.user.description=&7Cost\: &3$%s &7(&6Player Money&7)
 buyable.costs.extra=&7Additional Costs:
 buyable.costs.extra_only=&7Trade for:
-buyable.costs.item=&7- &3%s&7x &3%s
-buyable.no_item=&cYou do not have the required &4%s&cx &4%s &cto purchase this item!
+buyable.costs.item=&7- &3%sx &3%s
+buyable.no_item=&cYou do not have the required &4%sx &4%s &cto purchase this item!
 buyable.items_taken=&cThe required items were taken from your inventory
 
 item_buyable.no_space=&cYou do not have enough inventory space!
