@@ -21,14 +21,14 @@ public class CountdownConfig {
         this.seconds = seconds;
         this.localeStub = localeStub;
 
-        this.showTitle = false;
+        this.showTitle = true;
     }
 
     public CountdownConfig(Config config, String defaultName, int defaultSeconds, String defaultStub) {
         this.name = config.getString("name", defaultName);
         this.seconds = config.getInt("seconds", defaultSeconds);
         this.localeStub = config.getString("locale_stub", defaultStub);
-        this.showTitle = config.getBoolean("show_title");
+        this.showTitle = config.getBoolean("show_title", true);
 
         if(config.contains("tick_sound")) {
             tickSound = MinigamesConfigs.getSoundEffect(config, "tick_sound");
