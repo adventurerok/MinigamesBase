@@ -311,4 +311,29 @@ public class InventoryUtils {
 
         return amount;
     }
+
+    public static int removeItemsWithIdentifier(Inventory inventory, int identifier, int max) {
+        int actual = 0;
+
+        ItemStack[] contents = inventory.getContents();
+        for (int i = 0; i < contents.length; i++) {
+            ItemStack itemStack = contents[i];
+            if (itemStack == null || getIdentifier(itemStack) != identifier) continue;
+
+            int amountToRemove = Math.min(itemStack.getAmount(), max);
+            actual += amountToRemove;
+            max -= amountToRemove;
+
+            if (itemStack.getAmount() == amountToRemove) {
+                inventory.setItem(i, null);
+            } else {
+                itemStack.setAmount(itemStack.getAmount() - amountToRemove);
+                inventory.setItem(i, itemStack);
+            }
+
+            if(max == 0) break;
+        }
+
+        return actual;
+    }
 }

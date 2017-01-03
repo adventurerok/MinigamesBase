@@ -41,6 +41,10 @@ public abstract class Buyable extends ClickableItem {
     private String extraCostsLocale;
     private String extraCostsOnlyLocale;
     private String costsItemLocale;
+
+    private String noItemLocale;
+    private String itemsTakenLocale;
+
     private Calculator cost;
     private Calculator team;
     private Calculator canBuy;
@@ -65,6 +69,8 @@ public abstract class Buyable extends ClickableItem {
         extraCostsLocale = config.getString("extra_costs_locale", "buyable.costs.extra");
         extraCostsOnlyLocale = config.getString("extra_costs_only_locale", "buyable.costs.extra_only");
         costsItemLocale = config.getString("costs_item_locale", "buyable.costs.item");
+        noItemLocale = config.getString("no_item_locale", "buyable.no_item");
+        itemsTakenLocale = config.getString("items_taken_locale", "buyable.items_taken");
 
         if (config.contains("upgrade_on_buy")) configureUpgradeOnBuy(config.getConfigOrNull("upgrade_on_buy"));
 
@@ -190,53 +196,109 @@ public abstract class Buyable extends ClickableItem {
 
     @Override
     public void onClick(UserClickItemEvent event) {
-        Money userMoney = Money.getOrCreate(event.getUser());
+        User user = event.getUser();
+
+        Money userMoney = Money.getOrCreate(user);
         Money teamMoney = null;
 
-        int cost = getCost(event.getUser());
+        //check if the user has the money
+        int cost = getCost(user);
 
-        boolean team = this.team.calculateBoolean(event.getUser().getUserVariables());
+        boolean team = this.team.calculateBoolean(user.getUserVariables());
 
         if (team) {
-            teamMoney = Money.getOrCreate(event.getUser().getTeam());
+            teamMoney = Money.getOrCreate(user.getTeam());
             if (userMoney.getMoney() + teamMoney.getMoney() < cost) {
-                event.getUser().sendLocale(teamNoMoneyLocale);
+                user.sendLocale(teamNoMoneyLocale);
                 return;
             }
         } else if (!userMoney.hasMoney(cost)) {
-            event.getUser().sendLocale(userNoMoneyLocale);
+            user.sendLocale(userNoMoneyLocale);
             return;
         }
 
-        BuyablePurchaseEvent purchaseEvent = new BuyablePurchaseEvent(event.getUser(), event.getInventory(), this);
+        PlayerInventory inventory = user.getInventory();
+
+        //check if the user has the items
+        for (Map.Entry<String, Integer> customItemToAmount : customItemCosts.entrySet()) {
+            CustomItem customItem = event.getGameGroup().getCustomItem(customItemToAmount.getKey());
+
+            int userAmount = InventoryUtils.getAmountOfItemsWithIdentifier(inventory, customItem.getIdentifier());
+            int requiredAmount = customItemToAmount.getValue();
+
+            if (userAmount >= requiredAmount) continue;
+
+            String itemName = user.getLanguageLookup().getLocale(customItem.getDisplayNameLocale());
+
+            user.sendLocale(noItemLocale, requiredAmount, itemName);
+            return;
+        }
+
+        for (ItemStack itemCost : itemCosts) {
+            boolean hasAmount = inventory.containsAtLeast(itemCost, itemCost.getAmount());
+            if (hasAmount) continue;
+
+            String itemName = InventoryUtils.getItemStackDefaultName(itemCost);
+
+            user.sendLocale(noItemLocale, itemCost.getAmount(), itemName);
+            return;
+        }
+
+        //Try and buy
+        BuyablePurchaseEvent purchaseEvent = new BuyablePurchaseEvent(user, event.getInventory(), this);
 
         if (!canBuy(purchaseEvent)) {
-            event.getUser().sendLocale(cannotBuyLocale);
-            event.getUser().redoInventory();
+            user.sendLocale(cannotBuyLocale);
+            user.redoInventory();
             return;
         }
 
         if (!onPurchase(purchaseEvent)) return;
 
-        doUpgradesOnBuy(event.getUser());
+        doUpgradesOnBuy(user);
 
-        if (team) {
-            int teamAmount = Math.min(cost, teamMoney.getMoney());
-            int userAmount = cost - teamAmount;
+        //charge the user the money required
+        if (cost > 0) {
+            if (team) {
+                int teamAmount = Math.min(cost, teamMoney.getMoney());
+                int userAmount = cost - teamAmount;
 
-            if (teamAmount > 0) teamMoney.subtractMoney(teamAmount, true);
-            if (userAmount > 0) {
-                userMoney.subtractMoney(userAmount, true);
-                event.getUser().sendLocale(userPayTeamLocale, userAmount);
+                if (teamAmount > 0) teamMoney.subtractMoney(teamAmount, true);
+                if (userAmount > 0) {
+                    userMoney.subtractMoney(userAmount, true);
+                    user.sendLocale(userPayTeamLocale, userAmount);
+                }
+            } else {
+                userMoney.subtractMoney(cost, true);
             }
-        } else {
-            userMoney.subtractMoney(cost, true);
         }
 
-        event.getUser().playSound(event.getUser().getLocation(),
-                                  new SoundEffect(NamedSounds.fromName("ENTITY_BLAZE_HURT"), 1.0f, 1.0f));
+        boolean itemsTaken = false;
 
-        event.getUser().redoInventory();
+        //charge the user the items required
+        for (Map.Entry<String, Integer> customItemToAmount : customItemCosts.entrySet()) {
+            CustomItem customItem = event.getGameGroup().getCustomItem(customItemToAmount.getKey());
+
+            int amountRequired = customItemToAmount.getValue();
+
+            InventoryUtils.removeItemsWithIdentifier(inventory, customItem.getIdentifier(), amountRequired);
+
+            itemsTaken = true;
+        }
+
+        for (ItemStack itemCost : itemCosts) {
+            inventory.removeItem(itemCost);
+
+            itemsTaken = true;
+        }
+
+        if(itemsTaken) {
+            user.sendLocale(itemsTakenLocale);
+        }
+
+        user.playSound(user.getLocation(), new SoundEffect(NamedSounds.fromName("ENTITY_BLAZE_HURT"), 1.0f, 1.0f));
+
+        user.redoInventory();
     }
 
     public abstract boolean onPurchase(BuyablePurchaseEvent event);
