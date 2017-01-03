@@ -15,15 +15,12 @@ public class Countdown implements Nameable {
 
     private final String name;
     private final String localeStub;
-
+    private final boolean showTitle;
     private GameTask task;
     private int secondsRemaining;
-
     private SoundEffect tickSound;
     private SoundEffect finishedSound;
     private SoundEffect cancelledSound;
-
-    private final boolean showTitle;
 
     public Countdown(CountdownConfig config) {
         this.name = config.getName();
@@ -91,22 +88,27 @@ public class Countdown implements Nameable {
         LanguageLookup lookup = gameGroup.getLanguageLookup();
         String message = null;
 
-        String title = lookup.getLocale(localeStub + ".title");
+        String title = null;
 
         if (secondsRemaining > 30) {
             if (secondsRemaining % 30 != 0) return;
 
-            if (secondsRemaining % 60 == 0) {
-                message = lookup.getLocale(localeStub + ".minutes", secondsRemaining / 60);
+            int minutes = secondsRemaining / 60;
+            int seconds = secondsRemaining % 60;
+
+            if (seconds == 0) {
+                message = lookup.getLocale(localeStub + ".minutes", minutes);
+                title = lookup.getLocale(localeStub + ".title.minutes", minutes);
             } else {
-                message =
-                        lookup.getLocale(localeStub + ".minutes_seconds", secondsRemaining / 60, secondsRemaining % 60);
+                message = lookup.getLocale(localeStub + ".minutes_seconds", minutes, seconds);
+                title = lookup.getLocale(localeStub + ".title.minutes_seconds", minutes, seconds);
             }
         } else {
             switch (secondsRemaining) {
                 case 30:
                 case 10:
                     message = lookup.getLocale(localeStub + ".seconds", secondsRemaining);
+                    title = lookup.getLocale(localeStub + ".title.seconds", secondsRemaining);
                     break;
                 case 5:
                 case 4:
@@ -114,10 +116,16 @@ public class Countdown implements Nameable {
                 case 2:
                 case 1:
                     message = lookup.getLocale(localeStub + ".final", secondsRemaining);
+                    title = lookup.getLocale(localeStub + ".title.final", secondsRemaining);
                     break;
                 case 0:
                     message = lookup.getLocale(localeStub + ".now");
+                    title = lookup.getLocale(localeStub + ".title.now");
             }
+        }
+
+        if (title == null) {
+            title = lookup.getLocale(localeStub + ".title");
         }
 
         CountdownMessageEvent event = new CountdownMessageEvent(gameGroup, this, message);
@@ -128,7 +136,7 @@ public class Countdown implements Nameable {
             for (User user : gameGroup.getUsers()) {
                 user.showAboveHotbarMessage(message);
 
-                if(showTitle && title != null) {
+                if (showTitle && title != null) {
                     user.showTitle(title, message);
                 }
             }
