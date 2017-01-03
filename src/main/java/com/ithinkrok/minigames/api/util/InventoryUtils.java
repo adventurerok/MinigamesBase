@@ -1,6 +1,7 @@
 package com.ithinkrok.minigames.api.util;
 
 import com.ithinkrok.util.StringUtils;
+import net.milkbowl.vault.item.Items;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -109,6 +110,14 @@ public class InventoryUtils {
         }
 
         return -1;
+    }
+
+    /**
+     * @param item The item to get the name for
+     * @return The default Minecraft English name of the item
+     */
+    public static String getItemStackDefaultName(ItemStack item) {
+        return Items.itemByStack(item).getName();
     }
 
     public static ItemStack addIdentifier(ItemStack item, int identifier) {
@@ -289,5 +298,17 @@ public class InventoryUtils {
 
         if (identifier >= 0) item = addIdentifier(item, identifier);
         return item;
+    }
+
+    public static int getAmountOfItemsWithIdentifier(Inventory inventory, int identifier) {
+        int amount = 0;
+
+        for (ItemStack itemStack : inventory.getContents()) {
+            if(itemStack != null && getIdentifier(itemStack) == identifier) {
+                amount += itemStack.getAmount();
+            }
+        }
+
+        return amount;
     }
 }

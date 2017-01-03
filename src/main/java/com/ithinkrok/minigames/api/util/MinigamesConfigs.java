@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -41,6 +42,32 @@ public class MinigamesConfigs {
 
         if (!path.isEmpty()) config = config.getConfigOrNull(path);
 
+        return itemStackFromConfig(config);
+    }
+
+    public static List<ItemStack> getItemStackList(Config config, String path) {
+        List<Object> list = config.getList(path, Object.class);
+
+        List<ItemStack> result = new ArrayList<>();
+
+        for(Object itemObject : list) {
+            ItemStack item;
+
+            if(itemObject instanceof String) {
+                item = InventoryUtils.parseItem((String) itemObject);
+            } else if(itemObject instanceof Config) {
+                item = itemStackFromConfig((Config) itemObject);
+            } else continue;
+
+            if(item != null) {
+                result.add(item);
+            }
+        }
+
+        return result;
+    }
+
+    private static ItemStack itemStackFromConfig(Config config) {
         Material mat = Material.matchMaterial(config.getString("type"));
         int amount = config.getInt("amount", 1);
         int damage = config.getInt("damage", 0);

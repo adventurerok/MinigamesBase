@@ -43,7 +43,7 @@ public class CustomItem implements Identifiable, CustomListener, Nameable {
     private final List<CustomListener> allListeners = new ArrayList<>();
 
     private final String name;
-    private final String itemDisplayLocale;
+    private final String displayNameLocale;
     private final Material itemMaterial;
     private final int durability;
     private final boolean unbreakable;
@@ -64,7 +64,7 @@ public class CustomItem implements Identifiable, CustomListener, Nameable {
     public CustomItem(String name, Config config) {
         this.name = name;
 
-        this.itemDisplayLocale = config.getString("display_name_locale", null);
+        this.displayNameLocale = config.getString("display_name_locale", null);
         this.descriptionLocale = config.getString("description_locale", null);
         this.itemMaterial = Material.matchMaterial(config.getString("material"));
         this.durability = config.getInt("durability", 0);
@@ -231,7 +231,7 @@ public class CustomItem implements Identifiable, CustomListener, Nameable {
         lore.toArray(loreArray);
 
         String itemDisplayName = null;
-        if(itemDisplayLocale != null) itemDisplayName = languageLookup.getLocale(itemDisplayLocale);
+        if(displayNameLocale != null) itemDisplayName = languageLookup.getLocale(displayNameLocale);
 
         ItemStack item =
                 InventoryUtils.createItemWithNameAndLore(itemMaterial, 1, durability, itemDisplayName, loreArray);
@@ -275,4 +275,7 @@ public class CustomItem implements Identifiable, CustomListener, Nameable {
         }
     }
 
+    public String getDisplayNameLocale() {
+        return displayNameLocale;
+    }
 }
