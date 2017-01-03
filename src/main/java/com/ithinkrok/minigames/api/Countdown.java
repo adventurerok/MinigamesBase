@@ -23,10 +23,13 @@ public class Countdown implements Nameable {
     private SoundEffect finishedSound;
     private SoundEffect cancelledSound;
 
+    private final boolean showTitle;
+
     public Countdown(CountdownConfig config) {
         this.name = config.getName();
         this.localeStub = config.getLocaleStub();
         this.secondsRemaining = config.getSeconds() + 1;
+        this.showTitle = config.getShowTitle();
 
         this.tickSound = config.getTickSound();
         this.finishedSound = config.getFinishedSound();
@@ -88,6 +91,8 @@ public class Countdown implements Nameable {
         LanguageLookup lookup = gameGroup.getLanguageLookup();
         String message = null;
 
+        String subtitle = lookup.getLocale(localeStub + ".subtitle");
+
         if (secondsRemaining > 30) {
             if (secondsRemaining % 30 != 0) return;
 
@@ -122,6 +127,10 @@ public class Countdown implements Nameable {
             gameGroup.sendMessage(message);
             for (User user : gameGroup.getUsers()) {
                 user.showAboveHotbarMessage(message);
+
+                if(showTitle) {
+                    user.showTitle(message, subtitle);
+                }
             }
         }
     }
