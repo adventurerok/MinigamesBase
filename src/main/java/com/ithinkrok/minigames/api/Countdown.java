@@ -91,7 +91,7 @@ public class Countdown implements Nameable {
         LanguageLookup lookup = gameGroup.getLanguageLookup();
         String message = null;
 
-        String subtitle = lookup.getLocale(localeStub + ".subtitle");
+        String title = lookup.getLocale(localeStub + ".title");
 
         if (secondsRemaining > 30) {
             if (secondsRemaining % 30 != 0) return;
@@ -128,8 +128,8 @@ public class Countdown implements Nameable {
             for (User user : gameGroup.getUsers()) {
                 user.showAboveHotbarMessage(message);
 
-                if(showTitle) {
-                    user.showTitle(message, subtitle);
+                if(showTitle && title != null) {
+                    user.showTitle(title, message);
                 }
             }
         }
