@@ -30,8 +30,8 @@ import java.util.Map;
 public abstract class Buyable extends ClickableItem {
 
     private final Map<String, Calculator> upgradeOnBuy = new HashMap<>();
-    private final List<ItemStack> itemCosts = new ArrayList<>();
-    private final Map<String, Integer> customItemCosts = new HashMap<>();
+    private final Map<ItemStack, Calculator> itemCosts = new HashMap<>();
+    private final Map<String, Calculator> customItemCosts = new HashMap<>();
     private String teamNoMoneyLocale;
     private String userNoMoneyLocale;
     private String cannotBuyLocale;
@@ -75,20 +75,25 @@ public abstract class Buyable extends ClickableItem {
         if (config.contains("upgrade_on_buy")) configureUpgradeOnBuy(config.getConfigOrNull("upgrade_on_buy"));
 
         if (config.contains("item_costs")) {
-            itemCosts.addAll(MinigamesConfigs.getItemStackList(config, "item_costs"));
+            for (Config itemConfig : config.getConfigList("item_costs")) {
+                ItemStack item = MinigamesConfigs.getItemStack(itemConfig, "item");
+
+                Calculator amount = new ExpressionCalculator(itemConfig.getString("amount", "1"));
+
+                itemCosts.put(item, amount);
+            }
+
         }
 
         if (config.contains("custom_item_costs")) {
-            for (String itemToAmount : config.getStringList("custom_item_costs")) {
-                String[] parts = itemToAmount.split(",");
+            for (Config customItemConfig : config.getConfigList("custom_item_costs")) {
+                String customItem = customItemConfig.getString("name");
 
-                try {
-                    customItemCosts.put(parts[0], Integer.parseInt(parts[1]));
-                } catch (Exception e) {
-                    System.err.println("Bad buyable custom_item_costs: " + itemToAmount);
-                    e.printStackTrace();
-                }
+                Calculator amount = new ExpressionCalculator(customItemConfig.getString("amount", "1"));
+
+                customItemCosts.put(customItem, amount);
             }
+
 
         }
     }
@@ -161,11 +166,13 @@ public abstract class Buyable extends ClickableItem {
 
         PlayerInventory inventory = event.getUser().getInventory();
 
-        for (Map.Entry<String, Integer> customItemToAmount : customItemCosts.entrySet()) {
+        for (Map.Entry<String, Calculator> customItemToAmount : customItemCosts.entrySet()) {
+            int requiredAmount = (int) customItemToAmount.getValue().calculate(event.getUser().getUserVariables());
+            if(requiredAmount <= 0) continue;
+
             CustomItem customItem = event.getGameGroup().getCustomItem(customItemToAmount.getKey());
 
             int userAmount = InventoryUtils.getAmountOfItemsWithIdentifier(inventory, customItem.getIdentifier());
-            int requiredAmount = customItemToAmount.getValue();
 
             String prefix = ((userAmount >= requiredAmount) ? ChatColor.GREEN : ChatColor.RED).toString();
 
@@ -175,14 +182,17 @@ public abstract class Buyable extends ClickableItem {
             display = InventoryUtils.addLore(display, lore);
         }
 
-        for (ItemStack itemCost : itemCosts) {
-            boolean hasAmount = inventory.containsAtLeast(itemCost, itemCost.getAmount());
+        for (Map.Entry<ItemStack, Calculator> itemToAmount : itemCosts.entrySet()) {
+            int requiredAmount = (int) itemToAmount.getValue().calculate(event.getUser().getUserVariables());
+            if(requiredAmount <= 0) continue;
+
+            boolean hasAmount = inventory.containsAtLeast(itemToAmount.getKey(), requiredAmount);
 
             String prefix = (hasAmount ? ChatColor.GREEN : ChatColor.RED).toString();
 
-            String itemName = InventoryUtils.getItemStackDefaultName(itemCost);
+            String itemName = InventoryUtils.getItemStackDefaultName(itemToAmount.getKey());
 
-            String lore = lookup.getLocale(costsItemLocale, prefix + itemCost.getAmount(), prefix + itemName);
+            String lore = lookup.getLocale(costsItemLocale, prefix + requiredAmount, prefix + itemName);
             display = InventoryUtils.addLore(display, lore);
         }
 
@@ -219,12 +229,20 @@ public abstract class Buyable extends ClickableItem {
 
         PlayerInventory inventory = user.getInventory();
 
+        //We need to store the calculated amounts as if the user variables change these could change
+        Map<String, Integer> customItemAmounts = new HashMap<>();
+
         //check if the user has the items
-        for (Map.Entry<String, Integer> customItemToAmount : customItemCosts.entrySet()) {
+        for (Map.Entry<String, Calculator> customItemToAmount : customItemCosts.entrySet()) {
+            int requiredAmount = (int) customItemToAmount.getValue().calculate(user.getUserVariables());
+            if(requiredAmount <= 0) continue;
+
+            customItemAmounts.put(customItemToAmount.getKey(), requiredAmount);
+
             CustomItem customItem = event.getGameGroup().getCustomItem(customItemToAmount.getKey());
 
             int userAmount = InventoryUtils.getAmountOfItemsWithIdentifier(inventory, customItem.getIdentifier());
-            int requiredAmount = customItemToAmount.getValue();
+
 
             if (userAmount >= requiredAmount) continue;
 
@@ -234,13 +252,20 @@ public abstract class Buyable extends ClickableItem {
             return;
         }
 
-        for (ItemStack itemCost : itemCosts) {
-            boolean hasAmount = inventory.containsAtLeast(itemCost, itemCost.getAmount());
+        Map<ItemStack, Integer> itemAmounts = new HashMap<>();
+
+        for (Map.Entry<ItemStack, Calculator> itemToAmount : itemCosts.entrySet()) {
+            int requiredAmount = (int) itemToAmount.getValue().calculate(user.getUserVariables());
+            if(requiredAmount <= 0) continue;
+
+            itemAmounts.put(itemToAmount.getKey(), requiredAmount);
+
+            boolean hasAmount = inventory.containsAtLeast(itemToAmount.getKey(), requiredAmount);
             if (hasAmount) continue;
 
-            String itemName = InventoryUtils.getItemStackDefaultName(itemCost);
+            String itemName = InventoryUtils.getItemStackDefaultName(itemToAmount.getKey());
 
-            user.sendLocale(noItemLocale, itemCost.getAmount(), itemName);
+            user.sendLocale(noItemLocale, requiredAmount, itemName);
             return;
         }
 
@@ -276,17 +301,22 @@ public abstract class Buyable extends ClickableItem {
         boolean itemsTaken = false;
 
         //charge the user the items required
-        for (Map.Entry<String, Integer> customItemToAmount : customItemCosts.entrySet()) {
+        for (Map.Entry<String, Integer> customItemToAmount : customItemAmounts.entrySet()) {
+            int requiredAmount = customItemToAmount.getValue();
+            if(requiredAmount <= 0) continue;
+
             CustomItem customItem = event.getGameGroup().getCustomItem(customItemToAmount.getKey());
 
-            int amountRequired = customItemToAmount.getValue();
-
-            InventoryUtils.removeItemsWithIdentifier(inventory, customItem.getIdentifier(), amountRequired);
+            InventoryUtils.removeItemsWithIdentifier(inventory, customItem.getIdentifier(), requiredAmount);
 
             itemsTaken = true;
         }
 
-        for (ItemStack itemCost : itemCosts) {
+        for (Map.Entry<ItemStack, Integer> itemToAmount : itemAmounts.entrySet()) {
+            ItemStack itemCost = itemToAmount.getKey().clone();
+
+            itemCost.setAmount(itemToAmount.getValue());
+
             inventory.removeItem(itemCost);
 
             itemsTaken = true;
