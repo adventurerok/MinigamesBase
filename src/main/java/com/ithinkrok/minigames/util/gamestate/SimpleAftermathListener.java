@@ -40,6 +40,8 @@ public class SimpleAftermathListener implements CustomListener {
     protected String quitLocale;
     protected String joinLocale;
 
+    protected boolean launchFireworks;
+
     @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent<GameGroup, GameState> event) {
         gameState = event.getRepresenting();
@@ -51,6 +53,8 @@ public class SimpleAftermathListener implements CustomListener {
 
         quitLocale = config.getString("user_quit_locale", "user.quit");
         joinLocale = config.getString("user_join_locale", "user.join");
+
+        launchFireworks = config.getBoolean("launch_fireworks", true);
     }
 
     @CustomEventHandler
@@ -65,18 +69,20 @@ public class SimpleAftermathListener implements CustomListener {
 
         event.getGameGroup().startCountdown(countdown);
 
-        GameTask task = event.getGameGroup().repeatInFuture(t -> {
-            if (t.getRunCount() > 5) t.finish();
+        if(launchFireworks) {
+            GameTask task = event.getGameGroup().repeatInFuture(t -> {
+                if (t.getRunCount() > 5) t.finish();
 
-            for (User user : event.getGameGroup().getUsers()) {
-                if (!shouldLaunchFireworksForUser(user)) continue;
+                for (User user : event.getGameGroup().getUsers()) {
+                    if (!shouldLaunchFireworksForUser(user)) continue;
 
-                user.launchVictoryFirework();
-            }
+                    user.launchVictoryFirework();
+                }
 
-        }, 20, 20);
+            }, 20, 20);
 
-        event.getGameGroup().bindTaskToCurrentGameState(task);
+            event.getGameGroup().bindTaskToCurrentGameState(task);
+        }
     }
 
     @CustomEventHandler
