@@ -20,6 +20,8 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.projectiles.ProjectileSource;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -96,6 +98,32 @@ public class CustomEntity implements Nameable, CustomListener {
     public Entity spawnEntity(GameGroup gameGroup, Location location, Variables variables) {
         Entity entity = location.getWorld().spawnEntity(location, type);
 
+        setupCustomEntity(gameGroup, variables, entity);
+
+        return entity;
+    }
+
+    public Projectile launchProjectile(GameGroup gameGroup, ProjectileSource source, Variables variables, Vector
+            velocity) {
+
+        if(!Projectile.class.isAssignableFrom(type.getEntityClass())) {
+            throw new IllegalStateException("The entity type of CustomEntity " + name + " is not a Projectile");
+        }
+
+        Projectile projectile;
+
+        if(velocity == null) {
+            projectile = source.launchProjectile(type.getEntityClass().asSubclass(Projectile.class));
+        } else {
+            projectile = source.launchProjectile(type.getEntityClass().asSubclass(Projectile.class), velocity);
+        }
+
+        setupCustomEntity(gameGroup, variables, projectile);
+
+        return projectile;
+    }
+
+    private void setupCustomEntity(GameGroup gameGroup, Variables variables, Entity entity) {
         gameGroup.getGame().setupCustomEntity(entity, name, variables);
 
         //Handle entities with ages
@@ -132,7 +160,7 @@ public class CustomEntity implements Nameable, CustomListener {
         //Strike lightning at the new entity
         if(config.contains("strike_lightning")) {
             if(Math.floor(calculate(variables, config, "strike_lightning")) != 0) {
-                location.getWorld().strikeLightningEffect(location);
+                entity.getWorld().strikeLightningEffect(entity.getLocation());
             }
         }
 
@@ -159,8 +187,6 @@ public class CustomEntity implements Nameable, CustomListener {
         if (config.contains("equipment")) {
             addEntityEquipment(gameGroup, variables, (LivingEntity) entity);
         }
-
-        return entity;
     }
 
     private double calculate(Variables variables, Config config, String path) {
