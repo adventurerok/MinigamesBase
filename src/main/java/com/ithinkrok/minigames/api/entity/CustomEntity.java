@@ -95,15 +95,23 @@ public class CustomEntity implements Nameable, CustomListener {
         return name;
     }
 
-    public Entity spawnEntity(GameGroup gameGroup, Location location, Variables variables) {
-        Entity entity = location.getWorld().spawnEntity(location, type);
+    public Entity spawnCustomEntity(GameGroup gameGroup, Location location, Variables variables) {
+        Entity entity;
+
+
+        if(type == EntityType.LIGHTNING) {
+            entity = location.getWorld().strikeLightning(location);
+        } else {
+            entity = location.getWorld().spawnEntity(location, type);
+        }
 
         setupCustomEntity(gameGroup, variables, entity);
 
         return entity;
     }
 
-    public Projectile launchProjectile(GameGroup gameGroup, ProjectileSource source, Variables variables, Vector
+
+    public Projectile launchCustomProjectile(GameGroup gameGroup, ProjectileSource source, Variables variables, Vector
             velocity) {
 
         if(!Projectile.class.isAssignableFrom(type.getEntityClass())) {
