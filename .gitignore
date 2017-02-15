@@ -1,4 +1,5 @@
-.gitignore
+setuplinks.sh
+copytoserver.sh
 
 # Created by .ignore support plugin (hsz.mobi)
 ### Maven template
