@@ -41,6 +41,10 @@ public class ItemGiver {
         if (clearInventory) user.getInventory().clear();
 
         for (CustomItemInfo itemInfo : items) {
+            if(!itemInfo.permission.isEmpty() && !user.hasPermission(itemInfo.permission)) {
+                continue;
+            }
+
             CustomItem item = user.getGameGroup().getCustomItem(itemInfo.customItem);
             ItemStack itemStack;
 
@@ -67,12 +71,17 @@ public class ItemGiver {
         private final int slot;
         private Variables customVariables;
 
+        private String permission;
+
         public CustomItemInfo(Config config) {
             customItem = config.getString("name");
             slot = config.getInt("slot", -1);
 
-            if (!config.contains("custom_variables")) return;
-            customVariables = new MapVariables(config.getConfigOrEmpty("custom_variables"));
+            permission = config.getString("permission", "");
+
+            if (config.contains("custom_variables")) {
+                customVariables = new MapVariables(config.getConfigOrEmpty("custom_variables"));
+            }
         }
     }
 
