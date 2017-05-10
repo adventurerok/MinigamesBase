@@ -14,6 +14,8 @@ super_popper.victim=&aYou have been popped by &c%s
 super_popper.attacker=&aYou have popped &c%s
 super_popper.pvp=&cYou cannot use the super popper on someone in a PvP duel!
 
+ultra_popper.name=&b&lUltra &7Popper
+
 pvp_sword.name=&b&lPvP &7Sword
 pvp_sword.desc=&aChallenge your friends to a PvP duel!
 pvp_sword.pvp_start=&aPvP mode now enabled!

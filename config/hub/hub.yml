@@ -29,6 +29,9 @@ game_states:
                 slot: 0
               - name: "pvp_sword"
                 slot: 1
+              - name: "ultra_popper"
+                slot: 2
+                permission: "donator.ultra_popper"
               - name: "game_chooser"
                 slot: 4
               - name: "gamegroups_menu"
@@ -141,3 +144,17 @@ custom_items:
       super_popper:
         events: ["rightClick"]
         class: "com.ithinkrok.minigames.hub.item.SuperPopper"
+  ultra_popper:
+    material: "BONE"
+    display_name_locale: "ultra_popper.name"
+    right_cooldown:
+      ability: "ultra_popper"
+      timer: "0.5"
+    enchantments:
+      OXYGEN: 1
+    listeners:
+      ultra_popper:
+        class: "com.ithinkrok.minigames.hub.item.UltraPopper"
+        config:
+          low_speed: 0.1
+          high_speed: 2.0
