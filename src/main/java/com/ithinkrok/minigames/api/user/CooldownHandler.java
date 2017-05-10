@@ -33,7 +33,10 @@ public class CooldownHandler {
 
         coolingDown.put(ability, timeInFuture(seconds));
 
-        GameTask task = user.doInFuture(task1 -> stopCoolDown(ability, coolDownLocale), (int) (seconds * 20));
+        //Only play the sound if the cooldown lasts for more than 2 seconds
+
+        GameTask task = user.doInFuture(task1 -> stopCoolDown(ability, coolDownLocale, seconds > 2), (int) (seconds *
+                20));
 
         coolDownTasks.addTask(task);
 
@@ -44,32 +47,38 @@ public class CooldownHandler {
         return coolingDown.containsKey(ability);
     }
 
-    public double getCooldownSeconds(String ability) {
-        Long endNanos = coolingDown.get(ability);
-        if(endNanos == null) return 0;
-
-        //To the nearest tick
-        return Math.ceil((endNanos - System.nanoTime()) / 50_000_000d) / 20d;
-    }
-
     private long timeInFuture(double secondsInFuture) {
         return System.nanoTime() + (long) (secondsInFuture * 1000000000);
     }
 
     public void stopCoolDown(String ability, String stopLocale) {
+        stopCoolDown(ability, stopLocale, true);
+    }
+
+    public void stopCoolDown(String ability, String stopLocale, boolean playSound) {
         if (!isCoolingDown(ability)) return;
 
         coolingDown.remove(ability);
 
+        SoundEffect sound =
+                playSound ? new SoundEffect(NamedSounds.fromName("ENTITY_ZOMBIE_VILLAGER_CURE"), 1.0f, 2.0f) : null;
+
         //if (!isInGame()) return;
-        UserAbilityCooldownEvent event = new UserAbilityCooldownEvent(user, ability,
-                new SoundEffect(NamedSounds.fromName("ENTITY_ZOMBIE_VILLAGER_CURE"), 1.0f, 2.0f),
-                user.getGameGroup().getLocale(stopLocale));
+        UserAbilityCooldownEvent event =
+                new UserAbilityCooldownEvent(user, ability, sound, user.getGameGroup().getLocale(stopLocale));
 
         user.getGameGroup().userEvent(event);
 
         if (event.getCoolDownMessage() != null) user.sendMessage(ChatColor.GREEN + event.getCoolDownMessage());
         if (event.getSoundEffect() != null) user.playSound(user.getLocation(), event.getSoundEffect());
+    }
+
+    public double getCooldownSeconds(String ability) {
+        Long endNanos = coolingDown.get(ability);
+        if (endNanos == null) return 0;
+
+        //To the nearest tick
+        return Math.ceil((endNanos - System.nanoTime()) / 50_000_000d) / 20d;
     }
 
     public void cancelCoolDowns() {
