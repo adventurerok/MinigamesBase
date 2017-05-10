@@ -156,5 +156,5 @@ custom_items:
       ultra_popper:
         class: "com.ithinkrok.minigames.hub.item.UltraPopper"
         config:
-          low_speed: 0.1
+          low_speed: 0.2
           high_speed: 2.0
