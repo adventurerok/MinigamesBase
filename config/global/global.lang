@@ -59,6 +59,8 @@ item_buyable.no_space=&cYou do not have enough inventory space!
 #Default join/quit messages
 user.quit=%s &equit
 user.join=%s &ejoined
+user.quit.aftermath=
+user.join.aftermath=
 user.quit.lobby=%s &7left the lobby &8[&7%s&8/&7%s&8]
 user.join.lobby=%s &7joined the lobby &8[&7%s&8/&7%s&8]
 user.quit.spectator=&d%s &dquit spectating the game

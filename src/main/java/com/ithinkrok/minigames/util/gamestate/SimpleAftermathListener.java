@@ -50,9 +50,8 @@ public class SimpleAftermathListener implements CustomListener {
 
         countdown = MinigamesConfigs.getCountdown(config, "countdown", "aftermath", 15, "countdowns.aftermath");
 
-
-        quitLocale = config.getString("user_quit_locale", "user.quit");
-        joinLocale = config.getString("user_join_locale", "user.join");
+        quitLocale = config.getString("user_quit_locale", "user.quit.aftermath");
+        joinLocale = config.getString("user_join_locale", "user.join.aftermath");
 
         launchFireworks = config.getBoolean("launch_fireworks", true);
     }
