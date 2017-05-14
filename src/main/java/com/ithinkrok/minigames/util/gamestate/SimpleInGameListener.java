@@ -4,6 +4,7 @@ import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.GameState;
 import com.ithinkrok.minigames.api.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserJoinEvent;
+import com.ithinkrok.minigames.api.event.user.state.UserFoodLevelChangeEvent;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.util.ItemGiver;
 import com.ithinkrok.util.config.Config;
@@ -67,5 +68,14 @@ public class SimpleInGameListener implements CustomListener {
     public void makeUserSpectator(User user) {
         user.setSpectator(true);
         spectatorItems.giveToUser(user);
+    }
+
+    @CustomEventHandler
+    public void onUserFoodLevelChange(UserFoodLevelChangeEvent event) {
+        if(event.getUser().isInGame()) return;
+
+        event.setCancelled(true);
+        event.getUser().setFoodLevel(20);
+        event.getUser().setSaturation(20);
     }
 }
