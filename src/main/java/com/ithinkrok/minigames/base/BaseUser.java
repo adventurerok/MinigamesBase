@@ -123,7 +123,7 @@ public class BaseUser implements Listener, User {
 
             if (u.isCloaked()) hidePlayer(u);
             else {
-                hidePlayer(u);
+//                hidePlayer(u);
 
                 doInFuture(task -> {
                     if (!u.isCloaked()) {
@@ -134,7 +134,7 @@ public class BaseUser implements Listener, User {
 
             if (isCloaked()) u.hidePlayer(this);
             else {
-                u.hidePlayer(this);
+//                u.hidePlayer(this);
 
                 doInFuture(task -> {
                     if (!isCloaked()) {
@@ -898,6 +898,11 @@ public class BaseUser implements Listener, User {
 
         //Prevent death due to fall damage after teleporting
         getEntity().setFallDistance(0);
+
+        //Try and fix cloak glitches in showdown
+        if(isPlayer()) {
+            fixCloakedUsers();
+        }
 
         boolean success = entity.teleport(event.getTo());
 
