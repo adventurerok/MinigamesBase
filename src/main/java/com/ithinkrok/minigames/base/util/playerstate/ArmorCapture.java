@@ -130,6 +130,26 @@ public class ArmorCapture implements EntityEquipment {
 
     }
 
+    //1.9 @Override
+    public float getItemInMainHandDropChance() {
+        return 0;
+    }
+
+    //1.9 @Override
+    public void setItemInMainHandDropChance(float v) {
+
+    }
+
+    //1.9 @Override
+    public float getItemInOffHandDropChance() {
+        return 0;
+    }
+
+    //1.9 @Override
+    public void setItemInOffHandDropChance(float v) {
+
+    }
+
     @Override
     public float getHelmetDropChance() {
         return 0;

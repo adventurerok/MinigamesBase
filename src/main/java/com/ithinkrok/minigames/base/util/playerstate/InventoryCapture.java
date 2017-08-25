@@ -33,6 +33,11 @@ public class InventoryCapture implements PlayerInventory {
         return equipment().getArmorContents();
     }
 
+    //1.9 @Override
+    public ItemStack[] getExtraContents() {
+        return new ItemStack[0];
+    }
+
     private EntityEquipment equipment() {
         if (playerState == null) return EMPTY_ARMOR;
         if (playerState.getPlaceholder() != null) return playerState.getPlaceholder().getEquipment();
@@ -120,6 +125,11 @@ public class InventoryCapture implements PlayerInventory {
     @Override
     public void setArmorContents(ItemStack[] items) {
         equipment().setArmorContents(items);
+    }
+
+    //1.9 @Override
+    public void setExtraContents(ItemStack[] itemStacks) {
+
     }
 
     @SuppressWarnings("unused")
@@ -226,6 +236,16 @@ public class InventoryCapture implements PlayerInventory {
     @Override
     public void setContents(ItemStack[] items) throws IllegalArgumentException {
         this.contents = items;
+    }
+
+    //1.9 @Override
+    public ItemStack[] getStorageContents() {
+        return getContents();
+    }
+
+    //1.9 @Override
+    public void setStorageContents(ItemStack[] itemStacks) throws IllegalArgumentException {
+        setContents(itemStacks);
     }
 
     @Override
