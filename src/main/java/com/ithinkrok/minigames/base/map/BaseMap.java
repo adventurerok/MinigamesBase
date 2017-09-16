@@ -199,9 +199,9 @@ public class BaseMap implements GameMap, ConfigHolder {
     }
 
     @Override
-    public void teleportUser(User user) {
-        if (user.getLocation().getWorld().equals(world)) return;
-        user.teleport(getSpawn());
+    public boolean teleportUser(User user) {
+        if (user.getLocation().getWorld().equals(world)) return true;
+        return user.teleport(getSpawn());
     }
 
     @Override

@@ -845,7 +845,12 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
             usersInGroup.put(event.getUser().getUuid(), (BaseUser) event.getUser());
 
-            currentMap.teleportUser(event.getUser());
+            game.getLogger().info("Teleporting user " + event.getUser().getName() + " to GameGroup map");
+            boolean success = currentMap.teleportUser(event.getUser());
+
+            if(!success) {
+                game.getLogger().warning("Failed to teleport user " + event.getUser().getName() + " to GameGroup map");
+            }
 
             sendUpdatePayload();
         }

@@ -50,10 +50,8 @@ import org.bukkit.event.player.*;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.projectiles.ProjectileSource;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by paul on 27/02/16.
@@ -61,6 +59,8 @@ import java.util.Objects;
 public class GameBukkitListener implements Listener {
 
     private final Game game;
+
+    private final Map<UUID, Integer> notInGameGroupErrors = new ConcurrentHashMap<>();
 
     public GameBukkitListener(Game game) {
         this.game = game;
@@ -100,23 +100,32 @@ public class GameBukkitListener implements Listener {
         user.getGameGroup().userEvent(userEvent);
 
         game.doInFuture(task -> game.checkResourcesRestart());
+
+        notInGameGroupErrors.remove(user.getUuid());
     }
 
     private void notInGameGroupError(Entity player) {
         System.out
                 .println("Player not in GG: '" + player.getName() + "' in world '" + player.getWorld().getName() + "'");
 
-        //Schedule a server restart due to this
-        //Allow 1 player online when restarting as at least 1 player is not in a gamegroup
-        ClientAPIProtocol apiProtocol = MSMPlugin.getApiProtocol();
-        if (apiProtocol.isRestartScheduled()) return;
+        int count = notInGameGroupErrors.compute(player.getUniqueId(), (uuid, integer) -> integer == null ? 0 : integer + 1);
 
-        apiProtocol.scheduleRestart(10, 1);
+        if(count > 100) {
 
-        Bukkit.broadcastMessage("Server restart scheduled due to a NOT-IN-GAMEGROUP error");
-        Bukkit.broadcastMessage("The server will restart if 1 or less players are online");
-        Bukkit.broadcastMessage(
-                "If you believe you are glitched please move to another server in the network or disconnect");
+            //Schedule a server restart due to this
+            //Allow 1 player online when restarting as at least 1 player is not in a gamegroup
+            ClientAPIProtocol apiProtocol = MSMPlugin.getApiProtocol();
+            if (apiProtocol.isRestartScheduled()) return;
+
+            apiProtocol.scheduleRestart(10, 1);
+
+            Bukkit.broadcastMessage("Server restart scheduled due to a NOT-IN-GAMEGROUP error");
+            Bukkit.broadcastMessage("The server will restart if 1 or less players are online");
+            Bukkit.broadcastMessage(
+                    "If you believe you are glitched please move to another server in the network or disconnect");
+        } else if(player instanceof Player) {
+            game.rejoinPlayer((Player) player);
+        }
     }
 
     @EventHandler

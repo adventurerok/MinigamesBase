@@ -906,6 +906,10 @@ public class BaseUser implements Listener, User {
 
         boolean success = entity.teleport(event.getTo());
 
+        if(!success) {
+            System.out.println("Failed to teleport user: " + getName());
+        }
+
         return revalidateNonPlayer(event.getTo()) || success;
     }
 
