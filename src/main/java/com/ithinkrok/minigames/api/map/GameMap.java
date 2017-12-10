@@ -43,7 +43,7 @@ public interface GameMap extends LanguageLookup, SchematicPaster.BoundsChecker, 
 
     void unloadMap();
 
-    void teleportUser(User user);
+    boolean teleportUser(User user);
 
     List<CustomListener> getListeners();
 

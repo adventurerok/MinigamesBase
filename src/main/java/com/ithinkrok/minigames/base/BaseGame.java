@@ -305,6 +305,7 @@ public class BaseGame implements Game, FileLoader {
 
     @Override
     public void rejoinPlayer(Player player) {
+        getLogger().info("(Re)join player " + player.getName());
         BaseGameGroup gameGroup = getGameGroupForJoining(player.getUniqueId());
 
         if (gameGroup == null) {
@@ -337,6 +338,7 @@ public class BaseGame implements Game, FileLoader {
             user.becomePlayer(player);
         }
 
+        getLogger().info("Sending user join event for " + player.getName());
         gameGroup.userEvent(new UserJoinEvent(user, UserJoinEvent.JoinReason.JOINED_SERVER));
 
         final BaseUser finalUser = user;
