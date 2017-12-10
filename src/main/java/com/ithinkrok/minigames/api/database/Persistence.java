@@ -38,7 +38,7 @@ public class Persistence extends Thread {
         for (Plugin plugin : Bukkit.getServer().getPluginManager().getPlugins()) {
             if (!SpecificPlugin.class.isInstance(plugin)) continue;
 
-            if (!this.plugin.getDescription().isDatabaseEnabled()) continue;
+            if (!plugin.getDescription().isDatabaseEnabled()) continue;
 
             System.out.println("Ensuring tables exist for plugin database: " + plugin.getName());
 
@@ -60,7 +60,7 @@ public class Persistence extends Thread {
     @Override
     public void run() {
         while (!stop) {
-            if(!checkedDDL) {
+            if (!checkedDDL) {
                 try {
                     Thread.sleep(100L);
                 } catch (InterruptedException e) {
@@ -114,15 +114,15 @@ public class Persistence extends Thread {
             }
 
             for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
-                EbeanServer database = plugin.getDatabase();
-                if (database == null) continue;
-
                 try {
+
+                    EbeanServer database = plugin.getDatabase();
+                    if (database == null) continue;
                     database.find(databaseClass);
 
                     pluginNames.put(databaseClass, plugin.getName());
                     return database;
-                } catch (PersistenceException ignored) {
+                } catch (PersistenceException | IllegalStateException ignored) {
                 }
             }
 
