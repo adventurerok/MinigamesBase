@@ -59,6 +59,8 @@ public class CustomItem implements Identifiable, CustomListener, Nameable {
 
     private final boolean replaceOnUpgrade;
 
+    private final boolean useNewCombat;
+
     private final List<EnchantmentEffect> enchantmentEffects = new ArrayList<>();
 
     public CustomItem(String name, Config config) {
@@ -70,11 +72,16 @@ public class CustomItem implements Identifiable, CustomListener, Nameable {
         this.durability = config.getInt("durability", 0);
         this.unbreakable = config.getBoolean("unbreakable", itemMaterial.getMaxDurability() != 0);
         this.replaceOnUpgrade = config.getBoolean("upgradable", false);
+        this.useNewCombat = config.getBoolean("use_new_combat", false);
 
         if (config.contains("right_cooldown")) configureCooldown(config.getConfigOrNull("right_cooldown"));
         if (config.contains("right_timeout")) configureTimeout(config.getConfigOrNull("right_timeout"));
         if( config.contains("enchantments")) configureEnchantments(config.getConfigOrNull("enchantments"));
         if (config.contains("listeners")) configureListeners(config.getConfigOrNull("listeners"));
+    }
+
+    public boolean isUsingNewCombat() {
+        return useNewCombat;
     }
 
     private void configureEnchantments(Config enchantments) {
