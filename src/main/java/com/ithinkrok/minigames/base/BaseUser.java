@@ -35,7 +35,9 @@ import com.ithinkrok.minigames.api.util.SoundEffect;
 import com.ithinkrok.minigames.api.util.disguise.Disguise;
 import com.ithinkrok.minigames.base.util.playerstate.PlayerState;
 import com.ithinkrok.msm.bukkit.util.PlayerMessageSender;
+import com.ithinkrok.msm.common.message.ConfigMessageFactory;
 import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.config.JsonConfigIO;
 import com.ithinkrok.util.event.CustomEventExecutor;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
@@ -1316,10 +1318,16 @@ public class BaseUser implements Listener, User {
         Bukkit.dispatchCommand(console, "title " + getName() + " times " + fadeIn + " " + stay + " " + fadeOut);
 
         if (subTitle != null) {
-            Bukkit.dispatchCommand(console, "title " + getName() + " subtitle \"" + subTitle + "\"");
+            Config subConfig = (new ConfigMessageFactory(subTitle)).newBuilder().getResult();
+            String subJson = JsonConfigIO.dumpConfig(subConfig);
+
+            Bukkit.dispatchCommand(console, "title " + getName() + " subtitle " + subJson + "");
         }
 
-        Bukkit.dispatchCommand(console, "title " + getName() + " title \"" + title + "\"");
+        Config titleConfig = (new ConfigMessageFactory(title)).newBuilder().getResult();
+        String titleJson = JsonConfigIO.dumpConfig(titleConfig);
+
+        Bukkit.dispatchCommand(console, "title " + getName() + " title " + titleJson + "");
     }
 
     @Override
