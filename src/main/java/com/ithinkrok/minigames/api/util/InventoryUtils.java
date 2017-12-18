@@ -58,33 +58,47 @@ public class InventoryUtils {
     }
 
 
-    private static Material getSpecialMaterial(String name) {
-        name = name.toUpperCase();
+    public static ItemStack parseItem(String itemString) {
+        String baseString = itemString;
+        String extendedString = "";
 
-        if(name.startsWith("POTION: ")) return Material.POTION;
+        int colonIndex = itemString.indexOf(':');
+        if(colonIndex >= 0) {
+            baseString = itemString.substring(0, colonIndex);
+            extendedString = itemString.substring(colonIndex + 1, itemString.length());
+        }
 
-        else return Material.matchMaterial(name);
+        ItemStack result = parseBaseItemString(baseString);
+
+        if(!extendedString.isEmpty()) {
+            applyExtendedItemString(extendedString, result);
+        }
+
+        return result;
     }
 
-    private static void applySpecialMaterial(String name, ItemStack item) {
-        name = name.toUpperCase();
+    private static void applyExtendedItemString(String extendedString, ItemStack item) {
+        String[] parts = extendedString.trim().split(",");
 
-        if(name.startsWith("POTION: ")) {
-            String effectName = name.substring("POTION: ".length());
+        switch(item.getType()) {
+            case POTION:
+            case SPLASH_POTION:
+            case LINGERING_POTION:
+                String effectName = parts[0].toUpperCase();
 
-            PotionType type = PotionType.valueOf(effectName);
+                PotionType type = PotionType.valueOf(effectName);
 
-            PotionMeta meta = (PotionMeta) item.getItemMeta();
-            meta.setBasePotionData(new PotionData(type, false, false));
-            item.setItemMeta(meta);
+                PotionMeta meta = (PotionMeta) item.getItemMeta();
+                meta.setBasePotionData(new PotionData(type, false, false));
+                item.setItemMeta(meta);
         }
     }
 
-    public static ItemStack parseItem(String itemString) {
-        String[] parts = itemString.trim().split(",");
+    private static ItemStack parseBaseItemString(String baseString) {
+        String[] parts = baseString.trim().split(",");
 
         String materialName = parts[0].trim();
-        Material material = getSpecialMaterial(materialName);
+        Material material = Material.matchMaterial(materialName);
 
         if(material == null) throw new IllegalArgumentException("Unknown material: " + materialName);
 
@@ -102,11 +116,7 @@ public class InventoryUtils {
             lore[index] = StringUtils.convertAmpersandToSelectionCharacter(lore[index]);
         }
 
-        ItemStack result = createItemWithNameAndLore(material, amount, durability, name, lore);
-
-        applySpecialMaterial(materialName, result);
-
-        return result;
+        return createItemWithNameAndLore(material, amount, durability, name, lore);
     }
 
     public static ItemStack createItemWithNameAndLore(Material mat, int amount, int damage, String name,
