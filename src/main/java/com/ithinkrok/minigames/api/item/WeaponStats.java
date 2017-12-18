@@ -12,6 +12,10 @@ public class WeaponStats {
     
     private static final Map<Material, Double> speed = new HashMap<>();
 
+    private static final double defaultLegacyDamage = 1.0;
+    private static final double defaultNewDamage = 2.0;
+    private static final double defaultSpeed = 4.0;
+
     static {
         legacyDamage.put(Material.WOOD_SWORD, 4.0);
         legacyDamage.put(Material.WOOD_AXE, 3.0);
@@ -99,4 +103,28 @@ public class WeaponStats {
         speed.put(Material.DIAMOND_HOE, 4.0);
     }
 
+
+    public static double getLegacyDamage(Material material) {
+        return legacyDamage.getOrDefault(material, defaultLegacyDamage);
+    }
+
+    public static double getNewDamage(Material material) {
+        return newDamage.getOrDefault(material, defaultNewDamage);
+    }
+
+    public static double getSpeed(Material material) {
+        return speed.getOrDefault(material, defaultSpeed);
+    }
+
+    public static double getDefaultLegacyDamage() {
+        return defaultLegacyDamage;
+    }
+
+    public static double getDefaultNewDamage() {
+        return defaultNewDamage;
+    }
+
+    public static double getDefaultSpeed() {
+        return defaultSpeed;
+    }
 }

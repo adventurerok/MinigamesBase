@@ -15,6 +15,7 @@ import com.ithinkrok.minigames.api.event.user.inventory.UserItemHeldEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.api.inventory.ClickableInventory;
 import com.ithinkrok.minigames.api.item.CustomItem;
+import com.ithinkrok.minigames.api.item.WeaponStats;
 import com.ithinkrok.minigames.api.map.GameMap;
 import com.ithinkrok.minigames.api.metadata.UserMetadata;
 import com.ithinkrok.minigames.api.task.GameRunnable;
@@ -44,6 +45,7 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.*;
@@ -118,6 +120,9 @@ public class BaseUser implements Listener, User {
         fixCloakedUsers();
 
         repeatInFuture(task -> decrementAttackerTimers(), 20, 20);
+
+        //This just prevents weapon damage values being wrong for more than a second, vastly limiting possible exploits
+        repeatInFuture(task -> checkAttributes(), 20, 20);
     }
 
     @Override
@@ -127,7 +132,7 @@ public class BaseUser implements Listener, User {
 
             if (u.isCloaked()) hidePlayer(u);
             else {
-//                hidePlayer(u);
+                //                hidePlayer(u);
 
                 doInFuture(task -> {
                     if (!u.isCloaked()) {
@@ -138,7 +143,7 @@ public class BaseUser implements Listener, User {
 
             if (isCloaked()) u.hidePlayer(this);
             else {
-//                u.hidePlayer(this);
+                //                u.hidePlayer(this);
 
                 doInFuture(task -> {
                     if (!isCloaked()) {
@@ -178,9 +183,6 @@ public class BaseUser implements Listener, User {
             oldMetadata.cancelAllTasks();
             oldMetadata.removed();
         }
-    }    @Override
-    public boolean isPlayer() {
-        return entity instanceof Player;
     }
 
     @Override
@@ -205,15 +207,14 @@ public class BaseUser implements Listener, User {
     @Override
     public boolean hasSharedObject(String name) {
         return gameGroup.hasSharedObject(name);
+    }    @Override
+    public boolean isPlayer() {
+        return entity instanceof Player;
     }
 
     @Override
     public Config getSharedObject(String name) {
         return gameGroup.getSharedObject(name);
-    }    @Override
-    public Player getPlayer() {
-        if (!isPlayer()) throw new RuntimeException("You have no player");
-        return (Player) entity;
     }
 
     @Override
@@ -295,7 +296,7 @@ public class BaseUser implements Listener, User {
 
             ItemStack[] armor = inv.getArmorContents();
 
-            for(int index = 0; index < armor.length; ++index) {
+            for (int index = 0; index < armor.length; ++index) {
                 ItemStack old = armor[index];
 
                 ItemStack replace = upgradeItem(old);
@@ -344,38 +345,12 @@ public class BaseUser implements Listener, User {
         @CustomEventHandler(priority = CustomEventHandler.HIGH)
         public void eventInventoryUpdate(UserInventoryUpdateEvent event) {
 
-            AttributeInstance damage = getEntity().getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
-
-            System.out.println("Base damage: " + damage.getBaseValue());
-
-            for (AttributeModifier modifier : damage.getModifiers()) {
-                System.out.println(
-                        "Modifier: " + modifier.getName() + ", " + modifier.getOperation().toString() + "," + " " +
-                                modifier.getAmount());
-            }
-
-            AttributeInstance speed = getEntity().getAttribute(Attribute.GENERIC_ATTACK_SPEED);
-
-            System.out.println("Base speed: " + speed.getBaseValue());
-
-            for (AttributeModifier modifier : speed.getModifiers()) {
-                System.out.println(
-                        "Modifier: " + modifier.getName() + ", " + modifier.getOperation().toString() + "," + " " +
-                                modifier.getAmount());
-            }
+            doInFuture(task -> {
+                checkAttributes();
+                //Call CustomItem listeners
+            }, 1);
 
             ItemStack newItem = getInventory().getItemInMainHand();
-
-            if (newItem != null && !getGameGroup().getSharedObjectOrEmpty("user").getBoolean("use_new_combat",
-                                                                                             false)) {
-
-
-                //TODO just use damage events instead, but still set the speed attribute
-
-                for(AttributeModifier modifier : damage.getModifiers()) {
-                    damage.removeModifier(modifier);
-                }
-            }
 
             int newIdentifier = InventoryUtils.getIdentifier(newItem);
             if (newIdentifier > 0) {
@@ -399,6 +374,70 @@ public class BaseUser implements Listener, User {
 
     }
 
+    private void checkAttributes() {
+        AttributeInstance damage = getEntity().getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
+        AttributeInstance speed = getEntity().getAttribute(Attribute.GENERIC_ATTACK_SPEED);
+
+
+        Config userShared = getGameGroup().getSharedObjectOrEmpty("user");
+        boolean useNewCombat = userShared.getBoolean("use_new_combat", false);
+
+        if(!useNewCombat) {
+            //Remove 1.9+ damage values
+            for (AttributeModifier modifier : damage.getModifiers()) {
+                if ("Tool modifier".equals(modifier.getName()) ||
+                        "Weapon modifier".equals(modifier.getName()) ||
+                        "Damage Override".equals(modifier.getName())) {
+                    damage.removeModifier(modifier);
+                }
+            }
+
+            //Remove 1.9 attack speed
+            for (AttributeModifier attributeModifier : speed.getModifiers()) {
+                speed.removeModifier(attributeModifier);
+            }
+
+            speed.addModifier(
+                    new AttributeModifier("Speed Override", 4.0, AttributeModifier.Operation.ADD_NUMBER));
+        }
+
+        ItemStack newItem = getInventory().getItemInMainHand();
+
+        if (newItem != null && !useNewCombat) {
+
+            double legacyDamageModifier =
+                    WeaponStats.getLegacyDamage(newItem.getType()) - damage.getBaseValue();
+
+            if (legacyDamageModifier != 0) {
+                damage.addModifier(new AttributeModifier("Damage Override", legacyDamageModifier,
+                                                         AttributeModifier.Operation.ADD_NUMBER));
+            }
+        }
+
+//        System.out.println(getName() + " attributes fixed!");
+//
+//        //Show attributes
+//        System.out.println("Base damage: " + damage.getBaseValue());
+//        for (AttributeModifier modifier : damage.getModifiers()) {
+//            System.out.println(
+//                    "Modifier: " + modifier.getName() + ", " + modifier.getOperation().toString() + "," + " " +
+//                            modifier.getAmount());
+//        }
+//
+//        System.out.println("Base speed: " + speed.getBaseValue());
+//        for (AttributeModifier modifier : speed.getModifiers()) {
+//            System.out.println(
+//                    "Modifier: " + modifier.getName() + ", " + modifier.getOperation().toString() + "," + " " +
+//                            modifier.getAmount());
+//        }
+    }
+
+
+    @Override
+    public Player getPlayer() {
+        if (!isPlayer()) throw new RuntimeException("You have no player");
+        return (Player) entity;
+    }
 
 
     @Override
@@ -927,13 +966,13 @@ public class BaseUser implements Listener, User {
         getEntity().setFallDistance(0);
 
         //Try and fix cloak glitches in showdown
-        if(isPlayer()) {
+        if (isPlayer()) {
             fixCloakedUsers();
         }
 
         boolean success = entity.teleport(event.getTo());
 
-        if(!success) {
+        if (!success) {
             System.out.println("Failed to teleport user: " + getName());
         }
 
@@ -1361,8 +1400,6 @@ public class BaseUser implements Listener, User {
     public void setVelocity(Vector velocity) {
         entity.setVelocity(velocity);
     }
-
-
 
 
     @Override

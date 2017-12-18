@@ -556,6 +556,8 @@ public class GameBukkitListener implements Listener {
             return;
         }
 
+        System.out.println(attacked.getName() + " damaged: " + event.getFinalDamage());
+
         if (attacked.getHealth() - event.getFinalDamage() > 0.01) {
             if (attacker != null) attacked.setLastAttacker(attacker);
 
