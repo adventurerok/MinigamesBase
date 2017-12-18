@@ -14,6 +14,7 @@ import com.ithinkrok.minigames.api.event.user.inventory.UserInventoryUpdateEvent
 import com.ithinkrok.minigames.api.event.user.inventory.UserItemHeldEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.api.inventory.ClickableInventory;
+import com.ithinkrok.minigames.api.item.CombatMode;
 import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.item.WeaponStats;
 import com.ithinkrok.minigames.api.map.GameMap;
@@ -382,12 +383,40 @@ public class BaseUser implements Listener, User {
         Config userShared = getGameGroup().getSharedObjectOrEmpty("user");
         boolean useNewCombat = userShared.getBoolean("use_new_combat", false);
 
+        ItemStack newItem = getInventory().getItemInMainHand();
+
+        //We will check to see if there is a custom item overriding combat mode
+        CustomItem customItem = null;
+        if(newItem != null) {
+            int identifier = InventoryUtils.getIdentifier(newItem);
+            if(identifier >= 0 ) {
+                customItem = getGameGroup().getCustomItem(identifier);
+            }
+        }
+        if(customItem != null && customItem.getCombatMode() != CombatMode.INHERIT) {
+            useNewCombat = customItem.getCombatMode() == CombatMode.NEW;
+        }
+
+
+        //Remove our custom damage and speed overrides
+        for (AttributeModifier modifier : damage.getModifiers()) {
+            if("Damage Override".equals(modifier.getName())) {
+                damage.removeModifier(modifier);
+            }
+        }
+
+        for (AttributeModifier modifier : speed.getModifiers()) {
+            if("Speed Override".equals(modifier.getName())) {
+                speed.removeModifier(modifier);
+            }
+        }
+
+
         if(!useNewCombat) {
             //Remove 1.9+ damage values
             for (AttributeModifier modifier : damage.getModifiers()) {
                 if ("Tool modifier".equals(modifier.getName()) ||
-                        "Weapon modifier".equals(modifier.getName()) ||
-                        "Damage Override".equals(modifier.getName())) {
+                        "Weapon modifier".equals(modifier.getName())) {
                     damage.removeModifier(modifier);
                 }
             }
@@ -401,10 +430,10 @@ public class BaseUser implements Listener, User {
                     new AttributeModifier("Speed Override", 4.0, AttributeModifier.Operation.ADD_NUMBER));
         }
 
-        ItemStack newItem = getInventory().getItemInMainHand();
 
+
+        //Set damage to legacy values, if required
         if (newItem != null && !useNewCombat) {
-
             double legacyDamageModifier =
                     WeaponStats.getLegacyDamage(newItem.getType()) - damage.getBaseValue();
 
