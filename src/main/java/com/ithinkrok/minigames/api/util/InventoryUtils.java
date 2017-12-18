@@ -11,9 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.Potion;
-import org.bukkit.potion.PotionData;
-import org.bukkit.potion.PotionType;
+import org.bukkit.potion.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -86,10 +84,14 @@ public class InventoryUtils {
             case LINGERING_POTION:
                 String effectName = parts[0].toUpperCase();
 
-                PotionType type = PotionType.valueOf(effectName);
+                int amp = parts.length > 1 ? Integer.parseInt(parts[1]) - 1 : 0;
+                int duration = parts.length > 2 ? (int) (Double.parseDouble(parts[2]) / 20.0) : 3 * 60 * 20;
+
+                PotionEffectType type = PotionEffectType.getByName(effectName);
 
                 PotionMeta meta = (PotionMeta) item.getItemMeta();
-                meta.setBasePotionData(new PotionData(type, false, false));
+                meta.setBasePotionData(new PotionData(PotionType.getByEffect(type), false, false));
+                meta.addCustomEffect(new PotionEffect(type, duration, amp), true);
                 item.setItemMeta(meta);
         }
     }
