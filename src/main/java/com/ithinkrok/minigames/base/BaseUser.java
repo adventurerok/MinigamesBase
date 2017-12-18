@@ -10,6 +10,7 @@ import com.ithinkrok.minigames.api.event.game.MapChangedEvent;
 import com.ithinkrok.minigames.api.event.user.game.*;
 import com.ithinkrok.minigames.api.event.user.inventory.UserInventoryClickEvent;
 import com.ithinkrok.minigames.api.event.user.inventory.UserInventoryCloseEvent;
+import com.ithinkrok.minigames.api.event.user.inventory.UserInventoryUpdateEvent;
 import com.ithinkrok.minigames.api.event.user.inventory.UserItemHeldEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.api.inventory.ClickableInventory;
@@ -38,6 +39,9 @@ import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
 import com.ithinkrok.util.lang.LanguageLookup;
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
@@ -336,20 +340,43 @@ public class BaseUser implements Listener, User {
             CustomEventExecutor.executeEvent(event, customItem);
         }
 
+
         @CustomEventHandler(priority = CustomEventHandler.HIGH)
-        public void eventItemHeld(UserItemHeldEvent event) {
+        public void eventInventoryUpdate(UserInventoryUpdateEvent event) {
 
-            //Notify old item that it is no longer held
-            ItemStack oldItem = event.getOldHeldItem();
-            int oldIdentifier = InventoryUtils.getIdentifier(oldItem);
-            if (oldIdentifier > 0) {
-                CustomItem customItem = gameGroup.getCustomItem(oldIdentifier);
+            AttributeInstance damage = getEntity().getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
 
-                CustomEventExecutor.executeEvent(event, customItem);
+            System.out.println("Base damage: " + damage.getBaseValue());
+
+            for (AttributeModifier modifier : damage.getModifiers()) {
+                System.out.println(
+                        "Modifier: " + modifier.getName() + ", " + modifier.getOperation().toString() + "," + " " +
+                                modifier.getAmount());
             }
 
-            //Notify new item that it is held
-            ItemStack newItem = event.getNewHeldItem();
+            AttributeInstance speed = getEntity().getAttribute(Attribute.GENERIC_ATTACK_SPEED);
+
+            System.out.println("Base speed: " + speed.getBaseValue());
+
+            for (AttributeModifier modifier : speed.getModifiers()) {
+                System.out.println(
+                        "Modifier: " + modifier.getName() + ", " + modifier.getOperation().toString() + "," + " " +
+                                modifier.getAmount());
+            }
+
+            ItemStack newItem = getInventory().getItemInMainHand();
+
+            if (newItem != null && !getGameGroup().getSharedObjectOrEmpty("user").getBoolean("use_new_combat",
+                                                                                             false)) {
+
+
+                //TODO just use damage events instead, but still set the speed attribute
+
+                for(AttributeModifier modifier : damage.getModifiers()) {
+                    damage.removeModifier(modifier);
+                }
+            }
+
             int newIdentifier = InventoryUtils.getIdentifier(newItem);
             if (newIdentifier > 0) {
                 CustomItem customItem = gameGroup.getCustomItem(newIdentifier);

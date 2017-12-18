@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack;
 /**
  * Created by paul on 08/12/16.
  */
-public class UserItemHeldEvent extends UserInventoryEvent {
+public class UserItemHeldEvent extends UserInventoryUpdateEvent {
 
     private final PlayerItemHeldEvent event;
 

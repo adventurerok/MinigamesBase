@@ -10,10 +10,7 @@ import com.ithinkrok.minigames.api.event.controller.ControllerUpdateGameGroupEve
 import com.ithinkrok.minigames.api.event.map.*;
 import com.ithinkrok.minigames.api.event.user.game.UserCommandEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserQuitEvent;
-import com.ithinkrok.minigames.api.event.user.inventory.UserInventoryClickEvent;
-import com.ithinkrok.minigames.api.event.user.inventory.UserInventoryCloseEvent;
-import com.ithinkrok.minigames.api.event.user.inventory.UserItemConsumeEvent;
-import com.ithinkrok.minigames.api.event.user.inventory.UserItemHeldEvent;
+import com.ithinkrok.minigames.api.event.user.inventory.*;
 import com.ithinkrok.minigames.api.event.user.state.*;
 import com.ithinkrok.minigames.api.event.user.world.*;
 import com.ithinkrok.minigames.api.map.GameMap;
@@ -330,6 +327,9 @@ public class GameBukkitListener implements Listener {
         }
 
         user.getGameGroup().userEvent(new UserDropItemEvent(user, event));
+
+        if(event.isCancelled()) return;
+        user.getGameGroup().userEvent(new UserInventoryUpdateEvent(user));
     }
 
     @EventHandler
@@ -341,6 +341,9 @@ public class GameBukkitListener implements Listener {
         }
 
         user.getGameGroup().userEvent(new UserPickupItemEvent(user, event));
+
+        if(event.isCancelled()) return;
+        user.getGameGroup().userEvent(new UserInventoryUpdateEvent(user));
     }
 
     @EventHandler
@@ -641,6 +644,9 @@ public class GameBukkitListener implements Listener {
         }
 
         user.getGameGroup().userEvent(new UserInventoryClickEvent(user, event));
+
+        if(event.isCancelled()) return;
+        user.getGameGroup().userEvent(new UserInventoryUpdateEvent(user));
     }
 
     @EventHandler
