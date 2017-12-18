@@ -7,6 +7,11 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -109,6 +114,41 @@ public class MinigamesConfigs {
 
                 item.setItemMeta(meta);
             }
+        }
+
+        if(config.contains("potion")) {
+            if(mat != Material.POTION) throw new RuntimeException("potion data can only be added to potions!");
+
+            Config potionConfig = config.getConfigOrEmpty("potion");
+
+            PotionMeta meta = (PotionMeta) item.getItemMeta();
+
+            PotionType type = PotionType.valueOf(potionConfig.getString("type", "WATER").toUpperCase());
+            boolean extended = config.getBoolean("extended", false);
+            boolean upgraded = config.getBoolean("upgraded", false);
+
+            PotionData potionData = new PotionData(type, extended, upgraded);
+            meta.setBasePotionData(potionData);
+
+
+            if(potionConfig.contains("effects")) {
+                Config effectsConfig = potionConfig.getConfigOrNull("effects");
+                for(String effectName : effectsConfig.getKeys(false)) {
+                    PotionEffectType effectType = PotionEffectType.getByName(effectName);
+
+                    Config effectConfig = effectsConfig.getConfigOrEmpty(effectName);
+
+                    int duration = (int) (effectConfig.getDouble("duration", 1.0) * 20);
+
+                    int amp = effectConfig.getInt("level") - 1;
+
+                    PotionEffect effect = new PotionEffect(effectType, duration, amp);
+
+                    meta.addCustomEffect(effect, true);
+                }
+            }
+
+            item.setItemMeta(meta);
         }
 
         //TODO attributes support for 1.9

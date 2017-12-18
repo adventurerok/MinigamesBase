@@ -10,7 +10,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.Potion;
+import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 
 import java.util.ArrayList;
@@ -55,11 +57,34 @@ public class InventoryUtils {
         return itemStack;
     }
 
+
+    private static Material getSpecialMaterial(String name) {
+        name = name.toUpperCase();
+
+        if(name.startsWith("POTION: ")) return Material.POTION;
+
+        else return Material.matchMaterial(name);
+    }
+
+    private static void applySpecialMaterial(String name, ItemStack item) {
+        name = name.toUpperCase();
+
+        if(name.startsWith("POTION: ")) {
+            String effectName = name.substring("POTION: ".length());
+
+            PotionType type = PotionType.valueOf(effectName);
+
+            PotionMeta meta = (PotionMeta) item.getItemMeta();
+            meta.setBasePotionData(new PotionData(type, false, false));
+            item.setItemMeta(meta);
+        }
+    }
+
     public static ItemStack parseItem(String itemString) {
         String[] parts = itemString.trim().split(",");
 
         String materialName = parts[0].trim();
-        Material material = Material.matchMaterial(materialName);
+        Material material = getSpecialMaterial(materialName);
 
         if(material == null) throw new IllegalArgumentException("Unknown material: " + materialName);
 
@@ -77,7 +102,11 @@ public class InventoryUtils {
             lore[index] = StringUtils.convertAmpersandToSelectionCharacter(lore[index]);
         }
 
-        return createItemWithNameAndLore(material, amount, durability, name, lore);
+        ItemStack result = createItemWithNameAndLore(material, amount, durability, name, lore);
+
+        applySpecialMaterial(materialName, result);
+
+        return result;
     }
 
     public static ItemStack createItemWithNameAndLore(Material mat, int amount, int damage, String name,
