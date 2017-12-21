@@ -66,10 +66,6 @@ public class BasePlugin extends SpecificPlugin {
         List<Class<?>> result = new ArrayList<>();
 
         result.add(UserScore.class);
-        result.add(IntUserValue.class);
-        result.add(DoubleUserValue.class);
-        result.add(BooleanUserValue.class);
-        result.add(StringUserValue.class);
 
         return result;
     }

@@ -3,6 +3,9 @@ package com.ithinkrok.minigames.api.database;
 import com.avaje.ebean.Query;
 import com.ithinkrok.minigames.api.user.User;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -20,28 +23,23 @@ public class Database implements DatabaseTaskRunner {
         this.taskRunner = taskRunner;
     }
 
-    @Override
-    public void doDatabaseTask(DatabaseTask task) {
-        taskRunner.doDatabaseTask(task);
-    }
-
     public void getIntUserValue(User user, String name, IntConsumer consumer, int def) {
         getIntUserValue(user.getUuid(), name, consumer, def);
     }
 
     public void getIntUserValue(UUID user, String name, IntConsumer consumer, int def) {
-        doDatabaseTask(accessor -> {
-            Query<IntUserValue> query = accessor.find(IntUserValue.class);
-
-            query.where().eq("player_uuid", user.toString()).eq("property", name);
-
-            IntUserValue result = query.findUnique();
-            if(result == null) {
-                consumer.accept(def);
+        getUserValue(user, name, "mg_user_ints", o -> {
+            if(o != null) {
+                consumer.accept((Integer) o);
             } else {
-                consumer.accept(result.getValue());
+                consumer.accept(def);
             }
         });
+    }
+
+    @Override
+    public void doDatabaseTask(DatabaseTask task) {
+        taskRunner.doDatabaseTask(task);
     }
 
     public void setIntUserValue(User user, String name, int value) {
@@ -49,22 +47,65 @@ public class Database implements DatabaseTaskRunner {
     }
 
     public void setIntUserValue(UUID user, String name, int value) {
+        setUserValue(user, name, value);
+    }
+
+    private void getUserValue(UUID user, String property, String table, Consumer<Object> consumer) {
         doDatabaseTask(accessor -> {
-            Query<IntUserValue> query = accessor.find(IntUserValue.class);
 
-            query.where().eq("player_uuid", user.toString()).eq("property", name);
+            try (Connection connection = accessor.getConnection();
+                 PreparedStatement statement = connection.prepareStatement(
+                         "SELECT value FROM " + table + " WHERE player_uuid=? AND property=?"
+                 )) {
 
-            IntUserValue result = query.findUnique();
-            if(result == null) {
-                result = accessor.createEntityBean(IntUserValue.class);
+                statement.setString(1, user.toString());
+                statement.setString(2, property);
 
-                result.setPlayerUUID(user.toString());
-                result.setProperty(name);
+                try (ResultSet results = statement.executeQuery()) {
+                    if (results.next()) {
+                        consumer.accept(results.getObject("value"));
+                    } else {
+                        consumer.accept(null);
+                    }
+                }
             }
+        });
+    }
 
-            result.setValue(value);
+    private void setUserValue(UUID user, String property, Object value) {
+        String type;
 
-            accessor.save(result);
+        if (value instanceof Integer) {
+            type = "mg_user_ints";
+        } else if (value instanceof String) {
+            type = "mg_user_strings";
+        } else if (value instanceof Double) {
+            type = "mg_user_doubles";
+        } else if (value instanceof Boolean) {
+            type = "mg_user_bools";
+        } else {
+            throw new IllegalArgumentException("value of unsupported type: " + value.getClass().getName());
+        }
+
+        doDatabaseTask(accessor -> {
+            try (Connection connection = accessor.getConnection();
+                 PreparedStatement statement = connection.prepareStatement(
+                         "INSERT INTO " + type + " " +
+                                 "(player_uuid, property, value, version) VALUES (?,?,?, NOW()) " +
+                                 "ON DUPLICATE KEY UPDATE " +
+                                 "value=?, version=NOW();"
+                 )) {
+
+
+                statement.setString(1, user.toString());
+                statement.setString(2, property);
+
+                for (int n = 3; n <= 4; ++n) {
+                    statement.setObject(n, value);
+                }
+
+                statement.executeUpdate();
+            }
         });
     }
 
@@ -73,16 +114,11 @@ public class Database implements DatabaseTaskRunner {
     }
 
     public void getDoubleUserValue(UUID user, String name, DoubleConsumer consumer, double def) {
-        doDatabaseTask(accessor -> {
-            Query<DoubleUserValue> query = accessor.find(DoubleUserValue.class);
-
-            query.where().eq("player_uuid", user.toString()).eq("property", name);
-
-            DoubleUserValue result = query.findUnique();
-            if(result == null) {
-                consumer.accept(def);
+        getUserValue(user, name, "mg_user_doubles", o -> {
+            if(o != null) {
+                consumer.accept((Double) o);
             } else {
-                consumer.accept(result.getValue());
+                consumer.accept(def);
             }
         });
     }
@@ -92,23 +128,7 @@ public class Database implements DatabaseTaskRunner {
     }
 
     public void setDoubleUserValue(UUID user, String name, double value) {
-        doDatabaseTask(accessor -> {
-            Query<DoubleUserValue> query = accessor.find(DoubleUserValue.class);
-
-            query.where().eq("player_uuid", user.toString()).eq("property", name);
-
-            DoubleUserValue result = query.findUnique();
-            if(result == null) {
-                result = accessor.createEntityBean(DoubleUserValue.class);
-
-                result.setPlayerUUID(user.toString());
-                result.setProperty(name);
-            }
-
-            result.setValue(value);
-
-            accessor.save(result);
-        });
+        setUserValue(user, name, value);
     }
 
     public void getBooleanUserValue(User user, String name, Consumer<Boolean> consumer, Boolean def) {
@@ -116,16 +136,11 @@ public class Database implements DatabaseTaskRunner {
     }
 
     public void getBooleanUserValue(UUID user, String name, Consumer<Boolean> consumer, Boolean def) {
-        doDatabaseTask(accessor -> {
-            Query<BooleanUserValue> query = accessor.find(BooleanUserValue.class);
-
-            query.where().eq("player_uuid", user.toString()).eq("property", name);
-
-            BooleanUserValue result = query.findUnique();
-            if(result == null) {
-                consumer.accept(def);
+        getUserValue(user, name, "mg_user_bools", o -> {
+            if(o != null) {
+                consumer.accept((Boolean) o);
             } else {
-                consumer.accept(result.isValue());
+                consumer.accept(def);
             }
         });
     }
@@ -135,23 +150,7 @@ public class Database implements DatabaseTaskRunner {
     }
 
     public void setBooleanUserValue(UUID user, String name, boolean value) {
-        doDatabaseTask(accessor -> {
-            Query<BooleanUserValue> query = accessor.find(BooleanUserValue.class);
-
-            query.where().eq("player_uuid", user.toString()).eq("property", name);
-
-            BooleanUserValue result = query.findUnique();
-            if(result == null) {
-                result = accessor.createEntityBean(BooleanUserValue.class);
-
-                result.setPlayerUUID(user.toString());
-                result.setProperty(name);
-            }
-
-            result.setValue(value);
-
-            accessor.save(result);
-        });
+        setUserValue(user, name, value);
     }
 
     public void getStringUserValue(User user, String name, Consumer<String> consumer, String def) {
@@ -159,16 +158,11 @@ public class Database implements DatabaseTaskRunner {
     }
 
     public void getStringUserValue(UUID user, String name, Consumer<String> consumer, String def) {
-        doDatabaseTask(accessor -> {
-            Query<StringUserValue> query = accessor.find(StringUserValue.class);
-
-            query.where().eq("player_uuid", user.toString()).eq("property", name);
-
-            StringUserValue result = query.findUnique();
-            if(result == null) {
-                consumer.accept(def);
+        getUserValue(user, name, "mg_user_strings", o -> {
+            if(o != null) {
+                consumer.accept(o.toString());
             } else {
-                consumer.accept(result.getValue());
+                consumer.accept(def);
             }
         });
     }
@@ -178,23 +172,7 @@ public class Database implements DatabaseTaskRunner {
     }
 
     public void setStringUserValue(UUID user, String name, String value) {
-        doDatabaseTask(accessor -> {
-            Query<StringUserValue> query = accessor.find(StringUserValue.class);
-
-            query.where().eq("player_uuid", user.toString()).eq("property", name);
-
-            StringUserValue result = query.findUnique();
-            if(result == null) {
-                result = accessor.createEntityBean(StringUserValue.class);
-
-                result.setPlayerUUID(user.toString());
-                result.setProperty(name);
-            }
-
-            result.setValue(value);
-
-            accessor.save(result);
-        });
+        setUserValue(user, name, value);
     }
 
     public void getUserScore(User user, String gameType, Consumer<UserScore> consumer) {
@@ -217,7 +195,7 @@ public class Database implements DatabaseTaskRunner {
             Query<UserScore> query = accessor.find(UserScore.class);
 
             query.where().eq("game", gameType);
-            if(ascending) query.orderBy("value asc");
+            if (ascending) query.orderBy("value asc");
             else query.orderBy("value desc");
 
             query.setMaxRows(count);
@@ -226,6 +204,7 @@ public class Database implements DatabaseTaskRunner {
     }
 
     public void setUserScore(User user, String gameType, double value) {
+
         setUserScore(user.getUuid(), user.getName(), gameType, value);
     }
 
@@ -236,7 +215,7 @@ public class Database implements DatabaseTaskRunner {
             query.where().eq("player_uuid", user.toString()).eq("game", gameType);
 
             UserScore result = query.findUnique();
-            if(result == null) {
+            if (result == null) {
                 result = accessor.createEntityBean(UserScore.class);
 
                 result.setPlayerUUID(user.toString());

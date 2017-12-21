@@ -1,20 +1,13 @@
 package com.ithinkrok.minigames.api.database;
 
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.Query;
-import com.avaje.ebeaninternal.api.SpiEbeanServer;
-import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
-import com.ithinkrok.minigames.api.SpecificPlugin;
 import com.ithinkrok.util.config.Config;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
-import javax.persistence.OptimisticLockException;
-import javax.persistence.PersistenceException;
-import java.util.HashMap;
-import java.util.Map;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -50,24 +43,26 @@ public class Persistence extends Thread {
     }
 
     private void checkDDL() {
-        for (Plugin plugin : Bukkit.getServer().getPluginManager().getPlugins()) {
-            if (!SpecificPlugin.class.isInstance(plugin)) continue;
+//        for (Plugin plugin : Bukkit.getServer().getPluginManager().getPlugins()) {
+//            if (!SpecificPlugin.class.isInstance(plugin)) continue;
+//
+//            if (!plugin.getDescription().isDatabaseEnabled()) continue;
+//
+//            System.out.println("Ensuring tables exist for plugin database: " + plugin.getName());
+//
+//            try {
+//                SpiEbeanServer serv = (SpiEbeanServer) plugin.getDatabase();
+//                DdlGenerator gen = serv.getDdlGenerator();
+//
+//                gen.runScript(false, gen.generateCreateDdl().replace("create table", "create table if not exists"));
+//            } catch (PersistenceException e) {
+//                System.out.println("Error creating database tables for plugin: " + plugin.getName());
+//                e.printStackTrace();
+//
+//            }
+//        }
 
-            if (!plugin.getDescription().isDatabaseEnabled()) continue;
-
-            System.out.println("Ensuring tables exist for plugin database: " + plugin.getName());
-
-            try {
-                SpiEbeanServer serv = (SpiEbeanServer) plugin.getDatabase();
-                DdlGenerator gen = serv.getDdlGenerator();
-
-                gen.runScript(false, gen.generateCreateDdl().replace("create table", "create table if not exists"));
-            } catch (PersistenceException e) {
-                System.out.println("Error creating database tables for plugin: " + plugin.getName());
-                e.printStackTrace();
-
-            }
-        }
+        //TODO create tables if not exists, but do them properly with constraints and things now
 
         checkedDDL = true;
     }
@@ -118,45 +113,11 @@ public class Persistence extends Thread {
         threadTasks.add(task);
     }
 
-    private static class PersistenceDatabaseAccessor implements DatabaseAccessor {
-
-        private final Map<Class<?>, String> pluginNames = new HashMap<>();
+    private class PersistenceDatabaseAccessor implements DatabaseAccessor {
 
         @Override
-        public EbeanServer getDatabase(Class<?> databaseClass) {
-            if (pluginNames.containsKey(databaseClass)) {
-                return Bukkit.getPluginManager().getPlugin(pluginNames.get(databaseClass)).getDatabase();
-            }
-
-            for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
-                try {
-
-                    EbeanServer database = plugin.getDatabase();
-                    if (database == null) continue;
-                    database.find(databaseClass);
-
-                    pluginNames.put(databaseClass, plugin.getName());
-                    return database;
-                } catch (PersistenceException | IllegalStateException ignored) {
-                }
-            }
-
-            throw new RuntimeException("No plugin has registered database class: " + databaseClass);
-        }
-
-        @Override
-        public <T> Query<T> find(Class<T> beanType) {
-            return getDatabase(beanType).find(beanType);
-        }
-
-        @Override
-        public <T> T createEntityBean(Class<T> type) {
-            return getDatabase(type).createEntityBean(type);
-        }
-
-        @Override
-        public void save(Object bean) throws OptimisticLockException {
-            getDatabase(bean.getClass()).save(bean);
+        public Connection getConnection() throws SQLException {
+            return connectionPool.getConnection();
         }
     }
 }
