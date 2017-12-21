@@ -22,3 +22,12 @@ ramdisk:
 modules:
   game: true
   hub: false
+
+# Specify database connection details
+database:
+  url: "jdbc:mysql://localhost:3306/minigames"
+  driver: "com.mysql.jdbc.Driver"
+  user: "username"
+  password: "password"
+  min_connections: 1
+  max_connections: 10

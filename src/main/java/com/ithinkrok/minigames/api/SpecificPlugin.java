@@ -1,5 +1,6 @@
 package com.ithinkrok.minigames.api;
 
+import com.ithinkrok.minigames.api.database.DatabaseObject;
 import com.ithinkrok.minigames.base.BasePlugin;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.InvalidConfigException;
@@ -8,6 +9,8 @@ import com.ithinkrok.util.config.YamlConfigIO;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Created by paul on 17/01/16.
@@ -61,5 +64,9 @@ public class SpecificPlugin extends JavaPlugin {
         }
 
         return added;
+    }
+
+    public Collection<Class<? extends DatabaseObject>> getDatabaseClasses() {
+        return Collections.emptyList();
     }
 }

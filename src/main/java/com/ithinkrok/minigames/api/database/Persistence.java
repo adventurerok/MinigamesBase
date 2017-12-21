@@ -5,6 +5,9 @@ import com.avaje.ebean.Query;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 import com.ithinkrok.minigames.api.SpecificPlugin;
+import com.ithinkrok.util.config.Config;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
@@ -26,8 +29,20 @@ public class Persistence extends Thread {
 
     private boolean checkedDDL = false;
 
-    public Persistence(Plugin plugin) {
+    private HikariDataSource connectionPool;
+
+    public Persistence(Plugin plugin, Config config) {
         this.plugin = plugin;
+
+        HikariConfig hikari = new HikariConfig();
+        hikari.setJdbcUrl(config.getString("url"));
+        hikari.setDriverClassName(config.getString("driver", "com.mysql.jdbc.Driver"));
+        hikari.setUsername(config.getString("user"));
+        hikari.setPassword(config.getString("password"));
+        hikari.setMinimumIdle(config.getInt("min_connections", 1));
+        hikari.setMaximumPoolSize(config.getInt("max_connections", 10));
+
+        connectionPool = new HikariDataSource(hikari);
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, this::checkDDL);
 

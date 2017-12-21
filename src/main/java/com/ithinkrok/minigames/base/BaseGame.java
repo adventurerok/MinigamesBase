@@ -137,7 +137,7 @@ public class BaseGame implements Game, FileLoader {
             }
         }
 
-        persistence = new Persistence(plugin);
+        persistence = new Persistence(plugin, config.getConfigOrEmpty("database"));
 
         InvisiblePlayerAttacker.enablePlayerAttacker(this, plugin, ProtocolLibrary.getProtocolManager());
 
