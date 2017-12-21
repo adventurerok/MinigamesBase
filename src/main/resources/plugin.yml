@@ -4,7 +4,7 @@ main: "com.ithinkrok.minigames.base.BasePlugin"
 author: "ithinkrok"
 depend: ["HologramAPI", "ProtocolLib", "MSMClient"]
 softdepend: ["DisguiseCraft", "LibsDisguises"]
-database: true
+database: false
 
 permissions:
 
