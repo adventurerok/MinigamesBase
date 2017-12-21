@@ -1,40 +1,70 @@
 package com.ithinkrok.minigames.api.database;
 
-import javax.persistence.*;
-import java.util.Date;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by paul on 17/01/16.
  */
-@Entity
-@Table(name = "mg_user_score")
-public class UserScore {
+public class UserScore implements DatabaseObject {
 
-    @Id
-    private int id;
-
-    @Column
     private String playerUUID;
 
-    @Column
     private String playerName;
 
-    @Column
     private String game;
 
-    @Column
     private double value;
 
-    @SuppressWarnings("UseOfObsoleteDateTimeApi")
-    @Version
-    private Date version;
 
-    public int getId() {
-        return id;
+    public UserScore(String playerUUID, String playerName, String game, double value) {
+        this.playerUUID = playerUUID;
+        this.playerName = playerName;
+        this.game = game;
+        this.value = value;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public static UserScore get(DatabaseAccessor accessor, String playerUUID, String game) throws SQLException {
+        List<UserScore> result = query(accessor, "WHERE player_uuid=? AND game=?", playerUUID, game);
+
+        if(!result.isEmpty()) {
+            return result.get(0);
+        } else return null;
+    }
+
+    public static List<UserScore> query(DatabaseAccessor accessor, String sql, Object... params) throws SQLException {
+        try (Connection conn = accessor.getConnection();
+             PreparedStatement statement = conn.prepareStatement(
+                     "SELECT * from mg_user_score " + sql + ";"
+             )) {
+
+            for (int index = 0; index < params.length; ++index) {
+                statement.setObject(index + 1, params[index]);
+            }
+
+            try (ResultSet results = statement.executeQuery()) {
+                List<UserScore> output = new ArrayList<>();
+
+                while (results.next()) {
+                    output.add(load(results));
+                }
+
+                return output;
+            }
+        }
+    }
+
+    private static UserScore load(ResultSet results) throws SQLException {
+        return new UserScore(
+                results.getString("player_uuid"),
+                results.getString("player_name"),
+                results.getString("game"),
+                results.getDouble("value")
+        );
     }
 
     public String getPlayerUUID() {
@@ -69,11 +99,25 @@ public class UserScore {
         this.value = value;
     }
 
-    public Date getVersion() {
-        return version;
-    }
+    @Override
+    public void save(DatabaseAccessor accessor) throws SQLException {
+        try (Connection conn = accessor.getConnection();
+             PreparedStatement statement = conn.prepareStatement(
+                     "INSERT INTO mg_user_score " +
+                             "(player_uuid, player_name, game, value, version) " +
+                             "VALUES (?, ?, ?, ?, Now()) ON DUPLICATE KEY UPDATE " +
+                             "game=?, value=?, version=NOW();"
+             )) {
 
-    public void setVersion(Date version) {
-        this.version = version;
+            statement.setString(1, playerUUID);
+            statement.setString(2, playerName);
+
+            for (int n = 0; n <= 1; ++n) {
+                statement.setString(3 + 2 * n, game);
+                statement.setDouble(4 + 2 * n, value);
+            }
+
+            statement.executeUpdate();
+        }
     }
 }

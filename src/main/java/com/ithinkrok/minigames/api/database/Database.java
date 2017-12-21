@@ -29,25 +29,12 @@ public class Database implements DatabaseTaskRunner {
 
     public void getIntUserValue(UUID user, String name, IntConsumer consumer, int def) {
         getUserValue(user, name, "mg_user_ints", o -> {
-            if(o != null) {
+            if (o != null) {
                 consumer.accept((Integer) o);
             } else {
                 consumer.accept(def);
             }
         });
-    }
-
-    @Override
-    public void doDatabaseTask(DatabaseTask task) {
-        taskRunner.doDatabaseTask(task);
-    }
-
-    public void setIntUserValue(User user, String name, int value) {
-        setIntUserValue(user.getUuid(), name, value);
-    }
-
-    public void setIntUserValue(UUID user, String name, int value) {
-        setUserValue(user, name, value);
     }
 
     private void getUserValue(UUID user, String property, String table, Consumer<Object> consumer) {
@@ -70,6 +57,19 @@ public class Database implements DatabaseTaskRunner {
                 }
             }
         });
+    }
+
+    @Override
+    public void doDatabaseTask(DatabaseTask task) {
+        taskRunner.doDatabaseTask(task);
+    }
+
+    public void setIntUserValue(User user, String name, int value) {
+        setIntUserValue(user.getUuid(), name, value);
+    }
+
+    public void setIntUserValue(UUID user, String name, int value) {
+        setUserValue(user, name, value);
     }
 
     private void setUserValue(UUID user, String property, Object value) {
@@ -115,7 +115,7 @@ public class Database implements DatabaseTaskRunner {
 
     public void getDoubleUserValue(UUID user, String name, DoubleConsumer consumer, double def) {
         getUserValue(user, name, "mg_user_doubles", o -> {
-            if(o != null) {
+            if (o != null) {
                 consumer.accept((Double) o);
             } else {
                 consumer.accept(def);
@@ -137,7 +137,7 @@ public class Database implements DatabaseTaskRunner {
 
     public void getBooleanUserValue(UUID user, String name, Consumer<Boolean> consumer, Boolean def) {
         getUserValue(user, name, "mg_user_bools", o -> {
-            if(o != null) {
+            if (o != null) {
                 consumer.accept((Boolean) o);
             } else {
                 consumer.accept(def);
@@ -159,7 +159,7 @@ public class Database implements DatabaseTaskRunner {
 
     public void getStringUserValue(UUID user, String name, Consumer<String> consumer, String def) {
         getUserValue(user, name, "mg_user_strings", o -> {
-            if(o != null) {
+            if (o != null) {
                 consumer.accept(o.toString());
             } else {
                 consumer.accept(def);
@@ -181,25 +181,22 @@ public class Database implements DatabaseTaskRunner {
 
     public void getUserScore(UUID user, String gameType, Consumer<UserScore> consumer) {
         doDatabaseTask(accessor -> {
-            Query<UserScore> query = accessor.find(UserScore.class);
-
-            query.where().eq("player_uuid", user.toString()).eq("game", gameType);
-
-            UserScore result = query.findUnique();
-            consumer.accept(result);
+            UserScore userScore = UserScore.get(accessor, user.toString(), gameType);
+            consumer.accept(userScore);
         });
     }
 
     public void getHighScores(String gameType, int count, boolean ascending, Consumer<List<UserScore>> consumer) {
         doDatabaseTask(accessor -> {
-            Query<UserScore> query = accessor.find(UserScore.class);
+            List<UserScore> result;
 
-            query.where().eq("game", gameType);
-            if (ascending) query.orderBy("value asc");
-            else query.orderBy("value desc");
+            if (ascending) {
+                result = UserScore.query(accessor, "WHERE game=? ORDER BY value ASC LIMIT " + count, gameType);
+            } else {
+                result = UserScore.query(accessor, "WHERE game=? ORDER BY value DESC LIMIT " + count, gameType);
+            }
 
-            query.setMaxRows(count);
-            consumer.accept(query.findList());
+            consumer.accept(result);
         });
     }
 
@@ -210,22 +207,7 @@ public class Database implements DatabaseTaskRunner {
 
     public void setUserScore(UUID user, String userName, String gameType, double value) {
         doDatabaseTask(accessor -> {
-            Query<UserScore> query = accessor.find(UserScore.class);
-
-            query.where().eq("player_uuid", user.toString()).eq("game", gameType);
-
-            UserScore result = query.findUnique();
-            if (result == null) {
-                result = accessor.createEntityBean(UserScore.class);
-
-                result.setPlayerUUID(user.toString());
-                result.setGame(gameType);
-            }
-
-            result.setPlayerName(userName);
-            result.setValue(value);
-
-            accessor.save(result);
+            new UserScore(user.toString(), userName, gameType, value).save(accessor);
         });
     }
 }

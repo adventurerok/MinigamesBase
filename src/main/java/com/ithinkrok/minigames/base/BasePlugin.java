@@ -11,6 +11,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -62,11 +64,7 @@ public class BasePlugin extends SpecificPlugin {
     }
 
     @Override
-    public List<Class<?>> getDatabaseClasses() {
-        List<Class<?>> result = new ArrayList<>();
-
-        result.add(UserScore.class);
-
-        return result;
+    public Collection<Class<? extends DatabaseObject>> getDatabaseClasses() {
+        return Collections.singletonList(UserScore.class);
     }
 }
