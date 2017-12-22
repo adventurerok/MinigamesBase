@@ -49,7 +49,7 @@ public class InventoryUtils {
     public static ItemStack setUnbreakable(ItemStack itemStack, boolean unbreakable) {
         ItemMeta meta = itemStack.getItemMeta();
 
-        meta.spigot().setUnbreakable(unbreakable);
+        meta.setUnbreakable(unbreakable);
         itemStack.setItemMeta(meta);
 
         return itemStack;
