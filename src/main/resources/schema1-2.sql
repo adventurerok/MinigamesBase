@@ -16,7 +16,7 @@ CREATE PROCEDURE UpdateSchema1_2
       ALTER TABLE mg_user_score
         ADD INDEX unique_index (uuid, game);
       ALTER TABLE mg_user_score
-        MODIFY COLUMN game VARCHAR(255) NOT NULL;
+        MODIFY COLUMN game VARCHAR(50) NOT NULL;
       ALTER TABLE mg_user_score
         MODIFY COLUMN version DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 
@@ -32,7 +32,7 @@ CREATE PROCEDURE UpdateSchema1_2
       ALTER TABLE mg_user_ints
         ADD INDEX unique_index (uuid, property);
       ALTER TABLE mg_user_ints
-        MODIFY COLUMN property VARCHAR(255) NOT NULL;
+        MODIFY COLUMN property VARCHAR(100) NOT NULL;
       ALTER TABLE mg_user_ints
         MODIFY COLUMN version DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 
@@ -48,7 +48,7 @@ CREATE PROCEDURE UpdateSchema1_2
       ALTER TABLE mg_user_strings
         ADD INDEX unique_index (uuid, property);
       ALTER TABLE mg_user_strings
-        MODIFY COLUMN property VARCHAR(255) NOT NULL;
+        MODIFY COLUMN property VARCHAR(100) NOT NULL;
       ALTER TABLE mg_user_strings
         MODIFY COLUMN version DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 
@@ -64,7 +64,7 @@ CREATE PROCEDURE UpdateSchema1_2
       ALTER TABLE mg_user_bools
         ADD INDEX unique_index (uuid, property);
       ALTER TABLE mg_user_bools
-        MODIFY COLUMN property VARCHAR(255) NOT NULL;
+        MODIFY COLUMN property VARCHAR(100) NOT NULL;
       ALTER TABLE mg_user_bools
         MODIFY COLUMN version DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 
@@ -80,7 +80,7 @@ CREATE PROCEDURE UpdateSchema1_2
       ALTER TABLE mg_user_doubles
         ADD INDEX unique_index (uuid, property);
       ALTER TABLE mg_user_doubles
-        MODIFY COLUMN property VARCHAR(255) NOT NULL;
+        MODIFY COLUMN property VARCHAR(100) NOT NULL;
       ALTER TABLE mg_user_doubles
         MODIFY COLUMN version DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 
@@ -94,10 +94,13 @@ CREATE PROCEDURE UpdateSchema1_2
 
       INSERT INTO mg_name_cache (uuid, name, timestamp)
         SELECT
-          uuid,
-          player_name,
-          version
-        FROM mg_user_score;
+          m1.uuid,
+          m1.player_name,
+          m1.version
+        FROM mg_user_score AS m1
+          LEFT JOIN mg_user_score AS m2
+            ON m1.uuid = m2.uuid AND m1.version > m2.version
+        WHERE m2.uuid IS NULL;
 
       ALTER TABLE mg_user_score
         DROP COLUMN player_name;
