@@ -843,6 +843,9 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
                 throw new UnsupportedOperationException("Only supports BaseUser");
             }
 
+            //Update the user's name in the name cache
+            getDatabase().updateNameCache(event.getUser().getUuid(), event.getUser().getName());
+
             usersInGroup.put(event.getUser().getUuid(), (BaseUser) event.getUser());
 
             game.getLogger().info("Teleporting user " + event.getUser().getName() + " to GameGroup map");

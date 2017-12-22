@@ -41,7 +41,8 @@ public class Database implements DatabaseTaskRunner {
 
             try (Connection connection = accessor.getConnection();
                  PreparedStatement statement = connection.prepareStatement(
-                         "SELECT value FROM " + table + " WHERE player_uuid=? AND property=?"
+                         "SELECT value FROM " + table + " " +
+                         "WHERE uuid=UNHEX(REPLACE(?,'-','')) AND property=?"
                  )) {
 
                 statement.setString(1, user.toString());
@@ -90,9 +91,9 @@ public class Database implements DatabaseTaskRunner {
             try (Connection connection = accessor.getConnection();
                  PreparedStatement statement = connection.prepareStatement(
                          "INSERT INTO " + type + " " +
-                                 "(player_uuid, property, value, version) VALUES (?,?,?, NOW()) " +
-                                 "ON DUPLICATE KEY UPDATE " +
-                                 "value=?, version=NOW();"
+                         "(uuid, property, value) VALUES (UNHEX(REPLACE(?,'-','')),?,?) " +
+                         "ON DUPLICATE KEY UPDATE " +
+                         "value=?;"
                  )) {
 
 
@@ -180,7 +181,7 @@ public class Database implements DatabaseTaskRunner {
 
     public void getUserScore(UUID user, String gameType, Consumer<UserScore> consumer) {
         doDatabaseTask(accessor -> {
-            UserScore userScore = UserScore.get(accessor, user.toString(), gameType);
+            UserScore userScore = UserScore.get(accessor, user, gameType);
             consumer.accept(userScore);
         });
     }
@@ -206,7 +207,26 @@ public class Database implements DatabaseTaskRunner {
 
     public void setUserScore(UUID user, String userName, String gameType, double value) {
         doDatabaseTask(accessor -> {
-            new UserScore(user.toString(), userName, gameType, value).save(accessor);
+            new UserScore(user, userName, gameType, value).save(accessor);
+        });
+    }
+
+    public void updateNameCache(UUID user, String name) {
+        doDatabaseTask(accessor -> {
+            try (Connection conn = accessor.getConnection();
+                 PreparedStatement statement = conn.prepareStatement(
+                         "INSERT INTO mg_name_cache (uuid, name) " +
+                         "VALUES (UNHEX(REPLACE(?,'-','')), ?) ON DUPLICATE KEY UPDATE " +
+                         "name=?"
+                 )) {
+
+                statement.setString(1, user.toString());
+
+                statement.setString(2, name);
+                statement.setString(3, name);
+
+                statement.executeUpdate();
+            }
         });
     }
 }

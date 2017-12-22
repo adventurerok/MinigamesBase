@@ -1,18 +1,21 @@
 package com.ithinkrok.minigames.api.database;
 
+import com.ithinkrok.util.UUIDUtils;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by paul on 17/01/16.
  */
 public class UserScore implements DatabaseObject {
 
-    private String playerUUID;
+    private UUID playerUUID;
 
     private String playerName;
 
@@ -21,17 +24,23 @@ public class UserScore implements DatabaseObject {
     private double value;
 
 
-    public UserScore(String playerUUID, String playerName, String game, double value) {
+    public UserScore(UUID playerUUID, String playerName, String game, double value) {
         this.playerUUID = playerUUID;
         this.playerName = playerName;
         this.game = game;
         this.value = value;
     }
 
-    public static UserScore get(DatabaseAccessor accessor, String playerUUID, String game) throws SQLException {
-        List<UserScore> result = query(accessor, "WHERE player_uuid=? AND game=?", playerUUID, game);
+    public static UserScore get(DatabaseAccessor accessor, UUID playerUUID, String game) throws SQLException {
+        List<UserScore> result =
+                query(
+                        accessor,
+                        "WHERE uuid=UNHEX(REPLACE(?,'-','')) AND game=?",
+                        playerUUID.toString(),
+                        game
+                );
 
-        if(!result.isEmpty()) {
+        if (!result.isEmpty()) {
             return result.get(0);
         } else return null;
     }
@@ -39,7 +48,8 @@ public class UserScore implements DatabaseObject {
     public static List<UserScore> query(DatabaseAccessor accessor, String sql, Object... params) throws SQLException {
         try (Connection conn = accessor.getConnection();
              PreparedStatement statement = conn.prepareStatement(
-                     "SELECT * from mg_user_score " + sql + ";"
+                     "SELECT HEX(mg_user_score.uuid) as uuid, name, game, value from mg_user_score " +
+                     "LEFT JOIN mg_name_cache ON mg_user_score.uuid = mg_name_cache.uuid " + sql + ";"
              )) {
 
             for (int index = 0; index < params.length; ++index) {
@@ -60,18 +70,18 @@ public class UserScore implements DatabaseObject {
 
     private static UserScore load(ResultSet results) throws SQLException {
         return new UserScore(
-                results.getString("player_uuid"),
-                results.getString("player_name"),
+                UUIDUtils.fromStringWithoutDashes(results.getString("uuid")),
+                results.getString("name"),
                 results.getString("game"),
                 results.getDouble("value")
         );
     }
 
-    public String getPlayerUUID() {
+    public UUID getPlayerUUID() {
         return playerUUID;
     }
 
-    public void setPlayerUUID(String playerUUID) {
+    public void setPlayerUUID(UUID playerUUID) {
         this.playerUUID = playerUUID;
     }
 
@@ -104,17 +114,16 @@ public class UserScore implements DatabaseObject {
         try (Connection conn = accessor.getConnection();
              PreparedStatement statement = conn.prepareStatement(
                      "INSERT INTO mg_user_score " +
-                             "(player_uuid, player_name, game, value, version) " +
-                             "VALUES (?, ?, ?, ?, Now()) ON DUPLICATE KEY UPDATE " +
-                             "game=?, value=?, version=NOW();"
+                     "(uuid, game, value) " +
+                     "VALUES (UNHEX(REPLACE(?,'-','')), ?, ?) ON DUPLICATE KEY UPDATE " +
+                     "value=?;"
              )) {
 
-            statement.setString(1, playerUUID);
-            statement.setString(2, playerName);
+            statement.setString(1, playerUUID.toString());
+            statement.setString(2, game);
 
             for (int n = 0; n <= 1; ++n) {
-                statement.setString(3 + 2 * n, game);
-                statement.setDouble(4 + 2 * n, value);
+                statement.setDouble(3 + n, value);
             }
 
             statement.executeUpdate();
