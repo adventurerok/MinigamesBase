@@ -1,6 +1,5 @@
 package com.ithinkrok.minigames.api.database;
 
-import com.avaje.ebean.Query;
 import com.ithinkrok.minigames.api.user.User;
 
 import java.sql.Connection;

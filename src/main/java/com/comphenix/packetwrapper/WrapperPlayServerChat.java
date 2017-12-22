@@ -2,6 +2,7 @@ package com.comphenix.packetwrapper;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 
 public class WrapperPlayServerChat extends AbstractPacket {
@@ -32,8 +33,12 @@ public class WrapperPlayServerChat extends AbstractPacket {
         handle.getChatComponents().write(0, value);
     }
 
-    public byte getPosition() {
-        return handle.getBytes().read(0);
+    public EnumWrappers.ChatType getChatType() {
+        return handle.getChatTypes().read(0);
+    }
+
+    public void setChatType(EnumWrappers.ChatType type) {
+        handle.getChatTypes().write(0, type);
     }
 
     public void setPosition(byte position) {

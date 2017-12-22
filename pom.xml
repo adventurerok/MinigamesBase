@@ -88,13 +88,13 @@
         <dependency>
             <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib</artifactId>
-            <version>3.6.4</version>
+            <version>4.3.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>LibsDisguises</groupId>
             <artifactId>LibsDisguises</artifactId>
-            <version>9.0.7</version>
+            <version>9.5.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

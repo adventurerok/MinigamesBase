@@ -1,6 +1,7 @@
 package com.ithinkrok.minigames.base;
 
 import com.comphenix.packetwrapper.WrapperPlayServerChat;
+import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.MutableClassToInstanceMap;
@@ -1293,7 +1294,7 @@ public class BaseUser implements Listener, User {
         WrapperPlayServerChat chatPacket = new WrapperPlayServerChat();
 
         chatPacket.setMessage(WrappedChatComponent.fromText(message));
-        chatPacket.setPosition((byte) 2);
+        chatPacket.setChatType(EnumWrappers.ChatType.GAME_INFO);
 
         chatPacket.sendPacket(getPlayer());
     }
