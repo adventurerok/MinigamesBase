@@ -148,7 +148,7 @@ public class WeightedChestListener implements CustomListener {
         if (openedChests.contains(event.getClickedBlock().getLocation())) return;
 
         Chest chest = (Chest) event.getClickedBlock().getState();
-        Inventory inventory = chest.getInventory();
+        Inventory inventory = chest.getSnapshotInventory();
 
         WeightedInventory weightedInventory = getInventoryForBlock(event.getClickedBlock());
 
