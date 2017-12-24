@@ -116,6 +116,12 @@ invisible_user_toggle.name=Show/Hide other spectators
 spectate_chooser.name=Spectate Chooser
 spectate_chooser.title=Spectate Chooser
 
+player_compass.name=Player Compass
+player_compass.upgrade=Player Compass
+player_compass.locating=Locating closest player...
+player_compass.oriented=Oriented at\: %s
+player_compass.no_player=No One
+
 #Map credits starter
 start.map_credits=&6Map credits:
 
