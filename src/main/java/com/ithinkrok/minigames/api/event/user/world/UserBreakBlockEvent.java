@@ -31,4 +31,12 @@ public class UserBreakBlockEvent extends BaseUserEvent implements Cancellable {
     public void setCancelled(boolean cancel) {
         event.setCancelled(cancel);
     }
+
+    public void setDropItems(boolean dropItems) {
+        event.setDropItems(dropItems);
+    }
+
+    public boolean isDropItems() {
+        return event.isDropItems();
+    }
 }
