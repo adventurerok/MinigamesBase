@@ -31,3 +31,9 @@ commands:
       /<command> finish/cancel
       /<command> start <name> <seconds> <localestub>
     class: "com.ithinkrok.minigames.util.command.CountdownCommand"
+  debug:
+    description: "Various debug subcommands"
+    aliases: ["mgd", "mgdebug"]
+    permission: "mg.base.debug"
+    usage: "/<command> <custom/level/team/kit/money> [subcommandargs]"
+    class: "com.ithinkrok.minigames.util.command.DebugCommand"
