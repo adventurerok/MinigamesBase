@@ -408,9 +408,11 @@ public class BaseUser implements Listener, User {
             }
         }
 
-        for (AttributeModifier modifier : speed.getModifiers()) {
-            if("Speed Override".equals(modifier.getName())) {
-                speed.removeModifier(modifier);
+        if(speed != null) {
+            for (AttributeModifier modifier : speed.getModifiers()) {
+                if("Speed Override".equals(modifier.getName())) {
+                    speed.removeModifier(modifier);
+                }
             }
         }
 
@@ -425,12 +427,15 @@ public class BaseUser implements Listener, User {
             }
 
             //Remove 1.9 attack speed
-            for (AttributeModifier attributeModifier : speed.getModifiers()) {
-                speed.removeModifier(attributeModifier);
-            }
+            if(speed != null) {
+                for (AttributeModifier attributeModifier : speed.getModifiers()) {
+                    speed.removeModifier(attributeModifier);
+                }
 
-            speed.addModifier(
-                    new AttributeModifier("Speed Override", 4.0, AttributeModifier.Operation.ADD_NUMBER));
+
+                speed.addModifier(
+                        new AttributeModifier("Speed Override", 4.0, AttributeModifier.Operation.ADD_NUMBER));
+            }
         }
 
 
@@ -446,22 +451,6 @@ public class BaseUser implements Listener, User {
             }
         }
 
-//        System.out.println(getName() + " attributes fixed!");
-//
-//        //Show attributes
-//        System.out.println("Base damage: " + damage.getBaseValue());
-//        for (AttributeModifier modifier : damage.getModifiers()) {
-//            System.out.println(
-//                    "Modifier: " + modifier.getName() + ", " + modifier.getOperation().toString() + "," + " " +
-//                            modifier.getAmount());
-//        }
-//
-//        System.out.println("Base speed: " + speed.getBaseValue());
-//        for (AttributeModifier modifier : speed.getModifiers()) {
-//            System.out.println(
-//                    "Modifier: " + modifier.getName() + ", " + modifier.getOperation().toString() + "," + " " +
-//                            modifier.getAmount());
-//        }
     }
 
 
@@ -515,7 +504,6 @@ public class BaseUser implements Listener, User {
         playerState.setPlaceholder(entity);
 
         if (entity instanceof Zombie) {
-            ((Zombie) entity).setVillager(false);
             ((Zombie) entity).setBaby(false);
         }
 
