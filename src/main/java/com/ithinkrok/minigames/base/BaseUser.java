@@ -335,7 +335,7 @@ public class BaseUser implements Listener, User {
 
         @CustomEventHandler(priority = CustomEventHandler.HIGH)
         public void eventInteract(UserInteractEvent event) {
-            ItemStack item = getInventory().getItemInHand();
+            ItemStack item = event.getItem();
             int identifier = InventoryUtils.getIdentifier(item);
             if (identifier < 0) return;
 
