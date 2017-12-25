@@ -1,5 +1,6 @@
 package com.ithinkrok.minigames.api.schematic;
 
+import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.ithinkrok.minigames.api.map.GameMap;
 import com.ithinkrok.minigames.api.schematic.event.SchematicDestroyedEvent;
 import com.ithinkrok.minigames.api.schematic.event.SchematicFinishedEvent;
@@ -9,8 +10,6 @@ import com.ithinkrok.minigames.api.util.NamedSounds;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventExecutor;
 import com.ithinkrok.util.event.CustomListener;
-import de.inventivegames.hologram.Hologram;
-import de.inventivegames.hologram.HologramAPI;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -162,7 +161,7 @@ public class PastedSchematic implements SchematicPaster.BoundsChecker {
 
         if (buildTask != null && buildTask.getTaskState() == GameTask.TaskState.SCHEDULED) buildTask.cancel();
 
-        holograms.forEach(HologramAPI::removeHologram);
+        holograms.forEach(Hologram::delete);
 
         removed = true;
     }

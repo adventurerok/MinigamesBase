@@ -1,19 +1,23 @@
 package com.ithinkrok.minigames.api.schematic;
 
+import com.gmail.filoghost.holographicdisplays.api.Hologram;
+import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
+import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
 import com.ithinkrok.minigames.api.map.GameMap;
 import com.ithinkrok.minigames.api.schematic.blockentity.BlockEntity;
 import com.ithinkrok.minigames.api.task.GameRunnable;
 import com.ithinkrok.minigames.api.task.GameTask;
 import com.ithinkrok.minigames.api.task.TaskScheduler;
 import com.ithinkrok.minigames.api.util.BoundingBox;
+import com.ithinkrok.minigames.api.util.HologramUtils;
 import com.ithinkrok.minigames.api.util.NamedSounds;
-import de.inventivegames.hologram.Hologram;
-import de.inventivegames.hologram.HologramAPI;
+import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.plugin.Plugin;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -61,7 +65,7 @@ public class SchematicPaster {
             for (int y = 0; y < schem.getHeight(); ++y) {
                 for (int z = 0; z < schem.getLength(); ++z) {
                     Location l = new Location(loc.getWorld(), x + loc.getX() + schem.getOffsetX(),
-                            y + loc.getY() + schem.getOffsetY(), z + loc.getZ() + schem.getOffsetZ());
+                                              y + loc.getY() + schem.getOffsetY(), z + loc.getZ() + schem.getOffsetZ());
 
                     oldState = l.getBlock().getState();
 
@@ -85,7 +89,7 @@ public class SchematicPaster {
         });
 
         PastedSchematic result = new PastedSchematic(schemData.getName(), schemData, map, centerBlock, bounds, rotation,
-                schemData.getAllowOverlap(), locations, oldBlocks);
+                                                     schemData.getAllowOverlap(), locations, oldBlocks);
         result.addListeners(options.getDefaultListeners());
 
         SchematicBuilderTask builderTask = new SchematicBuilderTask(loc, result, schem, options);
@@ -160,9 +164,8 @@ public class SchematicPaster {
                     holoLoc = building.getCenterBlock().clone().add(0.5d, 1.5d, 0.5d);
                 else holoLoc = origin.clone().add(0.5d, 1.5d, 0.5d);
 
-                hologram = HologramAPI.createHologram(holoLoc, "Building: 0%");
-
-                hologram.spawn();
+                hologram = HologramUtils.createHologram(holoLoc);
+                hologram.appendTextLine("Building: 0%");
 
                 building.addHologram(hologram);
             }
@@ -198,7 +201,7 @@ public class SchematicPaster {
 
                 if (options.getOverrideDyeColor() != null) {
                     if (mat == Material.WOOL || mat == Material.STAINED_CLAY || mat == Material.STAINED_GLASS ||
-                            mat == Material.STAINED_GLASS_PANE) {
+                        mat == Material.STAINED_GLASS_PANE) {
                         bData = options.getOverrideDyeColor().getWoolData();
                     }
                 }
@@ -216,7 +219,7 @@ public class SchematicPaster {
                 if (options.getBuildSpeed() != -1 && count > options.getBuildSpeed()) {
                     loc.getWorld().playEffect(loc, Effect.STEP_SOUND, mat);
                     if (options.getProgressHologram()) {
-                        hologram.setText(
+                        ((TextLine) hologram.getLine(0)).setText(
                                 "Building: " + percentFormat.format((double) index / (double) locations.size()));
                     }
                     return;
@@ -227,14 +230,13 @@ public class SchematicPaster {
             if (task != null) task.finish();
 
             if (options.getProgressHologram()) {
-                HologramAPI.removeHologram(hologram);
-                building.removeHologram(hologram);
+                hologram.delete();
             }
 
             if (building.getCenterBlock() != null) {
                 building.getCenterBlock().getWorld()
                         .playSound(building.getCenterBlock(),
-                                NamedSounds.fromName("ENTITY_PLAYER_LEVELUP"), 1.0f, 1.0f);
+                                   NamedSounds.fromName("ENTITY_PLAYER_LEVELUP"), 1.0f, 1.0f);
             }
 
             building.setFinished();
