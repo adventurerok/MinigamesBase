@@ -4,6 +4,8 @@ import com.ithinkrok.minigames.api.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
+import com.ithinkrok.minigames.api.util.MinigamesConfigs;
+import com.ithinkrok.minigames.api.util.SoundEffect;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
@@ -22,6 +24,8 @@ public class PlayerCompass implements CustomListener {
     private PlayerCompassTarget target;
     private int locatingTime;
 
+    private SoundEffect locateSound;
+
     @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent<?, ?> event) {
         Config config = event.getConfigOrEmpty();
@@ -30,6 +34,8 @@ public class PlayerCompass implements CustomListener {
         locatingLocale = config.getString("locating_locale", "player_compass.locating");
         noPlayerLocale = config.getString("no_player_locale", "player_compass.no_player");
         orientedLocale = config.getString("oriented_locale", "player_compass.oriented");
+
+        locateSound = MinigamesConfigs.getSoundEffect(config, "locate_sound");
 
         target = PlayerCompassTarget.valueOf(config.getString("target", "enemies").toUpperCase());
 
@@ -76,6 +82,10 @@ public class PlayerCompass implements CustomListener {
             InventoryUtils.replaceItem(event.getUser().getInventory(), item);
 
             event.getUser().showAboveHotbarLocale(orientedLocale, closestName);
+
+            if(locateSound != null) {
+                locateSound.playToAll(event.getUser().getGameGroup(), event.getUser().getLocation());
+            }
         }, locatingTime);
 
         event.setStartCooldownAfterAction(true);
