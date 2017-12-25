@@ -60,7 +60,7 @@ public class PlayerCompass implements CustomListener {
                 if (dist > minDist) continue;
                 minDist = dist;
                 closest = user.getLocation();
-                closestName = user.getName();
+                closestName = user.getFormattedName();
             }
 
             LanguageLookup lookup = event.getUser().getLanguageLookup();
@@ -74,6 +74,8 @@ public class PlayerCompass implements CustomListener {
                     lookup.getLocale(orientedLocale, closestName));
 
             InventoryUtils.replaceItem(event.getUser().getInventory(), item);
+
+            event.getUser().showAboveHotbarLocale(orientedLocale, closestName);
         }, locatingTime);
 
         event.setStartCooldownAfterAction(true);
