@@ -2,7 +2,7 @@ name: "MinigamesBase"
 version: "${project.version}"
 main: "com.ithinkrok.minigames.base.BasePlugin"
 author: "ithinkrok"
-depend: ["HologramAPI", "ProtocolLib", "MSMClient"]
+depend: ["HolographicDisplays", "ProtocolLib", "MSMClient"]
 softdepend: ["DisguiseCraft", "LibsDisguises"]
 database: false
 
