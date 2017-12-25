@@ -32,6 +32,9 @@ command.debug.custom.success=&aGiven %s &athe custom item %s
 command.debug.level.success=%s&a's %s level set to %s
 command.debug.kit.unknown=&cUnknown kit %s
 command.debug.kit.success=%s&a's kit changed to %s
+command.debug.customlist.title=&6List of all custom items:
+command.debug.customlist.line=&a%s
+command.debug.customlist.separator=&7, &a
 
 #Global money messages
 money.transfer.too_expensive=&cYou do not have that amount of money

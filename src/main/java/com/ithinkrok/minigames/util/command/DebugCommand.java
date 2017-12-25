@@ -11,8 +11,7 @@ import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
 import com.ithinkrok.util.math.ExpressionCalculator;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class DebugCommand implements CustomListener {
 
@@ -24,6 +23,7 @@ public class DebugCommand implements CustomListener {
         addSubExecutor("team", "mg.base.debug.team", this::teamCommand);
         addSubExecutor("kit", "mg.base.debug.kit", this::kitCommand);
         addSubExecutor("money", "mg.base.debug.money", this::moneyCommand);
+        addSubExecutor("customlist", "mg.base.debug.customlist", this::customListCommand);
     }
 
     protected void addSubExecutor(String name, String permission, SubCommandExecutor executor) {
@@ -103,6 +103,38 @@ public class DebugCommand implements CustomListener {
                 "command.debug.custom.success",
                 command.getUser().getFormattedName(),
                 command.getStringArg(0, null));
+
+        return true;
+    }
+
+    private boolean customListCommand(MinigamesCommandSender sender, MinigamesCommand command) {
+        Collection<CustomItem> allCustoms = command.getUser().getGameGroup().getAllCustomItems();
+
+        List<CustomItem> customList = new ArrayList<>(allCustoms);
+        customList.sort(Comparator.comparing(CustomItem::getName));
+
+        sender.sendLocale("command.debug.customlist.title");
+
+        String separator = sender.getLanguageLookup().getLocale("command.debug.customlist.separator");
+        StringBuilder current = new StringBuilder();
+
+        for (CustomItem customItem : customList) {
+            String itemName = customItem.getName();
+
+            if (current.length() == 0 || current.length() + itemName.length() < 45) {
+                if (current.length() != 0) {
+                    current.append(separator);
+                }
+                current.append(itemName);
+            } else {
+                sender.sendLocale("command.debug.customlist.line", current.toString());
+                current = new StringBuilder();
+            }
+        }
+
+        if(current.length() > 0) {
+            sender.sendLocale("command.debug.customlist.line", current.toString());
+        }
 
         return true;
     }
