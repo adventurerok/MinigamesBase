@@ -18,6 +18,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +37,8 @@ public interface GameMap extends LanguageLookup, SchematicPaster.BoundsChecker, 
     CustomItem getCustomItem(String name);
 
     CustomItem getCustomItem(int identifier);
+
+    Collection<CustomItem> getAllCustomItems();
 
     CustomEntity getCustomEntity(String name);
 

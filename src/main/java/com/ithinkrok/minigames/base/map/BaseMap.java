@@ -35,10 +35,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by paul on 01/01/16.
@@ -175,6 +172,11 @@ public class BaseMap implements GameMap, ConfigHolder {
     @Override
     public CustomItem getCustomItem(int identifier) {
         return customItemIdentifierMap.get(identifier);
+    }
+
+    @Override
+    public Collection<CustomItem> getAllCustomItems() {
+        return customItemIdentifierMap.values();
     }
 
     @Override

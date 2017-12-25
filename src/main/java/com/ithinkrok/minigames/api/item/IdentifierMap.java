@@ -1,5 +1,6 @@
 package com.ithinkrok.minigames.api.item;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,5 +28,9 @@ public class IdentifierMap<I extends Identifiable> {
     public void clear() {
         namedMap.clear();
         idMap.clear();
+    }
+
+    public Collection<I> values() {
+        return idMap.values();
     }
 }

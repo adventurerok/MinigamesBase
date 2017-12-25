@@ -174,6 +174,8 @@ public interface GameGroup
 
     CustomItem getCustomItem(int identifier);
 
+    Collection<CustomItem> getAllCustomItems();
+
     CustomEntity getCustomEntity(String name);
 
     void gameEvent(GameEvent event);

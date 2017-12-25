@@ -504,6 +504,17 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     }
 
     @Override
+    public Collection<CustomItem> getAllCustomItems() {
+        List<CustomItem> result = new ArrayList<>(customItemIdentifierMap.values());
+
+        if(currentMap != null) {
+            result.addAll(currentMap.getAllCustomItems());
+        }
+
+        return result;
+    }
+
+    @Override
     public void gameEvent(GameEvent event) {
         CustomEventExecutor.executeEvent(event, getListeners(getAllUserListeners(), getAllTeamListeners()));
     }
