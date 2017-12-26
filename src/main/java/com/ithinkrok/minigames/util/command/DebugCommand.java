@@ -113,27 +113,29 @@ public class DebugCommand implements CustomListener {
         List<CustomItem> customList = new ArrayList<>(allCustoms);
         customList.sort(Comparator.comparing(CustomItem::getName));
 
-        sender.sendLocale("command.debug.customlist.title");
+        sender.sendLocaleNoPrefix("command.debug.customlist.title");
 
         String separator = sender.getLanguageLookup().getLocale("command.debug.customlist.separator");
         StringBuilder current = new StringBuilder();
 
-        for (CustomItem customItem : customList) {
-            String itemName = customItem.getName();
+        for(int index = 0; index < customList.size(); ++index) {
+            String itemName = customList.get(index).getName();
 
-            if (current.length() == 0 || current.length() + itemName.length() < 45) {
-                if (current.length() != 0) {
-                    current.append(separator);
-                }
+            if(current.length() == 0 || current.length() + itemName.length() < 60) {
                 current.append(itemName);
             } else {
-                sender.sendLocale("command.debug.customlist.line", current.toString());
+                sender.sendLocaleNoPrefix("command.debug.customlist.line", current.toString());
                 current = new StringBuilder();
+                current.append(itemName);
+            }
+
+            if(index != customList.size() - 1) {
+                current.append(separator);
             }
         }
 
         if(current.length() > 0) {
-            sender.sendLocale("command.debug.customlist.line", current.toString());
+            sender.sendLocaleNoPrefix("command.debug.customlist.line", current.toString());
         }
 
         return true;
