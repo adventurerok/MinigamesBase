@@ -82,6 +82,7 @@ public class InventoryUtils {
             case POTION:
             case SPLASH_POTION:
             case LINGERING_POTION:
+            case TIPPED_ARROW:
                 String effectName = parts[0].toUpperCase();
 
                 int amp = parts.length > 1 ? Integer.parseInt(parts[1]) - 1 : 0;
