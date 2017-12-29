@@ -91,7 +91,9 @@ public class InventoryUtils {
                 PotionEffectType type = PotionEffectType.getByName(effectName);
 
                 PotionMeta meta = (PotionMeta) item.getItemMeta();
-                meta.setBasePotionData(new PotionData(PotionType.getByEffect(type), false, false));
+                PotionType potionType = PotionType.getByEffect(type);
+                if(potionType == null) potionType = PotionType.UNCRAFTABLE;
+                meta.setBasePotionData(new PotionData(potionType, false, false));
                 meta.addCustomEffect(new PotionEffect(type, duration, amp), true);
                 item.setItemMeta(meta);
         }
