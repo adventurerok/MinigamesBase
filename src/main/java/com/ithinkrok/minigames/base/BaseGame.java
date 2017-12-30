@@ -34,6 +34,8 @@ import com.ithinkrok.msm.client.Client;
 import com.ithinkrok.msm.client.ClientListener;
 import com.ithinkrok.msm.client.impl.MSMClient;
 import com.ithinkrok.msm.client.protocol.ClientUpdateFileProtocol;
+import com.ithinkrok.msm.common.economy.EconomyContext;
+import com.ithinkrok.msm.common.economy.provider.EconomyProvider;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.lang.LangFile;
 import com.ithinkrok.util.math.Variables;
@@ -270,6 +272,16 @@ public class BaseGame implements Game, FileLoader {
     public void setupCustomEntity(Entity entity, String name, Variables variables) {
         entity.setMetadata("custom_name", new FixedMetadataValue(plugin, name));
         entity.setMetadata("custom_vars", new FixedMetadataValue(plugin, variables));
+    }
+
+    @Override
+    public EconomyProvider getServerEconomyProvider() {
+        return MSMPlugin.getGlobalEconomyProvider();
+    }
+
+    @Override
+    public EconomyContext getServerEconomyContext() {
+        return MSMPlugin.getGlobalEconomyContext();
     }
 
     @Override

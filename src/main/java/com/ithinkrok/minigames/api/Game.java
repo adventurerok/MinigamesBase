@@ -8,6 +8,8 @@ import com.ithinkrok.minigames.api.team.Team;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.disguise.Disguise;
 import com.ithinkrok.minigames.base.BaseUser;
+import com.ithinkrok.msm.common.economy.EconomyContext;
+import com.ithinkrok.msm.common.economy.provider.EconomyProvider;
 import com.ithinkrok.util.math.Variables;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -82,4 +84,15 @@ public interface Game extends TaskScheduler, DatabaseTaskRunner, Nameable {
     void checkResourcesRestart();
 
     void setupCustomEntity(Entity entity, String name, Variables variables);
+
+    /**
+     * @return An economy provider providing server and global level access
+     */
+    EconomyProvider getServerEconomyProvider();
+
+    /**
+     *
+     * @return The server economy context, capable of providing details of all server and global level currencies
+     */
+    EconomyContext getServerEconomyContext();
 }
