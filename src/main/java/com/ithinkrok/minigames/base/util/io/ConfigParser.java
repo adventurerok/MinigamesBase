@@ -54,6 +54,7 @@ public final class ConfigParser {
 
         if (config.contains("lang_files")) loadLangFiles(config.getStringList("lang_files"));
         if(config.contains("books")) loadBooks(config.getConfigOrNull("books"));
+        if(config.contains("currencies")) loadCurrencies(config.getConfigOrNull("currencies"));
         if (config.contains("shared_objects")) loadSharedObjects(config.getConfigOrNull("shared_objects"));
 
         if (config.contains("custom_items")) loadCustomItems(config.getConfigOrNull("custom_items"));
@@ -69,6 +70,12 @@ public final class ConfigParser {
         if (config.contains("commands")) loadCommands(config.getConfigOrNull("commands"));
 
         if (config.contains("additional_configs")) loadAdditionalConfigs(config.getStringList("additional_configs"));
+    }
+
+    private void loadCurrencies(Config currencies) {
+        for(String name : currencies.getKeys(false)) {
+            holder.addCurrency(name, currencies.getConfigOrNull(name));
+        }
     }
 
     private void loadBooks(Config books) {
