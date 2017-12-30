@@ -22,6 +22,7 @@ import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.CountdownConfig;
 import com.ithinkrok.minigames.api.util.JSONBook;
 import com.ithinkrok.minigames.base.command.CommandConfig;
+import com.ithinkrok.msm.common.economy.Economy;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.lang.LanguageLookup;
 import com.ithinkrok.util.lang.Messagable;
@@ -209,4 +210,11 @@ public interface GameGroup
     Map<String, CommandConfig> getCommands();
 
 
+    /**
+     * The Economy for this gamegroup will provide currencies specific to this GameGroup,
+     * as well access to server and global level economy.
+     *
+     * @return The economy for this GameGroup
+     */
+    Economy getEconomy();
 }

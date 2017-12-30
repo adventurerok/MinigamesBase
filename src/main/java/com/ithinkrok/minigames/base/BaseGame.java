@@ -34,6 +34,7 @@ import com.ithinkrok.msm.client.Client;
 import com.ithinkrok.msm.client.ClientListener;
 import com.ithinkrok.msm.client.impl.MSMClient;
 import com.ithinkrok.msm.client.protocol.ClientUpdateFileProtocol;
+import com.ithinkrok.msm.common.economy.Economy;
 import com.ithinkrok.msm.common.economy.EconomyContext;
 import com.ithinkrok.msm.common.economy.provider.EconomyProvider;
 import com.ithinkrok.util.config.Config;
@@ -275,13 +276,8 @@ public class BaseGame implements Game, FileLoader {
     }
 
     @Override
-    public EconomyProvider getServerEconomyProvider() {
-        return MSMPlugin.getGlobalEconomyProvider();
-    }
-
-    @Override
-    public EconomyContext getServerEconomyContext() {
-        return MSMPlugin.getGlobalEconomyContext();
+    public Economy getEconomy() {
+        return MSMPlugin.getServerEconomy();
     }
 
     @Override
