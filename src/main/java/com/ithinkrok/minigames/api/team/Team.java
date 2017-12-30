@@ -17,6 +17,7 @@ import org.bukkit.DyeColor;
 import org.bukkit.entity.Entity;
 
 import java.util.Collection;
+import java.util.UUID;
 
 /**
  * Created by paul on 20/02/16.
@@ -50,5 +51,10 @@ public interface Team
     void updateUserScoreboards();
 
     void removeFromGameGroup();
+
+    /**
+     * @return A UUID to uniquely identify this team (e.g. for an economy account)
+     */
+    UUID getUuid();
 
 }

@@ -34,6 +34,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class BaseTeam implements Listener, Team {
 
+    private final UUID uuid = UUID.randomUUID();
     private final TeamIdentifier teamIdentifier;
     private final ConcurrentMap<UUID, BaseUser> usersInTeam = new ConcurrentHashMap<>();
     private final BaseGameGroup gameGroup;
@@ -128,6 +129,11 @@ public class BaseTeam implements Listener, Team {
         }
 
         metadataMap.clear();
+    }
+
+    @Override
+    public UUID getUuid() {
+        return uuid;
     }
 
     @Override
