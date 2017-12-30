@@ -2,6 +2,14 @@
 lang_files:
   - "global/global.lang"
 
+currencies:
+  game:
+    singular: "coin"
+    plural: "coins"
+    symbol: "$"
+    format: "$%s"
+    decimals: 0
+
 commands:
   ahelp:
     description: "Shows all command help"
