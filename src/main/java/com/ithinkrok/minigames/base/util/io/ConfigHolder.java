@@ -43,4 +43,6 @@ public interface ConfigHolder {
     void addMapInfo(GameMapInfo mapInfo);
 
     void addBook(JSONBook book);
+
+    void addCurrency(String name, Config config);
 }

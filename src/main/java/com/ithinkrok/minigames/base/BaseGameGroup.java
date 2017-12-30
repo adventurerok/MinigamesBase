@@ -6,6 +6,7 @@ import com.ithinkrok.minigames.api.*;
 import com.ithinkrok.minigames.api.command.MinigamesCommand;
 import com.ithinkrok.minigames.api.database.Database;
 import com.ithinkrok.minigames.api.database.DatabaseTask;
+import com.ithinkrok.minigames.api.economy.GameEconomy;
 import com.ithinkrok.minigames.api.entity.CustomEntity;
 import com.ithinkrok.minigames.api.event.MinigamesCommandEvent;
 import com.ithinkrok.minigames.api.event.MinigamesEvent;
@@ -20,8 +21,6 @@ import com.ithinkrok.minigames.api.event.team.TeamEvent;
 import com.ithinkrok.minigames.api.event.user.UserEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserJoinEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserQuitEvent;
-import com.ithinkrok.minigames.api.event.user.state.UserAttackedEvent;
-import com.ithinkrok.minigames.api.event.user.state.UserDamagedEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserBreakBlockEvent;
 import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.item.IdentifierMap;
@@ -44,6 +43,7 @@ import com.ithinkrok.minigames.base.map.BaseMap;
 import com.ithinkrok.minigames.base.util.io.ConfigHolder;
 import com.ithinkrok.minigames.base.util.io.ConfigParser;
 import com.ithinkrok.minigames.base.util.io.FileLoader;
+import com.ithinkrok.msm.common.economy.Economy;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.ConfigUtils;
 import com.ithinkrok.util.config.MemoryConfig;
@@ -98,6 +98,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     private final Database database;
     private final int maxPlayers;
     private final List<String> parameters;
+    private final GameEconomy economy = new GameEconomy();
     private GameState gameState;
     private BaseMap currentMap;
     private List<CustomListener> defaultAndMapListeners = new ArrayList<>();
@@ -112,6 +113,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         this.type = type;
         this.parameters = parameters;
         this.database = new Database(this);
+        this.economy.setParent(game.getEconomy());
 
         gameGroupListener = new GameGroupListener();
         defaultAndMapListeners = createDefaultAndMapListeners();
@@ -248,6 +250,8 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
         game.setGameGroupForMap(this, newMap.getWorld().getName());
 
+        newMap.getCurrencies().forEach(this::addCurrency);
+
         MinigamesEvent event = new MapChangedEvent(this, oldMap, newMap);
 
         CustomEventExecutor
@@ -373,9 +377,6 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     @Override
     public boolean hasLocale(String name) {
         return (currentMap != null && currentMap.hasLocale(name) || languageLookup.hasLocale(name));
-    }    @Override
-    public ClientMinigamesRequestProtocol getRequestProtocol() {
-        return BasePlugin.getRequestProtocol();
     }
 
     @Override
@@ -417,24 +418,21 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
         return config;
     }    @Override
-    public ControllerInfo getControllerInfo() {
-        return getRequestProtocol().getControllerInfo();
+    public ClientMinigamesRequestProtocol getRequestProtocol() {
+        return BasePlugin.getRequestProtocol();
     }
 
     @Override
     public String getName() {
         return name;
-    }    @Override
-    public void requestControllerInfo() {
-        getRequestProtocol().enableControllerInfo();
     }
 
     @Override
     public BaseMap getCurrentMap() {
         return currentMap;
     }    @Override
-    public GameMapInfo getMap(String mapName) {
-        return gameMapInfoMap.get(mapName);
+    public ControllerInfo getControllerInfo() {
+        return getRequestProtocol().getControllerInfo();
     }
 
     @Override
@@ -450,6 +448,9 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         } else {
             CustomEventExecutor.executeEvent(event, getListeners(event.getUser().getListeners()));
         }
+    }    @Override
+    public void requestControllerInfo() {
+        getRequestProtocol().enableControllerInfo();
     }
 
     @Override
@@ -466,6 +467,9 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         }
 
         return result;
+    }    @Override
+    public GameMapInfo getMap(String mapName) {
+        return gameMapInfoMap.get(mapName);
     }
 
     @Override
@@ -490,12 +494,6 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         return item != null ? item : customItemIdentifierMap.get(name);
     }
 
-    public CustomEntity getCustomEntity(String name) {
-        CustomEntity entity = null;
-        if(currentMap != null) entity = currentMap.getCustomEntity(name);
-        return entity != null ? entity : customEntityMap.get(name);
-    }
-
     @Override
     public CustomItem getCustomItem(int identifier) {
         CustomItem item = null;
@@ -507,11 +505,17 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     public Collection<CustomItem> getAllCustomItems() {
         List<CustomItem> result = new ArrayList<>(customItemIdentifierMap.values());
 
-        if(currentMap != null) {
+        if (currentMap != null) {
             result.addAll(currentMap.getAllCustomItems());
         }
 
         return result;
+    }
+
+    public CustomEntity getCustomEntity(String name) {
+        CustomEntity entity = null;
+        if (currentMap != null) entity = currentMap.getCustomEntity(name);
+        return entity != null ? entity : customEntityMap.get(name);
     }
 
     @Override
@@ -569,6 +573,31 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         this.acceptingPlayers = acceptingPlayers;
 
         sendUpdatePayload();
+    }
+
+    @Override
+    public void doDatabaseTask(DatabaseTask databaseTask) {
+        game.doDatabaseTask(databaseTask);
+    }
+
+    @Override
+    public boolean hasSharedObject(String name) {
+        return getSharedObject(name) != null;
+    }
+
+    @Override
+    public Team getTeam(String name) {
+        return getTeam(getTeamIdentifier(name));
+    }
+
+    @Override
+    public Team getTeam(TeamIdentifier identifier) {
+        return teamsInGroup.get(identifier);
+    }
+
+    @Override
+    public TeamIdentifier getTeamIdentifier(String name) {
+        return teamIdentifiers.get(name);
     }    @Override
     public void unload() {
         if (currentMap == null) return;
@@ -580,16 +609,26 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     }
 
     @Override
-    public void doDatabaseTask(DatabaseTask databaseTask) {
-        game.doDatabaseTask(databaseTask);
+    public BaseUser getUser(UUID uuid) {
+        return usersInGroup.get(uuid);
+    }
+
+    @Override
+    public Config loadConfig(String name) {
+        return game.loadConfig(name);
     }    @Override
     public void bindTaskToCurrentGameState(GameTask task) {
         gameStateTaskList.addTask(task);
     }
 
     @Override
-    public boolean hasSharedObject(String name) {
-        return getSharedObject(name) != null;
+    public LangFile loadLangFile(String path) {
+        return game.loadLangFile(path);
+    }
+
+    @Override
+    public JSONBook loadBook(String name, String path) {
+        return game.loadBook(name, path);
     }    @Override
     public void bindTaskToCurrentMap(GameTask task) {
         if (currentMap == null) throw new RuntimeException("No GameMap to bind task to");
@@ -597,64 +636,120 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     }
 
     @Override
-    public Team getTeam(String name) {
-        return getTeam(getTeamIdentifier(name));
+    public Path getAssetDirectory() {
+        return game.getAssetDirectory();
+    }
+
+    @Override
+    public Schematic getSchematic(String name) {
+        Schematic schem = null;
+        if (currentMap != null) schem = currentMap.getSchematic(name);
+        return schem != null ? schem : schematicMap.get(name);
     }    @Override
     public Game getGame() {
         return game;
     }
 
     @Override
-    public Team getTeam(TeamIdentifier identifier) {
-        return teamsInGroup.get(identifier);
+    public String getLocale(String name) {
+        if (currentMap != null && currentMap.hasLocale(name)) return currentMap.getLocale(name);
+        else return languageLookup.getLocale(name);
+    }
+
+    @Override
+    public <B extends Metadata> B getMetadata(Class<? extends B> clazz) {
+        return metadataMap.getInstance(clazz);
     }    @Override
     public boolean hasActiveCountdown() {
         return countdown != null;
     }
 
     @Override
-    public TeamIdentifier getTeamIdentifier(String name) {
-        return teamIdentifiers.get(name);
+    public <B extends Metadata> void setMetadata(B metadata) {
+        Metadata oldMetadata = metadataMap.put(metadata.getMetadataClass(), metadata);
+
+        if (oldMetadata != null && oldMetadata != metadata) {
+            oldMetadata.cancelAllTasks();
+            oldMetadata.removed();
+        }
+    }
+
+    @Override
+    public boolean hasMetadata(Class<? extends Metadata> clazz) {
+        return metadataMap.containsKey(clazz);
     }    @Override
     public boolean hasActiveCountdown(String name) {
         return countdown != null && countdown.getName().equals(name);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public BaseUser getUser(UUID uuid) {
-        return usersInGroup.get(uuid);
+    public <B extends Metadata> B removeMetadata(Class<? extends B> clazz) {
+        B metadata = (B) metadataMap.remove(clazz);
+
+        if (metadata != null) metadata.removed();
+
+        return metadata;
+    }
+
+    @Override
+    public void addListener(String name, CustomListener listener) {
+        defaultListeners.put(name, listener);
+
+        createDefaultAndMapListeners();
     }    @Override
     public int getUserCount() {
         return getUsers().size();
     }
 
     @Override
-    public Config loadConfig(String name) {
-        return game.loadConfig(name);
+    public void addCustomItem(CustomItem customItem) {
+        customItemIdentifierMap.put(customItem.getName(), customItem);
+    }
+
+    @Override
+    public void addCustomEntity(CustomEntity customEntity) {
+        customEntityMap.put(customEntity.getName(), customEntity);
     }    @Override
     public Kit getKit(String name) {
         return kits.get(name);
     }
 
     @Override
-    public LangFile loadLangFile(String path) {
-        return game.loadLangFile(path);
+    public void addLanguageLookup(LanguageLookup languageLookup) {
+        this.languageLookup.addLanguageLookup(languageLookup);
+    }
+
+    @Override
+    public void addSharedObject(String name, Config config) {
+        sharedObjectMap.put(name, config);
     }    @Override
     public GameState getGameState(String gameStateName) {
         return gameStates.get(gameStateName);
     }
 
     @Override
-    public JSONBook loadBook(String name, String path) {
-        return game.loadBook(name, path);
+    public void addSchematic(Schematic schematic) {
+        schematicMap.put(schematic.getName(), schematic);
+    }
+
+    @Override
+    public void addTeamIdentifier(TeamIdentifier teamIdentifier) {
+        teamIdentifiers.put(teamIdentifier.getName(), teamIdentifier);
+
+        teamsInGroup.put(teamIdentifier, createTeam(teamIdentifier));
     }    @Override
     public Collection<TeamIdentifier> getTeamIdentifiers() {
         return teamIdentifiers.values();
     }
 
+    private BaseTeam createTeam(TeamIdentifier teamIdentifier) {
+        return new BaseTeam(teamIdentifier, this);
+    }
+
     @Override
-    public Path getAssetDirectory() {
-        return game.getAssetDirectory();
+    public void addGameState(GameState gameState) {
+        gameStates.put(gameState.getName(), gameState);
     }    @Override
     public JSONBook getBook(String name) {
         if (currentMap == null) return bookMap.get(name);
@@ -664,10 +759,18 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     }
 
     @Override
-    public Schematic getSchematic(String name) {
-        Schematic schem = null;
-        if (currentMap != null) schem = currentMap.getSchematic(name);
-        return schem != null ? schem : schematicMap.get(name);
+    public void addKit(Kit kit) {
+        kits.put(kit.getName(), kit);
+    }
+
+    @Override
+    public void addCommand(CommandConfig command) {
+        commandMap.put(command.getName(), command);
+        commandAliasesMap.put(command.getName(), command);
+
+        for (String alias : command.getAliases()) {
+            commandAliasesMap.put(alias.toLowerCase(), command);
+        }
     }    @Override
     public void kill() {
         List<User> users = new ArrayList<>(getUsers());
@@ -707,9 +810,13 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     }
 
     @Override
-    public String getLocale(String name) {
-        if (currentMap != null && currentMap.hasLocale(name)) return currentMap.getLocale(name);
-        else return languageLookup.getLocale(name);
+    public void addMapInfo(GameMapInfo mapInfo) {
+        gameMapInfoMap.put(mapInfo.getName(), mapInfo);
+    }
+
+    @Override
+    public void addBook(JSONBook book) {
+        bookMap.put(book.getName(), book);
     }    @Override
     public GameTask doInFuture(GameRunnable task) {
         GameTask gameTask = game.doInFuture(task);
@@ -719,127 +826,8 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     }
 
     @Override
-    public <B extends Metadata> B getMetadata(Class<? extends B> clazz) {
-        return metadataMap.getInstance(clazz);
-    }    @Override
-    public GameTask doInFuture(GameRunnable task, int delay) {
-        GameTask gameTask = game.doInFuture(task, delay);
-
-        gameGroupTaskList.addTask(gameTask);
-        return gameTask;
-    }
-
-    @Override
-    public <B extends Metadata> void setMetadata(B metadata) {
-        Metadata oldMetadata = metadataMap.put(metadata.getMetadataClass(), metadata);
-
-        if (oldMetadata != null && oldMetadata != metadata) {
-            oldMetadata.cancelAllTasks();
-            oldMetadata.removed();
-        }
-    }    @Override
-    public GameTask repeatInFuture(GameRunnable task, int delay, int period) {
-        GameTask gameTask = game.repeatInFuture(task, delay, period);
-
-        gameGroupTaskList.addTask(gameTask);
-        return gameTask;
-    }
-
-    @Override
-    public boolean hasMetadata(Class<? extends Metadata> clazz) {
-        return metadataMap.containsKey(clazz);
-    }    @Override
-    public void cancelAllTasks() {
-        gameGroupTaskList.cancelAllTasks();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <B extends Metadata> B removeMetadata(Class<? extends B> clazz) {
-        B metadata = (B) metadataMap.remove(clazz);
-
-        if (metadata != null) metadata.removed();
-
-        return metadata;
-    }    @Override
-    public CommandConfig getCommand(String name) {
-        return name != null ? commandAliasesMap.get(name.toLowerCase()) : null;
-    }
-
-    @Override
-    public void addListener(String name, CustomListener listener) {
-        defaultListeners.put(name, listener);
-
-        createDefaultAndMapListeners();
-    }    @Override
-    public Map<String, CommandConfig> getCommands() {
-        return commandMap;
-    }
-
-    @Override
-    public void addCustomItem(CustomItem customItem) {
-        customItemIdentifierMap.put(customItem.getName(), customItem);
-    }
-
-    @Override
-    public void addCustomEntity(CustomEntity customEntity) {
-        customEntityMap.put(customEntity.getName(), customEntity);
-    }
-
-    @Override
-    public void addLanguageLookup(LanguageLookup languageLookup) {
-        this.languageLookup.addLanguageLookup(languageLookup);
-    }
-
-    @Override
-    public void addSharedObject(String name, Config config) {
-        sharedObjectMap.put(name, config);
-    }
-
-    @Override
-    public void addSchematic(Schematic schematic) {
-        schematicMap.put(schematic.getName(), schematic);
-    }
-
-    @Override
-    public void addTeamIdentifier(TeamIdentifier teamIdentifier) {
-        teamIdentifiers.put(teamIdentifier.getName(), teamIdentifier);
-
-        teamsInGroup.put(teamIdentifier, createTeam(teamIdentifier));
-    }
-
-    private BaseTeam createTeam(TeamIdentifier teamIdentifier) {
-        return new BaseTeam(teamIdentifier, this);
-    }
-
-    @Override
-    public void addGameState(GameState gameState) {
-        gameStates.put(gameState.getName(), gameState);
-    }
-
-    @Override
-    public void addKit(Kit kit) {
-        kits.put(kit.getName(), kit);
-    }
-
-    @Override
-    public void addCommand(CommandConfig command) {
-        commandMap.put(command.getName(), command);
-        commandAliasesMap.put(command.getName(), command);
-
-        for (String alias : command.getAliases()) {
-            commandAliasesMap.put(alias.toLowerCase(), command);
-        }
-    }
-
-    @Override
-    public void addMapInfo(GameMapInfo mapInfo) {
-        gameMapInfoMap.put(mapInfo.getName(), mapInfo);
-    }
-
-    @Override
-    public void addBook(JSONBook book) {
-        bookMap.put(book.getName(), book);
+    public void addCurrency(String name, Config config) {
+        economy.getContext().registerCurrency(name, config);
     }
 
     private class GameGroupListener implements CustomListener {
@@ -862,7 +850,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
             game.getLogger().info("Teleporting user " + event.getUser().getName() + " to GameGroup map");
             boolean success = currentMap.teleportUser(event.getUser());
 
-            if(!success) {
+            if (!success) {
                 game.getLogger().warning("Failed to teleport user " + event.getUser().getName() + " to GameGroup map");
             }
 
@@ -872,7 +860,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         @CustomEventHandler(priority = CustomEventHandler.HIGH)
         public void eventMapEntityDeath(MapEntityDeathEvent event) {
             String customName = EntityUtils.getCustomEntityName(event.getEntity());
-            if(customName == null) return;
+            if (customName == null) return;
 
             CustomEntity customEntity = getCustomEntity(customName);
 
@@ -882,7 +870,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         @CustomEventHandler
         public void eventEntityAttacked(MapEntityAttackedEvent event) {
             String customName = EntityUtils.getCustomEntityName(event.getAttacker());
-            if(customName == null) return;
+            if (customName == null) return;
 
             CustomEntity customEntity = getCustomEntity(customName);
 
@@ -986,23 +974,49 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
                 }
             }
         }
+    }    @Override
+    public GameTask doInFuture(GameRunnable task, int delay) {
+        GameTask gameTask = game.doInFuture(task, delay);
+
+        gameGroupTaskList.addTask(gameTask);
+        return gameTask;
     }
 
 
 
+    @Override
+    public GameTask repeatInFuture(GameRunnable task, int delay, int period) {
+        GameTask gameTask = game.repeatInFuture(task, delay, period);
+
+        gameGroupTaskList.addTask(gameTask);
+        return gameTask;
+    }
 
 
 
+    @Override
+    public void cancelAllTasks() {
+        gameGroupTaskList.cancelAllTasks();
+    }
 
 
 
+    @Override
+    public CommandConfig getCommand(String name) {
+        return name != null ? commandAliasesMap.get(name.toLowerCase()) : null;
+    }
 
 
 
+    @Override
+    public Map<String, CommandConfig> getCommands() {
+        return commandMap;
+    }
 
-
-
-
+    @Override
+    public Economy getEconomy() {
+        return economy;
+    }
 
 
 

@@ -54,6 +54,9 @@ public class BaseMap implements GameMap, ConfigHolder {
     private final HashMap<String, Config> sharedObjects = new HashMap<>();
     private final List<PastedSchematic> pastedSchematics = new ArrayList<>();
     private final WorldHandler worldHandler;
+
+    private Map<String, Config> currencyConfigs = new HashMap<>();
+
     private World world;
     private Location spawn;
 
@@ -354,6 +357,15 @@ public class BaseMap implements GameMap, ConfigHolder {
     @Override
     public void addBook(JSONBook book) {
         bookMap.put(book.getName(), book);
+    }
+
+    @Override
+    public void addCurrency(String name, Config config) {
+        currencyConfigs.put(name, config);
+    }
+
+    public Map<String, Config> getCurrencies() {
+        return currencyConfigs;
     }
 
     @Override
