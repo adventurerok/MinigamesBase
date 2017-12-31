@@ -10,6 +10,7 @@ import com.ithinkrok.minigames.api.util.MinigamesConfigs;
 import com.ithinkrok.minigames.api.util.NamedSounds;
 import com.ithinkrok.minigames.api.util.SoundEffect;
 import com.ithinkrok.msm.common.economy.Currency;
+import com.ithinkrok.msm.common.economy.result.Balance;
 import com.ithinkrok.util.math.Calculator;
 import com.ithinkrok.util.math.ExpressionCalculator;
 import com.ithinkrok.minigames.util.inventory.event.BuyablePurchaseEvent;
@@ -24,6 +25,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created by paul on 08/01/16.
@@ -198,21 +200,38 @@ public abstract class Buyable extends ClickableItem {
     }
 
     private void addMoneyCostLore(CalculateItemForUserEvent event) {
-        Money userMoney = Money.getOrCreate(event.getUser());
+        User user = event.getUser();
 
-        BigDecimal cost = getCost(event.getUser());
+        //Check if the cost exists
+        BigDecimal cost = getCost(user);
         if (cost.compareTo(BigDecimal.ZERO) <= 0) return;
-        boolean hasMoney = true;
 
-        boolean team = this.team.calculateBoolean(event.getUser().getUserVariables());
+        Money userMoney = Money.getOrCreate(user);
+        Currency currency = getCurrency(user);
+        boolean hasMoney = true;
+        boolean unknownMoney = false;
+
+        boolean team = this.team.calculateBoolean(user.getUserVariables());
 
         if (team) {
-            Money teamMoney = Money.getOrCreate(event.getUser().getTeam());
+            Money teamMoney = Money.getOrCreate(user.getTeam());
             if (userMoney.getMoney() + teamMoney.getMoney() < cost.intValue()) hasMoney = false;
-        } else if (!userMoney.hasMoney(cost.intValue())) hasMoney = false;
 
-        String costString = (hasMoney ? ChatColor.GREEN : ChatColor.RED) + cost.toString();
-        LanguageLookup lookup = event.getUser().getLanguageLookup();
+        } else {
+            //Use new API
+            Optional<Balance> balance = user.getEconomyAccount().getBalance(currency);
+
+            if(balance.isPresent()) {
+                hasMoney = balance.get().getAmount().compareTo(cost) >= 0;
+            } else {
+                unknownMoney = true;
+            }
+        }
+
+        ChatColor costColor = (unknownMoney ? ChatColor.BLUE : hasMoney ? ChatColor.GREEN : ChatColor.RED);
+
+        String costString = costColor + currency.format(cost);
+        LanguageLookup lookup = user.getLanguageLookup();
 
         ItemStack display = event.getDisplay();
 
