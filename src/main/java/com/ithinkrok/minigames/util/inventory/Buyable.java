@@ -28,12 +28,12 @@ import java.util.Map;
 public abstract class Buyable extends ClickableItem {
 
     private final Map<String, Calculator> upgradeOnBuy = new HashMap<>();
-    private final Map<ItemStack, Calculator> itemCosts = new HashMap<>();
-    private final Map<String, Calculator> customItemCosts = new HashMap<>();
+    final Map<ItemStack, Calculator> itemCosts = new HashMap<>();
+    final Map<String, Calculator> customItemCosts = new HashMap<>();
     private String teamNoMoneyLocale;
     private String userNoMoneyLocale;
     private String cannotBuyLocale;
-    private String userPayTeamLocale;
+    String userPayTeamLocale;
     private String teamDescriptionLocale;
     private String userDescriptionLocale;
     private String extraCostsLocale;
@@ -44,7 +44,7 @@ public abstract class Buyable extends ClickableItem {
     private String itemsTakenLocale;
 
     private Calculator cost;
-    private Calculator team;
+    Calculator team;
     private Calculator canBuy;
 
     public Buyable(ItemStack baseDisplay, int slot) {
@@ -208,66 +208,29 @@ public abstract class Buyable extends ClickableItem {
 
     @Override
     public void onClick(UserClickItemEvent event) {
+        BuyablePurchaseHandler handler = new BuyablePurchaseHandler(this, event);
         User user = event.getUser();
 
-        Money userMoney = Money.getOrCreate(user);
-        Money teamMoney = null;
-
-        //check if the user has the money
-        int cost = getCost(user);
-
-        boolean team = this.team.calculateBoolean(user.getUserVariables());
-
-        if (team) {
-            teamMoney = Money.getOrCreate(user.getTeam());
-            if (userMoney.getMoney() + teamMoney.getMoney() < cost) {
+        //Check if we have the money to afford the purchase
+        if(!handler.checkHasMoney()) {
+            //We don't have the money
+            if(handler.isTeamPurchase()) {
                 user.sendLocale(teamNoMoneyLocale);
-                return;
+            } else {
+                user.sendLocale(userNoMoneyLocale);
             }
-        } else if (!userMoney.hasMoney(cost)) {
-            user.sendLocale(userNoMoneyLocale);
+
             return;
         }
 
-        PlayerInventory inventory = user.getInventory();
+        //Check if we have the items to afford the purchase
+        Map<String, Integer> missingItems = handler.checkHasItems();
+        if (!missingItems.isEmpty()) {
+            //We don't have the items
+            for (Map.Entry<String, Integer> missing : missingItems.entrySet()) {
+                user.sendLocale(noItemLocale, missing.getKey(), missing.getValue());
+            }
 
-        //We need to store the calculated amounts as if the user variables change these could change
-        Map<String, Integer> customItemAmounts = new HashMap<>();
-
-        //check if the user has the items
-        for (Map.Entry<String, Calculator> customItemToAmount : customItemCosts.entrySet()) {
-            int requiredAmount = (int) customItemToAmount.getValue().calculate(user.getUserVariables());
-            if(requiredAmount <= 0) continue;
-
-            customItemAmounts.put(customItemToAmount.getKey(), requiredAmount);
-
-            CustomItem customItem = event.getGameGroup().getCustomItem(customItemToAmount.getKey());
-
-            int userAmount = InventoryUtils.getAmountOfItemsWithIdentifier(inventory, customItem.getIdentifier());
-
-
-            if (userAmount >= requiredAmount) continue;
-
-            String itemName = user.getLanguageLookup().getLocale(customItem.getDisplayNameLocale());
-
-            user.sendLocale(noItemLocale, requiredAmount, itemName);
-            return;
-        }
-
-        Map<ItemStack, Integer> itemAmounts = new HashMap<>();
-
-        for (Map.Entry<ItemStack, Calculator> itemToAmount : itemCosts.entrySet()) {
-            int requiredAmount = (int) itemToAmount.getValue().calculate(user.getUserVariables());
-            if(requiredAmount <= 0) continue;
-
-            itemAmounts.put(itemToAmount.getKey(), requiredAmount);
-
-            boolean hasAmount = inventory.containsAtLeast(itemToAmount.getKey(), requiredAmount);
-            if (hasAmount) continue;
-
-            String itemName = InventoryUtils.getItemStackDefaultName(itemToAmount.getKey());
-
-            user.sendLocale(noItemLocale, requiredAmount, itemName);
             return;
         }
 
@@ -285,46 +248,9 @@ public abstract class Buyable extends ClickableItem {
         doUpgradesOnBuy(user);
 
         //charge the user the money required
-        if (cost > 0) {
-            if (team) {
-                int teamAmount = Math.min(cost, teamMoney.getMoney());
-                int userAmount = cost - teamAmount;
+        handler.chargeMoney();
 
-                if (teamAmount > 0) teamMoney.subtractMoney(teamAmount, true);
-                if (userAmount > 0) {
-                    userMoney.subtractMoney(userAmount, true);
-                    user.sendLocale(userPayTeamLocale, userAmount);
-                }
-            } else {
-                userMoney.subtractMoney(cost, true);
-            }
-        }
-
-        boolean itemsTaken = false;
-
-        //charge the user the items required
-        for (Map.Entry<String, Integer> customItemToAmount : customItemAmounts.entrySet()) {
-            int requiredAmount = customItemToAmount.getValue();
-            if(requiredAmount <= 0) continue;
-
-            CustomItem customItem = event.getGameGroup().getCustomItem(customItemToAmount.getKey());
-
-            InventoryUtils.removeItemsWithIdentifier(inventory, customItem.getIdentifier(), requiredAmount);
-
-            itemsTaken = true;
-        }
-
-        for (Map.Entry<ItemStack, Integer> itemToAmount : itemAmounts.entrySet()) {
-            ItemStack itemCost = itemToAmount.getKey().clone();
-
-            itemCost.setAmount(itemToAmount.getValue());
-
-            inventory.removeItem(itemCost);
-
-            itemsTaken = true;
-        }
-
-        if(itemsTaken) {
+        if(handler.chargeItems()) {
             user.sendLocale(itemsTakenLocale);
         }
 
@@ -339,10 +265,6 @@ public abstract class Buyable extends ClickableItem {
         for (Map.Entry<String, Calculator> upgrades : upgradeOnBuy.entrySet()) {
             user.setUserVariable(upgrades.getKey(), (int) upgrades.getValue().calculate(user.getUserVariables()));
         }
-    }
-
-    public boolean buyWithTeamMoney(User user) {
-        return team.calculateBoolean(user.getUserVariables());
     }
 
 }
