@@ -9,6 +9,7 @@ import com.ithinkrok.minigames.api.util.InventoryUtils;
 import com.ithinkrok.minigames.api.util.MinigamesConfigs;
 import com.ithinkrok.minigames.api.util.NamedSounds;
 import com.ithinkrok.minigames.api.util.SoundEffect;
+import com.ithinkrok.msm.common.economy.Currency;
 import com.ithinkrok.util.math.Calculator;
 import com.ithinkrok.util.math.ExpressionCalculator;
 import com.ithinkrok.minigames.util.inventory.event.BuyablePurchaseEvent;
@@ -19,6 +20,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,25 +30,26 @@ import java.util.Map;
  */
 public abstract class Buyable extends ClickableItem {
 
-    private final Map<String, Calculator> upgradeOnBuy = new HashMap<>();
     final Map<ItemStack, Calculator> itemCosts = new HashMap<>();
     final Map<String, Calculator> customItemCosts = new HashMap<>();
-    private String teamNoMoneyLocale;
-    private String userNoMoneyLocale;
-    private String cannotBuyLocale;
+    private final Map<String, Calculator> upgradeOnBuy = new HashMap<>();
+    String teamNoMoneyLocale;
+    String userNoMoneyLocale;
+    String cannotBuyLocale;
     String userPayTeamLocale;
-    private String teamDescriptionLocale;
-    private String userDescriptionLocale;
-    private String extraCostsLocale;
-    private String extraCostsOnlyLocale;
-    private String costsItemLocale;
+    String teamDescriptionLocale;
+    String userDescriptionLocale;
+    String extraCostsLocale;
+    String extraCostsOnlyLocale;
+    String costsItemLocale;
 
-    private String noItemLocale;
-    private String itemsTakenLocale;
+    String noItemLocale;
+    String itemsTakenLocale;
 
-    private Calculator cost;
+    String currency;
+    Calculator cost;
     Calculator team;
-    private Calculator canBuy;
+    Calculator canBuy;
 
     public Buyable(ItemStack baseDisplay, int slot) {
         super(baseDisplay, slot);
@@ -56,6 +60,7 @@ public abstract class Buyable extends ClickableItem {
         cost = new ExpressionCalculator(config.getString("cost"));
         team = new ExpressionCalculator(config.getString("team", "false"));
         canBuy = new ExpressionCalculator(config.getString("can_buy", "true"));
+        currency = config.getString("currency", "game");
 
         teamNoMoneyLocale = config.getString("team_no_money_locale", "buyable.team.no_money");
         userNoMoneyLocale = config.getString("user_no_money_locale", "buyable.user.no_money");
@@ -115,106 +120,15 @@ public abstract class Buyable extends ClickableItem {
         addItemCostLore(event);
     }
 
-    /**
-     *
-     * @param user Check if this item is available to buy for this user
-     * @return If the item is available for the user
-     */
-    public boolean isAvailable(User user) {
-        return canBuy.calculateBoolean(user.getUserVariables());
-    }
-
-    private void addMoneyCostLore(CalculateItemForUserEvent event) {
-        Money userMoney = Money.getOrCreate(event.getUser());
-
-        int cost = getCost(event.getUser());
-        if (cost <= 0) return;
-        boolean hasMoney = true;
-
-        boolean team = this.team.calculateBoolean(event.getUser().getUserVariables());
-
-        if (team) {
-            Money teamMoney = Money.getOrCreate(event.getUser().getTeam());
-            if (userMoney.getMoney() + teamMoney.getMoney() < cost) hasMoney = false;
-        } else if (!userMoney.hasMoney(cost)) hasMoney = false;
-
-        String costString = (hasMoney ? ChatColor.GREEN : ChatColor.RED) + Integer.toString(cost);
-        LanguageLookup lookup = event.getUser().getLanguageLookup();
-
-        ItemStack display = event.getDisplay();
-
-        if (team) {
-            display = InventoryUtils.addLore(display, lookup.getLocale(teamDescriptionLocale, costString));
-        } else {
-            display = InventoryUtils.addLore(display, lookup.getLocale(userDescriptionLocale, costString));
-        }
-
-        event.setDisplay(display);
-    }
-
-    private void addItemCostLore(CalculateItemForUserEvent event) {
-        if (itemCosts.isEmpty() && customItemCosts.isEmpty()) return;
-
-        ItemStack display = event.getDisplay();
-        LanguageLookup lookup = event.getUser().getLanguageLookup();
-
-        int moneyCost = getCost(event.getUser());
-
-        if (moneyCost > 0) {
-            display = InventoryUtils.addLore(display, lookup.getLocale(extraCostsLocale));
-        } else {
-            display = InventoryUtils.addLore(display, lookup.getLocale(extraCostsOnlyLocale));
-        }
-
-        PlayerInventory inventory = event.getUser().getInventory();
-
-        for (Map.Entry<String, Calculator> customItemToAmount : customItemCosts.entrySet()) {
-            int requiredAmount = (int) customItemToAmount.getValue().calculate(event.getUser().getUserVariables());
-            if(requiredAmount <= 0) continue;
-
-            CustomItem customItem = event.getGameGroup().getCustomItem(customItemToAmount.getKey());
-
-            int userAmount = InventoryUtils.getAmountOfItemsWithIdentifier(inventory, customItem.getIdentifier());
-
-            String prefix = ((userAmount >= requiredAmount) ? ChatColor.GREEN : ChatColor.RED).toString();
-
-            String itemName = lookup.getLocale(customItem.getDisplayNameLocale());
-
-            String lore = lookup.getLocale(costsItemLocale, prefix + requiredAmount, prefix + itemName);
-            display = InventoryUtils.addLore(display, lore);
-        }
-
-        for (Map.Entry<ItemStack, Calculator> itemToAmount : itemCosts.entrySet()) {
-            int requiredAmount = (int) itemToAmount.getValue().calculate(event.getUser().getUserVariables());
-            if(requiredAmount <= 0) continue;
-
-            boolean hasAmount = inventory.containsAtLeast(itemToAmount.getKey(), requiredAmount);
-
-            String prefix = (hasAmount ? ChatColor.GREEN : ChatColor.RED).toString();
-
-            String itemName = InventoryUtils.getItemStackDefaultName(itemToAmount.getKey());
-
-            String lore = lookup.getLocale(costsItemLocale, prefix + requiredAmount, prefix + itemName);
-            display = InventoryUtils.addLore(display, lore);
-        }
-
-
-        event.setDisplay(display);
-    }
-
-    public int getCost(User user) {
-        return (int) cost.calculate(user.getUserVariables());
-    }
-
     @Override
     public void onClick(UserClickItemEvent event) {
         BuyablePurchaseHandler handler = new BuyablePurchaseHandler(this, event);
         User user = event.getUser();
 
         //Check if we have the money to afford the purchase
-        if(!handler.checkHasMoney()) {
+        if (!handler.checkHasMoney()) {
             //We don't have the money
-            if(handler.isTeamPurchase()) {
+            if (handler.isTeamPurchase()) {
                 user.sendLocale(teamNoMoneyLocale);
             } else {
                 user.sendLocale(userNoMoneyLocale);
@@ -243,20 +157,36 @@ public abstract class Buyable extends ClickableItem {
             return;
         }
 
-        if (!onPurchase(purchaseEvent)) return;
-
-        doUpgradesOnBuy(user);
-
         //charge the user the money required
-        handler.chargeMoney();
+        handler.chargeMoney(/*success*/() -> {
+            if (!onPurchase(purchaseEvent)) {
+                handler.refundMoney();
+                return;
+            }
 
-        if(handler.chargeItems()) {
-            user.sendLocale(itemsTakenLocale);
-        }
+            doUpgradesOnBuy(user);
 
-        user.playSound(user.getLocation(), new SoundEffect(NamedSounds.fromName("ENTITY_BLAZE_HURT"), 1.0f, 1.0f));
+            if (handler.chargeItems()) {
+                user.sendLocale(itemsTakenLocale);
+            }
 
-        user.redoInventory();
+            user.playSound(user.getLocation(), new SoundEffect(NamedSounds.fromName("ENTITY_BLAZE_HURT"), 1.0f, 1.0f));
+
+            user.redoInventory();
+
+        }, /*failure*/() -> {
+            //Tell the user they couldn't afford the item
+            user.sendLocale(userNoMoneyLocale);
+        });
+
+    }
+
+    /**
+     * @param user Check if this item is available to buy for this user
+     * @return If the item is available for the user
+     */
+    public boolean isAvailable(User user) {
+        return canBuy.calculateBoolean(user.getUserVariables());
     }
 
     public abstract boolean onPurchase(BuyablePurchaseEvent event);
@@ -265,6 +195,94 @@ public abstract class Buyable extends ClickableItem {
         for (Map.Entry<String, Calculator> upgrades : upgradeOnBuy.entrySet()) {
             user.setUserVariable(upgrades.getKey(), (int) upgrades.getValue().calculate(user.getUserVariables()));
         }
+    }
+
+    private void addMoneyCostLore(CalculateItemForUserEvent event) {
+        Money userMoney = Money.getOrCreate(event.getUser());
+
+        BigDecimal cost = getCost(event.getUser());
+        if (cost.compareTo(BigDecimal.ZERO) <= 0) return;
+        boolean hasMoney = true;
+
+        boolean team = this.team.calculateBoolean(event.getUser().getUserVariables());
+
+        if (team) {
+            Money teamMoney = Money.getOrCreate(event.getUser().getTeam());
+            if (userMoney.getMoney() + teamMoney.getMoney() < cost.intValue()) hasMoney = false;
+        } else if (!userMoney.hasMoney(cost.intValue())) hasMoney = false;
+
+        String costString = (hasMoney ? ChatColor.GREEN : ChatColor.RED) + cost.toString();
+        LanguageLookup lookup = event.getUser().getLanguageLookup();
+
+        ItemStack display = event.getDisplay();
+
+        if (team) {
+            display = InventoryUtils.addLore(display, lookup.getLocale(teamDescriptionLocale, costString));
+        } else {
+            display = InventoryUtils.addLore(display, lookup.getLocale(userDescriptionLocale, costString));
+        }
+
+        event.setDisplay(display);
+    }
+
+    private void addItemCostLore(CalculateItemForUserEvent event) {
+        if (itemCosts.isEmpty() && customItemCosts.isEmpty()) return;
+
+        ItemStack display = event.getDisplay();
+        LanguageLookup lookup = event.getUser().getLanguageLookup();
+
+        BigDecimal moneyCost = getCost(event.getUser());
+
+        if (moneyCost.compareTo(BigDecimal.ZERO) > 0) {
+            display = InventoryUtils.addLore(display, lookup.getLocale(extraCostsLocale));
+        } else {
+            display = InventoryUtils.addLore(display, lookup.getLocale(extraCostsOnlyLocale));
+        }
+
+        PlayerInventory inventory = event.getUser().getInventory();
+
+        for (Map.Entry<String, Calculator> customItemToAmount : customItemCosts.entrySet()) {
+            int requiredAmount = (int) customItemToAmount.getValue().calculate(event.getUser().getUserVariables());
+            if (requiredAmount <= 0) continue;
+
+            CustomItem customItem = event.getGameGroup().getCustomItem(customItemToAmount.getKey());
+
+            int userAmount = InventoryUtils.getAmountOfItemsWithIdentifier(inventory, customItem.getIdentifier());
+
+            String prefix = ((userAmount >= requiredAmount) ? ChatColor.GREEN : ChatColor.RED).toString();
+
+            String itemName = lookup.getLocale(customItem.getDisplayNameLocale());
+
+            String lore = lookup.getLocale(costsItemLocale, prefix + requiredAmount, prefix + itemName);
+            display = InventoryUtils.addLore(display, lore);
+        }
+
+        for (Map.Entry<ItemStack, Calculator> itemToAmount : itemCosts.entrySet()) {
+            int requiredAmount = (int) itemToAmount.getValue().calculate(event.getUser().getUserVariables());
+            if (requiredAmount <= 0) continue;
+
+            boolean hasAmount = inventory.containsAtLeast(itemToAmount.getKey(), requiredAmount);
+
+            String prefix = (hasAmount ? ChatColor.GREEN : ChatColor.RED).toString();
+
+            String itemName = InventoryUtils.getItemStackDefaultName(itemToAmount.getKey());
+
+            String lore = lookup.getLocale(costsItemLocale, prefix + requiredAmount, prefix + itemName);
+            display = InventoryUtils.addLore(display, lore);
+        }
+
+
+        event.setDisplay(display);
+    }
+
+    public BigDecimal getCost(User user) {
+        Currency currency = getCurrency(user);
+
+        return cost.calculateDecimal(user.getUserVariables(), new MathContext(currency.getDecimalPlaces()));
+    }
+
+    public Currency getCurrency(User user) {
+        return user.getEconomyAccount().lookupCurrency(currency);
     }
 
 }

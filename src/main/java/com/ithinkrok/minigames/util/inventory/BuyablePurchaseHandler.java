@@ -5,12 +5,18 @@ import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
 import com.ithinkrok.minigames.util.metadata.Money;
+import com.ithinkrok.msm.common.economy.Currency;
+import com.ithinkrok.msm.common.economy.result.Balance;
+import com.ithinkrok.msm.common.economy.result.TransactionResult;
+import com.ithinkrok.util.NullReplacements;
 import com.ithinkrok.util.math.Calculator;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 class BuyablePurchaseHandler {
 
@@ -19,7 +25,7 @@ class BuyablePurchaseHandler {
     Map<String, Integer> customItemAmounts = new HashMap<>();
     Map<ItemStack, Integer> itemAmounts = new HashMap<>();
 
-    int cost;
+    BigDecimal cost;
     Money userMoney;
     Money teamMoney;
 
@@ -27,6 +33,9 @@ class BuyablePurchaseHandler {
     User user;
 
     Buyable item;
+
+    BigDecimal amountChargedToTeam, amountChargedToUser;
+    private Currency currency;
 
     public BuyablePurchaseHandler(Buyable item, UserClickItemEvent event) {
         this.item = item;
@@ -49,9 +58,18 @@ class BuyablePurchaseHandler {
         if (isTeamPurchase) {
             teamMoney = Money.getOrCreate(user.getTeam());
 
-            return cost <= userMoney.getMoney() + teamMoney.getMoney();
+            return cost.intValue() <= userMoney.getMoney() + teamMoney.getMoney();
         } else {
-            return userMoney.hasMoney(cost);
+            currency = item.getCurrency(user);
+
+            Optional<Balance> balance = user.getEconomyAccount().getBalance(currency);
+
+            if(balance.isPresent()) {
+                return cost.compareTo(balance.get().getAmount()) <= 0;
+            } else {
+                //We don't know if the user has the money, so lets assume they do (check later)
+                return true;
+            }
         }
 
     }
@@ -69,20 +87,48 @@ class BuyablePurchaseHandler {
         return missingItems;
     }
 
-    public void chargeMoney() {
-        if (cost > 0) {
+    public void chargeMoney(Runnable success, Runnable failure) {
+        if (cost.compareTo(BigDecimal.ZERO) > 0) {
             if (isTeamPurchase) {
-                int teamAmount = Math.min(cost, teamMoney.getMoney());
-                int userAmount = cost - teamAmount;
+                //Use old API for team purchase
+                int teamAmount = Math.min(cost.intValue(), teamMoney.getMoney());
+                int userAmount = cost.intValue() - teamAmount;
 
                 if (teamAmount > 0) teamMoney.subtractMoney(teamAmount, true);
                 if (userAmount > 0) {
                     userMoney.subtractMoney(userAmount, true);
                     user.sendLocale(item.userPayTeamLocale, userAmount);
                 }
+
+                amountChargedToTeam = BigDecimal.valueOf(teamAmount);
+                amountChargedToUser = BigDecimal.valueOf(userAmount);
+
+                success.run();
             } else {
-                userMoney.subtractMoney(cost, true);
+                //Use new API
+
+                amountChargedToTeam = BigDecimal.ZERO;
+                amountChargedToUser = cost;
+
+                user.getEconomyAccount().withdraw(currency, cost, "buyable purchase", result -> {
+                    if(result.getTransactionResult() == TransactionResult.SUCCESS) {
+                        user.doInFuture(task -> success.run());
+                    } else {
+                        user.doInFuture(task -> failure.run());
+                    }
+                });
             }
+        }
+    }
+
+
+    public void refundMoney() {
+        if(isTeamPurchase) {
+            teamMoney.addMoney(amountChargedToTeam.intValue(), true);
+            userMoney.addMoney(amountChargedToUser.intValue(), true);
+        } else {
+            user.getEconomyAccount().deposit(currency, amountChargedToUser, "buyable refund",
+                                             NullReplacements.nullConsumer());
         }
     }
 
