@@ -6,11 +6,16 @@ import com.ithinkrok.minigames.api.command.MinigamesCommandSender;
 import com.ithinkrok.minigames.api.event.MinigamesCommandEvent;
 import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.team.Team;
+import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.util.metadata.Money;
+import com.ithinkrok.msm.common.economy.Account;
+import com.ithinkrok.msm.common.economy.Currency;
+import com.ithinkrok.msm.common.economy.result.Balance;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
 import com.ithinkrok.util.math.ExpressionCalculator;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 public class DebugCommand implements CustomListener {
@@ -24,6 +29,76 @@ public class DebugCommand implements CustomListener {
         addSubExecutor("kit", "mg.base.debug.kit", this::kitCommand);
         addSubExecutor("money", "mg.base.debug.money", this::moneyCommand);
         addSubExecutor("customlist", "mg.base.debug.customlist", this::customListCommand);
+        addSubExecutor("econ", "mg.base.debug.econ", this::econCommand);
+    }
+
+    private boolean econCommand(MinigamesCommandSender sender, MinigamesCommand command) {
+        if(!command.requireArgumentCount(sender, 1)) return false;
+        if(!command.requireUser(sender)) return false;
+
+        User user = command.getUser();
+
+        String currencyName = command.getStringArg(0, null);
+        Account account = user.getEconomyAccount();
+        Currency currency = account.lookupCurrency(currencyName);
+
+        if(currency == null) {
+            sender.sendLocale("command.debug.econ.unknown", currencyName);
+            return true;
+        }
+
+        sender.sendLocale("command.debug.econ.title", currencyName);
+        sender.sendLocale("command.debug.econ.type", currency.getCurrencyType());
+        sender.sendLocale("command.debug.econ.names", currency.getFormattedName());
+        sender.sendLocale("command.debug.econ.decimals", currency.getDecimalPlaces());
+
+        Optional<Balance> optBalance = account.getBalance(currency);
+        if(optBalance.isPresent()) {
+            sender.sendLocale("command.debug.econ.optbalance.present",
+                              currency.format(optBalance.get().getAmount()));
+        } else {
+            sender.sendLocale("command.debug.econ.optbalance.notpresent");
+        }
+
+        BigDecimal nonFinalChange = BigDecimal.ZERO;
+
+        if(command.hasArg(1)) {
+            nonFinalChange = new BigDecimal(command.getStringArg(1, null));
+        }
+
+        BigDecimal change = nonFinalChange;
+
+        account.getBalance(currency, balance -> {
+            sender.sendLocale("command.debug.econ.balance",
+                              currency.format(balance.getAmount()));
+
+            int compare = change.compareTo(BigDecimal.ZERO);
+            if(compare > 0) {
+                account.deposit(currency, change, "debug econ deposit", result -> {
+                    if(result == null) {
+                        sender.sendLocale("command.debug.econ.nullresult");
+                        return;
+                    }
+
+                    sender.sendLocale("command.debug.econ.deposit",
+                                      result.getTransactionResult(),
+                                      currency.format(result.getBalanceChange().getNewBalance()));
+                });
+            } else if(compare < 0) {
+                account.withdraw(currency, change.negate(), "debug econ withdraw", result -> {
+                    if(result == null) {
+                        sender.sendLocale("command.debug.econ.nullresult");
+                        return;
+                    }
+
+                    sender.sendLocale("command.debug.econ.withdraw",
+                                      result.getTransactionResult(),
+                                      currency.format(result.getBalanceChange().getNewBalance()));
+                });
+            }
+        });
+
+        return true;
     }
 
     protected void addSubExecutor(String name, String permission, SubCommandExecutor executor) {
