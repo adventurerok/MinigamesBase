@@ -16,10 +16,17 @@ public class CalculateItemForUserEvent extends BaseUserEvent {
 
     private ItemStack display;
 
+    /**
+     * @return The item to display in the inventory. Null indicates that this item should be hidden in the shop
+     */
     public ItemStack getDisplay() {
         return display;
     }
 
+    /**
+     *
+     * @param display The item to display in the inventory. Setting this to null will hide the item in the inventory
+     */
     public void setDisplay(ItemStack display) {
         this.display = display;
     }

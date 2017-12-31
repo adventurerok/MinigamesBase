@@ -19,9 +19,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -107,9 +105,8 @@ public abstract class Buyable extends ClickableItem {
     @Override
     public void onCalculateItem(CalculateItemForUserEvent event) {
         if (event.getDisplay() == null) return;
-        BuyablePurchaseEvent purchaseEvent = new BuyablePurchaseEvent(event.getUser(), event.getInventory(), this);
 
-        if (!canBuy(purchaseEvent)) {
+        if (!isAvailable(event.getUser())) {
             event.setDisplay(null);
             return;
         }
@@ -118,8 +115,13 @@ public abstract class Buyable extends ClickableItem {
         addItemCostLore(event);
     }
 
-    public boolean canBuy(BuyablePurchaseEvent event) {
-        return canBuy.calculateBoolean(event.getUser().getUserVariables());
+    /**
+     *
+     * @param user Check if this item is available to buy for this user
+     * @return If the item is available for the user
+     */
+    public boolean isAvailable(User user) {
+        return canBuy.calculateBoolean(user.getUserVariables());
     }
 
     private void addMoneyCostLore(CalculateItemForUserEvent event) {
@@ -272,7 +274,7 @@ public abstract class Buyable extends ClickableItem {
         //Try and buy
         BuyablePurchaseEvent purchaseEvent = new BuyablePurchaseEvent(user, event.getInventory(), this);
 
-        if (!canBuy(purchaseEvent)) {
+        if (!isAvailable(user)) {
             user.sendLocale(cannotBuyLocale);
             user.redoInventory();
             return;

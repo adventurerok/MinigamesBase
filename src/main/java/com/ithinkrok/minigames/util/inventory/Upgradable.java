@@ -2,6 +2,7 @@ package com.ithinkrok.minigames.util.inventory;
 
 import com.ithinkrok.minigames.api.inventory.event.CalculateItemForUserEvent;
 import com.ithinkrok.minigames.api.item.CustomItem;
+import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
 import com.ithinkrok.util.math.MapVariables;
 import com.ithinkrok.minigames.util.inventory.event.BuyablePurchaseEvent;
@@ -66,9 +67,9 @@ public class Upgradable extends Buyable {
 
 
     @Override
-    public boolean canBuy(BuyablePurchaseEvent event) {
-        if(!super.canBuy(event)) return false;
-        double level = event.getUser().getUserVariable(upgradeName) + 1;
+    public boolean isAvailable(User user) {
+        if(!super.isAvailable(user)) return false;
+        double level = user.getUserVariable(upgradeName) + 1;
 
         return minLevel <= level && maxLevel >= level;
     }
