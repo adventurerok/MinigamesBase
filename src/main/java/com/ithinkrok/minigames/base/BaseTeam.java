@@ -12,6 +12,8 @@ import com.ithinkrok.minigames.api.task.TaskList;
 import com.ithinkrok.minigames.api.team.Team;
 import com.ithinkrok.minigames.api.team.TeamIdentifier;
 import com.ithinkrok.minigames.api.user.User;
+import com.ithinkrok.msm.common.economy.Account;
+import com.ithinkrok.msm.common.economy.EconomyAccount;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
@@ -41,10 +43,12 @@ public class BaseTeam implements Listener, Team {
     private final ClassToInstanceMap<Metadata> metadataMap = MutableClassToInstanceMap.create();
     private final TaskList teamTaskList = new TaskList();
     private final Collection<CustomListener> listeners = new ArrayList<>();
+    private final EconomyAccount economyAccount;
 
     public BaseTeam(TeamIdentifier teamIdentifier, BaseGameGroup gameGroup) {
         this.teamIdentifier = teamIdentifier;
         this.gameGroup = gameGroup;
+        this.economyAccount = new EconomyAccount(gameGroup.getEconomy(), uuid);
 
         listeners.add(new TeamListener());
     }
@@ -134,6 +138,11 @@ public class BaseTeam implements Listener, Team {
     @Override
     public UUID getUuid() {
         return uuid;
+    }
+
+    @Override
+    public Account getEconomyAccount() {
+        return economyAccount;
     }
 
     @Override

@@ -36,6 +36,8 @@ import com.ithinkrok.minigames.api.util.SoundEffect;
 import com.ithinkrok.minigames.api.util.disguise.Disguise;
 import com.ithinkrok.minigames.base.util.playerstate.PlayerState;
 import com.ithinkrok.msm.bukkit.util.PlayerMessageSender;
+import com.ithinkrok.msm.common.economy.Account;
+import com.ithinkrok.msm.common.economy.EconomyAccount;
 import com.ithinkrok.msm.common.message.ConfigMessageFactory;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.JsonConfigIO;
@@ -102,6 +104,8 @@ public class BaseUser implements Listener, User {
     private ClickableInventory openInventory;
     private Collection<CustomListener> kitListeners = new ArrayList<>();
 
+    private Account economyAccount;
+
     private Vector inventoryTether;
     private boolean spectator;
 
@@ -112,6 +116,7 @@ public class BaseUser implements Listener, User {
         this.team = team;
         this.uuid = uuid;
         this.entity = entity;
+        this.economyAccount = new EconomyAccount(gameGroup.getEconomy(), uuid);
 
         this.name = entity.getName();
         listeners.add(new UserListener());
@@ -1483,6 +1488,11 @@ public class BaseUser implements Listener, User {
     @Override
     public Collection<CustomListener> getListeners() {
         return listeners;
+    }
+
+    @Override
+    public Account getEconomyAccount() {
+        return economyAccount;
     }
 
 

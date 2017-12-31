@@ -8,6 +8,7 @@ import com.ithinkrok.minigames.api.metadata.MetadataHolder;
 import com.ithinkrok.minigames.api.task.TaskScheduler;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.user.UserResolver;
+import com.ithinkrok.msm.common.economy.Account;
 import com.ithinkrok.util.event.CustomListener;
 import com.ithinkrok.util.lang.LanguageLookup;
 import com.ithinkrok.util.lang.Messagable;
@@ -56,5 +57,7 @@ public interface Team
      * @return A UUID to uniquely identify this team (e.g. for an economy account)
      */
     UUID getUuid();
+
+    Account getEconomyAccount();
 
 }
