@@ -8,7 +8,11 @@ import com.ithinkrok.minigames.api.metadata.MetadataHolder;
 import com.ithinkrok.minigames.api.metadata.UserMetadata;
 import com.ithinkrok.minigames.api.team.Team;
 import com.ithinkrok.minigames.api.user.User;
+import com.ithinkrok.msm.common.economy.Account;
+import com.ithinkrok.msm.common.economy.result.Balance;
 import com.ithinkrok.util.config.Config;
+
+import java.util.Optional;
 
 /**
  * Created by paul on 05/01/16.
@@ -19,7 +23,7 @@ public abstract class Money extends UserMetadata {
     protected String addMoneyLocale;
     protected String subtractMoneyLocale;
     protected String newMoneyLocale;
-    protected int money;
+
 
     public static Money getOrCreate(MetadataHolder<? super UserMetadata> holder) {
         if (holder.hasMetadata(Money.class)) return holder.getMetadata(Money.class);
@@ -44,12 +48,20 @@ public abstract class Money extends UserMetadata {
         newMoneyLocale = config.getString("new_locale", "money.balance." + type + ".new");
     }
 
+    protected abstract Account getAccount();
+
     public int getMoney() {
-        return money;
+        Optional<Balance> bal = getAccount().getBalance("game");
+
+        if(bal.isPresent()) {
+            return bal.get().getAmountAsInt();
+        } else {
+            return 0;
+        }
     }
 
     public boolean hasMoney(int amount) {
-        return money >= amount;
+        return getMoney() >= amount;
     }
 
     public abstract void addMoney(int amount, boolean message);
