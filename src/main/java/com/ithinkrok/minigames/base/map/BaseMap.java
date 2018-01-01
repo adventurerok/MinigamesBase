@@ -148,7 +148,7 @@ public class BaseMap implements GameMap, ConfigHolder {
     }
 
     @Override
-    public World getWorld() {
+    public World getDefaultWorld() {
         return world;
     }
 

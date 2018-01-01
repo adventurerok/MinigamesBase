@@ -169,7 +169,7 @@ public class GameBukkitListener implements Listener {
         if (gameGroup == null) return;
 
         GameMap map = gameGroup.getCurrentMap();
-        if (!map.getWorld().getName().equals(mapName))
+        if (!map.getDefaultWorld().getName().equals(mapName))
             throw new RuntimeException("Map still registered to old GameGroup");
 
         gameGroup.gameEvent(new MapBlockBreakNaturallyEvent(gameGroup, map, event));
@@ -209,7 +209,7 @@ public class GameBukkitListener implements Listener {
         if (gameGroup == null) return;
 
         GameMap map = gameGroup.getCurrentMap();
-        if (!map.getWorld().getName().equals(mapName))
+        if (!map.getDefaultWorld().getName().equals(mapName))
             throw new RuntimeException("Map still registered to old GameGroup");
 
         gameGroup.gameEvent(new MapItemSpawnEvent(gameGroup, map, event));
@@ -222,7 +222,7 @@ public class GameBukkitListener implements Listener {
         if (gameGroup == null) return;
 
         GameMap map = gameGroup.getCurrentMap();
-        if (!map.getWorld().getName().equals(mapName))
+        if (!map.getDefaultWorld().getName().equals(mapName))
             throw new RuntimeException("Map still registered to old GameGroup");
 
         gameGroup.gameEvent(new MapCreatureSpawnEvent(gameGroup, map, event));
@@ -235,7 +235,7 @@ public class GameBukkitListener implements Listener {
         if (gameGroup == null) return;
 
         GameMap map = gameGroup.getCurrentMap();
-        if (!map.getWorld().getName().equals(mapName))
+        if (!map.getDefaultWorld().getName().equals(mapName))
             throw new RuntimeException("Map still registered to old GameGroup");
 
         gameGroup.gameEvent(new MapEntityTargetEvent(gameGroup, map, event));
@@ -251,7 +251,7 @@ public class GameBukkitListener implements Listener {
         if (EntityUtils.getActualUser(gameGroup, event.getEntity()) != null) return;
 
         GameMap map = gameGroup.getCurrentMap();
-        if (!map.getWorld().getName().equals(mapName))
+        if (!map.getDefaultWorld().getName().equals(mapName))
             throw new RuntimeException("Map still registered to old GameGroup");
 
         gameGroup.gameEvent(new MapEntityDeathEvent(gameGroup, map, event));
@@ -269,7 +269,7 @@ public class GameBukkitListener implements Listener {
             gameGroup.userEvent(new UserRegainHealthEvent(user, event));
         } else {
             GameMap map = gameGroup.getCurrentMap();
-            if (!map.getWorld().getName().equals(mapName))
+            if (!map.getDefaultWorld().getName().equals(mapName))
                 throw new RuntimeException("Map still registered to old GameGroup");
 
             gameGroup.gameEvent(new BaseMapEntityRegenHealthEvent(gameGroup, map, event));
@@ -286,7 +286,7 @@ public class GameBukkitListener implements Listener {
         if (EntityUtils.getActualUser(gameGroup, event.getEntity()) != null) return;
 
         GameMap map = gameGroup.getCurrentMap();
-        if (!map.getWorld().getName().equals(mapName))
+        if (!map.getDefaultWorld().getName().equals(mapName))
             throw new RuntimeException("Map still registered to old GameGroup");
 
         gameGroup.gameEvent(new MapProjectileLaunchEvent(gameGroup, map, event));
@@ -299,7 +299,7 @@ public class GameBukkitListener implements Listener {
         if (gameGroup == null) return;
 
         GameMap map = gameGroup.getCurrentMap();
-        if (!map.getWorld().getName().equals(mapName))
+        if (!map.getDefaultWorld().getName().equals(mapName))
             throw new RuntimeException("Map still registered to old GameGroup");
 
         gameGroup.gameEvent(new MapBlockIgniteEvent(gameGroup, map, event));
@@ -312,7 +312,7 @@ public class GameBukkitListener implements Listener {
         if (gameGroup == null) return;
 
         GameMap map = gameGroup.getCurrentMap();
-        if (!map.getWorld().getName().equals(mapName))
+        if (!map.getDefaultWorld().getName().equals(mapName))
             throw new RuntimeException("Map still registered to old GameGroup");
 
         gameGroup.gameEvent(new MapEntityExplodeEvent(gameGroup, map, event));

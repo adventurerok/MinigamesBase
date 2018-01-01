@@ -41,7 +41,7 @@ public abstract class InfoSign implements CustomListener {
         int y = config.getInt("y");
         int z = config.getInt("z");
 
-        location = new Location(gameGroup.getCurrentMap().getWorld(), x, y, z);
+        location = new Location(gameGroup.getCurrentMap().getDefaultWorld(), x, y, z);
 
         updateFrequency = config.getInt("update_freq");
     }

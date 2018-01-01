@@ -12,7 +12,6 @@ import com.ithinkrok.minigames.api.event.user.game.*;
 import com.ithinkrok.minigames.api.event.user.inventory.UserInventoryClickEvent;
 import com.ithinkrok.minigames.api.event.user.inventory.UserInventoryCloseEvent;
 import com.ithinkrok.minigames.api.event.user.inventory.UserInventoryUpdateEvent;
-import com.ithinkrok.minigames.api.event.user.inventory.UserItemHeldEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.api.inventory.ClickableInventory;
 import com.ithinkrok.minigames.api.item.CombatMode;
@@ -51,7 +50,6 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.*;
@@ -970,10 +968,10 @@ public class BaseUser implements Listener, User {
     @Override
     @SuppressWarnings("unchecked")
     public boolean teleport(Location location) {
-        if (getMap() != null && !getMap().getWorld().getName().equals(location.getWorld().getName())) {
+        if (getMap() != null && !getMap().getDefaultWorld().getName().equals(location.getWorld().getName())) {
             try {
                 String message = "tried to teleport user " + name + " to another Bukkit world: game_map=" +
-                        getMap().getWorld().getName() + ", world=" + location.getWorld().getName();
+                                 getMap().getDefaultWorld().getName() + ", world=" + location.getWorld().getName();
 
                 throw new RuntimeException(message);
             } catch (RuntimeException e) {

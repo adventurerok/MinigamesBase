@@ -26,7 +26,10 @@ import java.util.Map;
  * Created by paul on 20/02/16.
  */
 public interface GameMap extends LanguageLookup, SchematicPaster.BoundsChecker, SharedObjectAccessor {
-    World getWorld();
+    @Deprecated
+    World getDefaultWorld();
+
+    World getWorld(String name);
 
     void addPastedSchematic(PastedSchematic schematic);
 
@@ -56,14 +59,21 @@ public interface GameMap extends LanguageLookup, SchematicPaster.BoundsChecker, 
 
     JSONBook getBook(String name);
 
+    @Deprecated
     Entity spawnEntity(Location location, EntityType type);
 
+    @Deprecated
     Location getLocation(Vector location);
 
+    @Deprecated
     Location getLocation(double x, double y, double z);
 
+    Location getLocation(MapPoint point);
+
+    @Deprecated
     Block getBlock(Vector location);
 
+    @Deprecated
     Block getBlock(int x, int y, int z);
 
     Location getSpawn();

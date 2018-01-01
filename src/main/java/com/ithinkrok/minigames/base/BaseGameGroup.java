@@ -248,7 +248,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
         usersInGroup.values().forEach(newMap::teleportUser);
 
-        game.setGameGroupForMap(this, newMap.getWorld().getName());
+        game.setGameGroupForMap(this, newMap.getDefaultWorld().getName());
 
         newMap.getCurrencies().forEach(this::addCurrency);
 
@@ -261,7 +261,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
         if (oldMap != null) {
             oldMap.unloadMap();
-            game.removeGameGroupForMap(oldMap.getWorld().getName());
+            game.removeGameGroupForMap(oldMap.getDefaultWorld().getName());
         }
 
         sendUpdatePayload();
@@ -602,7 +602,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     public void unload() {
         if (currentMap == null) return;
 
-        String mapName = currentMap.getWorld().getName();
+        String mapName = currentMap.getDefaultWorld().getName();
         currentMap.unloadMap();
         game.removeGameGroupForMap(mapName);
         currentMap = null;

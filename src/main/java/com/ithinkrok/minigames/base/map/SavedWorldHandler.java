@@ -36,7 +36,7 @@ public class SavedWorldHandler implements WorldHandler {
     public void unloadWorld(BaseMap map) {
         if(wasLoaded) return;
 
-        World world = map.getWorld();
+        World world = map.getDefaultWorld();
 
         if (!world.getPlayers().isEmpty()) System.out.println("There are still players in an unloading map!");
 
