@@ -5,6 +5,14 @@ lang_files:
 maps:
   hub: "hub/maps/hub.yml"
 
+commands:
+  debug:
+    description: "Various debug subcommands"
+    aliases: ["mgd", "mgdebug"]
+    permission: "mg.base.debug"
+    usage: "/<command> <custom/level/team/kit/money> [subcommandargs]"
+    class: "com.ithinkrok.minigames.util.command.DebugCommand"
+
 shared_objects:
   start_info:
     game_state: "hub"
