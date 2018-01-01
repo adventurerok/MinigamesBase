@@ -8,7 +8,8 @@ import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.item.IdentifierMap;
 import com.ithinkrok.minigames.api.map.GameMap;
 import com.ithinkrok.minigames.api.map.GameMapInfo;
-import com.ithinkrok.minigames.api.map.MapType;
+import com.ithinkrok.minigames.api.map.MapPoint;
+import com.ithinkrok.minigames.api.map.MapWorldInfo;
 import com.ithinkrok.minigames.api.schematic.PastedSchematic;
 import com.ithinkrok.minigames.api.schematic.Schematic;
 import com.ithinkrok.minigames.api.task.GameTask;
@@ -53,45 +54,61 @@ public class BaseMap implements GameMap, ConfigHolder {
     private final Map<String, CustomEntity> customEntityMap = new HashMap<>();
     private final HashMap<String, Config> sharedObjects = new HashMap<>();
     private final List<PastedSchematic> pastedSchematics = new ArrayList<>();
-    private final WorldHandler worldHandler;
 
-    private Map<String, Config> currencyConfigs = new HashMap<>();
 
-    private World world;
+
+    private final Map<String, Config> currencyConfigs = new HashMap<>();
+
+    private final Map<String, World> worlds = new HashMap<>();
+    private final Map<String, String> reverseWorldNames = new HashMap<>();
+    private final Map<String, WorldHandler> worldHandlers = new HashMap<>();
+
     private Location spawn;
 
 
     public BaseMap(BaseGameGroup gameGroup, GameMapInfo gameMapInfo) {
         this.gameMapInfo = gameMapInfo;
 
-        switch (gameMapInfo.getMapType()) {
-            case INSTANCE:
-                worldHandler = new InstanceWorldHandler();
-                break;
-            case SAVED:
-                worldHandler = new SavedWorldHandler();
-                break;
-            default:
-                throw new UnsupportedOperationException("Unsupported map type: " + gameMapInfo.getMapType());
-        }
-
-        loadMap(gameGroup);
+       loadMapWorlds(gameGroup);
 
         ConfigParser
                 .parseConfig(gameGroup, this, gameGroup, this, gameMapInfo.getConfigName(), gameMapInfo.getConfig());
 
     }
 
-    private void loadMap(GameGroup gameGroup) {
-        world = worldHandler.loadWorld(gameGroup, this);
-        spawn = world.getSpawnLocation();
+    private void loadMapWorlds(GameGroup gameGroup) {
+        for (MapWorldInfo worldInfo : getInfo().getWorlds().values()) {
 
-        configureWorld();
+            WorldHandler worldHandler;
+
+            switch (worldInfo.getMapType()) {
+                case INSTANCE:
+                    worldHandler = new InstanceWorldHandler();
+                    break;
+                case SAVED:
+                    worldHandler = new SavedWorldHandler();
+                    break;
+                default:
+                    throw new UnsupportedOperationException("Unsupported map type: " + worldInfo.getMapType());
+            }
+
+            worldHandlers.put(worldInfo.getName(), worldHandler);
+
+            World world = worldHandler.loadWorld(gameGroup, this, worldInfo);
+            worlds.put(worldInfo.getName(), world);
+            reverseWorldNames.put(world.getName(), worldInfo.getName());
+
+            configureWorld(world, worldInfo.getConfig());
+        }
+
+
+        //TODO a way to specify which world to use for spawn
+        spawn = worlds.values().iterator().next().getSpawnLocation();
     }
 
 
-    private void configureWorld() {
-        Config config = gameMapInfo.getConfig();
+    private void configureWorld(World world, Config config) {
+
 
         if (config.contains("spawn")) {
             spawn = BukkitConfigUtils.getLocation(config, world, "spawn");
@@ -149,7 +166,18 @@ public class BaseMap implements GameMap, ConfigHolder {
 
     @Override
     public World getDefaultWorld() {
-        return world;
+        //TODO we are assuming there is a world called map
+        return worlds.get("map");
+    }
+
+    @Override
+    public World getWorld(String name) {
+        return worlds.get(name);
+    }
+
+    @Override
+    public MapWorldInfo getWorldInfo(World world) {
+        return getInfo().getWorlds().get(reverseWorldNames.get(world.getName()));
     }
 
     @Override
@@ -200,12 +228,15 @@ public class BaseMap implements GameMap, ConfigHolder {
 
         pastedSchematics.forEach(PastedSchematic::removed);
 
-        worldHandler.unloadWorld(this);
+        for (Map.Entry<String, World> worldEntry : worlds.entrySet()) {
+            worldHandlers.get(worldEntry.getKey()).unloadWorld(worldEntry.getValue());
+        }
+
     }
 
     @Override
     public boolean teleportUser(User user) {
-        if (user.getLocation().getWorld().equals(world)) return true;
+        if (user.getLocation().getWorld().equals(getSpawn().getWorld())) return true;
         return user.teleport(getSpawn());
     }
 
@@ -231,18 +262,23 @@ public class BaseMap implements GameMap, ConfigHolder {
 
     @Override
     public Entity spawnEntity(Location location, EntityType type) {
-        return world.spawnEntity(location, type);
+        return location.getWorld().spawnEntity(location, type);
     }
 
     @Override
     public Location getLocation(Vector location) {
         if (location == null) return null;
-        return new Location(world, location.getX(), location.getY(), location.getZ());
+        return new Location(getDefaultWorld(), location.getX(), location.getY(), location.getZ());
     }
 
     @Override
     public Location getLocation(double x, double y, double z) {
-        return new Location(world, x, y, z);
+        return new Location(getDefaultWorld(), x, y, z);
+    }
+
+    @Override
+    public Location getLocation(MapPoint point) {
+        return null;
     }
 
     @Override
@@ -252,17 +288,12 @@ public class BaseMap implements GameMap, ConfigHolder {
 
     @Override
     public Block getBlock(int x, int y, int z) {
-        return world.getBlockAt(x, y, z);
+        return getDefaultWorld().getBlockAt(x, y, z);
     }
 
     @Override
     public Location getSpawn() {
         return spawn;
-    }
-
-    @Override
-    public MapType getMapType() {
-        return gameMapInfo.getMapType();
     }
 
     @Override

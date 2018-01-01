@@ -1,6 +1,8 @@
 package com.ithinkrok.minigames.base.map;
 
 import com.ithinkrok.minigames.api.GameGroup;
+import com.ithinkrok.minigames.api.map.GameMap;
+import com.ithinkrok.minigames.api.map.MapWorldInfo;
 import com.ithinkrok.minigames.base.util.io.DirectoryUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -20,9 +22,11 @@ public class InstanceWorldHandler implements WorldHandler {
     private Path ramdiskPath;
 
     @Override
-    public World loadWorld(GameGroup gameGroup, BaseMap map) {
-        String randomWorldName = getRandomWorldName(map.getInfo().getName());
-        Path copyFrom = gameGroup.getGame().getMapDirectory().resolve(map.getInfo().getMapFolder());
+    public World loadWorld(GameGroup gameGroup, GameMap map, MapWorldInfo info) {
+        String worldName = map.getInfo().getName() + "_" + info.getName();
+
+        String randomWorldName = getRandomWorldName(worldName);
+        Path copyFrom = gameGroup.getGame().getMapDirectory().resolve(info.getWorldFolder());
 
         boolean ramdisk = gameGroup.getGame().getRamdiskDirectory() != null;
         Path copyTo;
@@ -61,7 +65,7 @@ public class InstanceWorldHandler implements WorldHandler {
 
         WorldCreator creator = new WorldCreator(randomWorldName);
 
-        creator.environment(map.getInfo().getEnvironment());
+        creator.environment(info.getEnvironment());
 
         World world = creator.createWorld();
         world.setAutoSave(false);
@@ -80,9 +84,7 @@ public class InstanceWorldHandler implements WorldHandler {
     }
 
     @Override
-    public void unloadWorld(BaseMap map) {
-        World world = map.getDefaultWorld();
-
+    public void unloadWorld(World world) {
         if (!world.getPlayers().isEmpty()) System.out.println("There are still players in an unloading map!");
 
         for (Player player : world.getPlayers()) {

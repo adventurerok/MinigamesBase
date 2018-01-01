@@ -1,6 +1,8 @@
 package com.ithinkrok.minigames.base.map;
 
 import com.ithinkrok.minigames.api.GameGroup;
+import com.ithinkrok.minigames.api.map.GameMap;
+import com.ithinkrok.minigames.api.map.MapWorldInfo;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
@@ -14,15 +16,15 @@ public class SavedWorldHandler implements WorldHandler {
     boolean wasLoaded = true;
 
     @Override
-    public World loadWorld(GameGroup gameGroup, BaseMap map) {
-        World world = Bukkit.getServer().getWorld(map.getInfo().getMapFolder());
+    public World loadWorld(GameGroup gameGroup, GameMap map, MapWorldInfo info) {
+        World world = Bukkit.getServer().getWorld(info.getWorldFolder());
 
         if(world == null) {
             wasLoaded = false;
 
-            WorldCreator creator = new WorldCreator(map.getInfo().getMapFolder());
+            WorldCreator creator = new WorldCreator(info.getWorldFolder());
 
-            creator.environment(map.getInfo().getEnvironment());
+            creator.environment(info.getEnvironment());
 
             world = creator.createWorld();
         }
@@ -33,10 +35,8 @@ public class SavedWorldHandler implements WorldHandler {
     }
 
     @Override
-    public void unloadWorld(BaseMap map) {
+    public void unloadWorld(World world) {
         if(wasLoaded) return;
-
-        World world = map.getDefaultWorld();
 
         if (!world.getPlayers().isEmpty()) System.out.println("There are still players in an unloading map!");
 

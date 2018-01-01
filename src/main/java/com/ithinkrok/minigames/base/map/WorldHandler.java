@@ -1,6 +1,8 @@
 package com.ithinkrok.minigames.base.map;
 
 import com.ithinkrok.minigames.api.GameGroup;
+import com.ithinkrok.minigames.api.map.GameMap;
+import com.ithinkrok.minigames.api.map.MapWorldInfo;
 import org.bukkit.World;
 
 /**
@@ -8,7 +10,7 @@ import org.bukkit.World;
  */
 public interface WorldHandler {
 
-    World loadWorld(GameGroup gameGroup, BaseMap map);
+    World loadWorld(GameGroup gameGroup, GameMap map, MapWorldInfo info);
 
-    void unloadWorld(BaseMap map);
+    void unloadWorld(World world);
 }

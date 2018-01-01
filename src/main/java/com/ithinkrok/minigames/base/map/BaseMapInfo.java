@@ -2,13 +2,16 @@ package com.ithinkrok.minigames.base.map;
 
 import com.ithinkrok.minigames.api.map.GameMapInfo;
 import com.ithinkrok.minigames.api.map.MapType;
+import com.ithinkrok.minigames.api.map.MapWorldInfo;
 import com.ithinkrok.minigames.base.util.io.FileLoader;
 import com.ithinkrok.util.StringUtils;
 import com.ithinkrok.util.config.Config;
 import org.bukkit.World;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by paul on 01/01/16.
@@ -19,10 +22,23 @@ public class BaseMapInfo implements GameMapInfo {
     private final String configPath;
     private final Config config;
 
+    private final Map<String, MapWorldInfo> worlds = new HashMap<>();
+
     public BaseMapInfo(FileLoader fileLoader, String name, String configPath) {
         this.name = name;
         this.configPath = configPath;
         this.config = fileLoader.loadConfig(getConfigName());
+
+        if(config.contains("worlds")) {
+            Config worldConfigs = config.getConfigOrEmpty("worlds");
+
+            for (String worldName : worldConfigs.getKeys(false)) {
+                worlds.put(worldName, new MapWorldInfo(worldName, worldConfigs.getConfigOrNull(worldName)));
+            }
+
+        } else {
+            worlds.put("map", new MapWorldInfo("map", config));
+        }
     }
 
     @Override
@@ -41,18 +57,8 @@ public class BaseMapInfo implements GameMapInfo {
     }
 
     @Override
-    public boolean getWeatherEnabled() {
-        return config.getBoolean("enable_weather", true);
-    }
-
-    @Override
     public Config getConfig() {
         return config;
-    }
-
-    @Override
-    public String getMapFolder() {
-        return config.getString("folder");
     }
 
     @Override
@@ -70,15 +76,7 @@ public class BaseMapInfo implements GameMapInfo {
     }
 
     @Override
-    public World.Environment getEnvironment() {
-        String envName = config.getString("environment", "normal").toUpperCase();
-
-        return World.Environment.valueOf(envName);
+    public Map<String, MapWorldInfo> getWorlds() {
+        return worlds;
     }
-
-    @Override
-    public MapType getMapType() {
-        return MapType.valueOf(config.getString("type", "instance").toUpperCase());
-    }
-
 }

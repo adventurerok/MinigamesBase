@@ -75,7 +75,7 @@ public class GameBukkitListener implements Listener {
         GameGroup gameGroup = getGameGroup(event.getWorld());
         if (gameGroup == null) return;
 
-        if (gameGroup.getCurrentMap().getInfo().getWeatherEnabled()) return;
+        if (gameGroup.getCurrentMap().getWorldInfo(event.getWorld()).isWeatherEnabled()) return;
         event.setCancelled(true);
     }
 
