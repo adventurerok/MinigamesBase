@@ -15,7 +15,7 @@ public class MapPoint {
 
 
     public MapPoint(String world, double x, double y, double z, float yaw, float pitch) {
-        if(world == null) {
+        if (world == null) {
             throw new NullPointerException("World cannot be null");
         }
 
@@ -40,12 +40,12 @@ public class MapPoint {
      * Loads a MapPoint from a string representation.
      * The representation can have the world name at any position, or none for the default world name 'map'.
      * Numbers in order are: x, y, z, yaw, pitch
-     *
+     * <p>
      * e.g. 100,54,100,nether,45,45
      */
     public MapPoint(String stringRep) {
         String[] parts = stringRep.split(",");
-        if(parts.length < 3 || parts.length > 6) {
+        if (parts.length < 3 || parts.length > 6) {
             throw new IllegalArgumentException("Expected a string with 3-6 comma separated parts");
         }
 
@@ -63,7 +63,7 @@ public class MapPoint {
             }
         }
 
-        if(doublesIndex < 3) {
+        if (doublesIndex < 3) {
             throw new IllegalArgumentException("x, y and z were not specified");
         }
 
@@ -73,6 +73,15 @@ public class MapPoint {
         this.z = doubles[2];
         this.yaw = (float) doubles[3];
         this.pitch = (float) doubles[4];
+    }
+
+    public static MapPoint fromConfig(Config config, String path) {
+        if (config.isString(path)) {
+            return new MapPoint(config.getString(path));
+        } else if (config.isConfig(path)) {
+            return new MapPoint(config.getConfigOrNull(path));
+        } else throw new IllegalArgumentException("There is no MapPoint at location " + path + " in config " +
+                                                  config.toString());
     }
 
     public String getWorld() {
