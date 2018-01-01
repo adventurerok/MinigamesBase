@@ -46,6 +46,8 @@ command.debug.econ.balance=&6Balance (from async): &a%s
 command.debug.econ.deposit=&6Deposit: &b%s&6, new balance is: &a%s
 command.debug.econ.withdraw=&6Withdraw: &b%s&6, new balance is: &a%s
 command.debug.econ.nullresult=&cNull result!
+command.debug.load.failure=&cFailed to load config: %s
+command.debug.load.success=&aSuccess! Config loaded!
 
 #Global money messages
 money.transfer.too_expensive=&cYou do not have that amount of money

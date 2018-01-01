@@ -1,5 +1,6 @@
 package com.ithinkrok.minigames.util.command;
 
+import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.Kit;
 import com.ithinkrok.minigames.api.command.MinigamesCommand;
 import com.ithinkrok.minigames.api.command.MinigamesCommandSender;
@@ -7,15 +8,23 @@ import com.ithinkrok.minigames.api.event.MinigamesCommandEvent;
 import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.team.Team;
 import com.ithinkrok.minigames.api.user.User;
+import com.ithinkrok.minigames.base.util.io.ConfigHolder;
+import com.ithinkrok.minigames.base.util.io.ConfigParser;
+import com.ithinkrok.minigames.base.util.io.FileLoader;
 import com.ithinkrok.minigames.util.metadata.Money;
 import com.ithinkrok.msm.common.economy.Account;
 import com.ithinkrok.msm.common.economy.Currency;
 import com.ithinkrok.msm.common.economy.result.Balance;
+import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.config.MemoryConfig;
+import com.ithinkrok.util.config.YamlConfigIO;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
 import com.ithinkrok.util.math.ExpressionCalculator;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.util.*;
 
 public class DebugCommand implements CustomListener {
@@ -30,6 +39,34 @@ public class DebugCommand implements CustomListener {
         addSubExecutor("money", "mg.base.debug.money", this::moneyCommand);
         addSubExecutor("customlist", "mg.base.debug.customlist", this::customListCommand);
         addSubExecutor("econ", "mg.base.debug.econ", this::econCommand);
+        addSubExecutor("load", "mg.base.debug.load", this::loadCommand);
+    }
+
+    private boolean loadCommand(MinigamesCommandSender sender, MinigamesCommand command) {
+        if(!command.requireArgumentCount(sender, 1)) return false;
+        if(!command.requireGameGroup(sender)) return false;
+
+        String configName = command.getStringArg(0, null);
+
+        GameGroup gameGroup = command.getGameGroup();
+        Path configDirectory = gameGroup.getGame().getConfigDirectory();
+
+        Path configPath = configDirectory.resolve(configName);
+
+        try {
+            Config config = YamlConfigIO.loadToConfig(configPath, new MemoryConfig());
+
+            FileLoader loader = (FileLoader) gameGroup.getGame();
+            ConfigHolder holder = (ConfigHolder) gameGroup;
+
+            ConfigParser.parseConfig(loader, holder, gameGroup, gameGroup, configName, config);
+
+            sender.sendLocale("command.debug.load.success");
+        } catch (IOException e) {
+            sender.sendLocale("command.debug.load.failure", e.getMessage());
+        }
+
+        return true;
     }
 
     private boolean econCommand(MinigamesCommandSender sender, MinigamesCommand command) {
