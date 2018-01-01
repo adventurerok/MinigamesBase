@@ -278,7 +278,9 @@ public class BaseMap implements GameMap, ConfigHolder {
 
     @Override
     public Location getLocation(MapPoint point) {
-        return null;
+        World world = worlds.get(point.getWorld());
+
+        return new Location(world, point.getX(), point.getY(), point.getZ(), point.getYaw(), point.getPitch());
     }
 
     @Override

@@ -10,10 +10,11 @@ public class MapPoint {
      */
     private final String world;
 
-    private final double x, y, z, yaw, pitch;
+    private final double x, y, z;
+    private final float yaw, pitch;
 
 
-    public MapPoint(String world, double x, double y, double z, double yaw, double pitch) {
+    public MapPoint(String world, double x, double y, double z, float yaw, float pitch) {
         if(world == null) {
             throw new NullPointerException("World cannot be null");
         }
@@ -31,8 +32,8 @@ public class MapPoint {
         this.x = config.getDouble("x");
         this.y = config.getDouble("y");
         this.z = config.getDouble("z");
-        this.yaw = config.getDouble("yaw", 0);
-        this.pitch = config.getDouble("pitch", 0);
+        this.yaw = (float) config.getDouble("yaw", 0);
+        this.pitch = (float) config.getDouble("pitch", 0);
     }
 
     /**
@@ -70,8 +71,8 @@ public class MapPoint {
         this.x = doubles[0];
         this.y = doubles[1];
         this.z = doubles[2];
-        this.yaw = doubles[3];
-        this.pitch = doubles[4];
+        this.yaw = (float) doubles[3];
+        this.pitch = (float) doubles[4];
     }
 
     public String getWorld() {
@@ -104,5 +105,13 @@ public class MapPoint {
 
     public Vector getXYZ() {
         return new Vector(x, y, z);
+    }
+
+    public float getYaw() {
+        return yaw;
+    }
+
+    public float getPitch() {
+        return pitch;
     }
 }
