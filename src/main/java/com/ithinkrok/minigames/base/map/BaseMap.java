@@ -230,11 +230,6 @@ public class BaseMap implements GameMap, ConfigHolder {
     }
 
     @Override
-    public Entity spawnEntity(Vector location, EntityType type) {
-        return spawnEntity(getLocation(location), type);
-    }
-
-    @Override
     public Entity spawnEntity(Location location, EntityType type) {
         return world.spawnEntity(location, type);
     }

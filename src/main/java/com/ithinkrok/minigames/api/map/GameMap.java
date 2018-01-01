@@ -56,8 +56,6 @@ public interface GameMap extends LanguageLookup, SchematicPaster.BoundsChecker, 
 
     JSONBook getBook(String name);
 
-    Entity spawnEntity(Vector location, EntityType type);
-
     Entity spawnEntity(Location location, EntityType type);
 
     Location getLocation(Vector location);
