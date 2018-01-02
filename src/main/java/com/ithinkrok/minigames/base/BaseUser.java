@@ -958,15 +958,6 @@ public class BaseUser implements Listener, User {
     }
 
     @Override
-    public boolean teleport(Vector loc) {
-        Location target =
-                new Location(getLocation().getWorld(), loc.getX(), loc.getY(), loc.getZ(), getLocation().getYaw(),
-                             getLocation().getPitch());
-        return teleport(target);
-
-    }
-
-    @Override
     public boolean teleport(MapPoint point) {
         Location target = new Location(getMap().getWorld(point.getWorld()),
                                        point.getX(), point.getY(), point.getZ(),

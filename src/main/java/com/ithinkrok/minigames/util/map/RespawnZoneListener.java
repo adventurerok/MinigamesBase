@@ -3,6 +3,7 @@ package com.ithinkrok.minigames.util.map;
 import com.ithinkrok.minigames.api.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.api.event.user.state.UserDamagedEvent;
 import com.ithinkrok.minigames.api.event.user.state.UserDeathEvent;
+import com.ithinkrok.minigames.api.map.MapPoint;
 import com.ithinkrok.minigames.api.util.BoundingBox;
 import com.ithinkrok.minigames.api.util.MinigamesConfigs;
 import com.ithinkrok.msm.bukkit.util.BukkitConfigUtils;
@@ -88,7 +89,7 @@ public class RespawnZoneListener implements CustomListener {
 
         private final boolean doCancelledDamage;
 
-        private final Vector respawn;
+        private final MapPoint respawn;
 
         private final boolean resetStats;
 
@@ -103,7 +104,7 @@ public class RespawnZoneListener implements CustomListener {
                 }
             }
 
-            respawn = BukkitConfigUtils.getVector(config, "respawn");
+            respawn = MinigamesConfigs.getMapPoint(config, "respawn");
 
             doDeath = config.getBoolean("do_death", true);
 

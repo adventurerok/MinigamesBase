@@ -102,7 +102,7 @@ public class SpleefMinigame implements CustomListener {
     private class Arena {
         private final List<MapPoint> queueButtons;
         private final List<MapPoint> spawnLocations;
-        private final Vector exitLocation;
+        private final MapPoint exitLocation;
         private final BoundingBox snowBounds;
         private final int extraRadius;
 
@@ -112,7 +112,7 @@ public class SpleefMinigame implements CustomListener {
         public Arena(Config config) {
             queueButtons = MinigamesConfigs.getMapPointList(config, "queue_buttons");
             spawnLocations = MinigamesConfigs.getMapPointList(config, "spawn_locations");
-            exitLocation = BukkitConfigUtils.getVector(config, "exit_location");
+            exitLocation = MinigamesConfigs.getMapPoint(config, "exit_location");
             snowBounds = MinigamesConfigs.getBounds(config, "snow");
             extraRadius = config.getInt("extra_radius");
         }

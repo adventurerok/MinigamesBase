@@ -158,9 +158,6 @@ public interface User
 
     UUID getUuid();
 
-    @Deprecated
-    boolean teleport(Vector loc);
-
     boolean teleport(Location location);
 
     boolean teleport(MapPoint point);
