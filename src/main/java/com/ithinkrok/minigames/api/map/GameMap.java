@@ -26,6 +26,9 @@ import java.util.Map;
  * Created by paul on 20/02/16.
  */
 public interface GameMap extends LanguageLookup, SchematicPaster.BoundsChecker, SharedObjectAccessor {
+
+    String DEFAULT_WORLD_NAME = "map";
+
     @Deprecated
     World getDefaultWorld();
 

@@ -14,6 +14,10 @@ public class MapPoint {
     private final float yaw, pitch;
 
 
+    public MapPoint(String world, double x, double y, double z) {
+        this(world, x, y, z, Float.NaN, Float.NaN);
+    }
+
     public MapPoint(String world, double x, double y, double z, float yaw, float pitch) {
         if (world == null) {
             throw new NullPointerException("World cannot be null");
@@ -28,7 +32,7 @@ public class MapPoint {
     }
 
     public MapPoint(Config config) {
-        this.world = config.getString("world", "map");
+        this.world = config.getString("world", GameMap.DEFAULT_WORLD_NAME);
         this.x = config.getDouble("x");
         this.y = config.getDouble("y");
         this.z = config.getDouble("z");
@@ -49,7 +53,7 @@ public class MapPoint {
             throw new IllegalArgumentException("Expected a string with 3-6 comma separated parts");
         }
 
-        String name = "map";
+        String name = GameMap.DEFAULT_WORLD_NAME;
         double[] doubles = new double[5];
         doubles[4] = doubles[3] = Double.NaN;
         int doublesIndex = 0;

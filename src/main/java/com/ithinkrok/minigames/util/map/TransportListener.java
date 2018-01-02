@@ -3,6 +3,7 @@ package com.ithinkrok.minigames.util.map;
 import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.api.map.GameMap;
+import com.ithinkrok.minigames.api.map.MapPoint;
 import com.ithinkrok.minigames.api.task.GameTask;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.BoundingBox;
@@ -57,6 +58,8 @@ public class TransportListener implements CustomListener {
 
     private static class Transport {
 
+        String world;
+
         BoundingBox bounds;
 
         Calculator xCalc, yCalc, zCalc;
@@ -73,6 +76,7 @@ public class TransportListener implements CustomListener {
 
         public Transport(Config config) {
             bounds = MinigamesConfigs.getBounds(config, "bounds");
+            world = config.getString("world", GameMap.DEFAULT_WORLD_NAME);
 
             velocity = config.getBoolean("velocity");
 
@@ -117,13 +121,11 @@ public class TransportListener implements CustomListener {
 
                 user.setVelocity(velocity);
             } else {
-                Vector position = new Vector();
+                double x = xCalc.calculate(variables);
+                double y = yCalc.calculate(variables);
+                double z = zCalc.calculate(variables);
 
-                position.setX(xCalc.calculate(variables));
-                position.setY(yCalc.calculate(variables));
-                position.setZ(zCalc.calculate(variables));
-
-                user.teleport(position);
+                user.teleport(new MapPoint(world, x, y, z));
             }
         }
 
