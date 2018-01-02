@@ -3,6 +3,8 @@ package com.ithinkrok.minigames.api.map;
 import com.ithinkrok.util.config.Config;
 import org.bukkit.util.Vector;
 
+import java.util.Objects;
+
 public class MapPoint {
 
     /**
@@ -126,5 +128,24 @@ public class MapPoint {
      */
     public float getPitch() {
         return pitch;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MapPoint mapPoint = (MapPoint) o;
+        return Double.compare(mapPoint.x, x) == 0 &&
+               Double.compare(mapPoint.y, y) == 0 &&
+               Double.compare(mapPoint.z, z) == 0 &&
+               Float.compare(mapPoint.yaw, yaw) == 0 &&
+               Float.compare(mapPoint.pitch, pitch) == 0 &&
+               Objects.equals(world, mapPoint.world);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(world, x, y, z, yaw, pitch);
     }
 }
