@@ -148,4 +148,9 @@ public class MapPoint {
 
         return Objects.hash(world, x, y, z, yaw, pitch);
     }
+
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }

@@ -6,6 +6,7 @@ import com.ithinkrok.minigames.api.event.user.state.UserDamagedEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserBreakBlockEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserInteractWorldEvent;
+import com.ithinkrok.minigames.api.map.MapPoint;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.BoundingBox;
 import com.ithinkrok.minigames.api.util.MinigamesConfigs;
@@ -29,7 +30,7 @@ public class SpleefMinigame implements CustomListener {
 
     private Material spadeMaterial;
 
-    private final Map<Vector, Arena> queueButtons = new HashMap<>();
+    private final Map<MapPoint, Arena> queueButtons = new HashMap<>();
     private final Map<UUID, Arena> queueLookups = new HashMap<>();
     private final Map<UUID, Arena> gameLookups = new HashMap<>();
 
@@ -43,7 +44,7 @@ public class SpleefMinigame implements CustomListener {
 
             Arena arena = new Arena(arenaConfig);
 
-            for(Vector button : arena.queueButtons){
+            for(MapPoint button : arena.queueButtons){
                 queueButtons.put(button, arena);
             }
         }
@@ -99,8 +100,8 @@ public class SpleefMinigame implements CustomListener {
     }
 
     private class Arena {
-        private final List<Vector> queueButtons;
-        private final List<Vector> spawnLocations;
+        private final List<MapPoint> queueButtons;
+        private final List<MapPoint> spawnLocations;
         private final Vector exitLocation;
         private final BoundingBox snowBounds;
         private final int extraRadius;
@@ -109,8 +110,8 @@ public class SpleefMinigame implements CustomListener {
         private final LinkedHashSet<UUID> queue = new LinkedHashSet<>();
 
         public Arena(Config config) {
-            queueButtons = BukkitConfigUtils.getVectorList(config, "queue_buttons");
-            spawnLocations = BukkitConfigUtils.getVectorList(config, "spawn_locations");
+            queueButtons = MinigamesConfigs.getMapPointList(config, "queue_buttons");
+            spawnLocations = MinigamesConfigs.getMapPointList(config, "spawn_locations");
             exitLocation = BukkitConfigUtils.getVector(config, "exit_location");
             snowBounds = MinigamesConfigs.getBounds(config, "snow");
             extraRadius = config.getInt("extra_radius");
@@ -181,7 +182,7 @@ public class SpleefMinigame implements CustomListener {
             resetArena(aUser);
 
             Iterator<UUID> iterator = queue.iterator();
-            for(Vector spawn : spawnLocations) {
+            for(MapPoint spawn : spawnLocations) {
                 UUID joiningUUID = iterator.next();
                 iterator.remove();
 
