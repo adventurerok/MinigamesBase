@@ -14,6 +14,7 @@ import com.ithinkrok.minigames.api.event.user.inventory.*;
 import com.ithinkrok.minigames.api.event.user.state.*;
 import com.ithinkrok.minigames.api.event.user.world.*;
 import com.ithinkrok.minigames.api.map.GameMap;
+import com.ithinkrok.minigames.api.map.MapWorldInfo;
 import com.ithinkrok.minigames.api.protocol.event.GameGroupKilledEvent;
 import com.ithinkrok.minigames.api.protocol.event.GameGroupSpawnedEvent;
 import com.ithinkrok.minigames.api.protocol.event.GameGroupUpdateEvent;
@@ -80,7 +81,7 @@ public class GameBukkitListener implements Listener {
     }
 
     private GameGroup getGameGroup(World world) {
-        return game.getGameGroupFromMapName(world.getName());
+        return game.getGameGroupFromWorldName(world.getName());
     }
 
     @EventHandler
@@ -164,21 +165,28 @@ public class GameBukkitListener implements Listener {
     public void eventBlockExp(BlockExpEvent event) {
         if (event instanceof BlockBreakEvent) return;
 
-        String mapName = event.getBlock().getWorld().getName();
-        GameGroup gameGroup = game.getGameGroupFromMapName(mapName);
+        String worldName = event.getBlock().getWorld().getName();
+        GameGroup gameGroup = game.getGameGroupFromWorldName(worldName);
         if (gameGroup == null) return;
 
         GameMap map = gameGroup.getCurrentMap();
-        if (!map.getDefaultWorld().getName().equals(mapName))
-            throw new RuntimeException("Map still registered to old GameGroup");
+        checkWorldIsInMap(event.getBlock().getWorld(), map);
 
         gameGroup.gameEvent(new MapBlockBreakNaturallyEvent(gameGroup, map, event));
+    }
+
+    private void checkWorldIsInMap(World world, GameMap map) {
+        MapWorldInfo worldInfo = map.getWorldInfo(world);
+
+        if (worldInfo == null) {
+            throw new RuntimeException("Map still registered to old GameGroup");
+        }
     }
 
     @EventHandler
     public void eventBlockBurn(BlockBurnEvent event) {
         String mapName = event.getBlock().getWorld().getName();
-        GameGroup gameGroup = game.getGameGroupFromMapName(mapName);
+        GameGroup gameGroup = game.getGameGroupFromWorldName(mapName);
         if (gameGroup == null) return;
 
         GameMap map = gameGroup.getCurrentMap();
@@ -194,7 +202,7 @@ public class GameBukkitListener implements Listener {
     @EventHandler
     public void eventBlockGrow(BlockGrowEvent event) {
         String mapName = event.getBlock().getWorld().getName();
-        GameGroup gameGroup = game.getGameGroupFromMapName(mapName);
+        GameGroup gameGroup = game.getGameGroupFromWorldName(mapName);
         if (gameGroup == null) return;
 
         GameMap map = gameGroup.getCurrentMap();
@@ -205,12 +213,11 @@ public class GameBukkitListener implements Listener {
     @EventHandler
     public void eventItemSpawn(ItemSpawnEvent event) {
         String mapName = event.getEntity().getWorld().getName();
-        GameGroup gameGroup = game.getGameGroupFromMapName(mapName);
+        GameGroup gameGroup = game.getGameGroupFromWorldName(mapName);
         if (gameGroup == null) return;
 
         GameMap map = gameGroup.getCurrentMap();
-        if (!map.getDefaultWorld().getName().equals(mapName))
-            throw new RuntimeException("Map still registered to old GameGroup");
+        checkWorldIsInMap(event.getEntity().getWorld(), map);
 
         gameGroup.gameEvent(new MapItemSpawnEvent(gameGroup, map, event));
     }
@@ -218,12 +225,11 @@ public class GameBukkitListener implements Listener {
     @EventHandler
     public void eventCreatureSpawn(CreatureSpawnEvent event) {
         String mapName = event.getEntity().getWorld().getName();
-        GameGroup gameGroup = game.getGameGroupFromMapName(mapName);
+        GameGroup gameGroup = game.getGameGroupFromWorldName(mapName);
         if (gameGroup == null) return;
 
         GameMap map = gameGroup.getCurrentMap();
-        if (!map.getDefaultWorld().getName().equals(mapName))
-            throw new RuntimeException("Map still registered to old GameGroup");
+        checkWorldIsInMap(event.getEntity().getWorld(), map);
 
         gameGroup.gameEvent(new MapCreatureSpawnEvent(gameGroup, map, event));
     }
@@ -231,12 +237,11 @@ public class GameBukkitListener implements Listener {
     @EventHandler
     public void eventEntityTarget(EntityTargetEvent event) {
         String mapName = event.getEntity().getWorld().getName();
-        GameGroup gameGroup = game.getGameGroupFromMapName(mapName);
+        GameGroup gameGroup = game.getGameGroupFromWorldName(mapName);
         if (gameGroup == null) return;
 
         GameMap map = gameGroup.getCurrentMap();
-        if (!map.getDefaultWorld().getName().equals(mapName))
-            throw new RuntimeException("Map still registered to old GameGroup");
+        checkWorldIsInMap(event.getEntity().getWorld(), map);
 
         gameGroup.gameEvent(new MapEntityTargetEvent(gameGroup, map, event));
     }
@@ -244,15 +249,14 @@ public class GameBukkitListener implements Listener {
     @EventHandler
     public void eventEntityDeath(EntityDeathEvent event) {
         String mapName = event.getEntity().getWorld().getName();
-        GameGroup gameGroup = game.getGameGroupFromMapName(mapName);
+        GameGroup gameGroup = game.getGameGroupFromWorldName(mapName);
         if (gameGroup == null) return;
 
         //Don't send entity death events for users
         if (EntityUtils.getActualUser(gameGroup, event.getEntity()) != null) return;
 
         GameMap map = gameGroup.getCurrentMap();
-        if (!map.getDefaultWorld().getName().equals(mapName))
-            throw new RuntimeException("Map still registered to old GameGroup");
+        checkWorldIsInMap(event.getEntity().getWorld(), map);
 
         gameGroup.gameEvent(new MapEntityDeathEvent(gameGroup, map, event));
     }
@@ -260,7 +264,7 @@ public class GameBukkitListener implements Listener {
     @EventHandler
     public void eventRegainHealth(EntityRegainHealthEvent event) {
         String mapName = event.getEntity().getWorld().getName();
-        GameGroup gameGroup = game.getGameGroupFromMapName(mapName);
+        GameGroup gameGroup = game.getGameGroupFromWorldName(mapName);
         if (gameGroup == null) return;
 
         //Don't send entity death events for users
@@ -269,8 +273,7 @@ public class GameBukkitListener implements Listener {
             gameGroup.userEvent(new UserRegainHealthEvent(user, event));
         } else {
             GameMap map = gameGroup.getCurrentMap();
-            if (!map.getDefaultWorld().getName().equals(mapName))
-                throw new RuntimeException("Map still registered to old GameGroup");
+            checkWorldIsInMap(event.getEntity().getWorld(), map);
 
             gameGroup.gameEvent(new BaseMapEntityRegenHealthEvent(gameGroup, map, event));
         }
@@ -279,15 +282,14 @@ public class GameBukkitListener implements Listener {
     @EventHandler
     public void eventProjectileLaunch(ProjectileLaunchEvent event) {
         String mapName = event.getEntity().getWorld().getName();
-        GameGroup gameGroup = game.getGameGroupFromMapName(mapName);
+        GameGroup gameGroup = game.getGameGroupFromWorldName(mapName);
         if (gameGroup == null) return;
 
         //Don't send entity death events for users
         if (EntityUtils.getActualUser(gameGroup, event.getEntity()) != null) return;
 
         GameMap map = gameGroup.getCurrentMap();
-        if (!map.getDefaultWorld().getName().equals(mapName))
-            throw new RuntimeException("Map still registered to old GameGroup");
+        checkWorldIsInMap(event.getEntity().getWorld(), map);
 
         gameGroup.gameEvent(new MapProjectileLaunchEvent(gameGroup, map, event));
     }
@@ -295,12 +297,11 @@ public class GameBukkitListener implements Listener {
     @EventHandler
     public void eventBlockIgnite(BlockIgniteEvent event) {
         String mapName = event.getBlock().getWorld().getName();
-        GameGroup gameGroup = game.getGameGroupFromMapName(mapName);
+        GameGroup gameGroup = game.getGameGroupFromWorldName(mapName);
         if (gameGroup == null) return;
 
         GameMap map = gameGroup.getCurrentMap();
-        if (!map.getDefaultWorld().getName().equals(mapName))
-            throw new RuntimeException("Map still registered to old GameGroup");
+        checkWorldIsInMap(event.getBlock().getWorld(), map);
 
         gameGroup.gameEvent(new MapBlockIgniteEvent(gameGroup, map, event));
     }
@@ -308,12 +309,11 @@ public class GameBukkitListener implements Listener {
     @EventHandler
     public void eventEntityExplode(EntityExplodeEvent event) {
         String mapName = event.getEntity().getWorld().getName();
-        GameGroup gameGroup = game.getGameGroupFromMapName(mapName);
+        GameGroup gameGroup = game.getGameGroupFromWorldName(mapName);
         if (gameGroup == null) return;
 
         GameMap map = gameGroup.getCurrentMap();
-        if (!map.getDefaultWorld().getName().equals(mapName))
-            throw new RuntimeException("Map still registered to old GameGroup");
+        checkWorldIsInMap(event.getEntity().getWorld(), map);
 
         gameGroup.gameEvent(new MapEntityExplodeEvent(gameGroup, map, event));
     }

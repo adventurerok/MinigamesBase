@@ -292,8 +292,8 @@ public class BaseGame implements Game, FileLoader {
     }
 
     @Override
-    public BaseGameGroup getGameGroupFromMapName(String mapName) {
-        return worldToGameGroup.get(mapName);
+    public BaseGameGroup getGameGroupFromWorldName(String worldName) {
+        return worldToGameGroup.get(worldName);
     }
 
     @Override

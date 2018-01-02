@@ -54,7 +54,7 @@ public class GameBukkitListenerTest {
         doReturn(gameGroup).when(game).getGameGroup(gameGroupName);
 
         doReturn(worldName).when(world).getName();
-        doReturn(gameGroup).when(game).getGameGroupFromMapName(worldName);
+        doReturn(gameGroup).when(game).getGameGroupFromWorldName(worldName);
 
         doReturn(Collections.emptyList()).when(world).getEntities();
 
