@@ -10,7 +10,6 @@ import com.ithinkrok.minigames.api.map.MapPoint;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.BoundingBox;
 import com.ithinkrok.minigames.api.util.MinigamesConfigs;
-import com.ithinkrok.msm.bukkit.util.BukkitConfigUtils;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
@@ -19,7 +18,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 
 import java.util.*;
 
@@ -118,9 +116,9 @@ public class SpleefMinigame implements CustomListener {
         }
 
         public boolean checkUserInBounds(double x, double z) {
-            if(x + extraRadius < snowBounds.min.getX() || x - extraRadius > snowBounds.max.getX()) return false;
+            if(x + extraRadius < snowBounds.getMin().getX() || x - extraRadius > snowBounds.getMax().getX()) return false;
 
-            return z + extraRadius >= snowBounds.min.getZ() && z - extraRadius <= snowBounds.max.getZ();
+            return z + extraRadius >= snowBounds.getMin().getZ() && z - extraRadius <= snowBounds.getMax().getZ();
         }
 
         public void spleefUserKilled(User user, boolean teleport) {
@@ -145,9 +143,9 @@ public class SpleefMinigame implements CustomListener {
         public void resetArena(User aUser) {
             World world = aUser.getLocation().getWorld();
 
-            for(int x = snowBounds.min.getBlockX(); x <= snowBounds.max.getBlockX(); ++x) {
-                for(int y = snowBounds.min.getBlockY(); y <= snowBounds.max.getBlockY(); ++y) {
-                    for(int z = snowBounds.min.getBlockZ(); z <= snowBounds.max.getBlockZ(); ++z) {
+            for(int x = snowBounds.getMin().getBlockX(); x <= snowBounds.getMax().getBlockX(); ++x) {
+                for(int y = snowBounds.getMin().getBlockY(); y <= snowBounds.getMax().getBlockY(); ++y) {
+                    for(int z = snowBounds.getMin().getBlockZ(); z <= snowBounds.getMax().getBlockZ(); ++z) {
                         world.getBlockAt(x, y, z).setType(Material.SNOW_BLOCK);
                     }
                 }

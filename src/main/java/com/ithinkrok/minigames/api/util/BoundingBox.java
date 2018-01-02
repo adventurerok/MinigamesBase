@@ -10,8 +10,8 @@ import org.bukkit.util.Vector;
  */
 public class BoundingBox {
 
-    public final Vector min;
-    public final Vector max;
+    private final Vector min;
+    private final Vector max;
 
     public BoundingBox(Vector min, Vector max) {
         this.min = min;
@@ -19,19 +19,29 @@ public class BoundingBox {
     }
 
     public boolean intercepts(BoundingBox other) {
-        return !(max.getX() < other.min.getX() || min.getX() > other.max.getX()) &&
-                !(max.getY() < other.min.getY() || min.getY() > other.max.getY()) &&
-                !(max.getZ() < other.min.getZ() || min.getZ() > other.max.getZ());
+        return !(getMax().getX() < other.getMin().getX() || getMin().getX() > other.getMax().getX()) &&
+               !(getMax().getY() < other.getMin().getY() || getMin().getY() > other.getMax().getY()) &&
+               !(getMax().getZ() < other.getMin().getZ() || getMin().getZ() > other.getMax().getZ());
 
     }
 
     public boolean interceptsXZ(BoundingBox other) {
-        return !(max.getX() < other.min.getX() || min.getX() > other.max.getX()) &&
-                !(max.getZ() < other.min.getZ() || min.getZ() > other.max.getZ());
+        return !(getMax().getX() < other.getMin().getX() || getMin().getX() > other.getMax().getX()) &&
+               !(getMax().getZ() < other.getMin().getZ() || getMin().getZ() > other.getMax().getZ());
     }
 
     public boolean containsLocation(Location loc) {
-        return loc.getX() >= min.getX() && loc.getX() <= max.getX() && loc.getY() >= min.getY() &&
-                loc.getY() <= max.getY() && loc.getZ() >= min.getZ() && loc.getZ() <= max.getZ();
+        return loc.getX() >= getMin().getX() && loc.getX() <= getMax().getX() && loc.getY() >= getMin().getY() &&
+               loc.getY() <= getMax().getY() && loc.getZ() >= getMin().getZ() && loc.getZ() <= getMax().getZ();
+    }
+
+
+    public Vector getMin() {
+        return min;
+    }
+
+
+    public Vector getMax() {
+        return max;
     }
 }

@@ -88,12 +88,12 @@ public class SchematicRotation {
 
 
             BoundingBox other = upgrade.getSchematicRotation(modRotation).calcBoundsNoUpgrades(loc);
-            if(other.min.getX() < bounds.min.getX()) bounds.min.setX(other.min.getX());
-            if(other.min.getY() < bounds.min.getY()) bounds.min.setY(other.min.getY());
-            if(other.min.getZ() < bounds.min.getZ()) bounds.min.setZ(other.min.getZ());
-            if(other.max.getX() > bounds.max.getX()) bounds.max.setX(other.max.getX());
-            if(other.max.getY() > bounds.max.getY()) bounds.max.setY(other.max.getY());
-            if(other.max.getZ() > bounds.max.getZ()) bounds.max.setZ(other.max.getZ());
+            if(other.getMin().getX() < bounds.getMin().getX()) bounds.getMin().setX(other.getMin().getX());
+            if(other.getMin().getY() < bounds.getMin().getY()) bounds.getMin().setY(other.getMin().getY());
+            if(other.getMin().getZ() < bounds.getMin().getZ()) bounds.getMin().setZ(other.getMin().getZ());
+            if(other.getMax().getX() > bounds.getMax().getX()) bounds.getMax().setX(other.getMax().getX());
+            if(other.getMax().getY() > bounds.getMax().getY()) bounds.getMax().setY(other.getMax().getY());
+            if(other.getMax().getZ() > bounds.getMax().getZ()) bounds.getMax().setZ(other.getMax().getZ());
         }
 
         return bounds;

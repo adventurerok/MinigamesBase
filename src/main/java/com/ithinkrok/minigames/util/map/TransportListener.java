@@ -104,13 +104,13 @@ public class TransportListener implements CustomListener {
             variables.setVariable("dy", velocity.getY());
             variables.setVariable("dz", velocity.getZ());
 
-            variables.setVariable("minX", bounds.min.getX());
-            variables.setVariable("minY", bounds.min.getY());
-            variables.setVariable("minZ", bounds.min.getZ());
+            variables.setVariable("minX", bounds.getMin().getX());
+            variables.setVariable("minY", bounds.getMin().getY());
+            variables.setVariable("minZ", bounds.getMin().getZ());
 
-            variables.setVariable("maxX", bounds.max.getX());
-            variables.setVariable("maxY", bounds.max.getY());
-            variables.setVariable("maxZ", bounds.max.getZ());
+            variables.setVariable("maxX", bounds.getMax().getX());
+            variables.setVariable("maxY", bounds.getMax().getY());
+            variables.setVariable("maxZ", bounds.getMax().getZ());
 
             if(!accept.calculateBoolean(variables)) return;
 
