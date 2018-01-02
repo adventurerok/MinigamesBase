@@ -103,9 +103,9 @@ public class BaseUser implements Listener, User {
     private ClickableInventory openInventory;
     private Collection<CustomListener> kitListeners = new ArrayList<>();
 
-    private Account economyAccount;
+    private final Account economyAccount;
 
-    private Vector inventoryTether;
+    private MapPoint inventoryTether;
     private boolean spectator;
 
     private GameTask revalidateTask;
@@ -1033,7 +1033,7 @@ public class BaseUser implements Listener, User {
             }
 
             this.openInventory = inventory;
-            this.inventoryTether = inventoryTether != null ? inventoryTether.toVector() : null;
+            this.inventoryTether = inventoryTether != null ? getMap().getMapPoint(inventoryTether) : null;
 
             Inventory newInventory = inventory.createInventory(this, old);
 
@@ -1056,7 +1056,7 @@ public class BaseUser implements Listener, User {
         doInFuture(task -> {
             if (!isPlayer()) return;
 
-            this.inventoryTether = inventoryTether != null ? inventoryTether.toVector() : null;
+            this.inventoryTether = inventoryTether != null ? getMap().getMapPoint(inventoryTether) : null;
 
             getPlayer().openInventory(inventory);
         });

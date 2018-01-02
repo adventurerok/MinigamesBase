@@ -68,13 +68,10 @@ public interface GameMap extends LanguageLookup, SchematicPaster.BoundsChecker, 
     @Deprecated
     Entity spawnEntity(Location location, EntityType type);
 
-    @Deprecated
-    Location getLocation(Vector location);
-
-    @Deprecated
-    Location getLocation(double x, double y, double z);
 
     Location getLocation(MapPoint point);
+
+    MapPoint getMapPoint(Location loc);
 
     @Deprecated
     Block getBlock(Vector location);

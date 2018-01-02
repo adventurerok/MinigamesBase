@@ -77,6 +77,7 @@ public class BaseMap implements GameMap, ConfigHolder {
 
     }
 
+
     private void loadMapWorlds(GameGroup gameGroup) {
         for (MapWorldInfo worldInfo : getInfo().getWorlds().values()) {
 
@@ -111,10 +112,12 @@ public class BaseMap implements GameMap, ConfigHolder {
         spawn = worlds.get(defaultWorldName).getSpawnLocation();
     }
 
+
     @Override
     public GameMapInfo getInfo() {
         return gameMapInfo;
     }
+
 
     private void configureWorld(World world, Config config) {
 
@@ -171,57 +174,41 @@ public class BaseMap implements GameMap, ConfigHolder {
             double size = config.getDouble("border.size");
             worldBorder.setSize(size);
         }
-    }    @Override
-    public World getDefaultWorld() {
-        return worlds.get(defaultWorldName);
     }
+
 
     @Override
     public CustomItem getCustomItem(String name) {
         return customItemIdentifierMap.get(name);
-    }    @Override
-    public World getWorld(String name) {
-        World world = worlds.get(name);
-
-        if (world == null && DEFAULT_WORLD_NAME.equals(name)) {
-            //handle a different default world name being used
-            return getDefaultWorld();
-        } else {
-            return world;
-        }
     }
+
 
     @Override
     public CustomItem getCustomItem(int identifier) {
         return customItemIdentifierMap.get(identifier);
-    }    @Override
-    public Collection<World> getWorlds() {
-        return worlds.values();
     }
+
 
     @Override
     public Collection<CustomItem> getAllCustomItems() {
         return customItemIdentifierMap.values();
-    }    @Override
-    public MapWorldInfo getWorldInfo(World world) {
-        return getInfo().getWorlds().get(reverseWorldNames.get(world.getName()));
     }
+
 
     @Override
     public CustomEntity getCustomEntity(String name) {
         return customEntityMap.get(name);
     }    @Override
-    public void addPastedSchematic(PastedSchematic schematic) {
-        pastedSchematics.add(schematic);
+    public World getDefaultWorld() {
+        return worlds.get(defaultWorldName);
     }
+
 
     @Override
     public void bindTaskToMap(GameTask task) {
         mapTaskList.addTask(task);
-    }    @Override
-    public void removePastedSchematic(PastedSchematic schematic) {
-        pastedSchematics.remove(schematic);
     }
+
 
     @Override
     public void unloadMap() {
@@ -237,61 +224,145 @@ public class BaseMap implements GameMap, ConfigHolder {
 
     }
 
+
     @Override
     public boolean teleportUser(User user) {
         if (user.getLocation().getWorld().equals(getSpawn().getWorld())) return true;
         return user.teleport(getSpawn());
     }
 
+
     @Override
     public List<CustomListener> getListeners() {
         return listeners;
     }
 
+
     @Override
     public Map<String, CustomListener> getListenerMap() {
         return listenerMap;
+    }    @Override
+    public World getWorld(String name) {
+        World world = worlds.get(name);
+
+        if (world == null && DEFAULT_WORLD_NAME.equals(name)) {
+            //handle a different default world name being used
+            return getDefaultWorld();
+        } else {
+            return world;
+        }
     }
+
 
     @Override
     public Schematic getSchematic(String name) {
         return schematicMap.get(name);
     }
 
+
     @Override
     public JSONBook getBook(String name) {
         return bookMap.get(name);
     }
+
 
     @Override
     public Entity spawnEntity(Location location, EntityType type) {
         return location.getWorld().spawnEntity(location, type);
     }
 
+
+    @Override
+    public Location getLocation(MapPoint point) {
+        World world = worlds.get(point.getWorld());
+
+        float yaw = point.getYaw();
+        float pitch = point.getPitch();
+
+        //Account for the fact that NaN yaw/pitch indicate that they shouldn't be changed / are not present
+        if (Float.isNaN(yaw)) yaw = 0;
+        if (Float.isNaN(pitch)) pitch = 0;
+
+        return new Location(world, point.getX(), point.getY(), point.getZ(), yaw, pitch);
+    }
+
+
+    @Override
+    public MapPoint getMapPoint(Location loc) {
+        String worldName = getWorldInfo(loc.getWorld()).getName();
+
+        return new MapPoint(worldName, loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+    }
+
+
+    @Override
+    public MapWorldInfo getWorldInfo(World world) {
+        return getInfo().getWorlds().get(reverseWorldNames.get(world.getName()));
+    }    @Override
+    public Collection<World> getWorlds() {
+        return worlds.values();
+    }
+
+
+    @Override
+    public void addPastedSchematic(PastedSchematic schematic) {
+        pastedSchematics.add(schematic);
+    }
+
+
+    @Override
+    public void removePastedSchematic(PastedSchematic schematic) {
+        pastedSchematics.remove(schematic);
+    }
+
+
+    @Override
+    public Block getBlock(Vector location) {
+        return getLocation(location).getBlock();
+    }
+
+
+    public Location getLocation(Vector location) {
+        if (location == null) return null;
+        return new Location(getDefaultWorld(), location.getX(), location.getY(), location.getZ());
+    }
+
+
+    @Override
+    public Block getBlock(int x, int y, int z) {
+        return getDefaultWorld().getBlockAt(x, y, z);
+    }
+
+
     @Override
     public Location getSpawn() {
         return spawn;
     }
+
 
     @Override
     public boolean hasSharedObject(String name) {
         return sharedObjects.containsKey(name);
     }
 
+
     @Override
     public String getLocale(String name) {
         return languageLookup.getLocale(name);
     }
+
 
     @Override
     public String getLocale(String name, Object... args) {
         return languageLookup.getLocale(name, args);
     }
 
+
     @Override
     public boolean hasLocale(String name) {
         return languageLookup.hasLocale(name);
     }
+
 
     @Override
     public void addListener(String name, CustomListener listener) {
@@ -299,95 +370,83 @@ public class BaseMap implements GameMap, ConfigHolder {
         listenerMap.put(name, listener);
     }
 
+
     @Override
     public void addCustomItem(CustomItem item) {
         customItemIdentifierMap.put(item.getName(), item);
-    }    @Override
-    public Location getLocation(Vector location) {
-        if (location == null) return null;
-        return new Location(getDefaultWorld(), location.getX(), location.getY(), location.getZ());
     }
+
 
     @Override
     public void addCustomEntity(CustomEntity customEntity) {
         customEntityMap.put(customEntity.getName(), customEntity);
-    }    @Override
-    public Location getLocation(double x, double y, double z) {
-        return new Location(getDefaultWorld(), x, y, z);
     }
+
 
     @Override
     public void addLanguageLookup(LanguageLookup languageLookup) {
         this.languageLookup.addLanguageLookup(languageLookup);
-    }    @Override
-    public Location getLocation(MapPoint point) {
-        World world = worlds.get(point.getWorld());
-
-        return new Location(world, point.getX(), point.getY(), point.getZ(), point.getYaw(), point.getPitch());
     }
+
 
     @Override
     public void addSharedObject(String name, Config config) {
         sharedObjects.put(name, config);
-    }    @Override
-    public Block getBlock(Vector location) {
-        return getLocation(location).getBlock();
     }
+
 
     @Override
     public void addSchematic(Schematic schematic) {
         schematicMap.put(schematic.getName(), schematic);
-    }    @Override
-    public Block getBlock(int x, int y, int z) {
-        return getDefaultWorld().getBlockAt(x, y, z);
     }
+
 
     @Override
     public void addTeamIdentifier(TeamIdentifier teamIdentifier) {
         //TODO custom TeamIdentifier support for maps
     }
 
+
     @Override
     public void addGameState(GameState gameState) {
         //TODO custom GameState support for maps
     }
+
 
     @Override
     public void addKit(Kit kit) {
         //TODO custom Kit support for maps
     }
 
+
     @Override
     public void addCommand(CommandConfig command) {
         //TODO custom CommandConfig support for maps
-    }    @Override
-    public Config getSharedObject(String name) {
-        return sharedObjects.get(name);
     }
+
 
     @Override
     public void addMapInfo(GameMapInfo mapInfo) {
         //TODO custom GameMapInfo support for maps
     }
 
+
     @Override
     public void addBook(JSONBook book) {
         bookMap.put(book.getName(), book);
-    }    @Override
-    public Config getSharedObjectOrEmpty(String name) {
-        Config sharedObject = getSharedObject(name);
-
-        return sharedObject != null ? sharedObject : ConfigUtils.EMPTY_CONFIG;
     }
+
 
     @Override
     public void addCurrency(String name, Config config) {
         currencyConfigs.put(name, config);
     }
 
+
     public Map<String, Config> getCurrencies() {
         return currencyConfigs;
     }
+
 
     @Override
     public boolean canPaste(BoundingBox bounds) {
@@ -399,30 +458,18 @@ public class BaseMap implements GameMap, ConfigHolder {
     }
 
 
+    @Override
+    public Config getSharedObject(String name) {
+        return sharedObjects.get(name);
+    }
 
 
+    @Override
+    public Config getSharedObjectOrEmpty(String name) {
+        Config sharedObject = getSharedObject(name);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        return sharedObject != null ? sharedObject : ConfigUtils.EMPTY_CONFIG;
+    }
 
 
 }

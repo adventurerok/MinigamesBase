@@ -153,4 +153,17 @@ public class MapPoint {
     public String toString() {
         return super.toString();
     }
+
+    /**
+     * Gets a new MapPoint with this MapPoint's position added to the provided x,y,z arguments.
+     *
+     * @param x X coord
+     * @param y Y coord
+     * @param z Z coord
+     * @return A new MapPoint with the modified position
+     */
+    public MapPoint add(double x, double y, double z) {
+        return new MapPoint(world, this.x + x, this.y + y, this.z + z, this.yaw, this.pitch);
+    }
+
 }
