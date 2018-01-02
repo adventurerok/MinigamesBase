@@ -65,9 +65,6 @@ public interface GameMap extends LanguageLookup, SchematicPaster.BoundsChecker, 
 
     JSONBook getBook(String name);
 
-    @Deprecated
-    Entity spawnEntity(Location location, EntityType type);
-
 
     Location getLocation(MapPoint point);
 
@@ -78,6 +75,8 @@ public interface GameMap extends LanguageLookup, SchematicPaster.BoundsChecker, 
 
     @Deprecated
     Block getBlock(int x, int y, int z);
+
+    Block getBlock(MapPoint point);
 
     Location getSpawn();
 

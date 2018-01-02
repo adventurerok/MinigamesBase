@@ -32,8 +32,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
 
 import java.util.*;
@@ -267,12 +265,6 @@ public class BaseMap implements GameMap, ConfigHolder {
 
 
     @Override
-    public Entity spawnEntity(Location location, EntityType type) {
-        return location.getWorld().spawnEntity(location, type);
-    }
-
-
-    @Override
     public Location getLocation(MapPoint point) {
         World world = worlds.get(point.getWorld());
 
@@ -331,6 +323,12 @@ public class BaseMap implements GameMap, ConfigHolder {
     @Override
     public Block getBlock(int x, int y, int z) {
         return getDefaultWorld().getBlockAt(x, y, z);
+    }
+
+
+    @Override
+    public Block getBlock(MapPoint point) {
+        return getLocation(point).getBlock();
     }
 
 

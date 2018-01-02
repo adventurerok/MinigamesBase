@@ -1242,7 +1242,7 @@ public class BaseUser implements Listener, User {
 
     @Override
     public TNTPrimed createExplosion(Location loc, float power, boolean fire, int fuseTicks) {
-        TNTPrimed tnt = (TNTPrimed) getMap().spawnEntity(loc, EntityType.PRIMED_TNT);
+        TNTPrimed tnt = (TNTPrimed) loc.getWorld().spawnEntity(loc, EntityType.PRIMED_TNT);
 
         makeEntityRepresentUser(tnt);
 
