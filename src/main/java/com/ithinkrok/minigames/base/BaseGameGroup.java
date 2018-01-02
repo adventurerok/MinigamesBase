@@ -409,7 +409,6 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
         if (currentMap != null) {
             config.set("map.name", currentMap.getInfo().getName());
-            config.set("map.type", currentMap.getInfo().getMapType().toString());
         }
 
         config.set("server", game.getName());
