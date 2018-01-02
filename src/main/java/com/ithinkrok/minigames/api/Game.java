@@ -12,6 +12,7 @@ import com.ithinkrok.msm.common.economy.Economy;
 import com.ithinkrok.msm.common.economy.EconomyContext;
 import com.ithinkrok.msm.common.economy.provider.EconomyProvider;
 import com.ithinkrok.util.math.Variables;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -55,7 +56,7 @@ public interface Game extends TaskScheduler, DatabaseTaskRunner, Nameable {
 
     void makeEntityActualUser(User user, Entity entity);
 
-    void setGameGroupForMap(GameGroup gameGroup, String mapName);
+    void setGameGroupForWorlds(GameGroup gameGroup, Collection<World> worlds);
 
     GameGroup getGameGroupFromMapName(String mapName);
 

@@ -35,8 +35,6 @@ import com.ithinkrok.msm.client.ClientListener;
 import com.ithinkrok.msm.client.impl.MSMClient;
 import com.ithinkrok.msm.client.protocol.ClientUpdateFileProtocol;
 import com.ithinkrok.msm.common.economy.Economy;
-import com.ithinkrok.msm.common.economy.EconomyContext;
-import com.ithinkrok.msm.common.economy.provider.EconomyProvider;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.lang.LangFile;
 import com.ithinkrok.util.math.Variables;
@@ -82,7 +80,7 @@ public class BaseGame implements Game, FileLoader {
     private final Map<String, String> gameGroupConfigMap = new HashMap<>();
     private final String fallbackConfig;
 
-    private final Map<String, BaseGameGroup> mapToGameGroup = new MapMaker().weakValues().makeMap();
+    private final Map<String, BaseGameGroup> worldToGameGroup = new MapMaker().weakValues().makeMap();
     private final Map<String, BaseGameGroup> nameToGameGroup = new HashMap<>();
 
     /**
@@ -281,19 +279,21 @@ public class BaseGame implements Game, FileLoader {
     }
 
     @Override
-    public void setGameGroupForMap(GameGroup gameGroup, String mapName) {
+    public void setGameGroupForWorlds(GameGroup gameGroup, Collection<World> worlds) {
         Validate.notNull(gameGroup, "gameGroup cannot be null");
 
         if (!(gameGroup instanceof BaseGameGroup)) {
             throw new UnsupportedOperationException("Only supports BaseGameGroup");
         }
 
-        mapToGameGroup.put(mapName, (BaseGameGroup) gameGroup);
+        for (World world : worlds) {
+            worldToGameGroup.put(world.getName(), (BaseGameGroup) gameGroup);
+        }
     }
 
     @Override
     public BaseGameGroup getGameGroupFromMapName(String mapName) {
-        return mapToGameGroup.get(mapName);
+        return worldToGameGroup.get(mapName);
     }
 
     @Override
@@ -411,7 +411,7 @@ public class BaseGame implements Game, FileLoader {
     @Override
     public BaseUser getUser(Entity entity) {
         String mapName = entity.getWorld().getName();
-        BaseGameGroup gameGroup = mapToGameGroup.get(mapName);
+        BaseGameGroup gameGroup = worldToGameGroup.get(mapName);
 
         if (gameGroup == null) return null;
         return gameGroup.getUser(entity.getUniqueId());
@@ -509,8 +509,11 @@ public class BaseGame implements Game, FileLoader {
         return result;
     }
 
-    public void removeGameGroupForMap(String mapName) {
-        mapToGameGroup.remove(mapName);
+    public void removeGameGroupForWorlds(Collection<World> worlds) {
+        for (World world : worlds) {
+            worldToGameGroup.remove(world.getName());
+        }
+
     }
 
     @Override

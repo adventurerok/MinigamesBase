@@ -31,6 +31,8 @@ public interface GameMap extends LanguageLookup, SchematicPaster.BoundsChecker, 
 
     World getWorld(String name);
 
+    Collection<World> getWorlds();
+
     MapWorldInfo getWorldInfo(World world);
 
     void addPastedSchematic(PastedSchematic schematic);

@@ -176,6 +176,11 @@ public class BaseMap implements GameMap, ConfigHolder {
     }
 
     @Override
+    public Collection<World> getWorlds() {
+        return worlds.values();
+    }
+
+    @Override
     public MapWorldInfo getWorldInfo(World world) {
         return getInfo().getWorlds().get(reverseWorldNames.get(world.getName()));
     }
