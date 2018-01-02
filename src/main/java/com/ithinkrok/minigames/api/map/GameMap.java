@@ -70,12 +70,6 @@ public interface GameMap extends LanguageLookup, SchematicPaster.BoundsChecker, 
 
     MapPoint getMapPoint(Location loc);
 
-    @Deprecated
-    Block getBlock(Vector location);
-
-    @Deprecated
-    Block getBlock(int x, int y, int z);
-
     Block getBlock(MapPoint point);
 
     Location getSpawn();

@@ -538,6 +538,12 @@ public class BaseUser implements Listener, User {
 
 
     @Override
+    public MapPoint getMapLocation() {
+        return getMap().getMapPoint(getLocation());
+    }
+
+
+    @Override
     public void launchVictoryFirework() {
         Location loc = getLocation();
 

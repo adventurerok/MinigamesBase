@@ -55,6 +55,8 @@ public interface User
 
     Location getLocation();
 
+    MapPoint getMapLocation();
+
     void launchVictoryFirework();
 
     void becomePlayer(Player player);

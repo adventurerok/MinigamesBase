@@ -26,8 +26,15 @@ public class MinigamesConfigs {
     public static BoundingBox getBounds(Config config, String path) {
         if (!path.isEmpty()) path = path + ".";
 
-        Vector min = BukkitConfigUtils.getVector(config, path + "min");
-        Vector max = BukkitConfigUtils.getVector(config, path + "max");
+        MapPoint min = getMapPoint(config, path + "min");
+        MapPoint max = getMapPoint(config, path + "max");
+
+        //We provide this option to avoid the annoyance of having to specify the same world twice in the MapPoints
+        String overrideWorld = config.getString(path + "world");
+        if(overrideWorld != null) {
+            min = min.setWorld(overrideWorld);
+            max = max.setWorld(overrideWorld);
+        }
 
         return new BoundingBox(min, max);
     }

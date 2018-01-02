@@ -45,7 +45,7 @@ public class TransportListener implements CustomListener {
 
             for(User user : gameGroup.getUsers()) {
                 for(Transport transport : transports) {
-                    if(!transport.bounds.containsLocation(user.getLocation())) continue;
+                    if(!transport.bounds.containsPoint(user.getMapLocation())) continue;
 
                     transport.moveUser(user);
                 }

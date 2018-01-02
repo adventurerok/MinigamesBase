@@ -5,6 +5,10 @@ import org.bukkit.util.Vector;
 
 import java.util.Objects;
 
+/**
+ * Immutable class representing a point in a world of a Map, with an optional orientation.
+ *
+ */
 public class MapPoint {
 
     /**
@@ -15,6 +19,9 @@ public class MapPoint {
     private final double x, y, z;
     private final float yaw, pitch;
 
+    public MapPoint(String world, Vector xyz) {
+        this(world, xyz.getX(), xyz.getY(), xyz.getZ());
+    }
 
     public MapPoint(String world, double x, double y, double z) {
         this(world, x, y, z, Float.NaN, Float.NaN);
@@ -164,6 +171,30 @@ public class MapPoint {
      */
     public MapPoint add(double x, double y, double z) {
         return new MapPoint(world, this.x + x, this.y + y, this.z + z, this.yaw, this.pitch);
+    }
+
+
+    /**
+     * Gets a new MapPoint with the world set to the provided world field.
+     *
+     * @param world The new world name
+     * @return A new map point representing this position in a different world.
+     */
+    public MapPoint setWorld(String world) {
+        return new MapPoint(world, this.x, this.y, this.z, this.yaw, this.pitch);
+    }
+
+
+    /**
+     * Gets a new MapPoint with this MapPoint's orientation and world and the provided xyz position.
+     *
+     * @param x X coord
+     * @param y Y coord
+     * @param z Z coord
+     * @return A new MapPoint with the XYZ position replaced with the new one specified
+     */
+    public MapPoint setXYZ(double x, double y, double z) {
+        return new MapPoint(this.world, x, y, z, this.yaw, this.pitch);
     }
 
 }

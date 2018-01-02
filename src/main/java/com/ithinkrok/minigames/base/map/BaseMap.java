@@ -308,21 +308,9 @@ public class BaseMap implements GameMap, ConfigHolder {
     }
 
 
-    @Override
-    public Block getBlock(Vector location) {
-        return getLocation(location).getBlock();
-    }
-
-
     public Location getLocation(Vector location) {
         if (location == null) return null;
         return new Location(getDefaultWorld(), location.getX(), location.getY(), location.getZ());
-    }
-
-
-    @Override
-    public Block getBlock(int x, int y, int z) {
-        return getDefaultWorld().getBlockAt(x, y, z);
     }
 
 

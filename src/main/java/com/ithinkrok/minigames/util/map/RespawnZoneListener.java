@@ -39,7 +39,7 @@ public class RespawnZoneListener implements CustomListener {
     @CustomEventHandler
     public void onUserDamaged(UserDamagedEvent event) {
         for (RespawnZone zone : zones) {
-            if (!zone.bounds.containsLocation(event.getUser().getLocation())) continue;
+            if (!zone.bounds.containsPoint(event.getUser().getMapLocation())) continue;
 
             if (!zone.damageCauses.contains(event.getDamageCause())) continue;
 
@@ -61,7 +61,7 @@ public class RespawnZoneListener implements CustomListener {
     @CustomEventHandler
     public void onUserDeath(UserDeathEvent event) {
         for (RespawnZone zone : zones) {
-            if (!zone.bounds.containsLocation(event.getUser().getLocation())) continue;
+            if (!zone.bounds.containsPoint(event.getUser().getMapLocation())) continue;
 
             if (!zone.doDeath) continue;
 
