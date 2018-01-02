@@ -18,6 +18,7 @@ import com.ithinkrok.minigames.api.item.CombatMode;
 import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.item.WeaponStats;
 import com.ithinkrok.minigames.api.map.GameMap;
+import com.ithinkrok.minigames.api.map.MapPoint;
 import com.ithinkrok.minigames.api.metadata.UserMetadata;
 import com.ithinkrok.minigames.api.task.GameRunnable;
 import com.ithinkrok.minigames.api.task.GameTask;
@@ -963,6 +964,16 @@ public class BaseUser implements Listener, User {
                              getLocation().getPitch());
         return teleport(target);
 
+    }
+
+    @Override
+    public boolean teleport(MapPoint point) {
+        Location target = new Location(getMap().getWorld(point.getWorld()),
+                                       point.getX(), point.getY(), point.getZ(),
+                                       Float.isFinite(point.getYaw()) ? point.getYaw() : getLocation().getYaw(),
+                                       Float.isFinite(point.getPitch()) ? point.getPitch() : getLocation().getPitch());
+
+        return teleport(target);
     }
 
     @Override

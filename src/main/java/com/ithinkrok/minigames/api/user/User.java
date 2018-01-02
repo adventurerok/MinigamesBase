@@ -8,6 +8,7 @@ import com.ithinkrok.minigames.api.command.MinigamesCommandSender;
 import com.ithinkrok.minigames.api.inventory.ClickableInventory;
 import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.map.GameMap;
+import com.ithinkrok.minigames.api.map.MapPoint;
 import com.ithinkrok.minigames.api.metadata.MetadataHolder;
 import com.ithinkrok.minigames.api.metadata.UserMetadata;
 import com.ithinkrok.minigames.api.task.GameTask;
@@ -160,6 +161,8 @@ public interface User
     boolean teleport(Vector loc);
 
     boolean teleport(Location location);
+
+    boolean teleport(MapPoint point);
 
     boolean isViewingClickableInventory();
 
