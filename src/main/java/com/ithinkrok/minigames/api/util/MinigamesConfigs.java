@@ -1,5 +1,6 @@
 package com.ithinkrok.minigames.api.util;
 
+import com.ithinkrok.minigames.api.map.MapPoint;
 import com.ithinkrok.msm.bukkit.util.BukkitConfigUtils;
 import com.ithinkrok.util.StringUtils;
 import com.ithinkrok.util.config.Config;
@@ -165,5 +166,33 @@ public class MinigamesConfigs {
     public static ParticleEffect getParticleEffect(Config config, String path) {
         if(config.isConfig(path)) return new ParticleEffect(config.getConfigOrNull(path));
         else return null;
+    }
+
+    public static MapPoint getMapPoint(Config config, String path) {
+        if (config.isString(path)) {
+            return new MapPoint(config.getString(path));
+        } else if (config.isConfig(path)) {
+            return new MapPoint(config.getConfigOrNull(path));
+        } else throw new IllegalArgumentException("There is no MapPoint at location " + path +
+                                                  " in config " + config.toString());
+    }
+
+    public static List<MapPoint> getMapPointList(Config config, String path) {
+        List<Object> points = config.getList(path, Object.class);
+        List<MapPoint> results = new ArrayList<>();
+
+        for (Object pointToLoad : points) {
+            MapPoint point = null;
+
+            if(pointToLoad instanceof String) {
+                point = new MapPoint((String) pointToLoad);
+            } else if(pointToLoad instanceof Config) {
+                point = new MapPoint((Config) pointToLoad);
+            } else throw new RuntimeException("Invalid MapPoint type: " + pointToLoad.getClass());
+
+            results.add(point);
+        }
+
+        return results;
     }
 }

@@ -80,15 +80,6 @@ public class MapPoint {
         this.pitch = (float) doubles[4];
     }
 
-    public static MapPoint fromConfig(Config config, String path) {
-        if (config.isString(path)) {
-            return new MapPoint(config.getString(path));
-        } else if (config.isConfig(path)) {
-            return new MapPoint(config.getConfigOrNull(path));
-        } else throw new IllegalArgumentException("There is no MapPoint at location " + path + " in config " +
-                                                  config.toString());
-    }
-
     public String getWorld() {
         return world;
     }
