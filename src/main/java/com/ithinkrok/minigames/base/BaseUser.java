@@ -12,6 +12,7 @@ import com.ithinkrok.minigames.api.event.user.game.*;
 import com.ithinkrok.minigames.api.event.user.inventory.UserInventoryClickEvent;
 import com.ithinkrok.minigames.api.event.user.inventory.UserInventoryCloseEvent;
 import com.ithinkrok.minigames.api.event.user.inventory.UserInventoryUpdateEvent;
+import com.ithinkrok.minigames.api.event.user.inventory.UserItemHeldEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.api.inventory.ClickableInventory;
 import com.ithinkrok.minigames.api.item.CombatMode;
@@ -358,7 +359,22 @@ public class BaseUser implements Listener, User {
                 //Call CustomItem listeners
             }, 1);
 
+            if(event instanceof UserItemHeldEvent) {
+                ItemStack oldItem = ((UserItemHeldEvent) event).getOldHeldItem();
+
+                int oldIdentifier = InventoryUtils.getIdentifier(oldItem);
+                if(oldIdentifier > 0) {
+                    CustomItem customItem = gameGroup.getCustomItem(oldIdentifier);
+
+                    CustomEventExecutor.executeEvent(event, customItem);
+                }
+            }
+
             ItemStack newItem = getInventory().getItemInMainHand();
+
+            if(event instanceof UserItemHeldEvent) {
+                newItem = ((UserItemHeldEvent) event).getNewHeldItem();
+            }
 
             int newIdentifier = InventoryUtils.getIdentifier(newItem);
             if (newIdentifier > 0) {
