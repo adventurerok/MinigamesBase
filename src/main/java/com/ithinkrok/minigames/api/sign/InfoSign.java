@@ -10,6 +10,7 @@ import com.ithinkrok.util.config.MemoryConfig;
 import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Sign;
 
 import java.util.ArrayList;
@@ -41,7 +42,16 @@ public abstract class InfoSign implements CustomListener {
         int y = config.getInt("y");
         int z = config.getInt("z");
 
-        location = new Location(gameGroup.getCurrentMap().getDefaultWorld(), x, y, z);
+        String mapWorld = config.getString("map_world");
+        World world;
+
+        if(mapWorld != null) {
+            world = gameGroup.getCurrentMap().getWorld(mapWorld);
+        } else {
+            world = gameGroup.getCurrentMap().getDefaultWorld();
+        }
+
+        location = new Location(world, x, y, z);
 
         updateFrequency = config.getInt("update_freq");
     }
@@ -112,7 +122,8 @@ public abstract class InfoSign implements CustomListener {
         config.set("x", location.getBlockX());
         config.set("y", location.getBlockY());
         config.set("z", location.getBlockZ());
-        config.set("world", gameGroup.getCurrentMap().getInfo().getName());
+        config.set("map", gameGroup.getCurrentMap().getInfo().getName());
+        config.set("map_world", gameGroup.getCurrentMap().getWorldInfo(location.getWorld()).getName());
         config.set("class", getClass().getName());
         config.set("update_freq", updateFrequency);
 

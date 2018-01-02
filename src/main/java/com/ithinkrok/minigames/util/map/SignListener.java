@@ -113,7 +113,7 @@ public class SignListener implements CustomListener {
         List<Config> signConfigs = config.getConfigList("signs");
 
         for(Config signConfig : signConfigs) {
-            String mapName = signConfig.getString("world");
+            String mapName = signConfig.getString("map", signConfig.getString("world"));
             if(mapName != null && !mapName.equals(map.getInfo().getName())) {
                 continue;
             }
