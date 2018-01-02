@@ -197,4 +197,40 @@ public class MapPoint {
         return new MapPoint(this.world, x, y, z, this.yaw, this.pitch);
     }
 
+
+    /**
+     * Computes the component-wise minimum position of this MapPoint and the provided one, and returns a new MapPoint
+     * with that position and the world and orientation of this MapPoint.
+     *
+     * Does NOT check if the worlds are the same.
+     *
+     * @param other The other point to check
+     * @return A new map point with the component-wise minimum position of this and the provided point, otherwise the
+     * same.
+     */
+    public MapPoint min(MapPoint other) {
+        double x = Math.min(this.getX(), other.getX());
+        double y = Math.min(this.getY(), other.getY());
+        double z = Math.min(this.getZ(), other.getZ());
+
+        return setXYZ(x, y, z);
+    }
+
+    /**
+     * Computes the component-wise maximum position of this MapPoint and the provided one, and returns a new MapPoint
+     * with that position and the world and orientation of this MapPoint.
+     *
+     * Does NOT check if the worlds are the same.
+     *
+     * @param other The other point to check
+     * @return A new map point with the component-wise maximum position of this and the provided point, otherwise the
+     * same.
+     */
+    public MapPoint max(MapPoint other) {
+        double x = Math.max(this.getX(), other.getX());
+        double y = Math.max(this.getY(), other.getY());
+        double z = Math.max(this.getZ(), other.getZ());
+
+        return setXYZ(x, y, z);
+    }
 }

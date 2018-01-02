@@ -88,12 +88,7 @@ public class SchematicRotation {
 
 
             BoundingBox other = upgrade.getSchematicRotation(modRotation).calcBoundsNoUpgrades(loc);
-            if(other.getMin().getX() < bounds.getMin().getX()) bounds.getMin().setX(other.getMin().getX());
-            if(other.getMin().getY() < bounds.getMin().getY()) bounds.getMin().setY(other.getMin().getY());
-            if(other.getMin().getZ() < bounds.getMin().getZ()) bounds.getMin().setZ(other.getMin().getZ());
-            if(other.getMax().getX() > bounds.getMax().getX()) bounds.getMax().setX(other.getMax().getX());
-            if(other.getMax().getY() > bounds.getMax().getY()) bounds.getMax().setY(other.getMax().getY());
-            if(other.getMax().getZ() > bounds.getMax().getZ()) bounds.getMax().setZ(other.getMax().getZ());
+            bounds = bounds.include(other);
         }
 
         return bounds;

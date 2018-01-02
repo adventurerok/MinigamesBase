@@ -58,6 +58,18 @@ public class BoundingBox {
     }
 
 
+    /**
+     * Return a new BoundingBox that contains both this BoundingBox and the provided one in its bounds
+     * @return The new BoundingBox
+     */
+    public BoundingBox include(BoundingBox other) {
+        MapPoint min = this.getMin().min(other.getMin());
+        MapPoint max = this.getMax().max(other.getMax());
+
+        return new BoundingBox(min, max);
+    }
+
+
     public MapPoint getMin() {
         return min;
     }
