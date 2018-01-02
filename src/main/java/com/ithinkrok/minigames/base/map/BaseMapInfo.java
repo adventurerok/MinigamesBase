@@ -29,21 +29,22 @@ public class BaseMapInfo implements GameMapInfo {
         this.configPath = configPath;
         this.config = fileLoader.loadConfig(getConfigName());
 
-        if(config.contains("worlds")) {
+        String defaultWorldName = config.getString("default_world", "map");
+
+        if (config.contains("worlds")) {
             Config worldConfigs = config.getConfigOrEmpty("worlds");
 
+
             for (String worldName : worldConfigs.getKeys(false)) {
-                worlds.put(worldName, new MapWorldInfo(worldName, worldConfigs.getConfigOrNull(worldName)));
+                boolean isDefault = defaultWorldName.equals(worldName);
+                Config worldConfig = worldConfigs.getConfigOrNull(worldName);
+
+                worlds.put(worldName, new MapWorldInfo(worldName, worldConfig, isDefault));
             }
 
         } else {
-            worlds.put("map", new MapWorldInfo("map", config));
+            worlds.put(defaultWorldName, new MapWorldInfo("map", config, true));
         }
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     @Override
@@ -65,10 +66,10 @@ public class BaseMapInfo implements GameMapInfo {
     public List<String> getCredit() {
         List<String> result = new ArrayList<>();
 
-        for(int count = 0;; ++count) {
+        for (int count = 0; ; ++count) {
             String configString = "credit." + count;
 
-            if(!config.contains(configString)) return result;
+            if (!config.contains(configString)) return result;
 
             String credit = StringUtils.convertAmpersandToSelectionCharacter(config.getString(configString));
             result.add(credit);
@@ -78,5 +79,10 @@ public class BaseMapInfo implements GameMapInfo {
     @Override
     public Map<String, MapWorldInfo> getWorlds() {
         return worlds;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 }

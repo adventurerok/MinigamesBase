@@ -29,7 +29,6 @@ public interface GameMap extends LanguageLookup, SchematicPaster.BoundsChecker, 
 
     String DEFAULT_WORLD_NAME = "map";
 
-    @Deprecated
     World getDefaultWorld();
 
     World getWorld(String name);

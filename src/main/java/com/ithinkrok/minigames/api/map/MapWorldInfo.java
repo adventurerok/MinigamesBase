@@ -7,10 +7,12 @@ public class MapWorldInfo {
 
     private final String name;
     private final Config config;
+    private final boolean defaultWorld;
 
-    public MapWorldInfo(String name, Config config) {
+    public MapWorldInfo(String name, Config config, boolean defaultWorld) {
         this.name = name;
         this.config = config;
+        this.defaultWorld = defaultWorld;
     }
 
     public String getName() {
@@ -39,4 +41,10 @@ public class MapWorldInfo {
         return config.getString("folder");
     }
 
+    /**
+     * @return If we are the default world for the map
+     */
+    public boolean isDefaultWorld() {
+        return defaultWorld;
+    }
 }

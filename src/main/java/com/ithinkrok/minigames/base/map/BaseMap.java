@@ -63,6 +63,8 @@ public class BaseMap implements GameMap, ConfigHolder {
     private final Map<String, String> reverseWorldNames = new HashMap<>();
     private final Map<String, WorldHandler> worldHandlers = new HashMap<>();
 
+    private String defaultWorldName = "map";
+
     private Location spawn;
 
 
@@ -99,11 +101,15 @@ public class BaseMap implements GameMap, ConfigHolder {
             reverseWorldNames.put(world.getName(), worldInfo.getName());
 
             configureWorld(world, worldInfo.getConfig());
+
+            if(worldInfo.isDefaultWorld()) {
+                defaultWorldName = worldInfo.getName();
+            }
         }
 
 
         //TODO a way to specify which world to use for spawn
-        spawn = worlds.values().iterator().next().getSpawnLocation();
+        spawn = worlds.get(defaultWorldName).getSpawnLocation();
     }
 
 
@@ -166,8 +172,7 @@ public class BaseMap implements GameMap, ConfigHolder {
 
     @Override
     public World getDefaultWorld() {
-        //TODO we are assuming there is a world called map
-        return worlds.get("map");
+        return worlds.get(defaultWorldName);
     }
 
     @Override
