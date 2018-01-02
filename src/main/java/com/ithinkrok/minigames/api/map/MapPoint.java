@@ -51,6 +51,7 @@ public class MapPoint {
 
         String name = "map";
         double[] doubles = new double[5];
+        doubles[4] = doubles[3] = Double.NaN;
         int doublesIndex = 0;
 
         //This way the name can be in whatever position we want
@@ -116,10 +117,18 @@ public class MapPoint {
         return new Vector(x, y, z);
     }
 
+    /**
+     *
+     * @return The yaw of this position. NaN indicates that no yaw is set
+     */
     public float getYaw() {
         return yaw;
     }
 
+    /**
+     *
+     * @return The pitch of this position. NaN indicates that no pitch is set
+     */
     public float getPitch() {
         return pitch;
     }
