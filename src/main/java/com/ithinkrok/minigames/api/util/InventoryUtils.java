@@ -23,7 +23,6 @@ import java.util.*;
  */
 public class InventoryUtils {
 
-    private static final String ID_START = ChatColor.BLACK.toString() + ChatColor.WHITE.toString();
     private static final String DEFAULT_LORE_STYLE = ChatColor.DARK_PURPLE.toString() + ChatColor.ITALIC.toString();
 
     public static boolean isMaterial(ItemStack stack, Material material) {
@@ -179,25 +178,6 @@ public class InventoryUtils {
         return stack == null || stack.getType() == Material.AIR || stack.getAmount() == 0;
     }
 
-    public static boolean isIdentifierString(String test) {
-        return test.startsWith(ID_START);
-    }
-
-    public static int getIdentifierFromString(String idString) {
-        idString = idString.substring(4, 20).replace("§", "");
-
-        return Integer.parseInt(idString, 16);
-    }
-
-    public static String generateIdentifierString(int identifier) {
-        StringBuilder result = new StringBuilder(ID_START);
-
-        for (int i = 28; i >= 0; i -= 4) {
-            result.append(ChatColor.getByChar(Integer.toHexString((identifier >> i) & 0xf)));
-        }
-
-        return result.append(ID_START).toString();
-    }
 
     public static ItemStack createPotion(PotionType type, int level, boolean splash, boolean extended, int amount) {
         Potion pot = new Potion(type, level);

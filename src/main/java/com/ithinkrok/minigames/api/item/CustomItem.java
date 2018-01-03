@@ -250,11 +250,7 @@ public class CustomItem implements CustomListener, Nameable {
         }
 
         //Make us unbreakable if we are
-        if(unbreakable) {
-            ItemMeta meta = item.getItemMeta();
-            meta.setUnbreakable(true);
-            item.setItemMeta(meta);
-        }
+        if(unbreakable) item = InventoryUtils.setUnbreakable(item, true);
 
         return InventoryUtils.addIdentifier(item, name);
     }
