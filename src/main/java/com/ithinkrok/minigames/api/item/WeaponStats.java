@@ -127,4 +127,8 @@ public class WeaponStats {
     public static double getDefaultSpeed() {
         return defaultSpeed;
     }
+
+    public static boolean isWeapon(Material material) {
+        return newDamage.containsKey(material);
+    }
 }

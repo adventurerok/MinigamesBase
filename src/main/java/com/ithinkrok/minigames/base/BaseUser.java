@@ -272,7 +272,7 @@ public class BaseUser implements Listener, User {
         }
 
         //Check to see if we should apply the changes to the item
-        if (!useNewCombat && newItem != null) {
+        if (!useNewCombat && newItem != null && WeaponStats.isWeapon(newItem.getType())) {
             ItemAttributes itemAttributes = new ItemAttributes(newItem);
 
             //Make sure we haven't already made the changes
