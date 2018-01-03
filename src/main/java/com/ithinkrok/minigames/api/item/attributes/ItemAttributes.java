@@ -143,10 +143,16 @@ public class ItemAttributes {
 
         NBTTagCompound tag = nmsItem.getTag();
 
-        this.modifiers = tag.getList("AttributeModifiers", 10);
-        if (this.modifiers == null) {
+        if(tag != null) {
+            this.modifiers = tag.getList("AttributeModifiers", 10);
+
+            if (this.modifiers == null) {
+                this.modifiers = new NBTTagList();
+            }
+        } else {
             this.modifiers = new NBTTagList();
         }
+
     }
 
 
