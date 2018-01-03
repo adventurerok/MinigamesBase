@@ -992,10 +992,10 @@ public class BaseUser implements Listener, User {
     @Override
     @SuppressWarnings("unchecked")
     public boolean teleport(Location location) {
-        if (getMap() != null && !getMap().getDefaultWorld().getName().equals(location.getWorld().getName())) {
+        if (getMap() != null && getMap().getWorldInfo(location.getWorld()) == null) {
             try {
-                String message = "tried to teleport user " + name + " to another Bukkit world: game_map=" +
-                                 getMap().getDefaultWorld().getName() + ", world=" + location.getWorld().getName();
+                String message = "tried to teleport user " + name + " to a world not from the map: game_map=" +
+                                 getMap().getInfo().getName() + ", world=" + location.getWorld().getName();
 
                 throw new RuntimeException(message);
             } catch (RuntimeException e) {
