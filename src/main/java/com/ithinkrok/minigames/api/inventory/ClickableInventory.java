@@ -23,7 +23,7 @@ public class ClickableInventory {
 
     private final String title;
     private final String identifier;
-    private final Map<Integer, ClickableItem> items = new LinkedHashMap<>();
+    private final Map<String, ClickableItem> items = new LinkedHashMap<>();
 
     public ClickableInventory(Config config) {
         this.title = config.getString("title", "Missing Inv Title");
@@ -78,7 +78,7 @@ public class ClickableInventory {
 
             item.onCalculateItem(event);
             if (event.getDisplay() == null) continue;
-            if (InventoryUtils.getIdentifier(event.getDisplay()) == -1) {
+            if (InventoryUtils.getIdentifier(event.getDisplay()) == null) {
                 event.setDisplay(InventoryUtils.addIdentifier(event.getDisplay().clone(), item.getIdentifier()));
             }
 
@@ -112,7 +112,7 @@ public class ClickableInventory {
         event.setCancelled(true);
 
         if (InventoryUtils.isEmpty(event.getItemInSlot())) return;
-        int identifier = InventoryUtils.getIdentifier(event.getItemInSlot());
+        String identifier = InventoryUtils.getIdentifier(event.getItemInSlot());
 
         ClickableItem item = items.get(identifier);
         if (item == null) return;

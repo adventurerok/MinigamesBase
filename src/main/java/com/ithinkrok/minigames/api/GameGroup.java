@@ -173,8 +173,6 @@ public interface GameGroup
 
     CustomItem getCustomItem(String name);
 
-    CustomItem getCustomItem(int identifier);
-
     Collection<CustomItem> getAllCustomItems();
 
     CustomEntity getCustomEntity(String name);

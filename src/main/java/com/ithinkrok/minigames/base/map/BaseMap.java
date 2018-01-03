@@ -48,7 +48,7 @@ public class BaseMap implements GameMap, ConfigHolder {
     private final Map<String, Schematic> schematicMap = new HashMap<>();
     private final Map<String, JSONBook> bookMap = new HashMap<>();
     private final TaskList mapTaskList = new TaskList();
-    private final IdentifierMap<CustomItem> customItemIdentifierMap = new IdentifierMap<>();
+    private final Map<String, CustomItem> customItemIdentifierMap = new HashMap<>();
     private final Map<String, CustomEntity> customEntityMap = new HashMap<>();
     private final HashMap<String, Config> sharedObjects = new HashMap<>();
     private final List<PastedSchematic> pastedSchematics = new ArrayList<>();
@@ -178,12 +178,6 @@ public class BaseMap implements GameMap, ConfigHolder {
     @Override
     public CustomItem getCustomItem(String name) {
         return customItemIdentifierMap.get(name);
-    }
-
-
-    @Override
-    public CustomItem getCustomItem(int identifier) {
-        return customItemIdentifierMap.get(identifier);
     }
 
 

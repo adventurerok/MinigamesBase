@@ -83,7 +83,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     private final String chatPrefix;
     //Loaded from config
     private final HashMap<String, CustomListener> defaultListeners = new HashMap<>();
-    private final IdentifierMap<CustomItem> customItemIdentifierMap = new IdentifierMap<>();
+    private final HashMap<String, CustomItem> customItemIdentifierMap = new HashMap<>();
     private final Map<String, CustomEntity> customEntityMap = new HashMap<>();
     private final Map<String, Config> sharedObjectMap = new HashMap<>();
     private final Map<String, Schematic> schematicMap = new HashMap<>();
@@ -491,13 +491,6 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         CustomItem item = null;
         if (currentMap != null) item = currentMap.getCustomItem(name);
         return item != null ? item : customItemIdentifierMap.get(name);
-    }
-
-    @Override
-    public CustomItem getCustomItem(int identifier) {
-        CustomItem item = null;
-        if (currentMap != null) item = currentMap.getCustomItem(identifier);
-        return item != null ? item : customItemIdentifierMap.get(identifier);
     }
 
     @Override

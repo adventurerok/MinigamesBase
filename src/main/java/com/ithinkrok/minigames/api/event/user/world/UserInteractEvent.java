@@ -44,8 +44,8 @@ public abstract class UserInteractEvent extends BaseUserEvent implements Cancell
     public CustomItem getCustomItem() {
         if (!hasItem()) return null;
 
-        int identifier = InventoryUtils.getIdentifier(getItem());
-        if (identifier < 0) return null;
+        String identifier = InventoryUtils.getIdentifier(getItem());
+        if (identifier == null) return null;
         return getGameGroup().getCustomItem(identifier);
     }
 

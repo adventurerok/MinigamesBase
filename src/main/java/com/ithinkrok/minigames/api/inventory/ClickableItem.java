@@ -10,12 +10,12 @@ import org.bukkit.inventory.ItemStack;
 /**
  * Created by paul on 02/01/16.
  */
-public abstract class ClickableItem implements Identifiable {
+public abstract class ClickableItem {
 
     private static int clickableItemCount = 0;
 
     protected ItemStack baseDisplay;
-    private final int identifier = clickableItemCount++;
+    private final String identifier = Integer.toString(clickableItemCount++);
 
     private final int slot;
 
@@ -34,7 +34,7 @@ public abstract class ClickableItem implements Identifiable {
 
     public void configure(Config config) {}
 
-    public int getIdentifier() {
+    public String getIdentifier() {
         return identifier;
     }
 

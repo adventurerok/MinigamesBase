@@ -266,7 +266,7 @@ public abstract class Buyable extends ClickableItem {
 
             CustomItem customItem = event.getGameGroup().getCustomItem(customItemToAmount.getKey());
 
-            int userAmount = InventoryUtils.getAmountOfItemsWithIdentifier(inventory, customItem.getIdentifier());
+            int userAmount = InventoryUtils.getAmountOfItemsWithIdentifier(inventory, customItem.getName());
 
             String prefix = ((userAmount >= requiredAmount) ? ChatColor.GREEN : ChatColor.RED).toString();
 

@@ -178,7 +178,7 @@ public class HubListener extends SignListener {
         if(event.getDamageCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
 
             //Prevent pvp users from being affected by the super popper
-            int userHeldId = InventoryUtils.getIdentifier(event.getUser().getInventory().getItemInHand());
+            String userHeldId = InventoryUtils.getIdentifier(event.getUser().getInventory().getItemInMainHand());
             CustomItem item = event.getGameGroup().getCustomItem(userHeldId);
 
             if(item != null && item.getName().equals(pvpSwordItem)) {
@@ -208,7 +208,7 @@ public class HubListener extends SignListener {
         } else if(event.getDamageCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
 
             //Prevent users attacking other users if they are not using the pvp sword
-            int attackerWeaponId = InventoryUtils.getIdentifier(event.getWeapon());
+            String attackerWeaponId = InventoryUtils.getIdentifier(event.getWeapon());
 
             CustomItem item = event.getGameGroup().getCustomItem(attackerWeaponId);
             if(item == null || !pvpSwordItem.equals(item.getName())) {
@@ -221,7 +221,7 @@ public class HubListener extends SignListener {
     public void onUserDamaged(UserDamagedEvent event) {
 
         //Only cancel damage if it is done while not in pvp
-        int userHeldId = InventoryUtils.getIdentifier(event.getUser().getInventory().getItemInHand());
+        String userHeldId = InventoryUtils.getIdentifier(event.getUser().getInventory().getItemInHand());
 
         CustomItem item = event.getGameGroup().getCustomItem(userHeldId);
         if(item == null || !pvpSwordItem.equals(item.getName())) {

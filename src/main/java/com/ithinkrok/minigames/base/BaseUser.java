@@ -262,8 +262,8 @@ public class BaseUser implements Listener, User {
         //We will check to see if there is a custom item overriding combat mode
         CustomItem customItem = null;
         if (newItem != null) {
-            int identifier = InventoryUtils.getIdentifier(newItem);
-            if (identifier >= 0) {
+            String identifier = InventoryUtils.getIdentifier(newItem);
+            if (identifier != null) {
                 customItem = getGameGroup().getCustomItem(identifier);
             }
         }
@@ -389,8 +389,8 @@ public class BaseUser implements Listener, User {
 
 
         private ItemStack upgradeItem(ItemStack old) {
-            int id = InventoryUtils.getIdentifier(old);
-            if (id < 0) return null;
+            String id = InventoryUtils.getIdentifier(old);
+            if (id == null) return null;
 
             CustomItem customItem = gameGroup.getCustomItem(id);
             if (!customItem.replaceOnUpgrade()) return null;
@@ -414,8 +414,8 @@ public class BaseUser implements Listener, User {
         @CustomEventHandler(priority = CustomEventHandler.HIGH)
         public void eventInteract(UserInteractEvent event) {
             ItemStack item = event.getItem();
-            int identifier = InventoryUtils.getIdentifier(item);
-            if (identifier < 0) return;
+            String identifier = InventoryUtils.getIdentifier(item);
+            if (identifier == null) return;
 
             CustomItem customItem = gameGroup.getCustomItem(identifier);
 
@@ -435,8 +435,8 @@ public class BaseUser implements Listener, User {
             if (event instanceof UserItemHeldEvent) {
                 ItemStack oldItem = ((UserItemHeldEvent) event).getOldHeldItem();
 
-                int oldIdentifier = InventoryUtils.getIdentifier(oldItem);
-                if (oldIdentifier > 0) {
+                String oldIdentifier = InventoryUtils.getIdentifier(oldItem);
+                if (oldIdentifier != null) {
                     CustomItem customItem = gameGroup.getCustomItem(oldIdentifier);
 
                     CustomEventExecutor.executeEvent(event, customItem);
@@ -449,8 +449,8 @@ public class BaseUser implements Listener, User {
                 newItem = ((UserItemHeldEvent) event).getNewHeldItem();
             }
 
-            int newIdentifier = InventoryUtils.getIdentifier(newItem);
-            if (newIdentifier > 0) {
+            String newIdentifier = InventoryUtils.getIdentifier(newItem);
+            if (newIdentifier != null) {
                 CustomItem customItem = gameGroup.getCustomItem(newIdentifier);
 
                 CustomEventExecutor.executeEvent(event, customItem);
@@ -461,8 +461,8 @@ public class BaseUser implements Listener, User {
         @CustomEventHandler
         public void eventAbilityCooldown(UserAbilityCooldownEvent event) {
             for (ItemStack item : getInventory()) {
-                int identifier = InventoryUtils.getIdentifier(item);
-                if (identifier < 0) continue;
+                String identifier = InventoryUtils.getIdentifier(item);
+                if (identifier == null) continue;
 
                 CustomItem customItem = gameGroup.getCustomItem(identifier);
 

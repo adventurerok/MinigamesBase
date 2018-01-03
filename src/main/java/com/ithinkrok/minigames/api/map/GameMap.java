@@ -45,8 +45,6 @@ public interface GameMap extends LanguageLookup, SchematicPaster.BoundsChecker, 
 
     CustomItem getCustomItem(String name);
 
-    CustomItem getCustomItem(int identifier);
-
     Collection<CustomItem> getAllCustomItems();
 
     CustomEntity getCustomEntity(String name);

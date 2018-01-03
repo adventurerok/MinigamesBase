@@ -30,11 +30,7 @@ import java.util.UUID;
  * <p>
  * An item with custom use or inventory click listeners
  */
-public class CustomItem implements Identifiable, CustomListener, Nameable {
-
-    private static int customItemCount = 0;
-
-    private final int customItemId = customItemCount++;
+public class CustomItem implements CustomListener, Nameable {
 
     private final List<CustomListener> rightClickActions = new ArrayList<>();
     private final List<CustomListener> leftClickActions = new ArrayList<>();
@@ -254,7 +250,7 @@ public class CustomItem implements Identifiable, CustomListener, Nameable {
 
         item.getItemMeta().spigot().setUnbreakable(unbreakable);
 
-        return InventoryUtils.addIdentifier(item, customItemId);
+        return InventoryUtils.addIdentifier(item, name);
     }
 
     @Override
@@ -265,11 +261,6 @@ public class CustomItem implements Identifiable, CustomListener, Nameable {
     @Override
     public String getFormattedName() {
         return name;
-    }
-
-    @Override
-    public int getIdentifier() {
-        return customItemId;
     }
 
     private static class EnchantmentEffect {

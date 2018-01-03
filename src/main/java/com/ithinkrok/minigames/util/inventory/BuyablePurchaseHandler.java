@@ -168,7 +168,7 @@ class BuyablePurchaseHandler {
 
             CustomItem customItem = event.getGameGroup().getCustomItem(customItemToAmount.getKey());
 
-            InventoryUtils.removeItemsWithIdentifier(inventory, customItem.getIdentifier(), requiredAmount);
+            InventoryUtils.removeItemsWithIdentifier(inventory, customItem.getName(), requiredAmount);
 
             itemsTaken = true;
         }
@@ -207,7 +207,7 @@ class BuyablePurchaseHandler {
 
             CustomItem customItem = event.getGameGroup().getCustomItem(customItemToAmount.getKey());
 
-            int userAmount = InventoryUtils.getAmountOfItemsWithIdentifier(inventory, customItem.getIdentifier());
+            int userAmount = InventoryUtils.getAmountOfItemsWithIdentifier(inventory, customItem.getName());
 
             if (userAmount < requiredAmount) {
                 //We don't have enough to pay with

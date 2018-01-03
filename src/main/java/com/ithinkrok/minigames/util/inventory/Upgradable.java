@@ -9,6 +9,8 @@ import com.ithinkrok.minigames.util.inventory.event.BuyablePurchaseEvent;
 import com.ithinkrok.util.config.Config;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Objects;
+
 /**
  * Created by paul on 14/01/16.
  */
@@ -83,7 +85,7 @@ public class Upgradable extends Buyable {
             boolean found = false;
 
             for (ItemStack item : event.getUser().getInventory()) {
-                if (InventoryUtils.getIdentifier(item) == cust.getIdentifier()) {
+                if (Objects.equals(InventoryUtils.getIdentifier(item), cust.getName())) {
                     found = true;
                     break;
                 }

@@ -13,13 +13,15 @@ import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import java.util.Objects;
+
 /**
  * Created by paul on 08/12/16.
  */
 public class PvpSword implements CustomListener {
 
 
-    private int customItemId;
+    private String customItemId;
 
     private ItemStack helmetArmor, chestArmor, legsArmor, bootsArmor;
 
@@ -29,7 +31,7 @@ public class PvpSword implements CustomListener {
 
     @CustomEventHandler
     public void onListenerLoadedEvent(ListenerLoadedEvent<?, CustomItem> event) {
-        customItemId = event.getRepresenting().getIdentifier();
+        customItemId = event.getRepresenting().getName();
 
         Config config = event.getConfigOrEmpty();
 
@@ -50,8 +52,8 @@ public class PvpSword implements CustomListener {
         User user = event.getUser();
         PlayerInventory inventory = user.getInventory();
 
-        if(InventoryUtils.getIdentifier(event.getOldHeldItem()) == customItemId) {
-            if(InventoryUtils.getIdentifier(event.getNewHeldItem()) == customItemId) return;
+        if(Objects.equals(InventoryUtils.getIdentifier(event.getOldHeldItem()), customItemId)) {
+            if(Objects.equals(InventoryUtils.getIdentifier(event.getNewHeldItem()), customItemId)) return;
 
             //Clear the user's armor to show they are not in pvp mode
             user.clearArmor();
@@ -61,7 +63,7 @@ public class PvpSword implements CustomListener {
             if(endSound != null) {
                 user.playSound(user.getLocation(), endSound);
             }
-        } else if(InventoryUtils.getIdentifier(event.getNewHeldItem()) == customItemId) {
+        } else if(Objects.equals(InventoryUtils.getIdentifier(event.getNewHeldItem()), customItemId)) {
             //Give the user diamond armor
 
             inventory.setHelmet(new ItemStack(helmetArmor));
