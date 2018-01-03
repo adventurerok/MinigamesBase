@@ -14,6 +14,9 @@ shared_objects:
     chat_prefix: "&7[&4Towny&7] &e"
   start_info:
     game_state: "towny"
+    map: "towny"
+  user:
+    user_new_combat: true
 
 game_states:
   towny: {}
