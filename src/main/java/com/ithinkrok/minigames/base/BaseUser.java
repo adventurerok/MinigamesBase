@@ -18,6 +18,10 @@ import com.ithinkrok.minigames.api.inventory.ClickableInventory;
 import com.ithinkrok.minigames.api.item.CombatMode;
 import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.item.WeaponStats;
+import com.ithinkrok.minigames.api.item.attributes.ItemAttributeModifier;
+import com.ithinkrok.minigames.api.item.attributes.ItemAttributes;
+import com.ithinkrok.minigames.api.item.attributes.Operation;
+import com.ithinkrok.minigames.api.item.attributes.Slot;
 import com.ithinkrok.minigames.api.map.GameMap;
 import com.ithinkrok.minigames.api.map.MapPoint;
 import com.ithinkrok.minigames.api.metadata.UserMetadata;
@@ -91,6 +95,7 @@ public class BaseUser implements Listener, User {
     private final TaskList userTaskList = new TaskList();
     private final TaskList inGameTaskList = new TaskList();
     private final Collection<CustomListener> listeners = new ArrayList<>();
+    private final Account economyAccount;
     private BaseTeam team;
     private Kit kit;
     private LivingEntity entity;
@@ -103,13 +108,11 @@ public class BaseUser implements Listener, User {
     private boolean isInGame = false;
     private ClickableInventory openInventory;
     private Collection<CustomListener> kitListeners = new ArrayList<>();
-
-    private final Account economyAccount;
-
     private MapPoint inventoryTether;
     private boolean spectator;
 
     private GameTask revalidateTask;
+
 
     public BaseUser(BaseGameGroup gameGroup, BaseTeam team, UUID uuid, LivingEntity entity) {
         this.gameGroup = gameGroup;
@@ -133,6 +136,7 @@ public class BaseUser implements Listener, User {
         //This just prevents weapon damage values being wrong for more than a second, vastly limiting possible exploits
         repeatInFuture(task -> checkAttributes(), 20, 20);
     }
+
 
     @Override
     public void fixCloakedUsers() {
@@ -163,26 +167,31 @@ public class BaseUser implements Listener, User {
         }
     }
 
+
     private void decrementAttackerTimers() {
         lastAttacker.decreaseAttackerTimer(20);
         fireAttacker.decreaseAttackerTimer(20);
         witherAttacker.decreaseAttackerTimer(20);
     }
 
+
     private void showPlayer(User other) {
         if (!isPlayer() || !other.isPlayer()) return;
         getPlayer().showPlayer(other.getPlayer());
     }
+
 
     @Override
     public User getUser(UUID uuid) {
         return gameGroup.getUser(uuid);
     }
 
+
     @Override
     public <B extends UserMetadata> B getMetadata(Class<? extends B> clazz) {
         return metadataMap.getInstance(clazz);
     }
+
 
     @Override
     public <B extends UserMetadata> void setMetadata(B metadata) {
@@ -194,10 +203,12 @@ public class BaseUser implements Listener, User {
         }
     }
 
+
     @Override
     public boolean hasMetadata(Class<? extends UserMetadata> clazz) {
         return metadataMap.containsKey(clazz);
     }
+
 
     @Override
     public <B extends UserMetadata> B removeMetadata(Class<? extends B> clazz) {
@@ -208,32 +219,87 @@ public class BaseUser implements Listener, User {
         return metadata;
     }
 
+
     @Override
     public boolean hasPermission(String permission) {
         return entity.hasPermission(permission);
     }
 
+
     @Override
     public boolean hasSharedObject(String name) {
         return gameGroup.hasSharedObject(name);
+    }
+
+
+    @Override
+    public Config getSharedObject(String name) {
+        return gameGroup.getSharedObject(name);
     }    @Override
     public boolean isPlayer() {
         return entity instanceof Player;
     }
 
-    @Override
-    public Config getSharedObject(String name) {
-        return gameGroup.getSharedObject(name);
-    }
 
     @Override
     public Config getSharedObjectOrEmpty(String name) {
         return gameGroup.getSharedObjectOrEmpty(name);
     }
 
+
     private void hidePlayer(User other) {
         if (!isPlayer() || !other.isPlayer()) return;
         getPlayer().hidePlayer(other.getPlayer());
+    }
+
+
+    private void checkAttributes() {
+        Config userShared = getGameGroup().getSharedObjectOrEmpty("user");
+        boolean useNewCombat = userShared.getBoolean("use_new_combat", false);
+
+        ItemStack newItem = getInventory().getItemInMainHand();
+
+        //We will check to see if there is a custom item overriding combat mode
+        CustomItem customItem = null;
+        if (newItem != null) {
+            int identifier = InventoryUtils.getIdentifier(newItem);
+            if (identifier >= 0) {
+                customItem = getGameGroup().getCustomItem(identifier);
+            }
+        }
+        if (customItem != null && customItem.getCombatMode() != CombatMode.INHERIT) {
+            useNewCombat = customItem.getCombatMode() == CombatMode.NEW;
+        }
+
+        //Check to see if we should apply the changes to the item
+        if (!useNewCombat && newItem != null) {
+            ItemAttributes itemAttributes = new ItemAttributes(newItem);
+
+            //Make sure we haven't already made the changes
+            if (itemAttributes.getModifier("Damage Override") == null) {
+                double legacyDamage = WeaponStats.getLegacyDamage(newItem.getType());
+                double newDamage = WeaponStats.getNewDamage(newItem.getType());
+                double damageChange = legacyDamage - newDamage;
+
+                ItemAttributeModifier damage = new ItemAttributeModifier(
+                        Attribute.GENERIC_ATTACK_DAMAGE, "Damage Override", damageChange,
+                        Operation.ADDITIVE, Slot.MAIN_HAND);
+
+                itemAttributes.addModifier(damage);
+
+                //Assume we don't have a speed modifier either
+
+                ItemAttributeModifier speed = new ItemAttributeModifier(
+                        Attribute.GENERIC_ATTACK_SPEED, "Speed Override", 4,
+                        Operation.ADDITIVE, Slot.MAIN_HAND);
+
+                itemAttributes.addModifier(speed);
+
+                ItemStack modified = itemAttributes.apply(newItem);
+                getInventory().setItemInMainHand(modified);
+            }
+        }
+
     }
 
     private class UserListener implements CustomListener {
@@ -253,6 +319,7 @@ public class BaseUser implements Listener, User {
             }
         }
 
+
         @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
         public void eventGameStateChange(GameStateChangedEvent event) {
             Iterator<UserMetadata> iterator = metadataMap.values().iterator();
@@ -267,6 +334,7 @@ public class BaseUser implements Listener, User {
                 }
             }
         }
+
 
         @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
         public void eventMapChange(MapChangedEvent event) {
@@ -283,12 +351,14 @@ public class BaseUser implements Listener, User {
             }
         }
 
+
         @CustomEventHandler
         public void eventInventoryClick(UserInventoryClickEvent event) {
             if (!isViewingClickableInventory()) return;
 
             getClickableInventory().inventoryClick(event);
         }
+
 
         @CustomEventHandler
         public void eventUpgrade(UserVariableChangeEvent event) {
@@ -317,6 +387,7 @@ public class BaseUser implements Listener, User {
             inv.setArmorContents(armor);
         }
 
+
         private ItemStack upgradeItem(ItemStack old) {
             int id = InventoryUtils.getIdentifier(old);
             if (id < 0) return null;
@@ -331,12 +402,14 @@ public class BaseUser implements Listener, User {
             return replace;
         }
 
+
         @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
         public void eventInventoryClose(UserInventoryCloseEvent event) {
             if (!isViewingClickableInventory()) return;
 
             openInventory = null;
         }
+
 
         @CustomEventHandler(priority = CustomEventHandler.HIGH)
         public void eventInteract(UserInteractEvent event) {
@@ -359,11 +432,11 @@ public class BaseUser implements Listener, User {
                 //Call CustomItem listeners
             }, 1);
 
-            if(event instanceof UserItemHeldEvent) {
+            if (event instanceof UserItemHeldEvent) {
                 ItemStack oldItem = ((UserItemHeldEvent) event).getOldHeldItem();
 
                 int oldIdentifier = InventoryUtils.getIdentifier(oldItem);
-                if(oldIdentifier > 0) {
+                if (oldIdentifier > 0) {
                     CustomItem customItem = gameGroup.getCustomItem(oldIdentifier);
 
                     CustomEventExecutor.executeEvent(event, customItem);
@@ -372,7 +445,7 @@ public class BaseUser implements Listener, User {
 
             ItemStack newItem = getInventory().getItemInMainHand();
 
-            if(event instanceof UserItemHeldEvent) {
+            if (event instanceof UserItemHeldEvent) {
                 newItem = ((UserItemHeldEvent) event).getNewHeldItem();
             }
 
@@ -383,6 +456,7 @@ public class BaseUser implements Listener, User {
                 CustomEventExecutor.executeEvent(event, customItem);
             }
         }
+
 
         @CustomEventHandler
         public void eventAbilityCooldown(UserAbilityCooldownEvent event) {
@@ -398,80 +472,8 @@ public class BaseUser implements Listener, User {
 
     }
 
-    private void checkAttributes() {
-        AttributeInstance damage = getEntity().getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
-        AttributeInstance speed = getEntity().getAttribute(Attribute.GENERIC_ATTACK_SPEED);
 
 
-        Config userShared = getGameGroup().getSharedObjectOrEmpty("user");
-        boolean useNewCombat = userShared.getBoolean("use_new_combat", false);
-
-        ItemStack newItem = getInventory().getItemInMainHand();
-
-        //We will check to see if there is a custom item overriding combat mode
-        CustomItem customItem = null;
-        if(newItem != null) {
-            int identifier = InventoryUtils.getIdentifier(newItem);
-            if(identifier >= 0 ) {
-                customItem = getGameGroup().getCustomItem(identifier);
-            }
-        }
-        if(customItem != null && customItem.getCombatMode() != CombatMode.INHERIT) {
-            useNewCombat = customItem.getCombatMode() == CombatMode.NEW;
-        }
-
-
-        //Remove our custom damage and speed overrides
-        for (AttributeModifier modifier : damage.getModifiers()) {
-            if("Damage Override".equals(modifier.getName())) {
-                damage.removeModifier(modifier);
-            }
-        }
-
-        if(speed != null) {
-            for (AttributeModifier modifier : speed.getModifiers()) {
-                if("Speed Override".equals(modifier.getName())) {
-                    speed.removeModifier(modifier);
-                }
-            }
-        }
-
-
-        if(!useNewCombat) {
-            //Remove 1.9+ damage values
-            for (AttributeModifier modifier : damage.getModifiers()) {
-                if ("Tool modifier".equals(modifier.getName()) ||
-                        "Weapon modifier".equals(modifier.getName())) {
-                    damage.removeModifier(modifier);
-                }
-            }
-
-            //Remove 1.9 attack speed
-            if(speed != null) {
-                for (AttributeModifier attributeModifier : speed.getModifiers()) {
-                    speed.removeModifier(attributeModifier);
-                }
-
-
-                speed.addModifier(
-                        new AttributeModifier("Speed Override", 4.0, AttributeModifier.Operation.ADD_NUMBER));
-            }
-        }
-
-
-
-        //Set damage to legacy values, if required
-        if (newItem != null && !useNewCombat) {
-            double legacyDamageModifier =
-                    WeaponStats.getLegacyDamage(newItem.getType()) - damage.getBaseValue();
-
-            if (legacyDamageModifier != 0) {
-                damage.addModifier(new AttributeModifier("Damage Override", legacyDamageModifier,
-                                                         AttributeModifier.Operation.ADD_NUMBER));
-            }
-        }
-
-    }
 
 
     @Override
@@ -620,6 +622,7 @@ public class BaseUser implements Listener, User {
         }
     }
 
+
     @Override
     public void updateScoreboard() {
         if (scoreboardDisplay == null || scoreboardHandler == null) return;
@@ -627,10 +630,12 @@ public class BaseUser implements Listener, User {
         scoreboardHandler.updateScoreboard(this, scoreboardDisplay);
     }
 
+
     @Override
     public boolean showCloakedUsers() {
         return showCloakedPlayers;
     }
+
 
     @Override
     public void removeNonPlayer() {
@@ -642,10 +647,12 @@ public class BaseUser implements Listener, User {
         gameGroup.userEvent(new UserQuitEvent(this, UserQuitEvent.QuitReason.NON_PLAYER_REMOVED));
     }
 
+
     @Override
     public void disguise(EntityType type) {
         disguise(new Disguise(type));
     }
+
 
     @Override
     public void disguise(Disguise disguise) {
@@ -653,11 +660,13 @@ public class BaseUser implements Listener, User {
         gameGroup.getGame().disguiseUser(this, disguise);
     }
 
+
     @Override
     public void unDisguise() {
         this.disguise = null;
         gameGroup.getGame().unDisguiseUser(this);
     }
+
 
     @Override
     public void setAllowFlight(boolean allowFlight) {
@@ -669,11 +678,13 @@ public class BaseUser implements Listener, User {
         }
     }
 
+
     @Override
     public void setFlySpeed(double flySpeed) {
         if (isPlayer()) getPlayer().setFlySpeed((float) flySpeed);
         else playerState.setFlySpeed((float) flySpeed);
     }
+
 
     @Override
     public void resetUserStats(boolean removePotionEffects) {
@@ -690,20 +701,24 @@ public class BaseUser implements Listener, User {
         if (removePotionEffects) removePotionEffects();
     }
 
+
     @Override
     public int getHitDelayTicks() {
         return entity.getMaximumNoDamageTicks();
     }
+
 
     @Override
     public void setHitDelayTicks(int ticks) {
         entity.setMaximumNoDamageTicks(ticks);
     }
 
+
     @Override
     public void setMaxHealth(double maxHealth) {
         entity.setMaxHealth(maxHealth);
     }
+
 
     @Override
     public void setFoodLevel(int foodLevel) {
@@ -711,17 +726,20 @@ public class BaseUser implements Listener, User {
         else playerState.setFoodLevel(foodLevel);
     }
 
+
     @Override
     public void setSaturation(double saturation) {
         if (isPlayer()) getPlayer().setSaturation((float) saturation);
         else playerState.setSaturation((float) saturation);
     }
 
+
     @Override
     public void setWalkSpeed(double walkSpeed) {
         if (isPlayer()) getPlayer().setWalkSpeed((float) walkSpeed);
         else playerState.setWalkSpeed((float) walkSpeed);
     }
+
 
     @Override
     public void removePotionEffects() {
@@ -734,12 +752,14 @@ public class BaseUser implements Listener, User {
         entity.setFireTicks(0);
     }
 
+
     @Override
     public void setCollidesWithEntities(boolean collides) {
         if (!isPlayer()) return;
 
         getPlayer().spigot().setCollidesWithEntities(collides);
     }
+
 
     @Override
     public void decloak() {
@@ -752,15 +772,18 @@ public class BaseUser implements Listener, User {
         }
     }
 
+
     @Override
     public String getTeamName() {
         return team != null ? team.getName() : null;
     }
 
+
     @Override
     public BaseTeam getTeam() {
         return team;
     }
+
 
     @Override
     public void setTeam(Team team) {
@@ -780,10 +803,12 @@ public class BaseUser implements Listener, User {
         gameGroup.userEvent(event);
     }
 
+
     @Override
     public Kit getKit() {
         return kit;
     }
+
 
     @Override
     public void setKit(Kit kit) {
@@ -804,20 +829,24 @@ public class BaseUser implements Listener, User {
         gameGroup.userEvent(event);
     }
 
+
     @Override
     public TeamIdentifier getTeamIdentifier() {
         return team != null ? team.getTeamIdentifier() : null;
     }
+
 
     @Override
     public BaseGameGroup getGameGroup() {
         return gameGroup;
     }
 
+
     @Override
     public boolean isInGame() {
         return isInGame;
     }
+
 
     @Override
     @SuppressWarnings("unchecked")
@@ -840,6 +869,7 @@ public class BaseUser implements Listener, User {
 
         gameGroup.userEvent(new UserInGameChangeEvent(this));
     }
+
 
     @Override
     public void setSpectator(boolean spectator) {
@@ -877,6 +907,7 @@ public class BaseUser implements Listener, User {
         gameGroup.userEvent(new UserSpectatorChangeEvent(this, spectator));
     }
 
+
     @Override
     public void setScoreboardHandler(ScoreboardHandler scoreboardHandler) {
         this.scoreboardHandler = scoreboardHandler;
@@ -886,10 +917,12 @@ public class BaseUser implements Listener, User {
         }
     }
 
+
     @Override
     public GameMode getGameMode() {
         return isPlayer() ? getPlayer().getGameMode() : playerState.getGameMode();
     }
+
 
     @Override
     public void setGameMode(GameMode gameMode) {
@@ -897,10 +930,12 @@ public class BaseUser implements Listener, User {
         else playerState.setGameMode(gameMode);
     }
 
+
     @Override
     public int getFireTicks() {
         return entity.getFireTicks();
     }
+
 
     @Override
     public void setFireTicks(User fireAttacker, int fireTicks) {
@@ -908,10 +943,12 @@ public class BaseUser implements Listener, User {
         entity.setFireTicks(fireTicks);
     }
 
+
     @Override
     public void setWitherTicks(User witherAttacker, int witherTicks) {
         setWitherTicks(witherAttacker, witherTicks, 0);
     }
+
 
     /**
      * @param witherAmplifier The amplifier for the effect. Level n is amplifier n-1.
@@ -922,15 +959,18 @@ public class BaseUser implements Listener, User {
         entity.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, witherAmplifier, witherAmplifier));
     }
 
+
     @Override
     public boolean startCoolDown(String ability, double seconds, String coolDownLocale) {
         return cooldownHandler.startCoolDown(ability, seconds, coolDownLocale);
     }
 
+
     @Override
     public void stopCoolDown(String ability, String stopLocale) {
         cooldownHandler.stopCoolDown(ability, stopLocale);
     }
+
 
     @Override
     public void playSound(Location location, SoundEffect sound) {
@@ -939,45 +979,54 @@ public class BaseUser implements Listener, User {
         getPlayer().playSound(location, sound.getSound(), sound.getVolume(), sound.getPitch());
     }
 
+
     @Override
     public boolean isCoolingDown(String ability) {
         return cooldownHandler.isCoolingDown(ability);
     }
+
 
     @Override
     public double getCooldownSeconds(String ability) {
         return cooldownHandler.getCooldownSeconds(ability);
     }
 
+
     @Override
     public double getUserVariable(String upgrade) {
         return userVariableHandler.getVariable(upgrade);
     }
+
 
     @Override
     public void setUserVariable(String upgrade, double level) {
         userVariableHandler.setVariable(upgrade, level);
     }
 
+
     @Override
     public ItemStack createCustomItemForUser(CustomItem item) {
         return item.createWithVariables(gameGroup, userVariableHandler);
     }
+
 
     @Override
     public <T extends Projectile> T launchProjectile(Class<? extends T> projectileClass) {
         return entity.launchProjectile(projectileClass);
     }
 
+
     @Override
     public UserVariableHandler getUserVariables() {
         return userVariableHandler;
     }
 
+
     @Override
     public UUID getUuid() {
         return uuid;
     }
+
 
     @Override
     public boolean teleport(MapPoint point) {
@@ -988,6 +1037,7 @@ public class BaseUser implements Listener, User {
 
         return teleport(target);
     }
+
 
     @Override
     @SuppressWarnings("unchecked")
@@ -1026,15 +1076,18 @@ public class BaseUser implements Listener, User {
         return revalidateNonPlayer(event.getTo()) || success;
     }
 
+
     @Override
     public boolean isViewingClickableInventory() {
         return openInventory != null;
     }
 
+
     @Override
     public ClickableInventory getClickableInventory() {
         return openInventory;
     }
+
 
     @Override
     public Inventory getEnderInventory() {
@@ -1042,6 +1095,7 @@ public class BaseUser implements Listener, User {
 
         return getPlayer().getEnderChest();
     }
+
 
     @Override
     @SuppressWarnings("unchecked")
@@ -1073,6 +1127,7 @@ public class BaseUser implements Listener, User {
         });
     }
 
+
     @Override
     public void showInventory(Inventory inventory, Location inventoryTether) {
         doInFuture(task -> {
@@ -1084,6 +1139,7 @@ public class BaseUser implements Listener, User {
         });
     }
 
+
     @Override
     public void redoInventory() {
         if (this.openInventory == null || !isPlayer()) return;
@@ -1093,10 +1149,12 @@ public class BaseUser implements Listener, User {
         this.openInventory.populateInventory(viewing, this);
     }
 
+
     @Override
     public Location getInventoryTether() {
         return gameGroup.getCurrentMap().getLocation(inventoryTether);
     }
+
 
     @Override
     public void setXpLevel(int level) {
@@ -1104,10 +1162,12 @@ public class BaseUser implements Listener, User {
         else playerState.setLevel(level);
     }
 
+
     @Override
     public float getExp() {
         return isPlayer() ? getPlayer().getExp() : playerState.getExp();
     }
+
 
     @Override
     public void setExp(double exp) {
@@ -1115,10 +1175,12 @@ public class BaseUser implements Listener, User {
         else playerState.setExp((float) exp);
     }
 
+
     @Override
     public void bindTaskToInGame(GameTask task) {
         inGameTaskList.addTask(task);
     }
+
 
     @Override
     public String getTabListName() {
@@ -1126,16 +1188,19 @@ public class BaseUser implements Listener, User {
         else return getPlayer().getPlayerListName();
     }
 
+
     @Override
     public void setTabListName(String tabListName) {
         if (!isPlayer()) playerState.setTabListName(tabListName);
         else getPlayer().setPlayerListName(tabListName);
     }
 
+
     @Override
     public Block rayTraceBlocks(int maxDistance) {
         return entity.getTargetBlock(SEE_THROUGH, maxDistance);
     }
+
 
     @Override
     public Inventory createInventory(int size, String title) {
@@ -1143,6 +1208,7 @@ public class BaseUser implements Listener, User {
 
         return Bukkit.createInventory((InventoryHolder) entity, size, title);
     }
+
 
     @Override
     public void closeInventory() {
@@ -1155,10 +1221,12 @@ public class BaseUser implements Listener, User {
         });
     }
 
+
     @Override
     public void giveColoredArmor(Color color, boolean unbreakable) {
         giveColoredArmor(color, unbreakable, true, true, true, true);
     }
+
 
     @Override
     public void giveColoredArmor(Color color, boolean unbreakable, boolean helmet, boolean chestplate, boolean leggings,
@@ -1181,10 +1249,12 @@ public class BaseUser implements Listener, User {
         }
     }
 
+
     @Override
     public PlayerInventory getInventory() {
         return isPlayer() ? getPlayer().getInventory() : playerState.getInventory();
     }
+
 
     @Override
     public void clearArmor(boolean helmet, boolean chestplate, boolean leggings, boolean boots) {
@@ -1196,15 +1266,18 @@ public class BaseUser implements Listener, User {
         if (boots) equipment.setBoots(null);
     }
 
+
     @Override
     public void clearArmor() {
         clearArmor(true, true, true, true);
     }
 
+
     @Override
     public String getKitName() {
         return kit != null ? kit.getName() : null;
     }
+
 
     @Override
     public Location getCompassTarget() {
@@ -1212,55 +1285,66 @@ public class BaseUser implements Listener, User {
         return getPlayer().getCompassTarget();
     }
 
+
     @Override
     public void setCompassTarget(Location compassTarget) {
         if (isPlayer()) getPlayer().setCompassTarget(compassTarget);
     }
+
 
     @Override
     public void addPotionEffect(PotionEffect effect) {
         entity.addPotionEffect(effect);
     }
 
+
     @Override
     public void addPotionEffect(PotionEffect effect, boolean force) {
         entity.addPotionEffect(effect, force);
     }
+
 
     @Override
     public User getFireAttacker() {
         return fireAttacker.getAttacker();
     }
 
+
     @Override
     public User getWitherAttacker() {
         return witherAttacker.getAttacker();
     }
+
 
     @Override
     public User getLastAttacker() {
         return lastAttacker.getAttacker();
     }
 
+
     @Override
     public void setLastAttacker(User lastAttacker) {
         this.lastAttacker.setAttacker(lastAttacker);
     }
+
 
     @Override
     public boolean isInsideVehicle() {
         return entity.isInsideVehicle();
     }
 
+
     @Override
     public Entity getVehicle() {
         return entity.getVehicle();
     }
 
+
     @Override
     public LivingEntity getEntity() {
         return entity;
     }
+
 
     @Override
     public TNTPrimed createExplosion(Location loc, float power, boolean fire, int fuseTicks) {
@@ -1276,20 +1360,24 @@ public class BaseUser implements Listener, User {
         return tnt;
     }
 
+
     @Override
     public GameMap getMap() {
         return gameGroup.getCurrentMap();
     }
+
 
     @Override
     public void makeEntityRepresentUser(Entity entity) {
         gameGroup.getGame().makeEntityRepresentUser(this, entity);
     }
 
+
     @Override
     public boolean isFlying() {
         return isPlayer() && getPlayer().isFlying();
     }
+
 
     @Override
     public void setFlying(boolean flying) {
@@ -1297,10 +1385,12 @@ public class BaseUser implements Listener, User {
         getPlayer().setFlying(flying);
     }
 
+
     @Override
     public void showAboveHotbarLocale(String locale, Object... args) {
         showAboveHotbarMessage(gameGroup.getLocale(locale, args));
     }
+
 
     @Override
     public void showAboveHotbarMessage(String message) {
@@ -1314,15 +1404,18 @@ public class BaseUser implements Listener, User {
         chatPacket.sendPacket(getPlayer());
     }
 
+
     @Override
     public void showTitle(String title) {
         showTitle(title, null);
     }
 
+
     @Override
     public void showTitle(String title, String subTitle) {
         showTitle(title, subTitle, 20, 60, 20);
     }
+
 
     @Override
     public void showTitle(String title, String subTitle, int fadeIn, int stay, int fadeOut) {
@@ -1346,30 +1439,36 @@ public class BaseUser implements Listener, User {
         Bukkit.dispatchCommand(console, "title " + getName() + " title " + titleJson + "");
     }
 
+
     @Override
     public double getHealth() {
         return entity.getHealth();
     }
+
 
     @Override
     public void setHealth(double health) {
         entity.setHealth(health);
     }
 
+
     @Override
     public boolean hasPotionEffect(PotionEffectType type) {
         return entity.hasPotionEffect(type);
     }
+
 
     @Override
     public void setFallDistance(double fallDistance) {
         entity.setFallDistance((float) fallDistance);
     }
 
+
     @Override
     public boolean isOnGround() {
         return entity.isOnGround();
     }
+
 
     @Override
     public boolean unstuck(int maxRadius) {
@@ -1409,16 +1508,19 @@ public class BaseUser implements Listener, User {
         return false;
     }
 
+
     @Override
     public String getName() {
         return name;
     }
+
 
     @Override
     public String getFormattedName() {
         String displayName = getDisplayName();
         return displayName != null ? displayName : getName();
     }
+
 
     @Override
     public GameTask doInFuture(GameRunnable task) {
@@ -1428,6 +1530,7 @@ public class BaseUser implements Listener, User {
         return gameTask;
     }
 
+
     @Override
     public GameTask doInFuture(GameRunnable task, int delay) {
         GameTask gameTask = gameGroup.doInFuture(task, delay);
@@ -1435,6 +1538,7 @@ public class BaseUser implements Listener, User {
         userTaskList.addTask(gameTask);
         return gameTask;
     }
+
 
     @Override
     public GameTask repeatInFuture(GameRunnable task, int delay, int period) {
@@ -1444,10 +1548,12 @@ public class BaseUser implements Listener, User {
         return gameTask;
     }
 
+
     @Override
     public void cancelAllTasks() {
         userTaskList.cancelAllTasks();
     }
+
 
     @Override
     public void setVelocity(Vector velocity) {
@@ -1486,6 +1592,7 @@ public class BaseUser implements Listener, User {
         else return entity.getType();
     }
 
+
     @Override
     public Disguise getDisguise() {
         return disguise;
@@ -1512,6 +1619,7 @@ public class BaseUser implements Listener, User {
         return listeners;
     }
 
+
     @Override
     public Account getEconomyAccount() {
         return economyAccount;
@@ -1529,6 +1637,7 @@ public class BaseUser implements Listener, User {
         sendMessageNoPrefix(gameGroup.getMessagePrefix() + message);
     }
 
+
     @Override
     public void sendMessageNoPrefix(Config message) {
         Player player = getPlayer();
@@ -1537,15 +1646,18 @@ public class BaseUser implements Listener, User {
         PlayerMessageSender.sendMessage(message, Collections.singleton(player));
     }
 
+
     @Override
     public void sendMessageNoPrefix(String message) {
         entity.sendMessage(message);
     }
 
+
     @Override
     public String getMessagePrefix() {
         return gameGroup.getMessagePrefix();
     }
+
 
     @Override
     public void sendLocaleNoPrefix(String locale, Object... args) {

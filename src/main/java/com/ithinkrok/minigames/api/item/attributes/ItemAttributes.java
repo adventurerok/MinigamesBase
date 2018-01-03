@@ -30,6 +30,10 @@ public class ItemAttributes {
         this.modifiers = new NBTTagList();
     }
 
+    public ItemAttributes(ItemStack item) {
+        getFromStack(item);
+    }
+
 
     /**
      * Add an modifier to this set of attribute modifiers for an item.
