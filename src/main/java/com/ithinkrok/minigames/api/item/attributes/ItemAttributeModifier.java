@@ -1,12 +1,9 @@
 package com.ithinkrok.minigames.api.item.attributes;
 
-import com.ithinkrok.minigames.api.util.ReflectionUtils;
 import com.ithinkrok.util.config.Config;
-import org.bukkit.Bukkit;
+import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import org.bukkit.attribute.Attribute;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.UUID;
 
 public class ItemAttributeModifier {
@@ -19,14 +16,17 @@ public class ItemAttributeModifier {
     private final double amount;
     private final UUID uuid;
 
+
     public ItemAttributeModifier(Attribute attribute, String name, double amount, Operation operation, Slot slot) {
         this(attribute, name, amount, operation, slot, UUID.randomUUID());
     }
+
 
     public ItemAttributeModifier(Attribute attribute, String name, double amount, Operation operation, Slot slot,
                                  UUID uuid) {
         this(getAttributeName(attribute), name, amount, operation, slot, uuid);
     }
+
 
     public ItemAttributeModifier(String attribute, String name, double amount, Operation operation, Slot slot,
                                  UUID uuid) {
@@ -37,6 +37,7 @@ public class ItemAttributeModifier {
         this.amount = amount;
         this.uuid = uuid;
     }
+
 
     private static String getAttributeName(Attribute attribute) {
         switch (attribute) {
@@ -65,40 +66,34 @@ public class ItemAttributeModifier {
         }
     }
 
+
     public ItemAttributeModifier(String attribute, String name, double amount, Operation operation, Slot slot) {
         this(attribute, name, amount, operation, slot, UUID.randomUUID());
     }
 
-    public ItemAttributeModifier(Object modifier) {
-        try {
 
-            Method getString = modifier.getClass().getMethod("getString", String.class);
+    public ItemAttributeModifier(NBTTagCompound modifier) {
+        this.attribute = modifier.getString("AttributeName");
+        this.name = modifier.getString("Name");
+        this.slot = Slot.getFromName(modifier.getString("Slot"));
 
-            this.attribute = (String) getString.invoke(modifier, "AttributeName");
-            this.name = (String) getString.invoke(modifier, "Name");
-            this.slot = Slot.getFromName((String) getString.invoke(modifier, "Slot"));
+        this.operation = Operation.getFromId(modifier.getInt("Operation"));
 
-            Method getInt = modifier.getClass().getMethod("getInt", String.class);
-            this.operation = Operation.getFromId((int) getInt.invoke(modifier, "Operation"));
+        this.amount = modifier.getDouble("Amount");
 
-            Method getDouble = modifier.getClass().getMethod("getDouble", String.class);
-            this.amount = (double) getDouble.invoke(modifier, "Amount");
+        this.uuid =
+                new UUID(modifier.getLong("UUIDMost"), modifier.getLong("UUIDLeast"));
 
-            Method getLong = modifier.getClass().getMethod("getLong", String.class);
-            this.uuid =
-                    new UUID((long) getLong.invoke(modifier, "UUIDMost"), (long) getLong.invoke(modifier, "UUIDLeast"));
-
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-            throw new IllegalArgumentException("Object provided is not an NBTCompound");
-        }
     }
+
 
     public ItemAttributeModifier(Config config) {
         String attribute = config.getString("attribute");
 
-        try{
+        try {
             attribute = getAttributeName(Attribute.valueOf(attribute.toUpperCase()));
-        } catch (IllegalArgumentException ignored) { }
+        } catch (IllegalArgumentException ignored) {
+        }
 
         this.attribute = attribute;
 
@@ -109,8 +104,8 @@ public class ItemAttributeModifier {
 
         Operation operation = Operation.ADDITIVE;
 
-        if(config.isString("operation")) {
-            try{
+        if (config.isString("operation")) {
+            try {
                 operation = Operation.valueOf(config.getString("operation"));
             } catch (Exception ignored) {
                 System.out.println("Invalid operation for attribute " + this.name + ", will use default additive");
@@ -123,7 +118,7 @@ public class ItemAttributeModifier {
 
         UUID uuid;
 
-        if(config.contains("uuid")) {
+        if (config.contains("uuid")) {
             uuid = UUID.fromString(config.getString("uuid"));
         } else {
             uuid = UUID.randomUUID();
@@ -132,59 +127,52 @@ public class ItemAttributeModifier {
         this.uuid = uuid;
     }
 
-    @SuppressWarnings("ConstantConditions")
-    public Object getNBT() {
-        try {
-            Object data = ReflectionUtils.getNMSClass("NBTTagCompound").newInstance();
-            if (data != null) {
 
-                Method setString = data.getClass().getMethod("setString", String.class, String.class);
-                setString.invoke(data, "AttributeName", getAttribute());
-                setString.invoke(data, "Name", getName());
-                if (getSlot() != null) {
-                    setString.invoke(data, "Slot", getSlot().getName());
-                }
+    public NBTTagCompound getNBT() {
+        NBTTagCompound data = new NBTTagCompound();
 
-                Method setInt = data.getClass().getMethod("setInt", String.class, int.class);
-                setInt.invoke(data, "Operation", getOperation().getId());
-
-                Method setDouble = data.getClass().getMethod("setDouble", String.class, double.class);
-                setDouble.invoke(data, "Amount", getAmount());
-
-                Method setLong = data.getClass().getMethod("setLong", String.class, long.class);
-                setLong.invoke(data, "UUIDMost", getUuid().getMostSignificantBits());
-                setLong.invoke(data, "UUIDLeast", getUuid().getLeastSignificantBits());
-
-                return data;
-            } else {
-                Bukkit.getLogger().info("[ItemAttributeAPI] Incompatible Server version! Missing classes.");
-                return null;
-            }
-        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
-            Bukkit.getLogger().info("[ItemAttributeAPI] Incompatible server version! Some methods can't be applied.");
-            return null;
+        data.setString("AttributeName", getAttribute());
+        data.setString("Name", getName());
+        if (getSlot() != null) {
+            data.setString("Slot", getSlot().getName());
         }
+
+        data.setInt("Operation", getOperation().getId());
+
+        data.setDouble("Amount", getAmount());
+
+        data.setLong("UUIDMost", getUuid().getMostSignificantBits());
+        data.setLong("UUIDLeast", getUuid().getLeastSignificantBits());
+
+        return data;
+
     }
+
 
     public String getAttribute() {
         return attribute;
     }
 
+
     public String getName() {
         return name;
     }
+
 
     public Slot getSlot() {
         return slot;
     }
 
+
     public Operation getOperation() {
         return operation;
     }
 
+
     public double getAmount() {
         return amount;
     }
+
 
     public UUID getUuid() {
         return uuid;
