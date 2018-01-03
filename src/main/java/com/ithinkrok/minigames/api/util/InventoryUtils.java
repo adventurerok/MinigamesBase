@@ -2,9 +2,12 @@ package com.ithinkrok.minigames.api.util;
 
 import com.ithinkrok.util.StringUtils;
 import net.milkbowl.vault.item.Items;
+import net.minecraft.server.v1_12_R1.NBTTagCompound;
+import net.minecraft.server.v1_12_R1.NBTTagString;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -13,10 +16,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by paul on 31/12/15.
@@ -132,28 +132,23 @@ public class InventoryUtils {
     }
 
     public static ItemStack setItemNameAndLore(ItemStack item, String name, String... lore) {
-        int identifier = getIdentifier(item);
-
         ItemMeta im = item.getItemMeta();
         if (name != null) im.setDisplayName(name);
         im.setLore(Arrays.asList(lore));
         item.setItemMeta(im);
 
-        return identifier == -1 ? item : addIdentifier(item, identifier);
+        return item;
     }
 
-    public static int getIdentifier(ItemStack item) {
-        if (isEmpty(item)) return -1;
-        ItemMeta im = item.getItemMeta();
+    public static String getIdentifier(ItemStack item) {
+        if (isEmpty(item)) return null;
 
-        if (!im.hasLore()) return -1;
-        List<String> lore = im.getLore();
+        net.minecraft.server.v1_12_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
 
-        for (String s : lore) {
-            if (isIdentifierString(s)) return getIdentifierFromString(s);
-        }
+        NBTTagCompound tag = nmsItem.getTag();
+        if(tag == null) return null;
 
-        return -1;
+        return tag.getString("CustomItem");
     }
 
     /**
@@ -164,24 +159,13 @@ public class InventoryUtils {
         return Items.itemByStack(item).getName();
     }
 
-    public static ItemStack addIdentifier(ItemStack item, int identifier) {
-        ItemMeta im = item.getItemMeta();
+    public static ItemStack addIdentifier(ItemStack item, String identifier) {
+        net.minecraft.server.v1_12_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+        nmsItem.a("CustomItem", new NBTTagString(identifier));
 
-        List<String> lore;
-        if (im.hasLore()) lore = im.getLore();
-        else lore = new ArrayList<>();
-
-        String idString = generateIdentifierString(identifier);
-
-        if (lore.isEmpty()) {
-            lore.add(idString);
-        } else {
-            lore.set(0, idString + DEFAULT_LORE_STYLE + lore.get(0));
-        }
-
-        im.setLore(lore);
-        item.setItemMeta(im);
-
+        //This works as the item meta stores its "unhandled" tags including our custom one
+        ItemMeta meta = CraftItemStack.asBukkitCopy(nmsItem).getItemMeta();
+        item.setItemMeta(meta);
         return item;
     }
 
@@ -242,11 +226,11 @@ public class InventoryUtils {
     }
 
     public static void replaceItem(Inventory inventory, ItemStack stack) {
-        int id = getIdentifier(stack);
-        if (id == -1) throw new RuntimeException("replaceItem() can only be used on items with identifiers");
+        String id = getIdentifier(stack);
+        if (id == null) throw new RuntimeException("replaceItem() can only be used on items with identifiers");
 
         for (int index = 0; index < inventory.getSize(); ++index) {
-            if (getIdentifier(inventory.getItem(index)) != id) continue;
+            if (!Objects.equals(getIdentifier(inventory.getItem(index)), id)) continue;
 
             inventory.setItem(index, stack);
         }
@@ -257,23 +241,19 @@ public class InventoryUtils {
     }
 
     public static ItemStack removeIdentifier(ItemStack item) {
-        ItemMeta im = item.getItemMeta();
+        net.minecraft.server.v1_12_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
 
-        if (!im.hasLore()) return item;
-
-        List<String> lore = im.getLore();
-        List<String> newLore = new ArrayList<>();
-
-        for (String loreLine : lore) {
-            if (isIdentifierString(loreLine)) {
-                if (loreLine.length() <= 24) continue;
-                loreLine = loreLine.substring(24);
-            }
-            newLore.add(loreLine);
+        NBTTagCompound tag = nmsItem.getTag();
+        if(tag == null) {
+            return item; //No identifier in the first place
         }
 
-        im.setLore(newLore);
-        item.setItemMeta(im);
+        tag.remove("CustomItem");
+        nmsItem.setTag(tag);
+
+        ItemMeta meta = CraftItemStack.asBukkitCopy(nmsItem).getItemMeta();
+        item.setItemMeta(meta);
+
         return item;
     }
 
@@ -291,9 +271,9 @@ public class InventoryUtils {
         return item;
     }
 
-    public static boolean containsIdentifier(Inventory inv, int identifier) {
+    public static boolean containsIdentifier(Inventory inv, String identifier) {
         for (ItemStack item : inv) {
-            if (getIdentifier(item) == identifier) return true;
+            if (Objects.equals(getIdentifier(item), identifier)) return true;
         }
 
         return false;
@@ -328,9 +308,6 @@ public class InventoryUtils {
     public static ItemStack addLore(ItemStack item, List<String> lore) {
         ItemMeta im = item.getItemMeta();
 
-        int identifier = getIdentifier(item);
-        if (identifier >= 0) item = removeIdentifier(item);
-
         List<String> oldLore;
         if (im.hasLore()) oldLore = im.getLore();
         else oldLore = new ArrayList<>();
@@ -340,15 +317,14 @@ public class InventoryUtils {
         if (!oldLore.isEmpty()) im.setLore(oldLore);
         item.setItemMeta(im);
 
-        if (identifier >= 0) item = addIdentifier(item, identifier);
         return item;
     }
 
-    public static int getAmountOfItemsWithIdentifier(Inventory inventory, int identifier) {
+    public static int getAmountOfItemsWithIdentifier(Inventory inventory, String identifier) {
         int amount = 0;
 
         for (ItemStack itemStack : inventory.getContents()) {
-            if(itemStack != null && getIdentifier(itemStack) == identifier) {
+            if(itemStack != null && Objects.equals(getIdentifier(itemStack), identifier)) {
                 amount += itemStack.getAmount();
             }
         }
@@ -356,13 +332,13 @@ public class InventoryUtils {
         return amount;
     }
 
-    public static int removeItemsWithIdentifier(Inventory inventory, int identifier, int max) {
+    public static int removeItemsWithIdentifier(Inventory inventory, String identifier, int max) {
         int actual = 0;
 
         ItemStack[] contents = inventory.getContents();
         for (int i = 0; i < contents.length; i++) {
             ItemStack itemStack = contents[i];
-            if (itemStack == null || getIdentifier(itemStack) != identifier) continue;
+            if (itemStack == null || !Objects.equals(getIdentifier(itemStack), identifier)) continue;
 
             int amountToRemove = Math.min(itemStack.getAmount(), max);
             actual += amountToRemove;
