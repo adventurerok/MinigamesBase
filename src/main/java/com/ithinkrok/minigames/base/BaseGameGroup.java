@@ -23,7 +23,6 @@ import com.ithinkrok.minigames.api.event.user.game.UserJoinEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserQuitEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserBreakBlockEvent;
 import com.ithinkrok.minigames.api.item.CustomItem;
-import com.ithinkrok.minigames.api.item.IdentifierMap;
 import com.ithinkrok.minigames.api.map.GameMapInfo;
 import com.ithinkrok.minigames.api.metadata.Metadata;
 import com.ithinkrok.minigames.api.protocol.ClientMinigamesRequestProtocol;

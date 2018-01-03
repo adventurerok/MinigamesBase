@@ -5,7 +5,6 @@ import com.ithinkrok.minigames.api.GameState;
 import com.ithinkrok.minigames.api.Kit;
 import com.ithinkrok.minigames.api.entity.CustomEntity;
 import com.ithinkrok.minigames.api.item.CustomItem;
-import com.ithinkrok.minigames.api.item.IdentifierMap;
 import com.ithinkrok.minigames.api.map.GameMap;
 import com.ithinkrok.minigames.api.map.GameMapInfo;
 import com.ithinkrok.minigames.api.map.MapPoint;

@@ -2,7 +2,6 @@ package com.ithinkrok.minigames.api.inventory;
 
 import com.ithinkrok.minigames.api.inventory.event.CalculateItemForUserEvent;
 import com.ithinkrok.minigames.api.inventory.event.UserClickItemEvent;
-import com.ithinkrok.minigames.api.item.Identifiable;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
 import com.ithinkrok.util.config.Config;
 import org.bukkit.inventory.ItemStack;
