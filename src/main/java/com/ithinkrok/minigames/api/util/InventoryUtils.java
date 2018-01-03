@@ -134,7 +134,13 @@ public class InventoryUtils {
     public static ItemStack setItemNameAndLore(ItemStack item, String name, String... lore) {
         ItemMeta im = item.getItemMeta();
         if (name != null) im.setDisplayName(name);
-        im.setLore(Arrays.asList(lore));
+
+        if(lore != null && lore.length > 0) {
+            im.setLore(Arrays.asList(lore));
+        } else {
+            im.setLore(null);
+        }
+
         item.setItemMeta(im);
 
         return item;
