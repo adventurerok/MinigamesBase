@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * This class represents some attribute modifiers, that can be applied on items.
@@ -79,21 +80,31 @@ public class ItemAttributes {
 
 
     /**
+     * Finds an attribute modifier by name, if it is present.
+     *
+     * @return The attribute modifier, if it is found
+     */
+    public ItemAttributeModifier getModifier(String name) {
+        Optional<ItemAttributeModifier> attribute = getModifiers().stream()
+                .filter(att -> att.getName().equals(name))
+                .findAny();
+
+        return attribute.isPresent() ? attribute.get() : null;
+    }
+
+
+    /**
      * Get all modifiers in this set of attribute modifiers.
      *
      * @return All modifiers or null if incompatible server version
      */
     public List<ItemAttributeModifier> getModifiers() {
-        if (this.modifiers != null) {
-
-            List<ItemAttributeModifier> modifiers = new ArrayList<>();
-            int size = this.modifiers.size();
-            for (int i = 0; i < size; i++) {
-                modifiers.add(new ItemAttributeModifier(this.modifiers.get(i)));
-            }
-            return modifiers;
-
-        } else return Collections.emptyList();
+        List<ItemAttributeModifier> modifiers = new ArrayList<>();
+        int size = this.modifiers.size();
+        for (int i = 0; i < size; i++) {
+            modifiers.add(new ItemAttributeModifier(this.modifiers.get(i)));
+        }
+        return modifiers;
     }
 
 
