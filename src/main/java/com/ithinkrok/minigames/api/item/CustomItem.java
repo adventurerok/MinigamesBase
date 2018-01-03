@@ -20,6 +20,7 @@ import com.ithinkrok.util.lang.LanguageLookup;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -248,7 +249,12 @@ public class CustomItem implements CustomListener, Nameable {
             }
         }
 
-        item.getItemMeta().spigot().setUnbreakable(unbreakable);
+        //Make us unbreakable if we are
+        if(unbreakable) {
+            ItemMeta meta = item.getItemMeta();
+            meta.setUnbreakable(true);
+            item.setItemMeta(meta);
+        }
 
         return InventoryUtils.addIdentifier(item, name);
     }
