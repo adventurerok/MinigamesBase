@@ -1,0 +1,15 @@
+description: "The group of worlds we play towny on!"
+
+worlds:
+  map:
+    folder: "towny"
+    environment: "normal"
+    type: "saved"
+  map_nether:
+    folder: "towny_nether"
+    environment: "nether"
+    type: "saved"
+  map_the_end:
+    folder: "towny_the_end"
+    environment: "the_end"
+    type: "saved"

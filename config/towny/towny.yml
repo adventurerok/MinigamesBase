@@ -1,0 +1,21 @@
+
+pre_configs:
+  - "global/global.yml"
+
+lang_files:
+#  - "towny/lang/towny.lang"
+#  - "towny/lang/items.lang"
+
+maps:
+  towny: "towny/maps/towny.yml"
+
+shared_objects:
+  game:
+    chat_prefix: "&7[&4Towny&7] &e"
+  start_info:
+    game_state: "towny"
+
+game_states:
+  towny: {}
+
+custom_items: {}
