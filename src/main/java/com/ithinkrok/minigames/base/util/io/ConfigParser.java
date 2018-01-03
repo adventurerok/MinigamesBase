@@ -112,7 +112,7 @@ public final class ConfigParser {
             Config gameStateConfig = config.getConfigOrNull(name);
             List<Config> listeners = new ArrayList<>();
 
-            Config listenersConfig = gameStateConfig.getConfigOrNull("listeners");
+            Config listenersConfig = gameStateConfig.getConfigOrEmpty("listeners");
 
             for (String listenerName : listenersConfig.getKeys(false)) {
                 Config listenerConfig = listenersConfig.getConfigOrNull(listenerName);
