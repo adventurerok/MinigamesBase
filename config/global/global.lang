@@ -162,3 +162,7 @@ spleef.begin=&6A new spleef game has started!
 wool_head.initial=&3%s &dwas given the wool!
 wool_head.transfer=&3%s &dtransferred the wool to &3%s!
 wool_head.given=&dYou now have the wool. Right click someone to transfer it to them!
+
+#Rewards
+reward.immediate.get=&6 You are rewarded &b%s
+reward.participation.get=&6You have been rewarded &b%s &6for participating

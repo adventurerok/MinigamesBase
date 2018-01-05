@@ -10,6 +10,17 @@ currencies:
     format: "$%s"
     decimals: 0
 
+shared_objects:
+  rewards:
+    mult:
+      copper: "players > 0"
+      silver: "players > 3"
+      gold: "players > 7"
+    participation:
+      copper: "50 * (1 + ln((players + 3) / 3))"
+      silver: "5 * (pow(players / 4, 1.2))"
+      gold: "(players - 8) / 8"
+
 commands:
   ahelp:
     description: "Shows all command help"
