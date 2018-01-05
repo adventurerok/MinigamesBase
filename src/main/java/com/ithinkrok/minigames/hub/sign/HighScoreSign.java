@@ -11,6 +11,7 @@ import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;
 import com.ithinkrok.util.event.CustomEventHandler;
 import org.apache.commons.lang.WordUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Skull;
@@ -133,7 +134,7 @@ public class HighScoreSign extends InfoSign {
 
         Skull skull = (Skull) head.getState();
 
-        skull.setOwner(score.getPlayerName());
+        skull.setOwningPlayer(Bukkit.getOfflinePlayer(score.getPlayerUUID()));
 
         skull.update();
     }
