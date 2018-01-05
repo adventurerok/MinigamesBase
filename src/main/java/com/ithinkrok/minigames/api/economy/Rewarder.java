@@ -28,6 +28,16 @@ public interface Rewarder {
 
 
     /**
+     * Gives the user immediate rewards of the type.
+     *
+     * The amount can still be modified by server wide boosters and rules such as disabling giving of a certain type.
+     *
+     * @return If any reward was given
+     */
+    boolean giveImmediateReward(User user, CreditAmount... amountsPerType);
+
+
+    /**
      * Give all the score rewards for this GameGroup.
      *
      * Should only be called when the game is over and the winner is known (and credited with a score reward :P)
