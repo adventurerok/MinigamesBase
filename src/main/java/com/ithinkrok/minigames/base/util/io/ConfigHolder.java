@@ -11,6 +11,7 @@ import com.ithinkrok.minigames.api.util.JSONBook;
 import com.ithinkrok.minigames.base.command.CommandConfig;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomListener;
+import com.ithinkrok.util.event.ListenerHolder;
 import com.ithinkrok.util.lang.LanguageLookup;
 
 /**
@@ -18,9 +19,7 @@ import com.ithinkrok.util.lang.LanguageLookup;
  *
  * Holds things loaded from configs
  */
-public interface ConfigHolder {
-
-    void addListener(String name, CustomListener listener);
+public interface ConfigHolder extends ListenerHolder {
 
     void addCustomItem(CustomItem customItem);
 

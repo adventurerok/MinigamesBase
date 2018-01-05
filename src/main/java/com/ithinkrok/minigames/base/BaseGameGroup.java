@@ -168,6 +168,8 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         List<CustomListener> result = new ArrayList<>(clone.values());
         result.add(gameGroupListener);
 
+        defaultAndMapListeners = result;
+
         return result;
     }
 
@@ -1009,6 +1011,10 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     }
 
 
+    @Override
+    public void removeListener(String name) {
+        defaultListeners.remove(name);
 
-
+        createDefaultAndMapListeners();
+    }
 }

@@ -445,4 +445,12 @@ public class BaseMap implements GameMap, ConfigHolder {
     }
 
 
+    @Override
+    public void removeListener(String name) {
+        CustomListener old = listenerMap.remove(name);
+
+        if(old != null) {
+            listeners.remove(old);
+        }
+    }
 }

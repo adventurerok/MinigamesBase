@@ -24,6 +24,7 @@ import com.ithinkrok.minigames.api.util.JSONBook;
 import com.ithinkrok.minigames.base.command.CommandConfig;
 import com.ithinkrok.msm.common.economy.Economy;
 import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.event.ListenerHolder;
 import com.ithinkrok.util.lang.LanguageLookup;
 import com.ithinkrok.util.lang.Messagable;
 
@@ -38,7 +39,7 @@ import java.util.Map;
  */
 public interface GameGroup
         extends LanguageLookup, Messagable, TaskScheduler, SharedObjectAccessor, MetadataHolder<Metadata>,
-        SchematicResolver, TeamUserResolver, DatabaseTaskRunner {
+        SchematicResolver, TeamUserResolver, DatabaseTaskRunner, ListenerHolder {
 
     List<String> getParameters();
 
