@@ -4,10 +4,13 @@ import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.economy.Credit;
 import com.ithinkrok.minigames.api.economy.CreditAmount;
 import com.ithinkrok.minigames.api.economy.Rewarder;
+import com.ithinkrok.minigames.api.event.game.GameStateChangedEvent;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.msm.common.economy.Currency;
 import com.ithinkrok.msm.common.economy.EconomyContext;
 import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.event.CustomEventHandler;
+import com.ithinkrok.util.event.CustomListener;
 import com.ithinkrok.util.math.Calculator;
 import com.ithinkrok.util.math.ExpressionCalculator;
 import com.ithinkrok.util.math.SingleValueVariables;
@@ -35,7 +38,7 @@ public class MCColonyRewarder implements Rewarder {
     /**
      * Number of players used to calculate reward amount
      */
-    private int maxPlayers; //TODO this value
+    private int maxPlayers;
 
     /**
      * Participation due to the type of game
@@ -65,7 +68,7 @@ public class MCColonyRewarder implements Rewarder {
 
         loadRewardsConfig(gameGroup.getSharedObjectOrEmpty("rewards"));
 
-        //TODO we need to listen for some events in the GameGroup
+        gameGroup.addListener("MCColonyRewarder", new RewardsListener());
     }
 
 
@@ -158,5 +161,28 @@ public class MCColonyRewarder implements Rewarder {
     @Override
     public void giveAllScoreRewards() {
         //TODO message controller
+    }
+
+    private class RewardsListener implements CustomListener {
+
+        @CustomEventHandler
+        public void onGameStateChange(GameStateChangedEvent event) {
+            if(gameGroup.isAcceptingPlayers()) {
+                //game not started
+                return;
+            }
+
+            //We check in the future to avoid incorrect counts
+            gameGroup.doInFuture(task -> {
+                int players = (int) event.getGameGroup().getUsers().stream()
+                        .filter(User::isInGame)
+                        .count();
+
+                if(players > maxPlayers) {
+                    maxPlayers = players;
+                }
+            }, 10);
+        }
+
     }
 }
