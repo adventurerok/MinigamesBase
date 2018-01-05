@@ -78,6 +78,8 @@ public class MCColonyRewarder implements Rewarder {
 
         for (Credit credit : Credit.values()) {
             Currency currency = creditCurrencies.get(credit);
+            if(currency == null) continue;
+
             SimplifyMode simplifyMode = SimplifyMode.decimal(currency.getMathContext());
 
             String multExpression = multConfig.getString(credit.name().toLowerCase());
@@ -99,6 +101,8 @@ public class MCColonyRewarder implements Rewarder {
 
         for (Credit credit : Credit.values()) {
             Currency currency = creditCurrencies.get(credit);
+            if(currency == null) continue;
+
             Calculator typeMultCalc = creditMultipliers.get(credit);
             BigDecimal typeMult = typeMultCalc.calculateDecimal(variables(), currency.getMathContext());
 
@@ -133,6 +137,8 @@ public class MCColonyRewarder implements Rewarder {
 
         for (CreditAmount ca : amountsPerType) {
             Currency currency = creditCurrencies.get(ca.getCredit());
+            if(currency == null) continue;
+
             Calculator typeMultCalc = creditMultipliers.get(ca.getCredit());
             BigDecimal typeMult = typeMultCalc.calculateDecimal(variables(), currency.getMathContext());
 

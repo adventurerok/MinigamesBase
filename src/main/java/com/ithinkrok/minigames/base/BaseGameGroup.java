@@ -123,10 +123,9 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
         Config baseConfig = game.loadConfig(configFile);
 
-        rewarder = new MCColonyRewarder(this);
-
-
         ConfigParser.parseConfig(game, this, this, this, configFile, baseConfig);
+
+        rewarder = new MCColonyRewarder(this);
 
         if (currentMap != null) defaultAndMapListeners = createDefaultAndMapListeners(currentMap.getListenerMap());
         else defaultAndMapListeners = createDefaultAndMapListeners();
