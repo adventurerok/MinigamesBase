@@ -5,6 +5,7 @@ import com.ithinkrok.minigames.api.GameState;
 import com.ithinkrok.minigames.api.Kit;
 import com.ithinkrok.minigames.api.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.api.event.game.GameStateChangedEvent;
+import com.ithinkrok.minigames.api.event.user.game.UserInGameChangeEvent;
 import com.ithinkrok.minigames.api.team.Team;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.util.ItemGiver;
@@ -13,10 +14,7 @@ import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by paul on 30/01/16.
@@ -30,6 +28,8 @@ public class SimpleGameStartListener implements CustomListener {
     private List<String> teamList;
     private List<String> kitList;
     private String lobbyGameState;
+
+    private final Set<UUID> gamePlayers = new HashSet<>();
 
     private String teamInfoLocale, kitInfoLocale;
 
@@ -115,6 +115,8 @@ public class SimpleGameStartListener implements CustomListener {
         user.setScoreboardHandler(null);
 
         itemGiver.giveToUser(user);
+
+        gamePlayers.add(user.getUuid());
     }
 
     protected Kit assignUserKit(GameGroup gameGroup) {
@@ -151,5 +153,18 @@ public class SimpleGameStartListener implements CustomListener {
         }
 
         return winningVote;
+    }
+
+    @CustomEventHandler
+    public void onUserInGameChange(UserInGameChangeEvent event) {
+        if(!event.isInGame() && gamePlayers.contains(event.getUser().getUuid())) {
+
+            //Give the participation reward.
+            //Doing it this way in the future ensures that quitters don't get their reward
+
+            event.getUser().doInFuture(task -> {
+                event.getGameGroup().getRewarder().giveParticipationReward(event.getUser());
+            });
+        }
     }
 }

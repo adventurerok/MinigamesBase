@@ -64,6 +64,11 @@ public class SimpleAftermathListener implements CustomListener {
         //Remove user scoreboards
         for (User user : event.getGameGroup().getUsers()) {
             user.setScoreboardHandler(null);
+
+            if(user.isInGame()) {
+                //Do the User's participation reward if they haven't had it already
+                event.getGameGroup().getRewarder().giveParticipationReward(user);
+            }
         }
 
         event.getGameGroup().startCountdown(countdown);
