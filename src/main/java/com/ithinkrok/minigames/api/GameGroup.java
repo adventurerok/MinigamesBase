@@ -2,6 +2,7 @@ package com.ithinkrok.minigames.api;
 
 import com.ithinkrok.minigames.api.database.Database;
 import com.ithinkrok.minigames.api.database.DatabaseTaskRunner;
+import com.ithinkrok.minigames.api.economy.Rewarder;
 import com.ithinkrok.minigames.api.entity.CustomEntity;
 import com.ithinkrok.minigames.api.event.game.GameEvent;
 import com.ithinkrok.minigames.api.event.team.TeamEvent;
@@ -216,4 +217,6 @@ public interface GameGroup
      * @return The economy for this GameGroup
      */
     Economy getEconomy();
+
+    Rewarder getRewarder();
 }

@@ -7,6 +7,7 @@ import com.ithinkrok.minigames.api.command.MinigamesCommand;
 import com.ithinkrok.minigames.api.database.Database;
 import com.ithinkrok.minigames.api.database.DatabaseTask;
 import com.ithinkrok.minigames.api.economy.GameEconomy;
+import com.ithinkrok.minigames.api.economy.Rewarder;
 import com.ithinkrok.minigames.api.entity.CustomEntity;
 import com.ithinkrok.minigames.api.event.MinigamesCommandEvent;
 import com.ithinkrok.minigames.api.event.MinigamesEvent;
@@ -38,6 +39,7 @@ import com.ithinkrok.minigames.api.util.CountdownConfig;
 import com.ithinkrok.minigames.api.util.EntityUtils;
 import com.ithinkrok.minigames.api.util.JSONBook;
 import com.ithinkrok.minigames.base.command.CommandConfig;
+import com.ithinkrok.minigames.base.economy.MCColonyRewarder;
 import com.ithinkrok.minigames.base.map.BaseMap;
 import com.ithinkrok.minigames.base.util.io.ConfigHolder;
 import com.ithinkrok.minigames.base.util.io.ConfigParser;
@@ -98,6 +100,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     private final int maxPlayers;
     private final List<String> parameters;
     private final GameEconomy economy = new GameEconomy();
+    private final Rewarder rewarder;
     private GameState gameState;
     private BaseMap currentMap;
     private List<CustomListener> defaultAndMapListeners = new ArrayList<>();
@@ -105,6 +108,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     private boolean acceptingPlayers = true;
     private String motd = "default motd";
     private boolean created = false;
+
 
     public BaseGameGroup(BaseGame game, String name, String type, String configFile, List<String> parameters) {
         this.game = game;
@@ -118,6 +122,8 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         defaultAndMapListeners = createDefaultAndMapListeners();
 
         Config baseConfig = game.loadConfig(configFile);
+
+        rewarder = new MCColonyRewarder(this);
 
 
         ConfigParser.parseConfig(game, this, this, this, configFile, baseConfig);
@@ -156,6 +162,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         created = true;
     }
 
+
     @SuppressWarnings("unchecked")
     @SafeVarargs
     private final List<CustomListener> createDefaultAndMapListeners(Map<String, CustomListener>... extra) {
@@ -173,6 +180,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         return result;
     }
 
+
     @Override
     public Config getSharedObjectOrEmpty(String name) {
         Config result = null;
@@ -184,12 +192,14 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         return result != null ? result : ConfigUtils.EMPTY_CONFIG;
     }
 
+
     @Override
     public Config getSharedObject(String name) {
         Config result = null;
         if (currentMap != null) result = currentMap.getSharedObject(name);
         return result != null ? result : sharedObjectMap.get(name);
     }
+
 
     private String fillInParameters(String input) {
         for (int index = 0; index < parameters.size(); ++index) {
@@ -201,6 +211,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         return input;
     }
 
+
     @Override
     public void changeGameState(String gameStateName) {
         GameState gameState = gameStates.get(gameStateName);
@@ -208,6 +219,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
         changeGameState(gameState);
     }
+
 
     @Override
     public void changeMap(String mapName) {
@@ -217,6 +229,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
         changeMap(mapInfo);
     }
+
 
     @Override
     @SuppressWarnings("unchecked")
@@ -239,6 +252,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
         sendUpdatePayload();
     }
+
 
     @Override
     public void changeMap(GameMapInfo mapInfo) {
@@ -272,6 +286,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         }
     }
 
+
     @Override
     public void stopCountdown() {
         if (countdown == null) return;
@@ -287,6 +302,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         }
     }
 
+
     @SafeVarargs
     private final Collection<Collection<CustomListener>> getListeners(Collection<CustomListener>... extras) {
         Collection<Collection<CustomListener>> listeners = new ArrayList<>(4);
@@ -296,6 +312,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
         return listeners;
     }
+
 
     private Collection<CustomListener> getAllUserListeners() {
         ArrayList<CustomListener> result = new ArrayList<>(usersInGroup.size());
@@ -307,6 +324,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         return result;
     }
 
+
     private Collection<CustomListener> getAllTeamListeners() {
         ArrayList<CustomListener> result = new ArrayList<>(teamsInGroup.size());
 
@@ -317,21 +335,25 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         return result;
     }
 
+
     public void sendUpdatePayload() {
         if (!created) return;
 
         game.getProtocol().sendGameGroupUpdatePayload(this);
     }
 
+
     @Override
     public void sendMessage(String message) {
         sendMessageNoPrefix(getMessagePrefix() + message);
     }
 
+
     @Override
     public Collection<BaseUser> getUsers() {
         return usersInGroup.values();
     }
+
 
     @Override
     public void sendMessageNoPrefix(String message) {
@@ -342,6 +364,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         Bukkit.getConsoleSender().sendMessage(message);
     }
 
+
     @Override
     public void sendMessageNoPrefix(Config message) {
         for (User user : usersInGroup.values()) {
@@ -349,25 +372,30 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         }
     }
 
+
     @Override
     public String getMessagePrefix() {
         return chatPrefix;
     }
+
 
     @Override
     public void sendLocale(String locale, Object... args) {
         sendMessage(getLocale(locale, args));
     }
 
+
     @Override
     public void sendLocaleNoPrefix(String locale, Object... args) {
         sendMessageNoPrefix(getLocale(locale, args));
     }
 
+
     @Override
     public LanguageLookup getLanguageLookup() {
         return this;
     }
+
 
     @Override
     public String getLocale(String name, Object... args) {
@@ -375,10 +403,12 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         else return languageLookup.getLocale(name, args);
     }
 
+
     @Override
     public boolean hasLocale(String name) {
         return (currentMap != null && currentMap.hasLocale(name) || languageLookup.hasLocale(name));
     }
+
 
     @Override
     public Config toConfig() {
@@ -417,28 +447,29 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         config.set("params", parameters);
 
         return config;
+    }
+
+
+    @Override
+    public String getName() {
+        return name;
     }    @Override
     public ClientMinigamesRequestProtocol getRequestProtocol() {
         return BasePlugin.getRequestProtocol();
     }
 
-    @Override
-    public String getName() {
-        return name;
-    }
 
     @Override
     public BaseMap getCurrentMap() {
         return currentMap;
-    }    @Override
-    public ControllerInfo getControllerInfo() {
-        return getRequestProtocol().getControllerInfo();
     }
+
 
     @Override
     public Countdown getCountdown() {
         return countdown;
     }
+
 
     @Override
     public void userEvent(UserEvent event) {
@@ -449,15 +480,17 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
             CustomEventExecutor.executeEvent(event, getListeners(event.getUser().getListeners()));
         }
     }    @Override
-    public void requestControllerInfo() {
-        getRequestProtocol().enableControllerInfo();
+    public ControllerInfo getControllerInfo() {
+        return getRequestProtocol().getControllerInfo();
     }
+
 
     @Override
     public void teamEvent(TeamEvent event) {
         CustomEventExecutor
                 .executeEvent(event, event.getTeam().getListeners(), getAllUsersInTeamListeners(event.getTeam()));
     }
+
 
     private Collection<CustomListener> getAllUsersInTeamListeners(Team team) {
         ArrayList<CustomListener> result = new ArrayList<>(team.getUsers().size());
@@ -467,15 +500,17 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         }
 
         return result;
-    }    @Override
-    public GameMapInfo getMap(String mapName) {
-        return gameMapInfoMap.get(mapName);
     }
+
 
     @Override
     public GameState getCurrentGameState() {
         return gameState;
+    }    @Override
+    public void requestControllerInfo() {
+        getRequestProtocol().enableControllerInfo();
     }
+
 
     @Override
     public void startCountdown(CountdownConfig countdownConfig) {
@@ -487,12 +522,14 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         System.out.println("Starting countdown " + countdownConfig);
     }
 
+
     @Override
     public CustomItem getCustomItem(String name) {
         CustomItem item = null;
         if (currentMap != null) item = currentMap.getCustomItem(name);
         return item != null ? item : customItemIdentifierMap.get(name);
     }
+
 
     @Override
     public Collection<CustomItem> getAllCustomItems() {
@@ -503,7 +540,11 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         }
 
         return result;
+    }    @Override
+    public GameMapInfo getMap(String mapName) {
+        return gameMapInfoMap.get(mapName);
     }
+
 
     public CustomEntity getCustomEntity(String name) {
         CustomEntity entity = null;
@@ -511,25 +552,30 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         return entity != null ? entity : customEntityMap.get(name);
     }
 
+
     @Override
     public void gameEvent(GameEvent event) {
         CustomEventExecutor.executeEvent(event, getListeners(getAllUserListeners(), getAllTeamListeners()));
     }
+
 
     @Override
     public List<String> getParameters() {
         return parameters;
     }
 
+
     @Override
     public int getMaxPlayers() {
         return maxPlayers;
     }
 
+
     @Override
     public String getMotd() {
         return motd;
     }
+
 
     @Override
     public void setMotd(String motd) {
@@ -540,20 +586,24 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         sendUpdatePayload();
     }
 
+
     @Override
     public Database getDatabase() {
         return database;
     }
+
 
     @Override
     public String getType() {
         return type;
     }
 
+
     @Override
     public boolean isAcceptingPlayers() {
         return acceptingPlayers;
     }
+
 
     /**
      * Sets acceptingPlayers. This boolean is used to determine if players can join this gamegroup to play the game.
@@ -568,29 +618,64 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         sendUpdatePayload();
     }
 
+
     @Override
     public void doDatabaseTask(DatabaseTask databaseTask) {
         game.doDatabaseTask(databaseTask);
     }
+
 
     @Override
     public boolean hasSharedObject(String name) {
         return getSharedObject(name) != null;
     }
 
+
     @Override
     public Team getTeam(String name) {
         return getTeam(getTeamIdentifier(name));
     }
+
 
     @Override
     public Team getTeam(TeamIdentifier identifier) {
         return teamsInGroup.get(identifier);
     }
 
+
     @Override
     public TeamIdentifier getTeamIdentifier(String name) {
         return teamIdentifiers.get(name);
+    }
+
+
+    @Override
+    public BaseUser getUser(UUID uuid) {
+        return usersInGroup.get(uuid);
+    }
+
+
+    @Override
+    public Config loadConfig(String name) {
+        return game.loadConfig(name);
+    }
+
+
+    @Override
+    public LangFile loadLangFile(String path) {
+        return game.loadLangFile(path);
+    }
+
+
+    @Override
+    public JSONBook loadBook(String name, String path) {
+        return game.loadBook(name, path);
+    }
+
+
+    @Override
+    public Path getAssetDirectory() {
+        return game.getAssetDirectory();
     }    @Override
     public void unload() {
         if (currentMap == null) return;
@@ -600,47 +685,14 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         currentMap = null;
     }
 
-    @Override
-    public BaseUser getUser(UUID uuid) {
-        return usersInGroup.get(uuid);
-    }
-
-    @Override
-    public Config loadConfig(String name) {
-        return game.loadConfig(name);
-    }    @Override
-    public void bindTaskToCurrentGameState(GameTask task) {
-        gameStateTaskList.addTask(task);
-    }
-
-    @Override
-    public LangFile loadLangFile(String path) {
-        return game.loadLangFile(path);
-    }
-
-    @Override
-    public JSONBook loadBook(String name, String path) {
-        return game.loadBook(name, path);
-    }    @Override
-    public void bindTaskToCurrentMap(GameTask task) {
-        if (currentMap == null) throw new RuntimeException("No GameMap to bind task to");
-        currentMap.bindTaskToMap(task);
-    }
-
-    @Override
-    public Path getAssetDirectory() {
-        return game.getAssetDirectory();
-    }
 
     @Override
     public Schematic getSchematic(String name) {
         Schematic schem = null;
         if (currentMap != null) schem = currentMap.getSchematic(name);
         return schem != null ? schem : schematicMap.get(name);
-    }    @Override
-    public Game getGame() {
-        return game;
     }
+
 
     @Override
     public String getLocale(String name) {
@@ -648,13 +700,15 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         else return languageLookup.getLocale(name);
     }
 
+
     @Override
     public <B extends Metadata> B getMetadata(Class<? extends B> clazz) {
         return metadataMap.getInstance(clazz);
     }    @Override
-    public boolean hasActiveCountdown() {
-        return countdown != null;
+    public void bindTaskToCurrentGameState(GameTask task) {
+        gameStateTaskList.addTask(task);
     }
+
 
     @Override
     public <B extends Metadata> void setMetadata(B metadata) {
@@ -666,13 +720,12 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         }
     }
 
+
     @Override
     public boolean hasMetadata(Class<? extends Metadata> clazz) {
         return metadataMap.containsKey(clazz);
-    }    @Override
-    public boolean hasActiveCountdown(String name) {
-        return countdown != null && countdown.getName().equals(name);
     }
+
 
     @SuppressWarnings("unchecked")
     @Override
@@ -682,78 +735,92 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         if (metadata != null) metadata.removed();
 
         return metadata;
+    }    @Override
+    public void bindTaskToCurrentMap(GameTask task) {
+        if (currentMap == null) throw new RuntimeException("No GameMap to bind task to");
+        currentMap.bindTaskToMap(task);
     }
+
 
     @Override
     public void addListener(String name, CustomListener listener) {
         defaultListeners.put(name, listener);
 
         createDefaultAndMapListeners();
-    }    @Override
-    public int getUserCount() {
-        return getUsers().size();
     }
+
+
+    @Override
+    public void removeListener(String name) {
+        defaultListeners.remove(name);
+
+        createDefaultAndMapListeners();
+    }
+
 
     @Override
     public void addCustomItem(CustomItem customItem) {
         customItemIdentifierMap.put(customItem.getName(), customItem);
+    }    @Override
+    public Game getGame() {
+        return game;
     }
+
 
     @Override
     public void addCustomEntity(CustomEntity customEntity) {
         customEntityMap.put(customEntity.getName(), customEntity);
-    }    @Override
-    public Kit getKit(String name) {
-        return kits.get(name);
     }
+
 
     @Override
     public void addLanguageLookup(LanguageLookup languageLookup) {
         this.languageLookup.addLanguageLookup(languageLookup);
     }
 
+
     @Override
     public void addSharedObject(String name, Config config) {
         sharedObjectMap.put(name, config);
     }    @Override
-    public GameState getGameState(String gameStateName) {
-        return gameStates.get(gameStateName);
+    public boolean hasActiveCountdown() {
+        return countdown != null;
     }
+
 
     @Override
     public void addSchematic(Schematic schematic) {
         schematicMap.put(schematic.getName(), schematic);
     }
 
+
     @Override
     public void addTeamIdentifier(TeamIdentifier teamIdentifier) {
         teamIdentifiers.put(teamIdentifier.getName(), teamIdentifier);
 
         teamsInGroup.put(teamIdentifier, createTeam(teamIdentifier));
-    }    @Override
-    public Collection<TeamIdentifier> getTeamIdentifiers() {
-        return teamIdentifiers.values();
     }
+
 
     private BaseTeam createTeam(TeamIdentifier teamIdentifier) {
         return new BaseTeam(teamIdentifier, this);
+    }    @Override
+    public boolean hasActiveCountdown(String name) {
+        return countdown != null && countdown.getName().equals(name);
     }
+
 
     @Override
     public void addGameState(GameState gameState) {
         gameStates.put(gameState.getName(), gameState);
-    }    @Override
-    public JSONBook getBook(String name) {
-        if (currentMap == null) return bookMap.get(name);
-        JSONBook book = currentMap.getBook(name);
-
-        return book != null ? book : bookMap.get(name);
     }
+
 
     @Override
     public void addKit(Kit kit) {
         kits.put(kit.getName(), kit);
     }
+
 
     @Override
     public void addCommand(CommandConfig command) {
@@ -764,6 +831,231 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
             commandAliasesMap.put(alias.toLowerCase(), command);
         }
     }    @Override
+    public int getUserCount() {
+        return getUsers().size();
+    }
+
+
+    @Override
+    public void addMapInfo(GameMapInfo mapInfo) {
+        gameMapInfoMap.put(mapInfo.getName(), mapInfo);
+    }
+
+
+    @Override
+    public void addBook(JSONBook book) {
+        bookMap.put(book.getName(), book);
+    }
+
+
+    @Override
+    public void addCurrency(String name, Config config) {
+        economy.getContext().registerCurrency(name, config);
+    }    @Override
+    public Kit getKit(String name) {
+        return kits.get(name);
+    }
+
+    private class GameGroupListener implements CustomListener {
+
+        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
+        public void eventUserJoin(UserJoinEvent event) {
+            if (event.getReason() != UserJoinEvent.JoinReason.JOINED_SERVER) {
+                sendUpdatePayload();
+                return;
+            }
+            if (!(event.getUser() instanceof BaseUser)) {
+                throw new UnsupportedOperationException("Only supports BaseUser");
+            }
+
+            //Update the user's name in the name cache
+            getDatabase().updateNameCache(event.getUser().getUuid(), event.getUser().getName());
+
+            usersInGroup.put(event.getUser().getUuid(), (BaseUser) event.getUser());
+
+            game.getLogger().info("Teleporting user " + event.getUser().getName() + " to GameGroup map");
+            boolean success = currentMap.teleportUser(event.getUser());
+
+            if (!success) {
+                game.getLogger().warning("Failed to teleport user " + event.getUser().getName() + " to GameGroup map");
+            }
+
+            sendUpdatePayload();
+        }
+
+
+        @CustomEventHandler(priority = CustomEventHandler.HIGH)
+        public void eventMapEntityDeath(MapEntityDeathEvent event) {
+            String customName = EntityUtils.getCustomEntityName(event.getEntity());
+            if (customName == null) return;
+
+            CustomEntity customEntity = getCustomEntity(customName);
+
+            CustomEventExecutor.executeEvent(event, customEntity.getListeners());
+        }
+
+
+        @CustomEventHandler
+        public void eventEntityAttacked(MapEntityAttackedEvent event) {
+            String customName = EntityUtils.getCustomEntityName(event.getAttacker());
+            if (customName == null) return;
+
+            CustomEntity customEntity = getCustomEntity(customName);
+
+            CustomEventExecutor.executeEvent(event, customEntity.getListeners());
+        }
+
+
+        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_LAST)
+        public void eventUserQuit(UserQuitEvent event) {
+            if (event.getRemoveUser()) {
+                event.getUser().setTeam(null);
+                usersInGroup.remove(event.getUser().getUuid());
+
+                event.getUser().removeFromGameGroup();
+            }
+
+            //Kill the gamegroup if it has no players in it
+            boolean foundPlayer = false;
+            for (User user : getUsers()) {
+                if (!user.isPlayer()) continue;
+
+                foundPlayer = true;
+                break;
+            }
+
+            if (foundPlayer) {
+                sendUpdatePayload();
+            } else {
+                kill();
+            }
+        }
+
+
+        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_LAST)
+        public void eventCountdownFinished(CountdownFinishedEvent event) {
+            if (event.getCountdown().getSecondsRemaining() > 0) return;
+            if (event.getCountdown() != countdown) return;
+
+            countdown = null;
+        }
+
+
+        @CustomEventHandler
+        public void eventBlockBreakNaturally(MapBlockBreakNaturallyEvent event) {
+            checkInventoryTethers(event.getBlock().getLocation());
+        }
+
+
+        private void checkInventoryTethers(Location location) {
+            for (User user : getUsers()) {
+                if (!location.equals(user.getInventoryTether())) continue;
+                user.closeInventory();
+            }
+        }
+
+
+        @CustomEventHandler
+        public void eventUserBreakBlock(UserBreakBlockEvent event) {
+            checkInventoryTethers(event.getBlock().getLocation());
+        }
+
+
+        @CustomEventHandler
+        public void eventCommand(MinigamesCommandEvent event) {
+            CommandConfig commandConfig = commandAliasesMap.get(event.getCommand().getCommand().toLowerCase());
+
+            if (commandConfig == null) return;
+            event.setHandled(true);
+
+            if (!MinigamesCommand.requirePermission(event.getCommandSender(), commandConfig.getPermission())) return;
+            if (commandConfig.hasOthersPermission() && !event.getCommand()
+                    .requireOthersPermission(event.getCommandSender(), commandConfig.getOthersPermission())) return;
+
+            CustomEventExecutor.executeEvent(event, commandConfig.getExecutor());
+
+            if (event.isValidCommand()) return;
+
+            event.getCommandSender().sendMessage(commandConfig.getUsage());
+        }
+
+
+        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
+        public void eventGameStateChange(GameStateChangedEvent event) {
+            Iterator<Metadata> iterator = metadataMap.values().iterator();
+
+            while (iterator.hasNext()) {
+                Metadata metadata = iterator.next();
+
+                if (metadata.removeOnGameStateChange(event)) {
+                    metadata.cancelAllTasks();
+                    metadata.removed();
+                    iterator.remove();
+                }
+            }
+        }
+
+
+        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
+        public void eventMapChange(MapChangedEvent event) {
+            Iterator<Metadata> iterator = metadataMap.values().iterator();
+
+            while (iterator.hasNext()) {
+                Metadata metadata = iterator.next();
+
+                if (metadata.removeOnMapChange(event)) {
+                    metadata.cancelAllTasks();
+                    metadata.removed();
+                    iterator.remove();
+                }
+            }
+        }
+    }
+
+
+
+
+
+    @Override
+    public GameState getGameState(String gameStateName) {
+        return gameStates.get(gameStateName);
+    }
+
+
+
+
+
+
+
+
+    @Override
+    public Collection<TeamIdentifier> getTeamIdentifiers() {
+        return teamIdentifiers.values();
+    }
+
+
+
+
+
+
+
+
+    @Override
+    public JSONBook getBook(String name) {
+        if (currentMap == null) return bookMap.get(name);
+        JSONBook book = currentMap.getBook(name);
+
+        return book != null ? book : bookMap.get(name);
+    }
+
+
+
+
+
+
+
+
+    @Override
     public void kill() {
         List<User> users = new ArrayList<>(getUsers());
 
@@ -801,15 +1093,14 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         });
     }
 
-    @Override
-    public void addMapInfo(GameMapInfo mapInfo) {
-        gameMapInfoMap.put(mapInfo.getName(), mapInfo);
-    }
+
+
+
+
+
+
 
     @Override
-    public void addBook(JSONBook book) {
-        bookMap.put(book.getName(), book);
-    }    @Override
     public GameTask doInFuture(GameRunnable task) {
         GameTask gameTask = game.doInFuture(task);
 
@@ -817,163 +1108,20 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         return gameTask;
     }
 
+
+
+
+
+
+
+
     @Override
-    public void addCurrency(String name, Config config) {
-        economy.getContext().registerCurrency(name, config);
-    }
-
-    private class GameGroupListener implements CustomListener {
-
-        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
-        public void eventUserJoin(UserJoinEvent event) {
-            if (event.getReason() != UserJoinEvent.JoinReason.JOINED_SERVER) {
-                sendUpdatePayload();
-                return;
-            }
-            if (!(event.getUser() instanceof BaseUser)) {
-                throw new UnsupportedOperationException("Only supports BaseUser");
-            }
-
-            //Update the user's name in the name cache
-            getDatabase().updateNameCache(event.getUser().getUuid(), event.getUser().getName());
-
-            usersInGroup.put(event.getUser().getUuid(), (BaseUser) event.getUser());
-
-            game.getLogger().info("Teleporting user " + event.getUser().getName() + " to GameGroup map");
-            boolean success = currentMap.teleportUser(event.getUser());
-
-            if (!success) {
-                game.getLogger().warning("Failed to teleport user " + event.getUser().getName() + " to GameGroup map");
-            }
-
-            sendUpdatePayload();
-        }
-
-        @CustomEventHandler(priority = CustomEventHandler.HIGH)
-        public void eventMapEntityDeath(MapEntityDeathEvent event) {
-            String customName = EntityUtils.getCustomEntityName(event.getEntity());
-            if (customName == null) return;
-
-            CustomEntity customEntity = getCustomEntity(customName);
-
-            CustomEventExecutor.executeEvent(event, customEntity.getListeners());
-        }
-
-        @CustomEventHandler
-        public void eventEntityAttacked(MapEntityAttackedEvent event) {
-            String customName = EntityUtils.getCustomEntityName(event.getAttacker());
-            if (customName == null) return;
-
-            CustomEntity customEntity = getCustomEntity(customName);
-
-            CustomEventExecutor.executeEvent(event, customEntity.getListeners());
-        }
-
-        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_LAST)
-        public void eventUserQuit(UserQuitEvent event) {
-            if (event.getRemoveUser()) {
-                event.getUser().setTeam(null);
-                usersInGroup.remove(event.getUser().getUuid());
-
-                event.getUser().removeFromGameGroup();
-            }
-
-            //Kill the gamegroup if it has no players in it
-            boolean foundPlayer = false;
-            for (User user : getUsers()) {
-                if (!user.isPlayer()) continue;
-
-                foundPlayer = true;
-                break;
-            }
-
-            if (foundPlayer) {
-                sendUpdatePayload();
-            } else {
-                kill();
-            }
-        }
-
-        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_LAST)
-        public void eventCountdownFinished(CountdownFinishedEvent event) {
-            if (event.getCountdown().getSecondsRemaining() > 0) return;
-            if (event.getCountdown() != countdown) return;
-
-            countdown = null;
-        }
-
-        @CustomEventHandler
-        public void eventBlockBreakNaturally(MapBlockBreakNaturallyEvent event) {
-            checkInventoryTethers(event.getBlock().getLocation());
-        }
-
-        private void checkInventoryTethers(Location location) {
-            for (User user : getUsers()) {
-                if (!location.equals(user.getInventoryTether())) continue;
-                user.closeInventory();
-            }
-        }
-
-        @CustomEventHandler
-        public void eventUserBreakBlock(UserBreakBlockEvent event) {
-            checkInventoryTethers(event.getBlock().getLocation());
-        }
-
-        @CustomEventHandler
-        public void eventCommand(MinigamesCommandEvent event) {
-            CommandConfig commandConfig = commandAliasesMap.get(event.getCommand().getCommand().toLowerCase());
-
-            if (commandConfig == null) return;
-            event.setHandled(true);
-
-            if (!MinigamesCommand.requirePermission(event.getCommandSender(), commandConfig.getPermission())) return;
-            if (commandConfig.hasOthersPermission() && !event.getCommand()
-                    .requireOthersPermission(event.getCommandSender(), commandConfig.getOthersPermission())) return;
-
-            CustomEventExecutor.executeEvent(event, commandConfig.getExecutor());
-
-            if (event.isValidCommand()) return;
-
-            event.getCommandSender().sendMessage(commandConfig.getUsage());
-        }
-
-        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
-        public void eventGameStateChange(GameStateChangedEvent event) {
-            Iterator<Metadata> iterator = metadataMap.values().iterator();
-
-            while (iterator.hasNext()) {
-                Metadata metadata = iterator.next();
-
-                if (metadata.removeOnGameStateChange(event)) {
-                    metadata.cancelAllTasks();
-                    metadata.removed();
-                    iterator.remove();
-                }
-            }
-        }
-
-        @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
-        public void eventMapChange(MapChangedEvent event) {
-            Iterator<Metadata> iterator = metadataMap.values().iterator();
-
-            while (iterator.hasNext()) {
-                Metadata metadata = iterator.next();
-
-                if (metadata.removeOnMapChange(event)) {
-                    metadata.cancelAllTasks();
-                    metadata.removed();
-                    iterator.remove();
-                }
-            }
-        }
-    }    @Override
     public GameTask doInFuture(GameRunnable task, int delay) {
         GameTask gameTask = game.doInFuture(task, delay);
 
         gameGroupTaskList.addTask(gameTask);
         return gameTask;
     }
-
 
 
     @Override
@@ -985,12 +1133,10 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     }
 
 
-
     @Override
     public void cancelAllTasks() {
         gameGroupTaskList.cancelAllTasks();
     }
-
 
 
     @Override
@@ -999,11 +1145,11 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     }
 
 
-
     @Override
     public Map<String, CommandConfig> getCommands() {
         return commandMap;
     }
+
 
     @Override
     public Economy getEconomy() {
@@ -1011,10 +1157,11 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     }
 
 
-    @Override
-    public void removeListener(String name) {
-        defaultListeners.remove(name);
 
-        createDefaultAndMapListeners();
+
+
+    @Override
+    public Rewarder getRewarder() {
+        return rewarder;
     }
 }
