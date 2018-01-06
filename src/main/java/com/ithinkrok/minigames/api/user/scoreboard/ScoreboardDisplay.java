@@ -50,8 +50,16 @@ public class ScoreboardDisplay {
             throw new RuntimeException("Wrong scoreboard mode or invalid line number: " + line);
         }
 
+
         if(text == null || text.isEmpty()) fakeTeams.get(line).setPrefix(emptyString(line));
-        else fakeTeams.get(line).setPrefix(text);
+        else {
+            //Prevent issues with text longer than 16 which throws an exception on Bukkit
+            if(text.length() > 16) {
+                text = text.substring(0, 16);
+            }
+
+            fakeTeams.get(line).setPrefix(text);
+        }
     }
 
     public void setTextLocale(int line, String locale, Object...args) {
