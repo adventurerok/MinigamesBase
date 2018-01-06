@@ -118,7 +118,7 @@ public class MCColonyRewarder implements Rewarder {
             if(amount.compareTo(BigDecimal.ZERO) > 0) {
                 user.getEconomyAccount().deposit(currency, amount, "minigame participation", result -> {
                     participationRewardsGiven.add(user.getUuid());
-                    user.sendLocale("reward.participation.get", amount);
+                    user.sendLocale("reward.participation.get", currency.format(amount));
                 });
             }
         }
@@ -173,7 +173,7 @@ public class MCColonyRewarder implements Rewarder {
 
         @CustomEventHandler
         public void onGameStateChange(GameStateChangedEvent event) {
-            if(gameGroup.isAcceptingPlayers()) {
+            if(!gameGroup.isAcceptingPlayers()) {
                 //game not started
                 return;
             }
