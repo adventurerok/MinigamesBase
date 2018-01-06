@@ -68,6 +68,7 @@ game_states:
             lobby_info_locale: "scoreboard.lobby_info"
             games_info_locale: "scoreboard.games_info"
             players_on_hub_locale: "scoreboard.players_on_hub"
+            balances_locale: "scoreboard.balances"
           lobby_created_locale: "hub.lobby_created"
           click_join_locale: "hub.click_join_builder"
 

@@ -27,10 +27,14 @@ welcome.title=&e&lWelcome!
 welcome.subtitle=&5&l%s
 
 scoreboard.title=&5&lMcColony Network
-scoreboard.players_online=&6&lOnline\:
-scoreboard.players_on_hub=&6&lOn Hub\:
-scoreboard.lobby_info=&6&lIn Lobbies\:
-scoreboard.games_info=&6&lIn Games\:
+scoreboard.players_online=%s &6&lOnline
+scoreboard.players_on_hub=%s &6&lOn Hub
+scoreboard.players_in_games=%s &6&lIn Games
+scoreboard.players_in_lobbies=%s &6&lIn Lobbies
+scoreboard.lobby_info=%s &5&lLobbies
+scoreboard.games_info=%s &5&lGames
+scoreboard.balances=&3&lBalances\:
+scoreboard.balance=%s
 
 hub.lobby_created=&6A new &c%s &6lobby was created\!
 
