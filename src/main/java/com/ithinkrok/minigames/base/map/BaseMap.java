@@ -259,6 +259,9 @@ public class BaseMap implements GameMap, ConfigHolder {
 
     @Override
     public Location getLocation(MapPoint point) {
+        //Return null if passed in null
+        if(point == null) return null;
+
         World world = worlds.get(point.getWorld());
 
         float yaw = point.getYaw();
