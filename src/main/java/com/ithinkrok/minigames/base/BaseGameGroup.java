@@ -280,7 +280,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
             //Remove worlds that the old map uses that the new map does not
             List<World> removeWorlds = new ArrayList<>(oldMap.getWorlds());
             removeWorlds.removeAll(newMap.getWorlds());
-            game.removeGameGroupForWorlds(removeWorlds);
+            game.removeGameGroupForWorlds(this, removeWorlds);
         }
 
         sendUpdatePayload();
@@ -685,7 +685,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         if (currentMap == null) return;
 
         currentMap.unloadMap();
-        game.removeGameGroupForWorlds(currentMap.getWorlds());
+        game.removeGameGroupForWorlds(this, currentMap.getWorlds());
         currentMap = null;
     }
 

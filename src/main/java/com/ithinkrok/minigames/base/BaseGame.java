@@ -287,9 +287,9 @@ public class BaseGame implements Game, FileLoader {
     }
 
 
-    public void removeGameGroupForWorlds(Collection<World> worlds) {
+    public void removeGameGroupForWorlds(BaseGameGroup gameGroup, Collection<World> worlds) {
         for (World world : worlds) {
-            worldToGameGroup.remove(world.getName());
+            worldToGameGroup.remove(world.getName(), gameGroup);
         }
 
     }    @Override
