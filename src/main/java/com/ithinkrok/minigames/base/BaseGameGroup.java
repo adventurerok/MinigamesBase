@@ -57,6 +57,7 @@ import com.ithinkrok.util.lang.MultipleLanguageLookup;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.nio.file.Path;
@@ -275,7 +276,11 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
         if (oldMap != null) {
             oldMap.unloadMap();
-            game.removeGameGroupForWorlds(oldMap.getWorlds());
+
+            //Remove worlds that the old map uses that the new map does not
+            List<World> removeWorlds = new ArrayList<>(oldMap.getWorlds());
+            removeWorlds.removeAll(newMap.getWorlds());
+            game.removeGameGroupForWorlds(removeWorlds);
         }
 
         sendUpdatePayload();
