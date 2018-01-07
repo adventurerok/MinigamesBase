@@ -81,7 +81,13 @@ public class GameBukkitListener implements Listener {
     }
 
     private GameGroup getGameGroup(World world) {
-        return game.getGameGroupFromWorldName(world.getName());
+        Objects.requireNonNull(world, "World provided to getGameGroup is null");
+
+        GameGroup gg = game.getGameGroupFromWorldName(world.getName());
+
+        Objects.requireNonNull(gg, "Could not find GameGroup for world: " + world.getName());
+
+        return gg;
     }
 
     @EventHandler
