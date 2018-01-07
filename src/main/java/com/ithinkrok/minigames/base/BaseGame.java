@@ -23,6 +23,7 @@ import com.ithinkrok.minigames.api.util.JSONBook;
 import com.ithinkrok.minigames.api.util.disguise.Disguise;
 import com.ithinkrok.minigames.api.util.disguise.DisguiseController;
 import com.ithinkrok.minigames.base.bukkitlistener.GameBukkitListener;
+import com.ithinkrok.minigames.base.map.BaseMap;
 import com.ithinkrok.minigames.base.util.InvisiblePlayerAttacker;
 import com.ithinkrok.minigames.base.util.disguise.LDDisguiseController;
 import com.ithinkrok.minigames.base.util.disguise.MinigamesDisguiseController;
@@ -103,6 +104,7 @@ public class BaseGame implements Game, FileLoader {
 
     private DisguiseController disguiseController;
 
+
     public BaseGame(BasePlugin plugin, Config config) {
         this.plugin = plugin;
 
@@ -159,6 +161,7 @@ public class BaseGame implements Game, FileLoader {
         MSMClient.addProtocol("MinigamesUpdate", updateProtocol);
     }
 
+
     /**
      * Unloads all chunks in all worlds
      */
@@ -174,6 +177,7 @@ public class BaseGame implements Game, FileLoader {
         }
     }
 
+
     private void setupDisguiseController() {
         if (Bukkit.getPluginManager().getPlugin("LibsDisguises") != null) {
             disguiseController = new LDDisguiseController();
@@ -182,61 +186,244 @@ public class BaseGame implements Game, FileLoader {
         }
     }
 
+
     @Override
     public ClientMinigamesProtocol getProtocol() {
         return protocol;
     }
+
 
     @Override
     public Collection<String> getAvailableGameGroupTypes() {
         return gameGroupConfigMap.keySet();
     }
 
+
     @Override
+    public GameTask doInFuture(GameRunnable task) {
+        return doInFuture(task, 1);
+    }
+
+
+    @Override
+    public GameTask doInFuture(GameRunnable task, int delay) {
+        GameTask gameTask = new GameTask(task);
+
+        gameTask.schedule(plugin, delay);
+        return gameTask;
+    }    @Override
     public Collection<BaseGameGroup> getGameGroups() {
         return nameToGameGroup.values();
     }
 
+
     @Override
+    public GameTask repeatInFuture(GameRunnable task, int delay, int period) {
+        GameTask gameTask = new GameTask(task);
+
+        gameTask.schedule(plugin, delay, period);
+        return gameTask;
+    }
+
+
+    @Override
+    public void cancelAllTasks() {
+        throw new RuntimeException("You cannot cancel all game tasks");
+    }    @Override
     public Path getAssetDirectory() {
         return assetsDirectory;
     }
 
-    @Override
+
+    private BaseGameGroup getGameGroupForJoining(UUID uniqueId) {
+        String gameGroupName = playersJoinGameGroups.remove(uniqueId);
+
+        if (gameGroupName != null && nameToGameGroup.containsKey(gameGroupName)) {
+            return nameToGameGroup.get(gameGroupName);
+        }
+
+        JoiningGameGroupData data = playersJoiningGameGroupTypes.remove(uniqueId);
+
+        if (data != null) {
+            for (BaseGameGroup gameGroup : getGameGroups()) {
+                if (!gameGroup.getType().equals(data.type)) continue;
+                if (!gameGroup.isAcceptingPlayers()) continue;
+                if (!data.params.isEmpty() && !data.params.equals(gameGroup.getParameters())) continue;
+
+                return gameGroup;
+            }
+
+            return createGameGroup(data.type, data.params);
+        }
+
+        return null;
+    }
+
+
+    private void hideNonGameGroupPlayers(BaseUser user) {
+        for (Player player : plugin.getServer().getOnlinePlayers()) {
+            BaseUser other = getUser(player);
+            if (other != null && other.getGameGroup() == user.getGameGroup()) continue;
+
+            user.getPlayer().hidePlayer(player);
+            player.hidePlayer(user.getPlayer());
+        }
+    }    @Override
     public Path getRamdiskDirectory() {
         return ramdiskDirectory;
     }
 
-    @Override
+
+    private String nextGameGroupName(String configName) {
+        String result;
+        int counter = 0;
+
+        do {
+            result = name + "_" + configName + "_" + counter;
+            ++counter;
+        } while (nameToGameGroup.containsKey(result));
+
+        return result;
+    }
+
+
+    public void removeGameGroupForWorlds(Collection<World> worlds) {
+        for (World world : worlds) {
+            worldToGameGroup.remove(world.getName());
+        }
+
+    }    @Override
     public Path getConfigDirectory() {
         return configDirectory;
     }
 
+
     @Override
+    public String getName() {
+        return name;
+    }
+
+
+    @Override
+    public String getFormattedName() {
+        return name;
+    }    @Override
     public Path getMapDirectory() {
         return mapDirectory;
     }
 
+
     @Override
+    public Config loadConfig(String path) {
+        try {
+            return new BukkitConfig(YamlConfiguration.loadConfiguration(configDirectory.resolve(path).toFile()));
+        } catch (Exception e) {
+            throw new RuntimeException("Error while loading config at: " + path, e);
+        }
+    }
+
+
+    @Override
+    public LangFile loadLangFile(String path) {
+        try {
+            return new LangFile(configDirectory.resolve(path));
+        } catch (IOException e) {
+            System.out.println("Failed to load lang file: " + path);
+            e.printStackTrace();
+            return new LangFile(new Properties());
+        }
+    }    @Override
     public Path getResourceDirectory() {
         return resourceDirectory;
     }
 
+
     @Override
+    public JSONBook loadBook(String name, String pathName) {
+        Path path = configDirectory.resolve(pathName);
+
+        try {
+            List<String> lines = Files.readAllLines(path);
+
+            StringBuilder json = new StringBuilder();
+
+            for (String line : lines) {
+                json.append(line);
+            }
+
+            return new JSONBook(name, json.toString());
+        } catch (IOException e) {
+            System.out.println("Failed to load json book file: " + pathName);
+            e.printStackTrace();
+            return new JSONBook(name, "failed to load");
+        }
+    }
+
+
+    @Override
+    public void doDatabaseTask(DatabaseTask task) {
+        persistence.doTask(task);
+    }    @Override
     public void registerListeners() {
         Listener listener = new GameBukkitListener(this);
         plugin.getServer().getPluginManager().registerEvents(listener, plugin);
     }
 
-    @Override
+    private static class JoiningGameGroupData {
+
+        String type;
+
+        List<String> params;
+
+
+        public JoiningGameGroupData(String type, List<String> params) {
+            this.type = type;
+            this.params = params;
+        }
+    }
+
+    private class TabCompleteListener extends PacketAdapter {
+
+        public TabCompleteListener(Plugin plugin, ListenerPriority listenerPriority) {
+            super(plugin, listenerPriority, PacketType.Play.Client.TAB_COMPLETE, PacketType.Play.Server.TAB_COMPLETE);
+        }
+
+
+        @Override
+        public void onPacketReceiving(PacketEvent event) {
+            if (event.getPacketType() != PacketType.Play.Client.TAB_COMPLETE) return;
+
+            WrapperPlayClientTabComplete packet = new WrapperPlayClientTabComplete(event.getPacket());
+
+            System.out.println(packet.getText());
+        }
+
+
+        @Override
+        public void onPacketSending(PacketEvent event) {
+            if (event.getPacketType() != PacketType.Play.Server.TAB_COMPLETE) return;
+
+            WrapperPlayServerTabComplete packet = new WrapperPlayServerTabComplete(event.getPacket());
+
+            System.out.println(Arrays.toString(packet.getText()));
+        }
+    }    @Override
     public void registerGameGroupConfig(String name, String configFile) {
         gameGroupConfigMap.put(name, configFile);
     }
+
+
+
+
 
     @Override
     public BaseGameGroup getGameGroup(String ggName) {
         return nameToGameGroup.get(ggName);
     }
+
+
+
+
 
     @Override
     public void unload() {
@@ -244,6 +431,10 @@ public class BaseGame implements Game, FileLoader {
 
         persistence.onPluginDisabled();
     }
+
+
+
+
 
     @Override
     public void removeGameGroup(GameGroup gameGroup) {
@@ -257,15 +448,27 @@ public class BaseGame implements Game, FileLoader {
         protocol.sendGameGroupKilledPayload(gameGroup);
     }
 
+
+
+
+
     @Override
     public void makeEntityRepresentUser(User user, Entity entity) {
         entity.setMetadata("rep", new FixedMetadataValue(plugin, user.getUuid()));
     }
 
+
+
+
+
     @Override
     public void makeEntityActualUser(User user, Entity entity) {
         entity.setMetadata("actual", new FixedMetadataValue(plugin, user.getUuid()));
     }
+
+
+
+
 
     @Override
     public void setupCustomEntity(Entity entity, String name, Variables variables) {
@@ -273,10 +476,18 @@ public class BaseGame implements Game, FileLoader {
         entity.setMetadata("custom_vars", new FixedMetadataValue(plugin, variables));
     }
 
+
+
+
+
     @Override
     public Economy getEconomy() {
         return MSMPlugin.getServerEconomy();
     }
+
+
+
+
 
     @Override
     public void setGameGroupForWorlds(GameGroup gameGroup, Collection<World> worlds) {
@@ -291,25 +502,77 @@ public class BaseGame implements Game, FileLoader {
         }
     }
 
+
     @Override
     public BaseGameGroup getGameGroupFromWorldName(String worldName) {
-        return worldToGameGroup.get(worldName);
+        BaseGameGroup gg = worldToGameGroup.get(worldName);
+        if (gg != null) {
+            return gg;
+        }
+
+        System.err.println("No GameGroup in world lookup table for world " + worldName);
+        System.err.println("Manually scanning GameGroup worlds");
+
+
+        Collection<BaseGameGroup> allGGs = getGameGroups();
+        if(allGGs.isEmpty()) {
+            System.err.println("There are NO GameGroups! We can't find world " + worldName);
+        }
+
+        //Just in case a GameGroup didn't manage to register its maps
+        for (BaseGameGroup aGameGroup : allGGs) {
+            BaseMap map = aGameGroup.getCurrentMap();
+            if (map == null) {
+                System.err.println("There is a GameGroup with no map: " + aGameGroup.getName());
+                continue;
+            }
+
+            if (map.getWorlds() == null) {
+                System.err.println("map.getWorlds() is null for map " + map.getInfo().getName() + "" +
+                                   "of GameGroup " + aGameGroup.getName());
+            } else if (map.getWorlds().isEmpty()) {
+                System.err.println("The map " + map.getInfo().getName() +
+                                   " of GameGroup " + aGameGroup.getName() +
+                                   "has no worlds!");
+            } else {
+                for (World world : map.getWorlds()) {
+
+                    System.out.println("GameGroup " + aGameGroup.getName() +
+                                       " map " + map.getInfo().getName() +
+                                       " has world " + world.getName() +
+                                       " with map-world-name " + map.getWorldInfo(world).getName());
+
+                    if (world.getName().equals(worldName)) {
+                        worldToGameGroup.put(worldName, aGameGroup);
+                        return aGameGroup;
+                    }
+                }
+            }
+
+        }
+
+        System.err.println("No world found doing manual scan for " + worldName);
+        return null;
     }
+
 
     @Override
     public void makeEntityRepresentTeam(Team team, Entity entity) {
         entity.setMetadata("team", new FixedMetadataValue(plugin, team.getName()));
     }
 
+
     @Override
     public void disguiseUser(User user, Disguise disguise) {
         disguiseController.disguise(user, disguise);
     }
 
+
     @Override
     public void unDisguiseUser(User user) {
         disguiseController.unDisguise(user);
     }
+
 
     @Override
     public void rejoinPlayer(Player player) {
@@ -355,6 +618,7 @@ public class BaseGame implements Game, FileLoader {
         });
     }
 
+
     @Override
     public boolean sendPlayerToHub(Player player) {
         if (hubServer == null) return false;
@@ -364,6 +628,7 @@ public class BaseGame implements Game, FileLoader {
 
         return client.changePlayerServer(player.getUniqueId(), hubServer);
     }
+
 
     @Override
     public BaseGameGroup createGameGroup(String type, List<String> params) {
@@ -381,6 +646,7 @@ public class BaseGame implements Game, FileLoader {
         return gameGroup;
     }
 
+
     @Override
     public BaseGameGroup getSpawnGameGroup() {
         if (nameToGameGroup.isEmpty()) return null;
@@ -388,10 +654,12 @@ public class BaseGame implements Game, FileLoader {
         return nameToGameGroup.values().iterator().next();
     }
 
+
     @Override
     public Logger getLogger() {
         return plugin.getLogger();
     }
+
 
     @Override
     public void preJoinGameGroup(UUID playerUUID, String type, String name, List<String> params) {
@@ -408,6 +676,7 @@ public class BaseGame implements Game, FileLoader {
         });
     }
 
+
     @Override
     public BaseUser getUser(Entity entity) {
         String mapName = entity.getWorld().getName();
@@ -416,6 +685,7 @@ public class BaseGame implements Game, FileLoader {
         if (gameGroup == null) return null;
         return gameGroup.getUser(entity.getUniqueId());
     }
+
 
     @Override
     public void checkResourcesRestart() {
@@ -431,180 +701,11 @@ public class BaseGame implements Game, FileLoader {
         long freeMemoryMB = actualFreeMemory / (1024 * 1024);
 
         //400+ MB is a good amount apparently. This should really be put in a config
-        if(freeMemoryMB > 400) return;
+        if (freeMemoryMB > 400) return;
 
         ClientAPIProtocol apiProtocol = MSMPlugin.getApiProtocol();
         apiProtocol.scheduleRestart(1, 0);
     }
 
-    @Override
-    public GameTask doInFuture(GameRunnable task) {
-        return doInFuture(task, 1);
-    }
 
-    @Override
-    public GameTask doInFuture(GameRunnable task, int delay) {
-        GameTask gameTask = new GameTask(task);
-
-        gameTask.schedule(plugin, delay);
-        return gameTask;
-    }
-
-    @Override
-    public GameTask repeatInFuture(GameRunnable task, int delay, int period) {
-        GameTask gameTask = new GameTask(task);
-
-        gameTask.schedule(plugin, delay, period);
-        return gameTask;
-    }
-
-    @Override
-    public void cancelAllTasks() {
-        throw new RuntimeException("You cannot cancel all game tasks");
-    }
-
-    private BaseGameGroup getGameGroupForJoining(UUID uniqueId) {
-        String gameGroupName = playersJoinGameGroups.remove(uniqueId);
-
-        if (gameGroupName != null && nameToGameGroup.containsKey(gameGroupName)) {
-            return nameToGameGroup.get(gameGroupName);
-        }
-
-        JoiningGameGroupData data = playersJoiningGameGroupTypes.remove(uniqueId);
-
-        if (data != null) {
-            for (BaseGameGroup gameGroup : getGameGroups()) {
-                if (!gameGroup.getType().equals(data.type)) continue;
-                if (!gameGroup.isAcceptingPlayers()) continue;
-                if (!data.params.isEmpty() && !data.params.equals(gameGroup.getParameters())) continue;
-
-                return gameGroup;
-            }
-
-            return createGameGroup(data.type, data.params);
-        }
-
-        return null;
-    }
-
-    private void hideNonGameGroupPlayers(BaseUser user) {
-        for (Player player : plugin.getServer().getOnlinePlayers()) {
-            BaseUser other = getUser(player);
-            if (other != null && other.getGameGroup() == user.getGameGroup()) continue;
-
-            user.getPlayer().hidePlayer(player);
-            player.hidePlayer(user.getPlayer());
-        }
-    }
-
-    private String nextGameGroupName(String configName) {
-        String result;
-        int counter = 0;
-
-        do {
-            result = name + "_" + configName + "_" + counter;
-            ++counter;
-        } while (nameToGameGroup.containsKey(result));
-
-        return result;
-    }
-
-    public void removeGameGroupForWorlds(Collection<World> worlds) {
-        for (World world : worlds) {
-            worldToGameGroup.remove(world.getName());
-        }
-
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getFormattedName() {
-        return name;
-    }
-
-    @Override
-    public Config loadConfig(String path) {
-        try {
-            return new BukkitConfig(YamlConfiguration.loadConfiguration(configDirectory.resolve(path).toFile()));
-        } catch (Exception e) {
-            throw new RuntimeException("Error while loading config at: " + path, e);
-        }
-    }
-
-    @Override
-    public LangFile loadLangFile(String path) {
-        try {
-            return new LangFile(configDirectory.resolve(path));
-        } catch (IOException e) {
-            System.out.println("Failed to load lang file: " + path);
-            e.printStackTrace();
-            return new LangFile(new Properties());
-        }
-    }
-
-    @Override
-    public JSONBook loadBook(String name, String pathName) {
-        Path path = configDirectory.resolve(pathName);
-
-        try {
-            List<String> lines = Files.readAllLines(path);
-
-            StringBuilder json = new StringBuilder();
-
-            for (String line : lines) {
-                json.append(line);
-            }
-
-            return new JSONBook(name, json.toString());
-        } catch (IOException e) {
-            System.out.println("Failed to load json book file: " + pathName);
-            e.printStackTrace();
-            return new JSONBook(name, "failed to load");
-        }
-    }
-
-    @Override
-    public void doDatabaseTask(DatabaseTask task) {
-        persistence.doTask(task);
-    }
-
-    private static class JoiningGameGroupData {
-        String type;
-
-        List<String> params;
-
-        public JoiningGameGroupData(String type, List<String> params) {
-            this.type = type;
-            this.params = params;
-        }
-    }
-
-    private class TabCompleteListener extends PacketAdapter {
-
-        public TabCompleteListener(Plugin plugin, ListenerPriority listenerPriority) {
-            super(plugin, listenerPriority, PacketType.Play.Client.TAB_COMPLETE, PacketType.Play.Server.TAB_COMPLETE);
-        }
-
-        @Override
-        public void onPacketReceiving(PacketEvent event) {
-            if (event.getPacketType() != PacketType.Play.Client.TAB_COMPLETE) return;
-
-            WrapperPlayClientTabComplete packet = new WrapperPlayClientTabComplete(event.getPacket());
-
-            System.out.println(packet.getText());
-        }
-
-        @Override
-        public void onPacketSending(PacketEvent event) {
-            if (event.getPacketType() != PacketType.Play.Server.TAB_COMPLETE) return;
-
-            WrapperPlayServerTabComplete packet = new WrapperPlayServerTabComplete(event.getPacket());
-
-            System.out.println(Arrays.toString(packet.getText()));
-        }
-    }
 }
