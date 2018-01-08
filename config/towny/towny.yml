@@ -16,7 +16,7 @@ shared_objects:
     game_state: "towny"
     map: "towny"
   user:
-    user_new_combat: true
+    use_new_combat: true
 
 game_states:
   towny: {}
