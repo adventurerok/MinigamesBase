@@ -679,8 +679,8 @@ public class BaseGame implements Game, FileLoader {
 
     @Override
     public BaseUser getUser(Entity entity) {
-        String mapName = entity.getWorld().getName();
-        BaseGameGroup gameGroup = worldToGameGroup.get(mapName);
+        String worldName = entity.getWorld().getName();
+        BaseGameGroup gameGroup = getGameGroupFromWorldName(worldName);
 
         if (gameGroup == null) return null;
         return gameGroup.getUser(entity.getUniqueId());

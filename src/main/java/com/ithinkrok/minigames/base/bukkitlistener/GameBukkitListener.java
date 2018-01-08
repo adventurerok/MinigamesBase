@@ -73,21 +73,42 @@ public class GameBukkitListener implements Listener {
 
     @EventHandler
     public void eventWeatherChanged(WeatherChangeEvent event) {
-        GameGroup gameGroup = getGameGroup(event.getWorld());
-        if (gameGroup == null) return;
+        GameGroup gameGroup;
+        try {
+            gameGroup = getGameGroup(event.getWorld());
+        } catch (UnknownWorldException ignored) {
+            return;
+        }
 
-        if (gameGroup.getCurrentMap().getWorldInfo(event.getWorld()).isWeatherEnabled()) return;
+        GameMap map = gameGroup.getCurrentMap();
+        MapWorldInfo worldInfo = map.getWorldInfo(event.getWorld());
+
+        if (worldInfo.isWeatherEnabled()) return;
         event.setCancelled(true);
     }
 
+
+    /**
+     *
+     * @throws UnknownWorldException If there is no gamegroup for the world
+     */
     private GameGroup getGameGroup(World world) {
         Objects.requireNonNull(world, "World provided to getGameGroup is null");
 
         GameGroup gg = game.getGameGroupFromWorldName(world.getName());
 
-        Objects.requireNonNull(gg, "Could not find GameGroup for world: " + world.getName());
+        if(gg == null) {
+            throw new UnknownWorldException(world);
+        }
 
         return gg;
+    }
+
+    private static class UnknownWorldException extends RuntimeException {
+
+        public UnknownWorldException(World world) {
+            super("No GameGroup for world: " + world.getName());
+        }
     }
 
     @EventHandler
@@ -134,8 +155,13 @@ public class GameBukkitListener implements Listener {
 
     @EventHandler
     public void eventPotionSplash(PotionSplashEvent event) {
-        GameGroup gameGroup = getGameGroup(event.getPotion().getWorld());
-        if (gameGroup == null) return;
+        GameGroup gameGroup;
+        try {
+            gameGroup = getGameGroup(event.getPotion().getWorld());
+        } catch (UnknownWorldException ignored) {
+            //Potion splash in world not managed by us
+            return;
+        }
 
         GameMap map = gameGroup.getCurrentMap();
 
