@@ -600,7 +600,10 @@ public class GameBukkitListener implements Listener {
 
             return;
         }
-        if (attacked.isPlayer()) event.setCancelled(true);
+        Config gameShared = gameGroup.getSharedObjectOrEmpty("game");
+        boolean cancelDeath = gameShared.getBoolean("cancel_death", true);
+
+        if (attacked.isPlayer() && cancelDeath) event.setCancelled(true);
 
         if (attacker == null) {
             switch (event.getCause()) {
