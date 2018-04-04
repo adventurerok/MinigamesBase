@@ -13,7 +13,7 @@ public class WeaponStats {
     private static final Map<Material, Double> speed = new HashMap<>();
 
     private static final double defaultLegacyDamage = 1.0;
-    private static final double defaultNewDamage = 2.0;
+    private static final double defaultNewDamage = 1.0;
     private static final double defaultSpeed = 4.0;
 
     static {

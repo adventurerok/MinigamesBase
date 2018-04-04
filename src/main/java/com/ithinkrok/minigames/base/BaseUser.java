@@ -277,8 +277,10 @@ public class BaseUser implements Listener, User {
 
             //Make sure we haven't already made the changes
             if (itemAttributes.getModifier("Damage Override") == null) {
+                //turns out giving an item attributes means it only uses those to calculate its damage, rather than
+                //its weapon type
                 double legacyDamage = WeaponStats.getLegacyDamage(newItem.getType());
-                double newDamage = WeaponStats.getNewDamage(newItem.getType());
+                double newDamage = WeaponStats.getDefaultNewDamage();
                 double damageChange = legacyDamage - newDamage;
 
                 ItemAttributeModifier damage = new ItemAttributeModifier(
