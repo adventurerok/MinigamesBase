@@ -14,7 +14,7 @@ CREATE PROCEDURE UpdateSchema1_2
       ALTER TABLE mg_user_score
         DROP COLUMN player_uuid;
       ALTER TABLE mg_user_score
-        ADD INDEX unique_index (uuid, game);
+        ADD UNIQUE INDEX unique_index (uuid, game);
       ALTER TABLE mg_user_score
         MODIFY COLUMN game VARCHAR(50) NOT NULL;
       ALTER TABLE mg_user_score
@@ -30,7 +30,7 @@ CREATE PROCEDURE UpdateSchema1_2
       ALTER TABLE mg_user_ints
         DROP COLUMN player_uuid;
       ALTER TABLE mg_user_ints
-        ADD INDEX unique_index (uuid, property);
+        ADD UNIQUE INDEX unique_index (uuid, property);
       ALTER TABLE mg_user_ints
         MODIFY COLUMN property VARCHAR(100) NOT NULL;
       ALTER TABLE mg_user_ints
@@ -46,7 +46,7 @@ CREATE PROCEDURE UpdateSchema1_2
       ALTER TABLE mg_user_strings
         DROP COLUMN player_uuid;
       ALTER TABLE mg_user_strings
-        ADD INDEX unique_index (uuid, property);
+        ADD UNIQUE INDEX unique_index (uuid, property);
       ALTER TABLE mg_user_strings
         MODIFY COLUMN property VARCHAR(100) NOT NULL;
       ALTER TABLE mg_user_strings
@@ -62,7 +62,7 @@ CREATE PROCEDURE UpdateSchema1_2
       ALTER TABLE mg_user_bools
         DROP COLUMN player_uuid;
       ALTER TABLE mg_user_bools
-        ADD INDEX unique_index (uuid, property);
+        ADD UNIQUE INDEX unique_index (uuid, property);
       ALTER TABLE mg_user_bools
         MODIFY COLUMN property VARCHAR(100) NOT NULL;
       ALTER TABLE mg_user_bools
@@ -78,7 +78,7 @@ CREATE PROCEDURE UpdateSchema1_2
       ALTER TABLE mg_user_doubles
         DROP COLUMN player_uuid;
       ALTER TABLE mg_user_doubles
-        ADD INDEX unique_index (uuid, property);
+        ADD UNIQUE INDEX unique_index (uuid, property);
       ALTER TABLE mg_user_doubles
         MODIFY COLUMN property VARCHAR(100) NOT NULL;
       ALTER TABLE mg_user_doubles
