@@ -3,6 +3,7 @@ package com.ithinkrok.minigames.api.util;
 import com.ithinkrok.util.StringUtils;
 import net.milkbowl.vault.item.Items;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
+import net.minecraft.server.v1_12_R1.NBTTagList;
 import net.minecraft.server.v1_12_R1.NBTTagString;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -154,6 +155,16 @@ public class InventoryUtils {
         if(tag == null) return null;
 
         return tag.getString("CustomItem");
+    }
+
+    public static ItemStack disableBlockPlacing(ItemStack blockItem) {
+        net.minecraft.server.v1_12_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(blockItem);
+        nmsItem.a("CanPlaceOn", new NBTTagList());
+
+        //This works as the item meta stores its "unhandled" tags including our custom one
+        ItemMeta meta = CraftItemStack.asBukkitCopy(nmsItem).getItemMeta();
+        blockItem.setItemMeta(meta);
+        return blockItem;
     }
 
     /**

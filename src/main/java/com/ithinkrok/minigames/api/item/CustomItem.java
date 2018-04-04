@@ -44,6 +44,7 @@ public class CustomItem implements CustomListener, Nameable {
     private final Material itemMaterial;
     private final int durability;
     private final boolean unbreakable;
+    private final boolean blockPlacingDisabled;
 
     private String rightClickCooldownFinishedLocale;
     private Calculator rightClickCooldown;
@@ -70,6 +71,7 @@ public class CustomItem implements CustomListener, Nameable {
         this.unbreakable = config.getBoolean("unbreakable", itemMaterial.getMaxDurability() != 0);
         this.replaceOnUpgrade = config.getBoolean("upgradable", false);
         this.combatMode = CombatMode.valueOf(config.getString("combat_mode", "INHERIT").toUpperCase());
+        this.blockPlacingDisabled = config.getBoolean("block_placing_disabled", false);
 
         if (config.contains("right_cooldown")) configureCooldown(config.getConfigOrNull("right_cooldown"));
         if (config.contains("right_timeout")) configureTimeout(config.getConfigOrNull("right_timeout"));
@@ -250,7 +252,13 @@ public class CustomItem implements CustomListener, Nameable {
         }
 
         //Make us unbreakable if we are
-        if(unbreakable) item = InventoryUtils.setUnbreakable(item, true);
+        if(unbreakable) {
+            item = InventoryUtils.setUnbreakable(item, true);
+        }
+
+        if(blockPlacingDisabled) {
+            item = InventoryUtils.disableBlockPlacing(item);
+        }
 
         return InventoryUtils.addIdentifier(item, name);
     }
