@@ -78,9 +78,7 @@ public class ClickableInventory {
 
             item.onCalculateItem(event);
             if (event.getDisplay() == null) continue;
-            if (InventoryUtils.getIdentifier(event.getDisplay()) == null) {
                 event.setDisplay(InventoryUtils.addIdentifier(event.getDisplay().clone(), item.getIdentifier()));
-            }
 
             if(item.getSlot() >= 0) {
                 inventory.setItem(item.getSlot(), event.getDisplay());
@@ -115,7 +113,10 @@ public class ClickableInventory {
         String identifier = InventoryUtils.getIdentifier(event.getItemInSlot());
 
         ClickableItem item = items.get(identifier);
-        if (item == null) return;
+        if (item == null) {
+            throw new RuntimeException("Item in slot " + event.getItemInSlot() + " of inventory " + identifier +
+                    " is not registered. Identifier is " + identifier);
+        }
 
         item.onClick(new UserClickItemEvent(event.getUser(), this, item, event.getClickType()));
     }
