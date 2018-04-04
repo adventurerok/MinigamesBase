@@ -25,12 +25,14 @@ public class ClickableInventory {
     private final String identifier;
     private final Map<String, ClickableItem> items = new LinkedHashMap<>();
 
+
     public ClickableInventory(Config config) {
         this.title = config.getString("title", "Missing Inv Title");
         this.identifier = config.getString("identifier", title);
 
         loadFromConfig(config.getConfigList("items"));
     }
+
 
     @SuppressWarnings("unchecked")
     public void loadFromConfig(List<Config> items) {
@@ -55,46 +57,33 @@ public class ClickableInventory {
         }
     }
 
+
     public void addItem(ClickableItem item) {
         items.put(item.getIdentifier(), item);
     }
 
+
     public ClickableInventory(String title) {
         this(title, title);
     }
+
 
     public ClickableInventory(String title, String identifier) {
         this.title = title;
         this.identifier = identifier;
     }
 
+
     public String getIdentifier() {
         return identifier;
     }
 
-    public Inventory populateInventory(Inventory inventory, User user) {
-        for (ClickableItem item : items.values()) {
-            CalculateItemForUserEvent event = new CalculateItemForUserEvent(user, this, item);
-
-            item.onCalculateItem(event);
-            if (event.getDisplay() == null) continue;
-                event.setDisplay(InventoryUtils.addIdentifier(event.getDisplay().clone(), item.getIdentifier()));
-
-            if(item.getSlot() >= 0) {
-                inventory.setItem(item.getSlot(), event.getDisplay());
-            } else {
-                inventory.addItem(event.getDisplay());
-            }
-        }
-
-        return inventory;
-    }
 
     public Inventory createInventory(User user, Inventory old) {
         if (old == null || items.size() > old.getSize()) {
             int highestSlot = items.size();
-            for(ClickableItem item : items.values()) {
-                if(item.getSlot() + 1 > highestSlot) {
+            for (ClickableItem item : items.values()) {
+                if (item.getSlot() + 1 > highestSlot) {
                     highestSlot = item.getSlot() + 1;
                 }
             }
@@ -106,6 +95,26 @@ public class ClickableInventory {
         return populateInventory(old, user);
     }
 
+
+    public Inventory populateInventory(Inventory inventory, User user) {
+        for (ClickableItem item : items.values()) {
+            CalculateItemForUserEvent event = new CalculateItemForUserEvent(user, this, item);
+
+            item.onCalculateItem(event);
+            if (event.getDisplay() == null) continue;
+            event.setDisplay(InventoryUtils.addIdentifier(event.getDisplay().clone(), item.getIdentifier()));
+
+            if (item.getSlot() >= 0) {
+                inventory.setItem(item.getSlot(), event.getDisplay());
+            } else {
+                inventory.addItem(event.getDisplay());
+            }
+        }
+
+        return inventory;
+    }
+
+
     public void inventoryClick(UserInventoryClickEvent event) {
         event.setCancelled(true);
 
@@ -115,7 +124,7 @@ public class ClickableInventory {
         ClickableItem item = items.get(identifier);
         if (item == null) {
             throw new RuntimeException("Item in slot " + event.getItemInSlot() + " of inventory " + identifier +
-                    " is not registered. Identifier is " + identifier);
+                                       " is not registered. Identifier is " + identifier);
         }
 
         item.onClick(new UserClickItemEvent(event.getUser(), this, item, event.getClickType()));
