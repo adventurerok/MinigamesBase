@@ -15,6 +15,9 @@ import com.ithinkrok.util.math.Calculator;
 import com.ithinkrok.util.math.ExpressionCalculator;
 import com.ithinkrok.util.math.Variables;
 import org.bukkit.Location;
+import org.bukkit.attribute.Attributable;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
@@ -179,10 +182,19 @@ public class CustomEntity implements Nameable, CustomListener {
 
         //Set the max health and initial health of the entity
         if (config.contains("max_health")) {
-            int maxHealth = (int) (calculate(variables, config, "max_health") * HEALTH_PER_HEART);
+            double maxHealth = calculate(variables, config, "max_health") * HEALTH_PER_HEART;
 
-            ((Damageable) entity).setMaxHealth(maxHealth);
+//            ((Damageable) entity).setMaxHealth(maxHealth);
+            ((Attributable) entity).getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
             ((Damageable) entity).setHealth(maxHealth);
+        }
+
+        if(config.contains("attack_damage")) {
+            double attackDamage = calculate(variables, config, "attack_damage") * HEALTH_PER_HEART;
+
+            AttributeInstance attribute = ((Attributable) entity).getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
+            System.out.println("For entity " + entity.getType() + ", base attack damage was " + attribute.getBaseValue());
+            attribute.setBaseValue(attackDamage);
         }
 
         //Show a name above the entity
