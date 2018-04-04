@@ -395,6 +395,11 @@ public class BaseUser implements Listener, User {
             if (id == null) return null;
 
             CustomItem customItem = gameGroup.getCustomItem(id);
+            if(customItem == null) {
+                System.out.println("CustomItem '" + id + "' does not exist. Cannot upgrade this item (" +
+                old.getType() + ")");
+                return old;
+            }
             if (!customItem.replaceOnUpgrade()) return null;
 
             ItemStack replace = customItem.createForUser(BaseUser.this);
