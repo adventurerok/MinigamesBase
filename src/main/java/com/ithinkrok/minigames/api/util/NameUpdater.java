@@ -21,6 +21,9 @@ public class NameUpdater extends Thread {
     private static Queue<UUID> toLookup = new ConcurrentLinkedQueue<>();
     private static ConcurrentHashMap<UUID, Set<Consumer<NameResult>>> callbacks = new ConcurrentHashMap<>();
 
+    //for each UUID we only error once
+    private static Set<UUID> badUUIDs = new HashSet<>();
+
     private static volatile boolean exit = false;
 
 
@@ -80,8 +83,11 @@ public class NameUpdater extends Thread {
             consumers.forEach(nameResultConsumer -> nameResultConsumer.accept(new NameResult(uuid, name)));
 
         } catch (IOException | ParseException e) {
-            System.err.println("Error on name updater thread name lookup:");
-            e.printStackTrace();
+            if(!badUUIDs.contains(uuid)) {
+                System.err.println("Error on name updater thread name lookup for UUID (perhaps invalid) " + uuid);
+                e.printStackTrace();
+                badUUIDs.add(uuid);
+            }
         }
     }
 
