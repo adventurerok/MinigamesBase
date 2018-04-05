@@ -134,9 +134,11 @@ public class HighScoreSign extends InfoSign {
 
         Skull skull = (Skull) head.getState();
 
-        skull.setOwningPlayer(Bukkit.getOfflinePlayer(score.getPlayerUUID()));
-
-        skull.update();
+        //only update the head if the player has changed
+        if(skull.getOwningPlayer() == null || !skull.getOwningPlayer().getUniqueId().equals(score.getPlayerUUID())) {
+            skull.setOwningPlayer(Bukkit.getOfflinePlayer(score.getPlayerUUID()));
+            skull.update();
+        }
     }
 
     @Override
