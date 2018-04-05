@@ -215,11 +215,11 @@ public class Database implements DatabaseTaskRunner {
 
             if (ascending) {
                 result = UserScore.query(accessor,
-                                         "WHERE game=? ORDER BY value ASC, version DESC ASC " + count,
+                                         "WHERE game=? ORDER BY value ASC, version ASC, uuid LIMIT " + count,
                                          gameType);
             } else {
                 result = UserScore.query(accessor,
-                                         "WHERE game=? ORDER BY value DESC, version ASC LIMIT " + count,
+                                         "WHERE game=? ORDER BY value DESC, version ASC, uuid LIMIT " + count,
                                          gameType);
             }
 

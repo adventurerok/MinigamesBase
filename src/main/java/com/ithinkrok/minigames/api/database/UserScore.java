@@ -46,6 +46,7 @@ public class UserScore implements DatabaseObject {
     }
 
     public static List<UserScore> query(DatabaseAccessor accessor, String sql, Object... params) throws SQLException {
+        sql = sql.replace("uuid", "mg_user_score.uuid");
         try (Connection conn = accessor.getConnection();
              PreparedStatement statement = conn.prepareStatement(
                      "SELECT HEX(mg_user_score.uuid) as uuid, name, game, value from mg_user_score " +
