@@ -10,16 +10,23 @@ import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.MemoryConfig;
 import com.ithinkrok.util.event.CustomEventHandler;
+import com.mojang.authlib.GameProfile;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.block.Skull;
+import org.bukkit.craftbukkit.v1_12_R1.CraftOfflinePlayer;
+import org.bukkit.craftbukkit.v1_12_R1.CraftServer;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Created by paul on 20/02/16.
@@ -136,10 +143,38 @@ public class HighScoreSign extends InfoSign {
 
         //only update the head if the player has changed
         if(skull.getOwningPlayer() == null || !skull.getOwningPlayer().getUniqueId().equals(score.getPlayerUUID())) {
-            skull.setOwningPlayer(Bukkit.getOfflinePlayer(score.getPlayerUUID()));
+            OfflinePlayer offline = getOfflinePlayer(score.getPlayerUUID(), score.getPlayerName());
+
+            skull.setOwningPlayer(offline);
             skull.update();
         }
     }
+
+
+    private OfflinePlayer getOfflinePlayer(UUID uuid, String name) {
+        //this method ensures the offline player returned has the correct name for the skin cache (which uses names wtf Mojang)
+
+        OfflinePlayer bukkitPlayer = Bukkit.getOfflinePlayer(uuid);
+        if(Objects.equals(bukkitPlayer.getName(), name)) {
+            return bukkitPlayer;
+        }
+
+        try {
+            Constructor<CraftOfflinePlayer> cons =
+                    CraftOfflinePlayer.class.getDeclaredConstructor(CraftServer.class, GameProfile.class);
+            cons.setAccessible(true);
+
+            GameProfile profile = new GameProfile(uuid, name);
+            //noinspection JavaReflectionInvocation
+            return cons.newInstance(Bukkit.getServer(), profile);
+
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
+            System.err.println("Failed to create our custom OfflinePlayer");
+            e.printStackTrace();
+            return bukkitPlayer;
+        }
+    }
+
 
     @Override
     public void onRightClick(User user) {
