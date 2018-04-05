@@ -1,10 +1,14 @@
 package com.ithinkrok.minigames.api.database;
 
 import com.ithinkrok.minigames.api.user.User;
+import com.ithinkrok.minigames.api.util.NameUpdater;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -14,7 +18,7 @@ import java.util.function.IntConsumer;
 /**
  * Created by paul on 20/02/16.
  */
-public class Database implements DatabaseTaskRunner {
+public class Database implements DatabaseTaskRunner, Consumer<NameUpdater.NameResult> {
 
     private final DatabaseTaskRunner taskRunner;
 
@@ -223,8 +227,21 @@ public class Database implements DatabaseTaskRunner {
                                          gameType);
             }
 
+            checkIfNamesNeedUpdating(result);
             consumer.accept(result);
         });
+    }
+
+
+    private void checkIfNamesNeedUpdating(List<? extends NameHolder> result) {
+        Instant updateIfBefore = Instant.now().minus(24, ChronoUnit.HOURS);
+
+        for (NameHolder nameHolder : result) {
+            if(nameHolder.getNameKnownAt().isBefore(updateIfBefore)) {
+                NameUpdater.lookupName(nameHolder.getPlayerUUID(), this);
+            }
+        }
+
     }
 
 
@@ -245,9 +262,9 @@ public class Database implements DatabaseTaskRunner {
         doDatabaseTask(accessor -> {
             try (Connection conn = accessor.getConnection();
                  PreparedStatement statement = conn.prepareStatement(
-                         "INSERT INTO mg_name_cache (uuid, name) " +
-                         "VALUES (UNHEX(REPLACE(?,'-','')), ?) ON DUPLICATE KEY UPDATE " +
-                         "name=?"
+                         "INSERT INTO mg_name_cache (uuid, name, timestamp) " +
+                         "VALUES (UNHEX(REPLACE(?,'-','')), ?, NOW()) ON DUPLICATE KEY UPDATE " +
+                         "name=?, timestamp=NOW()"
                  )) {
 
                 statement.setString(1, user.toString());
@@ -258,5 +275,11 @@ public class Database implements DatabaseTaskRunner {
                 statement.executeUpdate();
             }
         });
+    }
+
+
+    @Override
+    public void accept(NameUpdater.NameResult nameResult) {
+        updateNameCache(nameResult.uuid, nameResult.name);
     }
 }
