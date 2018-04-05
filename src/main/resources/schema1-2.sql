@@ -51,6 +51,8 @@ CREATE PROCEDURE UpdateSchema1_2
         MODIFY COLUMN property VARCHAR(100) NOT NULL;
       ALTER TABLE mg_user_strings
         MODIFY COLUMN version DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+      ALTER TABLE mg_user_strings
+        MODIFY value MEDIUMTEXT;
 
       # Change mg_user_bools
       ALTER TABLE mg_user_bools

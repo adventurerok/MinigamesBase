@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `mg_user_strings` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uuid` BINARY(16) NOT NULL,
   `property` varchar(100) NOT NULL,
-  `value` varchar(255) DEFAULT '0',
+  `value` MEDIUMTEXT DEFAULT '0',
   `version` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_index` (`uuid`,`property`)
@@ -42,6 +42,13 @@ CREATE TABLE IF NOT EXISTS `mg_user_score` (
   `version` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_index` (`uuid`,`game`)
+);
+
+CREATE TABLE IF NOT EXISTS mg_name_cache (
+  uuid      BINARY(16)   NOT NULL,
+  name      VARCHAR(255) NOT NULL,
+  timestamp DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (uuid)
 );
 
 CREATE TABLE IF NOT EXISTS mg_schema_version (
