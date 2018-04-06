@@ -10,6 +10,7 @@ import com.ithinkrok.minigames.api.util.MinigamesConfigs;
 import com.ithinkrok.minigames.api.util.NamedSounds;
 import com.ithinkrok.minigames.api.util.SoundEffect;
 import com.ithinkrok.msm.common.economy.Currency;
+import com.ithinkrok.msm.common.economy.CurrencyType;
 import com.ithinkrok.msm.common.economy.result.Balance;
 import com.ithinkrok.util.math.Calculator;
 import com.ithinkrok.util.math.ExpressionCalculator;
@@ -39,8 +40,10 @@ public abstract class Buyable extends ClickableItem {
     String userNoMoneyLocale;
     String cannotBuyLocale;
     String userPayTeamLocale;
-    String teamDescriptionLocale;
-    String userDescriptionLocale;
+    String teamCostLocale;
+    String userCostLocale;
+    String currencyCostLocale;
+    String currencyAmountLocale;
     String extraCostsLocale;
     String extraCostsOnlyLocale;
     String costsItemLocale;
@@ -52,6 +55,8 @@ public abstract class Buyable extends ClickableItem {
     Calculator cost;
     Calculator team;
     Calculator canBuy;
+
+
 
     public Buyable(ItemStack baseDisplay, int slot) {
         super(baseDisplay, slot);
@@ -68,8 +73,10 @@ public abstract class Buyable extends ClickableItem {
         userNoMoneyLocale = config.getString("user_no_money_locale", "buyable.user.no_money");
         cannotBuyLocale = config.getString("cannot_buy_locale", "buyable.cannot_buy");
         userPayTeamLocale = config.getString("user_pay_team_locale", "buyable.user.pay_team");
-        teamDescriptionLocale = config.getString("team_description_locale", "buyable.team.description");
-        userDescriptionLocale = config.getString("user_description_locale", "buyable.user.description");
+        teamCostLocale = config.getString("cost_team_locale", "buyable.cost.team");
+        userCostLocale = config.getString("cost_user_locale", "buyable.cost.user");
+        currencyCostLocale = config.getString("cost_currency_locale", "buyable.cost.currency");
+        currencyAmountLocale = config.getString("currency_amount_locale", "buyable.currency_amount");
 
         extraCostsLocale = config.getString("extra_costs_locale", "buyable.costs.extra");
         extraCostsOnlyLocale = config.getString("extra_costs_only_locale", "buyable.costs.extra_only");
@@ -213,6 +220,8 @@ public abstract class Buyable extends ClickableItem {
 
         boolean team = this.team.calculateBoolean(user.getUserVariables());
 
+        BigDecimal knownBalance = null;
+
         if (team) {
             Money teamMoney = Money.getOrCreate(user.getTeam());
             if (userMoney.getMoney() + teamMoney.getMoney() < cost.intValue()) hasMoney = false;
@@ -222,7 +231,8 @@ public abstract class Buyable extends ClickableItem {
             Optional<Balance> balance = user.getEconomyAccount().getBalance(currency);
 
             if(balance.isPresent()) {
-                hasMoney = balance.get().getAmount().compareTo(cost) >= 0;
+                knownBalance = balance.get().getAmount();
+                hasMoney = knownBalance.compareTo(cost) >= 0;
             } else {
                 unknownMoney = true;
             }
@@ -236,9 +246,15 @@ public abstract class Buyable extends ClickableItem {
         ItemStack display = event.getDisplay();
 
         if (team) {
-            display = InventoryUtils.addLore(display, lookup.getLocale(teamDescriptionLocale, costString));
+            display = InventoryUtils.addLore(display, lookup.getLocale(teamCostLocale, costString));
+        } else if(currency.getCurrencyType().equals(CurrencyType.MINIGAME_SPECIFIC)){
+            display = InventoryUtils.addLore(display, lookup.getLocale(userCostLocale, costString));
         } else {
-            display = InventoryUtils.addLore(display, lookup.getLocale(userDescriptionLocale, costString));
+            display = InventoryUtils.addLore(display, lookup.getLocale(currencyCostLocale, costString));
+
+            if(knownBalance != null) {
+                display = InventoryUtils.addLore(display, lookup.getLocale(currencyAmountLocale, currency.format(knownBalance)));
+            }
         }
 
         event.setDisplay(display);
