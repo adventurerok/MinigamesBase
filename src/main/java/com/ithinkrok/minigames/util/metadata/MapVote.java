@@ -21,7 +21,10 @@ public class MapVote extends UserMetadata {
     public MapVote(User user, String vote) {
         mapVote = vote;
 
-        voteWeight = 1;
+        int mgVoteWeight = user.getMinigameSpecificConfig().getInt("vote_weight", 0);
+        int globalVoteWeight = user.getGlobalConfig().getInt("vote_weight", 0);
+
+        voteWeight = 1 + mgVoteWeight + globalVoteWeight;
 
         int next = 2;
         while(user.hasPermission("minigames.map_vote.weight." + next) && next <= 10) {
