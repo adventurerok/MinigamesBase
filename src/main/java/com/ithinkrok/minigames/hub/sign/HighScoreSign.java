@@ -142,7 +142,8 @@ public class HighScoreSign extends InfoSign {
         Skull skull = (Skull) head.getState();
 
         //only update the head if the player has changed
-        if(skull.getOwningPlayer() == null || !skull.getOwningPlayer().getUniqueId().equals(score.getPlayerUUID())) {
+        if(skull.getOwningPlayer() == null || !skull.getOwningPlayer().getUniqueId().equals(score.getPlayerUUID())
+                || !Objects.equals(skull.getOwningPlayer().getName(), score.getPlayerName())) {
             OfflinePlayer offline = getOfflinePlayer(score.getPlayerUUID(), score.getPlayerName());
 
             skull.setOwningPlayer(offline);
