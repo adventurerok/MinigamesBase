@@ -4,6 +4,7 @@ import com.ithinkrok.minigames.api.inventory.event.CalculateItemForUserEvent;
 import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
+import com.ithinkrok.minigames.api.util.MinigamesConfigs;
 import com.ithinkrok.util.math.MapVariables;
 import com.ithinkrok.minigames.util.inventory.event.BuyablePurchaseEvent;
 import com.ithinkrok.util.config.Config;
@@ -20,6 +21,7 @@ public class Upgradable extends Buyable {
     private String upgradeDisplayLang;
     private double minLevel, maxLevel;
     private String customItem;
+    private ItemStack item;
     private boolean giveItem = true;
 
     public Upgradable(ItemStack baseDisplay, int slot) {
@@ -36,6 +38,10 @@ public class Upgradable extends Buyable {
         maxLevel = config.getDouble("max_level", Integer.MAX_VALUE);
 
         customItem = config.getString("upgrade_item", null);
+        if(customItem == null) {
+            item = MinigamesConfigs.getItemStack(config, "item");
+        }
+
         giveItem = config.getBoolean("give_upgrade_item", true);
     }
 
@@ -56,6 +62,8 @@ public class Upgradable extends Buyable {
                     .createWithVariables(event.getUser().getLanguageLookup(), variables);
 
             display = InventoryUtils.removeIdentifier(display);
+        } else if(item != null) {
+            display = item.clone();
         }
 
         if (upgradeDisplayLang != null) {
