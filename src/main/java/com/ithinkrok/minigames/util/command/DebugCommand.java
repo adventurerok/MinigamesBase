@@ -259,7 +259,7 @@ public class DebugCommand implements CustomListener {
 
         String upgrade = command.getStringArg(0, null);
 
-        if(command.hasArg(2)) {
+        if(command.hasArg(1)) {
             int level = (int) new ExpressionCalculator(
                     command.getStringArg(1, "0")
             ).calculate(command.getUser().getUserVariables());
