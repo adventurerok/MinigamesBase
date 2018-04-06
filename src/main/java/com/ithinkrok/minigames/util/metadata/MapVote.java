@@ -93,7 +93,7 @@ public class MapVote extends UserMetadata {
 
             MapVote vote = user.getMetadata(MapVote.class);
 
-            if(Objects.equals(vote.mapVote, map)) ++count;
+            if(Objects.equals(vote.mapVote, map)) count += vote.voteWeight;
         }
 
         return count;
