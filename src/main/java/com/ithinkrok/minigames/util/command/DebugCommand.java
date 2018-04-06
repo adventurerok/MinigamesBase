@@ -255,15 +255,21 @@ public class DebugCommand implements CustomListener {
 
     private boolean levelCommand(MinigamesCommandSender sender, MinigamesCommand command) {
         if (!command.requireUser(sender)) return true;
-        if (!command.requireArgumentCount(sender, 2)) return false;
+        if (!command.requireArgumentCount(sender, 1)) return false;
 
         String upgrade = command.getStringArg(0, null);
-        int level = (int) new ExpressionCalculator(
-                command.getStringArg(1, "0")
-        ).calculate(command.getUser().getUserVariables());
 
-        command.getUser().setUserVariable(upgrade, level);
-        sender.sendLocale("command.debug.level.success", command.getUser().getFormattedName(), upgrade, level);
+        if(command.hasArg(2)) {
+            int level = (int) new ExpressionCalculator(
+                    command.getStringArg(1, "0")
+            ).calculate(command.getUser().getUserVariables());
+
+            command.getUser().setUserVariable(upgrade, level);
+            sender.sendLocale("command.debug.level.success", command.getUser().getFormattedName(), upgrade, level);
+        } else {
+            double level = command.getUser().getUserVariable(upgrade);
+            sender.sendLocale("command.debug.level.value", command.getUser().getFormattedName(), upgrade, level);
+        }
 
         return true;
     }
