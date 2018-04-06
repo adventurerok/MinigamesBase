@@ -2,6 +2,7 @@ package com.ithinkrok.minigames.api.user;
 
 import com.ithinkrok.minigames.api.event.user.game.UserVariableChangeEvent;
 import com.ithinkrok.util.math.ExpressionCalculator;
+import com.ithinkrok.util.math.MutableVariables;
 import com.ithinkrok.util.math.Variables;
 
 import java.util.HashMap;
@@ -10,16 +11,46 @@ import java.util.Map;
 /**
  * Created by paul on 03/01/16.
  */
-public class UserVariableHandler implements Variables {
+public class UserVariableHandler implements MutableVariables {
 
     private final User user;
     private final Map<String, Double> variables = new HashMap<>();
 
-    private final Map<String, Variables> customLookupHandlers = new HashMap<>();
+    private final Map<String, Variables> customHandlers = new HashMap<>();
 
     public UserVariableHandler(User user) {
         this.user = user;
+
+        addDefaultHandlers();
     }
+
+
+    private void addDefaultHandlers() {
+        addCustomVariableHandler("mg", new MutableVariables() {
+            @Override
+            public void setVariable(String name, double value) {
+                user.getMinigameSpecificConfig().set(name, value);
+            }
+
+            @Override
+            public double getVariable(String name) {
+                return user.getMinigameSpecificConfig().getDouble(name, 0);
+            }
+        });
+
+        addCustomVariableHandler("gu", new MutableVariables() {
+            @Override
+            public void setVariable(String name, double value) {
+                user.getGlobalConfig().set(name, value);
+            }
+
+            @Override
+            public double getVariable(String name) {
+                return user.getGlobalConfig().getDouble(name, 0);
+            }
+        });
+    }
+
 
     @Override
     public double getVariable(String upgrade) {
@@ -30,9 +61,12 @@ public class UserVariableHandler implements Variables {
                 String handlerName = upgrade.substring(1, hashTagIndex);
                 String varName = upgrade.substring(hashTagIndex + 1);
 
-                if(customLookupHandlers.containsKey(handlerName)) {
-                     return (int) customLookupHandlers.get(handlerName).getVariable(varName);
-                } else return 0;
+                if(customHandlers.containsKey(handlerName)) {
+                     return (int) customHandlers.get(handlerName).getVariable(varName);
+                } else {
+                    System.out.println("Custom variable was requested with no handler: " + upgrade);
+                    return 0;
+                }
             }
         }
 
@@ -41,12 +75,12 @@ public class UserVariableHandler implements Variables {
         return level == null ? 0 : level;
     }
 
-    public void addCustomVariableLookup(String name, Variables variables) {
-        customLookupHandlers.put(name, variables);
+    public void addCustomVariableHandler(String name, Variables variables) {
+        customHandlers.put(name, variables);
     }
 
-    public void removeCustomVariableLookup(String name) {
-        customLookupHandlers.remove(name);
+    public void removeCustomVariableHandler(String name) {
+        customHandlers.remove(name);
     }
 
     @SuppressWarnings("unchecked")
@@ -57,9 +91,29 @@ public class UserVariableHandler implements Variables {
             throw new RuntimeException(upgrade + " is an operator or function name. It cannot be used for variables");
 
         double oldLevel = getVariable(upgrade);
-        if (oldLevel == level && variables.containsKey(upgrade)) return;
+        boolean isCustom = upgrade.startsWith("@");
+        if (oldLevel == level && (variables.containsKey(upgrade) || isCustom)) return;
 
-        variables.put(upgrade, level);
+        if(isCustom) {
+            int hashTagIndex = upgrade.indexOf('#');
+
+            if(hashTagIndex > 1 && hashTagIndex < upgrade.length() - 1) {
+                String handlerName = upgrade.substring(1, hashTagIndex);
+                String varName = upgrade.substring(hashTagIndex + 1);
+
+                if(customHandlers.containsKey(handlerName)) {
+                    Variables handler = customHandlers.get(handlerName);
+                    if(!(handler instanceof MutableVariables)) {
+                        throw new RuntimeException("Not a mutable variable: " + upgrade + " (tried to upgrade to level " + level + ")");
+                    }
+                    ((MutableVariables) handler).setVariable(varName, level);
+                } else {
+                    throw new RuntimeException("Could not update variable " + upgrade + " to " + level + " as no handler");
+                }
+            }
+        } else {
+            variables.put(upgrade, level);
+        }
 
         UserVariableChangeEvent event = new UserVariableChangeEvent(user, upgrade, oldLevel, level);
 
