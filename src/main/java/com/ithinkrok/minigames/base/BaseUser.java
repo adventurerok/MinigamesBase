@@ -32,8 +32,8 @@ import com.ithinkrok.minigames.api.team.Team;
 import com.ithinkrok.minigames.api.team.TeamIdentifier;
 import com.ithinkrok.minigames.api.user.AttackerTracker;
 import com.ithinkrok.minigames.api.user.CooldownHandler;
-import com.ithinkrok.minigames.api.user.UserVariableHandler;
 import com.ithinkrok.minigames.api.user.User;
+import com.ithinkrok.minigames.api.user.UserVariableHandler;
 import com.ithinkrok.minigames.api.user.scoreboard.ScoreboardDisplay;
 import com.ithinkrok.minigames.api.user.scoreboard.ScoreboardHandler;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
@@ -46,14 +46,13 @@ import com.ithinkrok.msm.common.economy.EconomyAccount;
 import com.ithinkrok.msm.common.message.ConfigMessageFactory;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.JsonConfigIO;
+import com.ithinkrok.util.config.TrackingConfig;
 import com.ithinkrok.util.event.CustomEventExecutor;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
 import com.ithinkrok.util.lang.LanguageLookup;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
@@ -110,6 +109,8 @@ public class BaseUser implements Listener, User {
     private Collection<CustomListener> kitListeners = new ArrayList<>();
     private MapPoint inventoryTether;
     private boolean spectator;
+    private TrackingConfig ourGlobalConfig;
+    private TrackingConfig ourMinigameConfig;
 
     private GameTask revalidateTask;
 
@@ -135,6 +136,31 @@ public class BaseUser implements Listener, User {
 
         //This just prevents weapon damage values being wrong for more than a second, vastly limiting possible exploits
         repeatInFuture(task -> checkAttributes(), 20, 20);
+
+        gameGroup.getDatabase().getStringUserValue(this, "gconf", s -> {
+            ourGlobalConfig = new TrackingConfig(JsonConfigIO.loadConfig(s));
+        }, "{}");
+
+        gameGroup.getDatabase().getStringUserValue(this, "fconf_" + gameGroup.getFamily(), s -> {
+            ourMinigameConfig = new TrackingConfig(JsonConfigIO.loadConfig(s));
+        }, "{}");
+
+        repeatInFuture(task -> saveConfigs(), 20, 20);
+    }
+
+
+    public void saveConfigs() {
+        if(ourGlobalConfig.getModificationCount() > 0) {
+            String json = JsonConfigIO.dumpConfig(ourGlobalConfig);
+            gameGroup.getDatabase().setStringUserValue(getUuid(), "gconf", json);
+            ourGlobalConfig.resetCounts();
+        }
+
+        if(ourMinigameConfig.getModificationCount() > 0) {
+            String json = JsonConfigIO.dumpConfig(ourMinigameConfig);
+            gameGroup.getDatabase().setStringUserValue(getUuid(), "fconf_" + gameGroup.getFamily(), json);
+            ourMinigameConfig.resetCounts();
+        }
     }
 
 
@@ -1630,6 +1656,18 @@ public class BaseUser implements Listener, User {
     @Override
     public Account getEconomyAccount() {
         return economyAccount;
+    }
+
+
+    @Override
+    public Config getGlobalConfig() {
+        return ourGlobalConfig;
+    }
+
+
+    @Override
+    public Config getMinigameSpecificConfig() {
+        return ourMinigameConfig;
     }
 
 

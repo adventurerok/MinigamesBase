@@ -19,6 +19,7 @@ import com.ithinkrok.minigames.api.user.scoreboard.ScoreboardHandler;
 import com.ithinkrok.minigames.api.util.SoundEffect;
 import com.ithinkrok.minigames.api.util.disguise.Disguise;
 import com.ithinkrok.msm.common.economy.Account;
+import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
@@ -278,4 +279,8 @@ public interface User
     Collection<CustomListener> getListeners();
 
     Account getEconomyAccount();
+
+    Config getGlobalConfig();
+
+    Config getMinigameSpecificConfig();
 }

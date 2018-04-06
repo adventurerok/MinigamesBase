@@ -72,6 +72,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
     private final String name;
     private final String type;
+    private final String family; // family type of game
 
     private final ConcurrentMap<UUID, BaseUser> usersInGroup = new ConcurrentHashMap<>();
 
@@ -136,6 +137,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         maxPlayers = gameConfig.getInt("max_players", 40);
         motd = gameConfig.getString("default_motd", "No default motd");
         chatPrefix = gameConfig.getString("chat_prefix").replace('&', '§');
+        family = gameConfig.getString("family", type);
 
         //Load the start map and start gamestate from the "start_info" shared object
         Config startConfig = getSharedObject("start_info");
@@ -604,6 +606,12 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
 
     @Override
+    public String getFamily() {
+        return family;
+    }
+
+
+    @Override
     public boolean isAcceptingPlayers() {
         return acceptingPlayers;
     }
@@ -912,6 +920,8 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
         @CustomEventHandler(priority = CustomEventHandler.INTERNAL_LAST)
         public void eventUserQuit(UserQuitEvent event) {
+            ((BaseUser)event.getUser()).saveConfigs();
+
             if (event.getRemoveUser()) {
                 event.getUser().setTeam(null);
                 usersInGroup.remove(event.getUser().getUuid());

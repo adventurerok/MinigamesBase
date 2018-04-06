@@ -82,6 +82,14 @@ public interface GameGroup
      */
     String getType();
 
+
+    /**
+     * If this minigame type is part of a family of minigames, return the name of that family.
+     *
+     * @return The family of this gamegroup
+     */
+    String getFamily();
+
     /**
      * Gets the acceptingPlayers flag of this gamegroup
      * <p>
