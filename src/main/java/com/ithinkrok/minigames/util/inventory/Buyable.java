@@ -47,6 +47,7 @@ public abstract class Buyable extends ClickableItem {
     String extraCostsLocale;
     String extraCostsOnlyLocale;
     String costsItemLocale;
+    String purchaseLocale;
 
     String noItemLocale;
     String itemsTakenLocale;
@@ -77,6 +78,7 @@ public abstract class Buyable extends ClickableItem {
         userCostLocale = config.getString("cost_user_locale", "buyable.cost.user");
         currencyCostLocale = config.getString("cost_currency_locale", "buyable.cost.currency");
         currencyAmountLocale = config.getString("currency_amount_locale", "buyable.currency_amount");
+        purchaseLocale = config.getString("purchase_locale");
 
         extraCostsLocale = config.getString("extra_costs_locale", "buyable.costs.extra");
         extraCostsOnlyLocale = config.getString("extra_costs_only_locale", "buyable.costs.extra_only");
@@ -177,6 +179,10 @@ public abstract class Buyable extends ClickableItem {
 
             if (handler.chargeItems()) {
                 user.sendLocale(itemsTakenLocale);
+            }
+
+            if(purchaseLocale != null) {
+                user.sendLocale(purchaseLocale);
             }
 
             user.playSound(user.getLocation(), new SoundEffect(NamedSounds.fromName("ENTITY_BLAZE_HURT"), 1.0f, 1.0f));
