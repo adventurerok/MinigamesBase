@@ -21,6 +21,7 @@ permissions:
     default: true
     children:
       mg.base.help: true
+      mg.base.shop: true
 
   mg.base.mg:
     description: "Allows use of /mg"
@@ -36,6 +37,10 @@ permissions:
 
   mg.base.help:
     description: "Allows use of /help"
+    default: false
+
+  mg.base.shop:
+    description: "Allows use of /shop"
     default: false
 
 commands:

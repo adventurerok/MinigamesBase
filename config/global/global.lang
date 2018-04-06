@@ -49,6 +49,9 @@ command.debug.econ.nullresult=&cNull result!
 command.debug.load.failure=&cFailed to load config: %s
 command.debug.load.success=&aSuccess! Config loaded!
 
+command.shop.open=&6Opened the rewards shop!
+command.shop.none=&cThis gamemode doesn't have a shop yet.
+
 #Global money messages
 money.transfer.too_expensive=&cYou do not have that amount of money
 money.transfer.team=%s &3transferred &a$%s &eto your team's account!

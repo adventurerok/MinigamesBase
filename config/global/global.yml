@@ -56,3 +56,9 @@ commands:
     permission: "mg.base.debug"
     usage: "/<command> <custom/level/team/kit/money> [subcommandargs]"
     class: "com.ithinkrok.minigames.util.command.DebugCommand"
+  shop:
+    description: "Show the rewards shop"
+    aliases: ["mgshop", "mgrewards"]
+    permission: "mg.base.shop"
+    usage: "/<command>"
+    class: "com.ithinkrok.minigames.util.command.ShopCommand"
