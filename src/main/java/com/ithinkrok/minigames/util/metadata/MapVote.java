@@ -16,64 +16,42 @@ public class MapVote extends UserMetadata {
     private static final Random random = new Random();
 
     private final String mapVote;
-    private int voteWeight;
+    private final User user;
+    private int voteWeight = 1;
+
 
     public MapVote(User user, String vote) {
-        mapVote = vote;
-
-        int mgVoteWeight = user.getMinigameSpecificConfig().getInt("vote_weight", 0);
-        int globalVoteWeight = user.getGlobalConfig().getInt("vote_weight", 0);
-
-        voteWeight = 1 + mgVoteWeight + globalVoteWeight;
+        this.user = user;
+        this.mapVote = vote;
 
         int next = 2;
-        while(user.hasPermission("minigames.map_vote.weight." + next) && next <= 10) {
+        while (user.hasPermission("minigames.map_vote.weight." + next) && next <= 10) {
             voteWeight = next++;
         }
 
     }
 
-    public int getVoteWeight() {
-        return voteWeight;
-    }
-
-    public String getMapVote() {
-        return mapVote;
-    }
-
-    @Override
-    public boolean removeOnInGameChange(UserInGameChangeEvent event) {
-        return false;
-    }
-
-    @Override
-    public boolean removeOnGameStateChange(GameStateChangedEvent event) {
-        return false;
-    }
-
-    @Override
-    public boolean removeOnMapChange(MapChangedEvent event) {
-        return true;
-    }
 
     public static String getWinningVote(Collection<? extends User> users) {
         Map<String, Integer> votes = new HashMap<>();
 
-        for(User user : users) {
-            if(!user.hasMetadata(MapVote.class)) continue;
+        for (User user : users) {
+            if (!user.hasMetadata(MapVote.class)) continue;
 
             MapVote vote = user.getMetadata(MapVote.class);
-            if(votes.containsKey(vote.mapVote)){
-                votes.put(vote.mapVote, votes.get(vote.mapVote) + vote.voteWeight);
-            } else votes.put(vote.mapVote, vote.voteWeight);
+            int voteWeight = vote.getVoteWeight();
+
+            if (votes.containsKey(vote.mapVote)) {
+                votes.put(vote.mapVote, votes.get(vote.mapVote) + voteWeight);
+            } else votes.put(vote.mapVote, voteWeight);
         }
 
         List<String> winningMaps = new ArrayList<>();
         int highestVotes = 0;
 
-        for(Map.Entry<String, Integer> entry : votes.entrySet()) {
-            if(entry.getValue() < highestVotes) continue;
-            if(entry.getValue() == highestVotes) winningMaps.add(entry.getKey());
+        for (Map.Entry<String, Integer> entry : votes.entrySet()) {
+            if (entry.getValue() < highestVotes) continue;
+            if (entry.getValue() == highestVotes) winningMaps.add(entry.getKey());
             else {
                 highestVotes = entry.getValue();
                 winningMaps.clear();
@@ -81,21 +59,53 @@ public class MapVote extends UserMetadata {
             }
         }
 
-        if(winningMaps.isEmpty()) return null;
+        if (winningMaps.isEmpty()) return null;
         else return winningMaps.get(random.nextInt(winningMaps.size()));
     }
+
+
+    public int getVoteWeight() {
+        int mgVoteWeight = user.getMinigameSpecificConfig().getInt("vote_weight", 0);
+        int globalVoteWeight = user.getGlobalConfig().getInt("vote_weight", 0);
+
+        return voteWeight + mgVoteWeight + globalVoteWeight;
+    }
+
 
     public static int getVotesForMap(Collection<? extends User> users, String map) {
         int count = 0;
 
-        for(User user : users) {
-            if(!user.hasMetadata(MapVote.class)) continue;
+        for (User user : users) {
+            if (!user.hasMetadata(MapVote.class)) continue;
 
             MapVote vote = user.getMetadata(MapVote.class);
 
-            if(Objects.equals(vote.mapVote, map)) count += vote.voteWeight;
+            if (Objects.equals(vote.mapVote, map)) count += vote.getVoteWeight();
         }
 
         return count;
+    }
+
+
+    public String getMapVote() {
+        return mapVote;
+    }
+
+
+    @Override
+    public boolean removeOnInGameChange(UserInGameChangeEvent event) {
+        return false;
+    }
+
+
+    @Override
+    public boolean removeOnGameStateChange(GameStateChangedEvent event) {
+        return false;
+    }
+
+
+    @Override
+    public boolean removeOnMapChange(MapChangedEvent event) {
+        return true;
     }
 }
