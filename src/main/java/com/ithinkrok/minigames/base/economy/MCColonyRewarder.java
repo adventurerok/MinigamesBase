@@ -126,8 +126,8 @@ public class MCColonyRewarder implements Rewarder {
             BigDecimal amount = multedTemp;
 
             if(amount.compareTo(BigDecimal.ZERO) > 0) {
+                participationRewardsGiven.add(user.getUuid());
                 user.getEconomyAccount().deposit(currency, amount, "minigame participation", result -> {
-                    participationRewardsGiven.add(user.getUuid());
                     user.sendLocale("reward.participation.get", currency.format(amount));
                 });
             }
