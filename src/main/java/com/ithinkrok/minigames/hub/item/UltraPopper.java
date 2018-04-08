@@ -33,16 +33,16 @@ public class UltraPopper implements CustomListener {
     public void onUserRightClick(UserInteractEvent event) {
         User user = event.getUser();
 
-        Arrow arrow = user.launchProjectile(Arrow.class);
-
         boolean shotArrow = false;
 
         if(event.getInteractType() == UserInteractEvent.InteractType.RIGHT_CLICK) {
+            Arrow arrow = user.launchProjectile(Arrow.class);
             arrow.setVelocity(arrow.getVelocity().multiply(highSpeed));
 
             event.setStartCooldownAfterAction(true);
             shotArrow = true;
         } else if(event.getInteractType() == UserInteractEvent.InteractType.LEFT_CLICK) {
+            Arrow arrow = user.launchProjectile(Arrow.class);
             arrow.setVelocity(arrow.getVelocity().multiply(lowSpeed));
             shotArrow = true;
         }
