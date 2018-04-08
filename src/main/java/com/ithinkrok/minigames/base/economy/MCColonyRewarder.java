@@ -6,6 +6,7 @@ import com.ithinkrok.minigames.api.economy.CreditAmount;
 import com.ithinkrok.minigames.api.economy.Rewarder;
 import com.ithinkrok.minigames.api.event.game.GameStateChangedEvent;
 import com.ithinkrok.minigames.api.user.User;
+import com.ithinkrok.minigames.util.metadata.GameTimer;
 import com.ithinkrok.msm.common.economy.Currency;
 import com.ithinkrok.msm.common.economy.EconomyContext;
 import com.ithinkrok.util.config.Config;
@@ -18,6 +19,7 @@ import com.ithinkrok.util.math.Variables;
 import com.ithinkrok.util.math.expression.SimplifyMode;
 
 import java.math.BigDecimal;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class MCColonyRewarder implements Rewarder {
@@ -43,7 +45,7 @@ public class MCColonyRewarder implements Rewarder {
     /**
      * Participation due to the type of game
      */
-    private BigDecimal gameParticipationMultiplier = BigDecimal.ONE;
+    private Calculator gameParticipationMultiplier;
 
 
     /**
@@ -69,6 +71,9 @@ public class MCColonyRewarder implements Rewarder {
         loadRewardsConfig(gameGroup.getSharedObjectOrEmpty("rewards"));
 
         gameGroup.addListener("MCColonyRewarder", new RewardsListener());
+
+        Config gameShared = gameGroup.getSharedObjectOrEmpty("game_rewards");
+        gameParticipationMultiplier = new ExpressionCalculator(gameShared.getString("mult", "1"));
     }
 
 
@@ -88,7 +93,6 @@ public class MCColonyRewarder implements Rewarder {
             String participationExpression = participationConfig.getString(credit.name().toLowerCase());
             participationRewards.put(credit, new ExpressionCalculator(participationExpression, simplifyMode));
         }
-
     }
 
 
@@ -110,10 +114,16 @@ public class MCColonyRewarder implements Rewarder {
             BigDecimal partReward = partCalc.calculateDecimal(variables(), currency.getMathContext());
 
             BigDecimal amountTemp = partReward.multiply(typeMult, currency.getMathContext());
-            amountTemp = amountTemp.multiply(gameParticipationMultiplier, currency.getMathContext());
-            amountTemp = amountTemp.multiply(serverParticipationMultiplier, currency.getMathContext());
+            BigDecimal gameMult = gameParticipationMultiplier.calculateDecimal(variables(), currency.getMathContext());
 
-            BigDecimal amount = amountTemp;
+            BigDecimal multedTemp = amountTemp.multiply(gameMult, currency.getMathContext());
+
+            if(amountTemp.compareTo(BigDecimal.ONE) > 0 && multedTemp.compareTo(BigDecimal.ONE) < 0) {
+                multedTemp = BigDecimal.ONE; //prevent getting less than one due to gamemult (time)
+            }
+            multedTemp = multedTemp.multiply(serverParticipationMultiplier, currency.getMathContext());
+
+            BigDecimal amount = multedTemp;
 
             if(amount.compareTo(BigDecimal.ZERO) > 0) {
                 user.getEconomyAccount().deposit(currency, amount, "minigame participation", result -> {
@@ -160,7 +170,15 @@ public class MCColonyRewarder implements Rewarder {
     }
 
     private Variables variables() {
-        return new SingleValueVariables(maxPlayers);
+        return name -> {
+            switch(name) {
+                case "time":
+                    return GameTimer.getOrCreate(gameGroup).getGameLength().get(ChronoUnit.SECONDS) / 60.0;
+                case "players":
+                default:
+                    return maxPlayers;
+            }
+        };
     }
 
 

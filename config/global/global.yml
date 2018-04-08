@@ -20,6 +20,8 @@ shared_objects:
       copper: "50 * (1 + ln((players + 3) / 3))"
       silver: "5 * (pow(players / 4, 1.2))"
       gold: "(players - 8) / 8"
+  game_rewards:
+    mult: "pow(time/10, 0.75)"
 
 commands:
   ahelp:
