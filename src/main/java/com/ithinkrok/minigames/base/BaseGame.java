@@ -37,6 +37,8 @@ import com.ithinkrok.msm.client.impl.MSMClient;
 import com.ithinkrok.msm.client.protocol.ClientUpdateFileProtocol;
 import com.ithinkrok.msm.common.economy.Economy;
 import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.config.MemoryConfig;
+import com.ithinkrok.util.config.YamlConfigIO;
 import com.ithinkrok.util.lang.LangFile;
 import com.ithinkrok.util.math.Variables;
 import org.apache.commons.lang.Validate;
@@ -316,7 +318,7 @@ public class BaseGame implements Game, FileLoader {
     @Override
     public Config loadConfig(String path) {
         try {
-            return new BukkitConfig(YamlConfiguration.loadConfiguration(configDirectory.resolve(path).toFile()));
+            return YamlConfigIO.loadToConfig(configDirectory.resolve(path), new MemoryConfig());
         } catch (Exception e) {
             throw new RuntimeException("Error while loading config at: " + path, e);
         }
