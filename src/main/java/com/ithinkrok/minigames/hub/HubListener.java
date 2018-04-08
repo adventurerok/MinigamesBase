@@ -205,6 +205,7 @@ public class HubListener extends SignListener {
             }
 
             event.setCancelled(true);
+            event.getAttacker().remove();
         } else if(event.getDamageCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
 
             //Prevent users attacking other users if they are not using the pvp sword
