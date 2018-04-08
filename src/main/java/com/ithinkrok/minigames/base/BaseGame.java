@@ -202,220 +202,52 @@ public class BaseGame implements Game, FileLoader {
 
 
     @Override
-    public GameTask doInFuture(GameRunnable task) {
-        return doInFuture(task, 1);
-    }
-
-
-    @Override
-    public GameTask doInFuture(GameRunnable task, int delay) {
-        GameTask gameTask = new GameTask(task);
-
-        gameTask.schedule(plugin, delay);
-        return gameTask;
-    }    @Override
     public Collection<BaseGameGroup> getGameGroups() {
         return nameToGameGroup.values();
     }
 
 
     @Override
-    public GameTask repeatInFuture(GameRunnable task, int delay, int period) {
-        GameTask gameTask = new GameTask(task);
-
-        gameTask.schedule(plugin, delay, period);
-        return gameTask;
-    }
-
-
-    @Override
-    public void cancelAllTasks() {
-        throw new RuntimeException("You cannot cancel all game tasks");
-    }    @Override
     public Path getAssetDirectory() {
         return assetsDirectory;
     }
 
 
-    private BaseGameGroup getGameGroupForJoining(UUID uniqueId) {
-        String gameGroupName = playersJoinGameGroups.remove(uniqueId);
-
-        if (gameGroupName != null && nameToGameGroup.containsKey(gameGroupName)) {
-            return nameToGameGroup.get(gameGroupName);
-        }
-
-        JoiningGameGroupData data = playersJoiningGameGroupTypes.remove(uniqueId);
-
-        if (data != null) {
-            for (BaseGameGroup gameGroup : getGameGroups()) {
-                if (!gameGroup.getType().equals(data.type)) continue;
-                if (!gameGroup.isAcceptingPlayers()) continue;
-                if (!data.params.isEmpty() && !data.params.equals(gameGroup.getParameters())) continue;
-
-                return gameGroup;
-            }
-
-            return createGameGroup(data.type, data.params);
-        }
-
-        return null;
-    }
-
-
-    private void hideNonGameGroupPlayers(BaseUser user) {
-        for (Player player : plugin.getServer().getOnlinePlayers()) {
-            BaseUser other = getUser(player);
-            if (other != null && other.getGameGroup() == user.getGameGroup()) continue;
-
-            user.getPlayer().hidePlayer(player);
-            player.hidePlayer(user.getPlayer());
-        }
-    }    @Override
+    @Override
     public Path getRamdiskDirectory() {
         return ramdiskDirectory;
     }
 
 
-    private String nextGameGroupName(String configName) {
-        String result;
-        int counter = 0;
-
-        do {
-            result = name + "_" + configName + "_" + counter;
-            ++counter;
-        } while (nameToGameGroup.containsKey(result));
-
-        return result;
-    }
-
-
-    public void removeGameGroupForWorlds(BaseGameGroup gameGroup, Collection<World> worlds) {
-        for (World world : worlds) {
-            worldToGameGroup.remove(world.getName(), gameGroup);
-        }
-
-    }    @Override
+    @Override
     public Path getConfigDirectory() {
         return configDirectory;
     }
 
 
     @Override
-    public String getName() {
-        return name;
-    }
-
-
-    @Override
-    public String getFormattedName() {
-        return name;
-    }    @Override
     public Path getMapDirectory() {
         return mapDirectory;
     }
 
 
     @Override
-    public Config loadConfig(String path) {
-        try {
-            return YamlConfigIO.loadToConfig(configDirectory.resolve(path), new MemoryConfig());
-        } catch (Exception e) {
-            throw new RuntimeException("Error while loading config at: " + path, e);
-        }
-    }
-
-
-    @Override
-    public LangFile loadLangFile(String path) {
-        try {
-            return new LangFile(configDirectory.resolve(path));
-        } catch (IOException e) {
-            System.out.println("Failed to load lang file: " + path);
-            e.printStackTrace();
-            return new LangFile(new Properties());
-        }
-    }    @Override
     public Path getResourceDirectory() {
         return resourceDirectory;
     }
 
 
     @Override
-    public JSONBook loadBook(String name, String pathName) {
-        Path path = configDirectory.resolve(pathName);
-
-        try {
-            List<String> lines = Files.readAllLines(path);
-
-            StringBuilder json = new StringBuilder();
-
-            for (String line : lines) {
-                json.append(line);
-            }
-
-            return new JSONBook(name, json.toString());
-        } catch (IOException e) {
-            System.out.println("Failed to load json book file: " + pathName);
-            e.printStackTrace();
-            return new JSONBook(name, "failed to load");
-        }
-    }
-
-
-    @Override
-    public void doDatabaseTask(DatabaseTask task) {
-        persistence.doTask(task);
-    }    @Override
     public void registerListeners() {
         Listener listener = new GameBukkitListener(this);
         plugin.getServer().getPluginManager().registerEvents(listener, plugin);
     }
 
-    private static class JoiningGameGroupData {
 
-        String type;
-
-        List<String> params;
-
-
-        public JoiningGameGroupData(String type, List<String> params) {
-            this.type = type;
-            this.params = params;
-        }
-    }
-
-    private class TabCompleteListener extends PacketAdapter {
-
-        public TabCompleteListener(Plugin plugin, ListenerPriority listenerPriority) {
-            super(plugin, listenerPriority, PacketType.Play.Client.TAB_COMPLETE, PacketType.Play.Server.TAB_COMPLETE);
-        }
-
-
-        @Override
-        public void onPacketReceiving(PacketEvent event) {
-            if (event.getPacketType() != PacketType.Play.Client.TAB_COMPLETE) return;
-
-            WrapperPlayClientTabComplete packet = new WrapperPlayClientTabComplete(event.getPacket());
-
-            System.out.println(packet.getText());
-        }
-
-
-        @Override
-        public void onPacketSending(PacketEvent event) {
-            if (event.getPacketType() != PacketType.Play.Server.TAB_COMPLETE) return;
-
-            WrapperPlayServerTabComplete packet = new WrapperPlayServerTabComplete(event.getPacket());
-
-            System.out.println(Arrays.toString(packet.getText()));
-        }
-    }    @Override
+    @Override
     public void registerGameGroupConfig(String name, String configFile) {
         gameGroupConfigMap.put(name, configFile);
     }
-
-
-
 
 
     @Override
@@ -424,18 +256,12 @@ public class BaseGame implements Game, FileLoader {
     }
 
 
-
-
-
     @Override
     public void unload() {
         nameToGameGroup.values().forEach(GameGroup::unload);
 
         persistence.onPluginDisabled();
     }
-
-
-
 
 
     @Override
@@ -451,44 +277,16 @@ public class BaseGame implements Game, FileLoader {
     }
 
 
-
-
-
     @Override
     public void makeEntityRepresentUser(User user, Entity entity) {
         entity.setMetadata("rep", new FixedMetadataValue(plugin, user.getUuid()));
     }
 
 
-
-
-
     @Override
     public void makeEntityActualUser(User user, Entity entity) {
         entity.setMetadata("actual", new FixedMetadataValue(plugin, user.getUuid()));
     }
-
-
-
-
-
-    @Override
-    public void setupCustomEntity(Entity entity, String name, Variables variables) {
-        entity.setMetadata("custom_name", new FixedMetadataValue(plugin, name));
-        entity.setMetadata("custom_vars", new FixedMetadataValue(plugin, variables));
-    }
-
-
-
-
-
-    @Override
-    public Economy getEconomy() {
-        return MSMPlugin.getServerEconomy();
-    }
-
-
-
 
 
     @Override
@@ -517,7 +315,7 @@ public class BaseGame implements Game, FileLoader {
 
 
         Collection<BaseGameGroup> allGGs = getGameGroups();
-        if(allGGs.isEmpty()) {
+        if (allGGs.isEmpty()) {
             System.err.println("There are NO GameGroups! We can't find world " + worldName);
         }
 
@@ -707,6 +505,208 @@ public class BaseGame implements Game, FileLoader {
 
         ClientAPIProtocol apiProtocol = MSMPlugin.getApiProtocol();
         apiProtocol.scheduleRestart(1, 0);
+    }
+
+
+    @Override
+    public void setupCustomEntity(Entity entity, String name, Variables variables) {
+        entity.setMetadata("custom_name", new FixedMetadataValue(plugin, name));
+        entity.setMetadata("custom_vars", new FixedMetadataValue(plugin, variables));
+    }
+
+
+    @Override
+    public Economy getEconomy() {
+        return MSMPlugin.getServerEconomy();
+    }
+
+
+    @Override
+    public GameTask doInFuture(GameRunnable task) {
+        return doInFuture(task, 1);
+    }
+
+
+    @Override
+    public GameTask doInFuture(GameRunnable task, int delay) {
+        GameTask gameTask = new GameTask(task);
+
+        gameTask.schedule(plugin, delay);
+        return gameTask;
+    }
+
+
+    @Override
+    public GameTask repeatInFuture(GameRunnable task, int delay, int period) {
+        GameTask gameTask = new GameTask(task);
+
+        gameTask.schedule(plugin, delay, period);
+        return gameTask;
+    }
+
+
+    @Override
+    public void cancelAllTasks() {
+        throw new RuntimeException("You cannot cancel all game tasks");
+    }
+
+
+    private BaseGameGroup getGameGroupForJoining(UUID uniqueId) {
+        String gameGroupName = playersJoinGameGroups.remove(uniqueId);
+
+        if (gameGroupName != null && nameToGameGroup.containsKey(gameGroupName)) {
+            return nameToGameGroup.get(gameGroupName);
+        }
+
+        JoiningGameGroupData data = playersJoiningGameGroupTypes.remove(uniqueId);
+
+        if (data != null) {
+            for (BaseGameGroup gameGroup : getGameGroups()) {
+                if (!gameGroup.getType().equals(data.type)) continue;
+                if (!gameGroup.isAcceptingPlayers()) continue;
+                if (!data.params.isEmpty() && !data.params.equals(gameGroup.getParameters())) continue;
+
+                return gameGroup;
+            }
+
+            return createGameGroup(data.type, data.params);
+        }
+
+        return null;
+    }
+
+
+    private void hideNonGameGroupPlayers(BaseUser user) {
+        for (Player player : plugin.getServer().getOnlinePlayers()) {
+            BaseUser other = getUser(player);
+            if (other != null && other.getGameGroup() == user.getGameGroup()) continue;
+
+            user.getPlayer().hidePlayer(player);
+            player.hidePlayer(user.getPlayer());
+        }
+    }
+
+
+    private String nextGameGroupName(String configName) {
+        String result;
+        int counter = 0;
+
+        do {
+            result = name + "_" + configName + "_" + counter;
+            ++counter;
+        } while (nameToGameGroup.containsKey(result));
+
+        return result;
+    }
+
+
+    public void removeGameGroupForWorlds(BaseGameGroup gameGroup, Collection<World> worlds) {
+        for (World world : worlds) {
+            worldToGameGroup.remove(world.getName(), gameGroup);
+        }
+
+    }
+
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+
+    @Override
+    public String getFormattedName() {
+        return name;
+    }
+
+
+    @Override
+    public Config loadConfig(String path) {
+        try {
+            return YamlConfigIO.loadToConfig(configDirectory.resolve(path), new MemoryConfig());
+        } catch (Exception e) {
+            throw new RuntimeException("Error while loading config at: " + path, e);
+        }
+    }
+
+
+    @Override
+    public LangFile loadLangFile(String path) {
+        try {
+            return new LangFile(configDirectory.resolve(path));
+        } catch (IOException e) {
+            System.out.println("Failed to load lang file: " + path);
+            e.printStackTrace();
+            return new LangFile(new Properties());
+        }
+    }
+
+
+    @Override
+    public JSONBook loadBook(String name, String pathName) {
+        Path path = configDirectory.resolve(pathName);
+
+        try {
+            List<String> lines = Files.readAllLines(path);
+
+            StringBuilder json = new StringBuilder();
+
+            for (String line : lines) {
+                json.append(line);
+            }
+
+            return new JSONBook(name, json.toString());
+        } catch (IOException e) {
+            System.out.println("Failed to load json book file: " + pathName);
+            e.printStackTrace();
+            return new JSONBook(name, "failed to load");
+        }
+    }
+
+
+    @Override
+    public void doDatabaseTask(DatabaseTask task) {
+        persistence.doTask(task);
+    }
+
+    private static class JoiningGameGroupData {
+
+        String type;
+
+        List<String> params;
+
+
+        public JoiningGameGroupData(String type, List<String> params) {
+            this.type = type;
+            this.params = params;
+        }
+    }
+
+    private class TabCompleteListener extends PacketAdapter {
+
+        public TabCompleteListener(Plugin plugin, ListenerPriority listenerPriority) {
+            super(plugin, listenerPriority, PacketType.Play.Client.TAB_COMPLETE, PacketType.Play.Server.TAB_COMPLETE);
+        }
+
+
+        @Override
+        public void onPacketReceiving(PacketEvent event) {
+            if (event.getPacketType() != PacketType.Play.Client.TAB_COMPLETE) return;
+
+            WrapperPlayClientTabComplete packet = new WrapperPlayClientTabComplete(event.getPacket());
+
+            System.out.println(packet.getText());
+        }
+
+
+        @Override
+        public void onPacketSending(PacketEvent event) {
+            if (event.getPacketType() != PacketType.Play.Server.TAB_COMPLETE) return;
+
+            WrapperPlayServerTabComplete packet = new WrapperPlayServerTabComplete(event.getPacket());
+
+            System.out.println(Arrays.toString(packet.getText()));
+        }
     }
 
 
