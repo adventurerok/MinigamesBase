@@ -182,7 +182,7 @@ public class HubListener extends SignListener {
             CustomItem item = event.getGameGroup().getCustomItem(userHeldId);
 
             if(item != null && item.getName().equals(pvpSwordItem)) {
-                event.getAttackerUser().sendLocale(superPopperPvpLocale);
+                event.getAttackerUser().showAboveHotbarLocale(superPopperPvpLocale);
                 event.setCancelled(true);
                 return;
             }
@@ -193,8 +193,11 @@ public class HubListener extends SignListener {
 
             event.getUser().setVelocity(velocity);
 
-            event.getUser().sendLocale(superPopperVictimLocale, event.getAttackerUser().getDisplayName());
-            event.getAttackerUser().sendLocale(superPopperAttackerLocale, event.getUser().getDisplayName());
+            event.getUser().showAboveHotbarLocale(superPopperVictimLocale, event.getAttackerUser().getDisplayName());
+
+            if(event.getUser() != event.getAttackerUser()) {
+                event.getAttackerUser().showAboveHotbarLocale(superPopperAttackerLocale, event.getUser().getDisplayName());
+            }
 
             if(superPopperVictimSound != null) {
                 event.getUser().playSound(event.getUser().getLocation(), superPopperVictimSound);
