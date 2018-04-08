@@ -188,6 +188,7 @@ public abstract class Buyable extends ClickableItem {
             user.playSound(user.getLocation(), new SoundEffect(NamedSounds.fromName("ENTITY_BLAZE_HURT"), 1.0f, 1.0f));
 
             user.redoInventory();
+            user.updateScoreboard();
 
         }, /*failure*/() -> {
             //Tell the user they couldn't afford the item
