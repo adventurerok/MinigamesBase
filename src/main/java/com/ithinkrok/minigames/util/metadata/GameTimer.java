@@ -50,7 +50,7 @@ public class GameTimer extends Metadata {
 
     @Override
     public boolean removeOnMapChange(MapChangedEvent event) {
-        return true;
+        return false;
     }
 
     public static GameTimer getOrCreate(GameGroup gameGroup) {

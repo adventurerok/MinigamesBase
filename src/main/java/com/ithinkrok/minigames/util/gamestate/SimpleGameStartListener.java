@@ -9,6 +9,7 @@ import com.ithinkrok.minigames.api.event.user.game.UserInGameChangeEvent;
 import com.ithinkrok.minigames.api.team.Team;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.util.ItemGiver;
+import com.ithinkrok.minigames.util.metadata.GameTimer;
 import com.ithinkrok.minigames.util.metadata.MapVote;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
@@ -73,6 +74,7 @@ public class SimpleGameStartListener implements CustomListener {
 
         //Stop accepting players
         event.getGameGroup().setAcceptingPlayers(false);
+        GameTimer.getOrCreate(event.getGameGroup());
 
         event.getGameGroup().changeMap(assignGameMap(event.getGameGroup()));
 
