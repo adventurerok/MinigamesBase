@@ -35,18 +35,22 @@ public class UltraPopper implements CustomListener {
 
         Arrow arrow = user.launchProjectile(Arrow.class);
 
+        boolean shotArrow = false;
+
         if(event.getInteractType() == UserInteractEvent.InteractType.RIGHT_CLICK) {
             arrow.setVelocity(arrow.getVelocity().multiply(highSpeed));
 
             event.setStartCooldownAfterAction(true);
-
-
+            shotArrow = true;
         } else if(event.getInteractType() == UserInteractEvent.InteractType.LEFT_CLICK) {
             arrow.setVelocity(arrow.getVelocity().multiply(lowSpeed));
+            shotArrow = true;
         }
 
-        Location loc = event.getUser().getLocation();
-        SoundEffect sound = new SoundEffect(NamedSounds.fromName("ENTITY_ARROW_SHOOT"), 1.0f, 1.0f);
-        sound.playToAll(event.getGameGroup(), loc);
+        if(shotArrow) {
+            Location loc = event.getUser().getLocation();
+            SoundEffect sound = new SoundEffect(NamedSounds.fromName("ENTITY_ARROW_SHOOT"), 1.0f, 1.0f);
+            sound.playToAll(event.getGameGroup(), loc);
+        }
     }
 }
