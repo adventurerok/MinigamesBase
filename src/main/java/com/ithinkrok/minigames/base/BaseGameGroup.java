@@ -44,6 +44,7 @@ import com.ithinkrok.minigames.base.map.BaseMap;
 import com.ithinkrok.minigames.base.util.io.ConfigHolder;
 import com.ithinkrok.minigames.base.util.io.ConfigParser;
 import com.ithinkrok.minigames.base.util.io.FileLoader;
+import com.ithinkrok.minigames.util.metadata.GameTimer;
 import com.ithinkrok.msm.common.economy.Economy;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.ConfigUtils;
@@ -613,6 +614,11 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
      */
     @Override
     public void setAcceptingPlayers(boolean acceptingPlayers) {
+        if(this.acceptingPlayers && !acceptingPlayers) {
+            //game probably starting. Start the timer
+            GameTimer.getOrCreate(this);
+        }
+
         this.acceptingPlayers = acceptingPlayers;
 
         sendUpdatePayload();

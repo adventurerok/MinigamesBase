@@ -14,7 +14,7 @@ import java.time.Instant;
 public class GameTimer extends Metadata {
 
 
-    private final Instant timeStarted = Instant.now();
+    private Instant timeStarted = Instant.now();
 
 
     public Instant getTimeStarted() {
@@ -37,6 +37,10 @@ public class GameTimer extends Metadata {
         } else {
             return String.format("%d:%02d", minutes, seconds);
         }
+    }
+
+    public void reset() {
+        timeStarted = Instant.now();
     }
 
     @Override
