@@ -372,6 +372,12 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
 
     @Override
+    public String getMessagePrefix() {
+        return chatPrefix;
+    }
+
+
+    @Override
     public void sendMessageNoPrefix(Config message) {
         for (User user : usersInGroup.values()) {
             user.sendMessageNoPrefix(message);
@@ -380,14 +386,15 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
 
     @Override
-    public String getMessagePrefix() {
-        return chatPrefix;
+    public void sendLocale(String locale, Object... args) {
+        sendMessage(getLocale(locale, args));
     }
 
 
     @Override
-    public void sendLocale(String locale, Object... args) {
-        sendMessage(getLocale(locale, args));
+    public String getLocale(String name, Object... args) {
+        if (currentMap != null && currentMap.hasLocale(name)) return currentMap.getLocale(name, args);
+        else return languageLookup.getLocale(name, args);
     }
 
 
@@ -400,13 +407,6 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     @Override
     public LanguageLookup getLanguageLookup() {
         return this;
-    }
-
-
-    @Override
-    public String getLocale(String name, Object... args) {
-        if (currentMap != null && currentMap.hasLocale(name)) return currentMap.getLocale(name, args);
-        else return languageLookup.getLocale(name, args);
     }
 
 
@@ -459,9 +459,6 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     @Override
     public String getName() {
         return name;
-    }    @Override
-    public ClientMinigamesRequestProtocol getRequestProtocol() {
-        return BasePlugin.getRequestProtocol();
     }
 
 
@@ -485,9 +482,6 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         } else {
             CustomEventExecutor.executeEvent(event, getListeners(event.getUser().getListeners()));
         }
-    }    @Override
-    public ControllerInfo getControllerInfo() {
-        return getRequestProtocol().getControllerInfo();
     }
 
 
@@ -512,9 +506,6 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     @Override
     public GameState getCurrentGameState() {
         return gameState;
-    }    @Override
-    public void requestControllerInfo() {
-        getRequestProtocol().enableControllerInfo();
     }
 
 
@@ -546,9 +537,6 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         }
 
         return result;
-    }    @Override
-    public GameMapInfo getMap(String mapName) {
-        return gameMapInfoMap.get(mapName);
     }
 
 
@@ -688,13 +676,6 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     @Override
     public Path getAssetDirectory() {
         return game.getAssetDirectory();
-    }    @Override
-    public void unload() {
-        if (currentMap == null) return;
-
-        currentMap.unloadMap();
-        game.removeGameGroupForWorlds(this, currentMap.getWorlds());
-        currentMap = null;
     }
 
 
@@ -716,9 +697,6 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     @Override
     public <B extends Metadata> B getMetadata(Class<? extends B> clazz) {
         return metadataMap.getInstance(clazz);
-    }    @Override
-    public void bindTaskToCurrentGameState(GameTask task) {
-        gameStateTaskList.addTask(task);
     }
 
 
@@ -747,10 +725,6 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         if (metadata != null) metadata.removed();
 
         return metadata;
-    }    @Override
-    public void bindTaskToCurrentMap(GameTask task) {
-        if (currentMap == null) throw new RuntimeException("No GameMap to bind task to");
-        currentMap.bindTaskToMap(task);
     }
 
 
@@ -773,9 +747,6 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     @Override
     public void addCustomItem(CustomItem customItem) {
         customItemIdentifierMap.put(customItem.getName(), customItem);
-    }    @Override
-    public Game getGame() {
-        return game;
     }
 
 
@@ -794,9 +765,6 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     @Override
     public void addSharedObject(String name, Config config) {
         sharedObjectMap.put(name, config);
-    }    @Override
-    public boolean hasActiveCountdown() {
-        return countdown != null;
     }
 
 
@@ -816,9 +784,6 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
     private BaseTeam createTeam(TeamIdentifier teamIdentifier) {
         return new BaseTeam(teamIdentifier, this);
-    }    @Override
-    public boolean hasActiveCountdown(String name) {
-        return countdown != null && countdown.getName().equals(name);
     }
 
 
@@ -842,9 +807,6 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         for (String alias : command.getAliases()) {
             commandAliasesMap.put(alias.toLowerCase(), command);
         }
-    }    @Override
-    public int getUserCount() {
-        return getUsers().size();
     }
 
 
@@ -863,10 +825,202 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     @Override
     public void addCurrency(String name, Config config) {
         economy.getContext().registerCurrency(name, config);
-    }    @Override
+    }
+
+
+    @Override
+    public ControllerInfo getControllerInfo() {
+        return getRequestProtocol().getControllerInfo();
+    }
+
+
+    @Override
+    public ClientMinigamesRequestProtocol getRequestProtocol() {
+        return BasePlugin.getRequestProtocol();
+    }
+
+
+    @Override
+    public void requestControllerInfo() {
+        getRequestProtocol().enableControllerInfo();
+    }
+
+
+    @Override
+    public GameMapInfo getMap(String mapName) {
+        return gameMapInfoMap.get(mapName);
+    }
+
+
+    @Override
+    public void bindTaskToCurrentGameState(GameTask task) {
+        gameStateTaskList.addTask(task);
+    }
+
+
+    @Override
+    public void bindTaskToCurrentMap(GameTask task) {
+        if (currentMap == null) throw new RuntimeException("No GameMap to bind task to");
+        currentMap.bindTaskToMap(task);
+    }
+
+
+    @Override
+    public Game getGame() {
+        return game;
+    }
+
+
+    @Override
+    public boolean hasActiveCountdown() {
+        return countdown != null;
+    }
+
+
+    @Override
+    public boolean hasActiveCountdown(String name) {
+        return countdown != null && countdown.getName().equals(name);
+    }
+
+
+    @Override
+    public int getUserCount() {
+        return getUsers().size();
+    }
+
+
+    @Override
     public Kit getKit(String name) {
         return kits.get(name);
     }
+
+
+    @Override
+    public GameState getGameState(String gameStateName) {
+        return gameStates.get(gameStateName);
+    }
+
+
+    @Override
+    public Collection<TeamIdentifier> getTeamIdentifiers() {
+        return teamIdentifiers.values();
+    }
+
+
+    @Override
+    public JSONBook getBook(String name) {
+        if (currentMap == null) return bookMap.get(name);
+        JSONBook book = currentMap.getBook(name);
+
+        return book != null ? book : bookMap.get(name);
+    }
+
+
+    @Override
+    public void kill() {
+        List<User> users = new ArrayList<>(getUsers());
+
+        List<Player> players = new ArrayList<>();
+
+        for (User user : users) {
+            user.removeFromGameGroup();
+
+            if (user.isPlayer()) players.add(user.getPlayer());
+        }
+
+        for (Team team : teamsInGroup.values()) {
+            team.removeFromGameGroup();
+        }
+
+        for (Metadata metadata : metadataMap.values()) {
+            metadata.removed();
+        }
+
+        metadataMap.clear();
+
+        cancelAllTasks();
+
+        game.removeGameGroup(this);
+
+        for (Player player : players) {
+            game.sendPlayerToHub(player);
+            game.rejoinPlayer(player);
+        }
+
+        doInFuture(task -> {
+            //Make sure all tasks are cancelled
+            cancelAllTasks();
+            unload();
+        });
+    }
+
+
+    @Override
+    public void cancelAllTasks() {
+        gameGroupTaskList.cancelAllTasks();
+    }
+
+
+    @Override
+    public GameTask doInFuture(GameRunnable task) {
+        GameTask gameTask = game.doInFuture(task);
+
+        gameGroupTaskList.addTask(gameTask);
+        return gameTask;
+    }
+
+
+    @Override
+    public void unload() {
+        if (currentMap == null) return;
+
+        currentMap.unloadMap();
+        game.removeGameGroupForWorlds(this, currentMap.getWorlds());
+        currentMap = null;
+    }
+
+
+    @Override
+    public GameTask doInFuture(GameRunnable task, int delay) {
+        GameTask gameTask = game.doInFuture(task, delay);
+
+        gameGroupTaskList.addTask(gameTask);
+        return gameTask;
+    }
+
+
+    @Override
+    public GameTask repeatInFuture(GameRunnable task, int delay, int period) {
+        GameTask gameTask = game.repeatInFuture(task, delay, period);
+
+        gameGroupTaskList.addTask(gameTask);
+        return gameTask;
+    }
+
+
+    @Override
+    public CommandConfig getCommand(String name) {
+        return name != null ? commandAliasesMap.get(name.toLowerCase()) : null;
+    }
+
+
+    @Override
+    public Map<String, CommandConfig> getCommands() {
+        return commandMap;
+    }
+
+
+    @Override
+    public Economy getEconomy() {
+        return economy;
+    }
+
+
+    @Override
+    public Rewarder getRewarder() {
+        return rewarder;
+    }
+
 
     private class GameGroupListener implements CustomListener {
 
@@ -920,7 +1074,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
         @CustomEventHandler(priority = CustomEventHandler.INTERNAL_LAST)
         public void eventUserQuit(UserQuitEvent event) {
-            ((BaseUser)event.getUser()).saveConfigs();
+            ((BaseUser) event.getUser()).saveConfigs();
 
             if (event.getRemoveUser()) {
                 event.getUser().setTeam(null);
@@ -1024,158 +1178,5 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
                 }
             }
         }
-    }
-
-
-
-
-
-    @Override
-    public GameState getGameState(String gameStateName) {
-        return gameStates.get(gameStateName);
-    }
-
-
-
-
-
-
-
-
-    @Override
-    public Collection<TeamIdentifier> getTeamIdentifiers() {
-        return teamIdentifiers.values();
-    }
-
-
-
-
-
-
-
-
-    @Override
-    public JSONBook getBook(String name) {
-        if (currentMap == null) return bookMap.get(name);
-        JSONBook book = currentMap.getBook(name);
-
-        return book != null ? book : bookMap.get(name);
-    }
-
-
-
-
-
-
-
-
-    @Override
-    public void kill() {
-        List<User> users = new ArrayList<>(getUsers());
-
-        List<Player> players = new ArrayList<>();
-
-        for (User user : users) {
-            user.removeFromGameGroup();
-
-            if (user.isPlayer()) players.add(user.getPlayer());
-        }
-
-        for (Team team : teamsInGroup.values()) {
-            team.removeFromGameGroup();
-        }
-
-        for (Metadata metadata : metadataMap.values()) {
-            metadata.removed();
-        }
-
-        metadataMap.clear();
-
-        cancelAllTasks();
-
-        game.removeGameGroup(this);
-
-        for (Player player : players) {
-            game.sendPlayerToHub(player);
-            game.rejoinPlayer(player);
-        }
-
-        doInFuture(task -> {
-            //Make sure all tasks are cancelled
-            cancelAllTasks();
-            unload();
-        });
-    }
-
-
-
-
-
-
-
-
-    @Override
-    public GameTask doInFuture(GameRunnable task) {
-        GameTask gameTask = game.doInFuture(task);
-
-        gameGroupTaskList.addTask(gameTask);
-        return gameTask;
-    }
-
-
-
-
-
-
-
-
-    @Override
-    public GameTask doInFuture(GameRunnable task, int delay) {
-        GameTask gameTask = game.doInFuture(task, delay);
-
-        gameGroupTaskList.addTask(gameTask);
-        return gameTask;
-    }
-
-
-    @Override
-    public GameTask repeatInFuture(GameRunnable task, int delay, int period) {
-        GameTask gameTask = game.repeatInFuture(task, delay, period);
-
-        gameGroupTaskList.addTask(gameTask);
-        return gameTask;
-    }
-
-
-    @Override
-    public void cancelAllTasks() {
-        gameGroupTaskList.cancelAllTasks();
-    }
-
-
-    @Override
-    public CommandConfig getCommand(String name) {
-        return name != null ? commandAliasesMap.get(name.toLowerCase()) : null;
-    }
-
-
-    @Override
-    public Map<String, CommandConfig> getCommands() {
-        return commandMap;
-    }
-
-
-    @Override
-    public Economy getEconomy() {
-        return economy;
-    }
-
-
-
-
-
-    @Override
-    public Rewarder getRewarder() {
-        return rewarder;
     }
 }
