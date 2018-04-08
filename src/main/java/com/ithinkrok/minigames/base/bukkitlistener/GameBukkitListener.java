@@ -153,6 +153,10 @@ public class GameBukkitListener implements Listener {
         }
     }
 
+    public void eventLingeringPotionSplash(LingeringPotionSplashEvent event) {
+        event.getAreaEffectCloud();
+    }
+
     @EventHandler
     public void eventPotionSplash(PotionSplashEvent event) {
         GameGroup gameGroup;
