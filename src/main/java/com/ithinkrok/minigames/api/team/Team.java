@@ -33,6 +33,8 @@ public interface Team
 
     int getUserCount();
 
+    int getInGameUserCount();
+
     Collection<? extends User> getUsers();
 
     TeamIdentifier getTeamIdentifier();

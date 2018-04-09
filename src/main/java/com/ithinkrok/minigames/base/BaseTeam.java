@@ -73,6 +73,13 @@ public class BaseTeam implements Listener, Team {
         return getUsers().size();
     }
 
+
+    @Override
+    public int getInGameUserCount() {
+        return (int) getUsers().stream().filter(User::isInGame).count();
+    }
+
+
     @Override
     public Collection<BaseUser> getUsers() {
         return usersInTeam.values();
