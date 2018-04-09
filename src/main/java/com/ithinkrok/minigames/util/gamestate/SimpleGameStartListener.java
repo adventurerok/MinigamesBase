@@ -116,12 +116,13 @@ public class SimpleGameStartListener implements CustomListener {
             user.sendLocale(kitInfoLocale, user.getKit().getFormattedName());
         }
 
-        user.setInGame(true);
         user.resetUserStats(true);
         user.setCollidesWithEntities(true);
         user.setScoreboardHandler(null);
-
         itemGiver.giveToUser(user);
+
+        user.setInGame(true);
+
 
         gamePlayers.add(user.getUuid());
     }
