@@ -394,6 +394,8 @@ public class BaseGame implements Game, FileLoader {
 
         if (user == null) {
             user = new BaseUser(gameGroup, null, player.getUniqueId(), player);
+        } else if(user.getEntity() instanceof Player && user.getEntity() != player) {
+            user.becomePlayer(player);
         }
 
         //Send an event to the old user's gamegroup notifying them that the user is no longer a player
@@ -577,6 +579,7 @@ public class BaseGame implements Game, FileLoader {
 
 
     private void hideNonGameGroupPlayers(BaseUser user) {
+        //TODO check they are shown again when they join a game together
         for (Player player : plugin.getServer().getOnlinePlayers()) {
             BaseUser other = getUser(player);
             if (other != null && other.getGameGroup() == user.getGameGroup()) continue;

@@ -614,7 +614,11 @@ public class BaseUser implements Listener, User {
 
     @Override
     public void becomePlayer(Player player) {
-        if (isPlayer()) return;
+        if (isPlayer() && entity == player) return;
+
+        if(isPlayer() && !entity.getUniqueId().equals(player.getUniqueId())) {
+            throw new RuntimeException("No support for changing a user to a different actual player yet");
+        }
 
         revalidateTask.cancel();
 
@@ -624,7 +628,7 @@ public class BaseUser implements Listener, User {
         playerState.restore(player);
         playerState.setPlaceholder(null);
 
-        entity.remove();
+        if(!(entity instanceof Player)) entity.remove();
         entity = player;
 
         fixCloakedUsers();
