@@ -84,7 +84,7 @@ public class BaseGame implements Game, FileLoader {
     private final String fallbackConfig;
 
     private final Map<String, BaseGameGroup> worldToGameGroup = new MapMaker().weakValues().makeMap();
-    private final Map<String, BaseGameGroup> nameToGameGroup = new HashMap<>();
+    private final Map<String, BaseGameGroup> nameToGameGroup = new ConcurrentHashMap<>();
 
     /**
      * Maps player UUID to game group joining data
