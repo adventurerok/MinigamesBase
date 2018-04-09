@@ -98,7 +98,7 @@ public class MCColonyRewarder implements Rewarder {
 
     @Override
     public void giveParticipationReward(User user) {
-        if(participationRewardsGiven.contains(user.getUuid())) {
+        if(!user.getGameGroup().isAccredited() || participationRewardsGiven.contains(user.getUuid())) {
             //don't reward them twice
             return;
         }
@@ -143,6 +143,8 @@ public class MCColonyRewarder implements Rewarder {
 
     @Override
     public boolean giveImmediateReward(User user, CreditAmount... amountsPerType) {
+        if(!user.getGameGroup().isAccredited()) return false;
+
         boolean givenReward = false;
 
         for (CreditAmount ca : amountsPerType) {
