@@ -395,6 +395,7 @@ public class BaseGame implements Game, FileLoader {
         if (user == null) {
             user = new BaseUser(gameGroup, null, player.getUniqueId(), player);
         } else if(user.getEntity() instanceof Player && user.getEntity() != player) {
+            System.err.println("User persisted with different player object");
             user.becomePlayer(player);
         }
 
