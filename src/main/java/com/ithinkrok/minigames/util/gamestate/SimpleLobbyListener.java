@@ -29,6 +29,8 @@ import org.bukkit.Material;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.util.Objects;
+import java.util.Random;
+import java.util.TreeMap;
 
 /**
  * Created by paul on 30/01/16.
@@ -45,7 +47,6 @@ public class SimpleLobbyListener implements CustomListener {
     private String needsMorePlayersLocale;
     private int minPlayersToStartGame;
 
-    private String lobbyMapName;
     private String nextGameState;
 
     private String joinLobbyLocaleStub;
@@ -62,6 +63,8 @@ public class SimpleLobbyListener implements CustomListener {
     private String startingEventuallyLocale;
     private String startedLocale;
 
+    private TreeMap<Double, String> possibleLobbyMaps = new TreeMap<>();
+
     @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent<GameGroup, GameState> event) {
         gameState = event.getRepresenting();
@@ -72,7 +75,17 @@ public class SimpleLobbyListener implements CustomListener {
 
         configureCountdown(config.getConfigOrEmpty("start_countdown"));
 
-        lobbyMapName = config.getString("lobby_map");
+        String lobbyMapName = config.getString("lobby_map");
+        if(lobbyMapName != null) {
+            possibleLobbyMaps.put(1.0, lobbyMapName);
+        } else {
+            Config multiMapConfig = config.getConfigOrEmpty("lobby_maps");
+            double low = 0.0;
+            for(String mapName : multiMapConfig.getKeys(false)) {
+                low += multiMapConfig.getDouble(mapName);
+                possibleLobbyMaps.put(low, mapName);
+            }
+        }
 
         giveOnJoin = new ItemGiver(config.getConfigOrEmpty("give_on_join"));
 
@@ -200,7 +213,11 @@ public class SimpleLobbyListener implements CustomListener {
     public void onGameStateChanged(GameStateChangedEvent event) {
         if (!Objects.equals(event.getNewGameState(), gameState)) return;
 
-        event.getGameGroup().changeMap(lobbyMapName);
+        Random random = new Random();
+        double lobbyMapKey = random.nextDouble() * possibleLobbyMaps.lastKey();
+        String mapName = possibleLobbyMaps.higherEntry(lobbyMapKey).getValue();
+
+        event.getGameGroup().changeMap(mapName);
 
         resetCountdown(event.getGameGroup());
 
