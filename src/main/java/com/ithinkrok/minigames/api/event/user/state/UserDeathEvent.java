@@ -59,6 +59,10 @@ public class UserDeathEvent extends BaseUserEvent implements Cancellable {
         return playDeathSound;
     }
 
+    public double getDamage() {
+        return event.getFinalDamage();
+    }
+
     public ItemStack getWeapon() {
         if(!hasKillerUser()) return null;
 
