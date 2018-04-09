@@ -25,6 +25,7 @@ public class SimpleGameStartListener implements CustomListener {
     protected final Random random = new Random();
 
     private String randomMapName;
+    private String disableMapName;
     private List<String> mapList;
     private List<String> teamList;
     private List<String> kitList;
@@ -59,6 +60,7 @@ public class SimpleGameStartListener implements CustomListener {
 
     private void configureMapVoting(Config config) {
         randomMapName = config.getString("random_map", "random");
+        disableMapName = config.getString("disable_map", "disable");
 
         mapList = new ArrayList<>(config.getStringList("map_list"));
         mapList.remove(randomMapName);
@@ -76,7 +78,10 @@ public class SimpleGameStartListener implements CustomListener {
         event.getGameGroup().setAcceptingPlayers(false);
         GameTimer.getOrCreate(event.getGameGroup());
 
-        event.getGameGroup().changeMap(assignGameMap(event.getGameGroup()));
+        String mapName = assignGameMap(event.getGameGroup());
+        if(!mapName.equals(disableMapName)) {
+            event.getGameGroup().changeMap(mapName);
+        }
 
         postMapLoad(event.getGameGroup());
 
