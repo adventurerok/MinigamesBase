@@ -112,6 +112,8 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     private String motd = "default motd";
     private boolean created = false;
 
+    private boolean accredited = true;
+
 
     public BaseGameGroup(BaseGame game, String name, String type, String configFile, List<String> parameters) {
         this.game = game;
@@ -139,6 +141,8 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
         motd = gameConfig.getString("default_motd", "No default motd");
         chatPrefix = gameConfig.getString("chat_prefix").replace('&', '§');
         family = gameConfig.getString("family", type);
+        accredited = gameConfig.getBoolean("accredited", true);
+        database.setSavingAllowed(accredited);
 
         //Load the start map and start gamestate from the "start_info" shared object
         Config startConfig = getSharedObject("start_info");
@@ -1025,6 +1029,19 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     @Override
     public Rewarder getRewarder() {
         return rewarder;
+    }
+
+
+    @Override
+    public boolean isAccredited() {
+        return accredited;
+    }
+
+
+    @Override
+    public void setAccredited(boolean accredit) {
+        this.accredited = accredit;
+        database.setSavingAllowed(accredit);
     }
 
 

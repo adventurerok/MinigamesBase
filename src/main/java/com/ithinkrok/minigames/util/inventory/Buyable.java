@@ -48,6 +48,7 @@ public abstract class Buyable extends ClickableItem {
     String extraCostsOnlyLocale;
     String costsItemLocale;
     String purchaseLocale;
+    String notAccreditedLocale;
 
     String noItemLocale;
     String itemsTakenLocale;
@@ -56,7 +57,6 @@ public abstract class Buyable extends ClickableItem {
     Calculator cost;
     Calculator team;
     Calculator canBuy;
-
 
 
     public Buyable(ItemStack baseDisplay, int slot) {
@@ -79,6 +79,7 @@ public abstract class Buyable extends ClickableItem {
         currencyCostLocale = config.getString("cost_currency_locale", "buyable.cost.currency");
         currencyAmountLocale = config.getString("currency_amount_locale", "buyable.currency_amount");
         purchaseLocale = config.getString("purchase_locale");
+        notAccreditedLocale = config.getString("not_accredited_locale", "buyable.not_accredited");
 
         extraCostsLocale = config.getString("extra_costs_locale", "buyable.costs.extra");
         extraCostsOnlyLocale = config.getString("extra_costs_only_locale", "buyable.costs.extra_only");
@@ -165,6 +166,12 @@ public abstract class Buyable extends ClickableItem {
         if (!isAvailable(user)) {
             user.sendLocale(cannotBuyLocale);
             user.redoInventory();
+            return;
+        }
+
+        Currency currencyObj = user.getEconomyAccount().getContext().lookupCurrency(this.currency);
+        if(!user.getGameGroup().isAccredited() && currencyObj.getCurrencyType() != CurrencyType.MINIGAME_SPECIFIC) {
+            user.sendLocale(notAccreditedLocale);
             return;
         }
 

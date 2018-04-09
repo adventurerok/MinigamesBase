@@ -227,4 +227,12 @@ public interface GameGroup
     Economy getEconomy();
 
     Rewarder getRewarder();
+
+    /**
+     * @return Should this game contribute to users scores etc...
+     */
+    boolean isAccredited();
+
+
+    void setAccredited(boolean accredit);
 }

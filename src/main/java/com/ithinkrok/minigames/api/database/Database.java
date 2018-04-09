@@ -8,7 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -22,6 +21,7 @@ public class Database implements DatabaseTaskRunner, Consumer<NameUpdater.NameRe
 
     private final DatabaseTaskRunner taskRunner;
 
+    private boolean savingAllowed = true;
 
     public Database(DatabaseTaskRunner taskRunner) {
         this.taskRunner = taskRunner;
@@ -41,6 +41,16 @@ public class Database implements DatabaseTaskRunner, Consumer<NameUpdater.NameRe
                 consumer.accept(def);
             }
         });
+    }
+
+
+    public boolean isSavingAllowed() {
+        return savingAllowed;
+    }
+
+
+    public void setSavingAllowed(boolean savingAllowed) {
+        this.savingAllowed = savingAllowed;
     }
 
 
@@ -85,6 +95,8 @@ public class Database implements DatabaseTaskRunner, Consumer<NameUpdater.NameRe
 
 
     private void setUserValue(UUID user, String property, Object value) {
+        if(!savingAllowed) return;
+
         String type;
 
         if (value instanceof Integer) {
@@ -252,6 +264,8 @@ public class Database implements DatabaseTaskRunner, Consumer<NameUpdater.NameRe
 
 
     public void setUserScore(UUID user, String userName, String gameType, double value) {
+        if(!savingAllowed) return;
+
         doDatabaseTask(accessor -> {
             new UserScore(user, userName, gameType, value).save(accessor);
         });
