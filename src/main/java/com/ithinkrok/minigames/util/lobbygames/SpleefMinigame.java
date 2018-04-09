@@ -90,7 +90,8 @@ public class SpleefMinigame implements CustomListener {
             case STONE_BUTTON:
                 if(event.getInteractType() != UserInteractEvent.InteractType.RIGHT_CLICK) return;
 
-                Arena arena = queueButtons.get(event.getClickedBlock().getLocation().toVector());
+                MapPoint point = event.getUser().getMap().getMapPoint(event.getClickedBlock().getLocation());
+                Arena arena = queueButtons.get(point);
                 if(arena == null) return;
 
                 arena.addUserToQueue(event.getUser());
