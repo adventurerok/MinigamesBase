@@ -18,8 +18,8 @@ shared_objects:
       gold: "players > 7"
     participation:
       copper: "75 * (1 + ln((players + 3) / 3))"
-      silver: "5 * (pow(players / 4, 1.2))"
-      gold: "(players - 7) / 8"
+      silver: "8 * (pow(players / 4, 1.2))"
+      gold: "2 * (players - 7) / 8"
   game_rewards:
     mult: "pow(time/10, 0.75)"
 
