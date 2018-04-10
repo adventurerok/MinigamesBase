@@ -5,10 +5,15 @@ import com.ithinkrok.minigames.api.economy.Credit;
 import com.ithinkrok.minigames.api.economy.CreditAmount;
 import com.ithinkrok.minigames.api.economy.Rewarder;
 import com.ithinkrok.minigames.api.event.game.GameStateChangedEvent;
+import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.util.metadata.GameTimer;
+import com.ithinkrok.msm.bukkit.MSMPlugin;
+import com.ithinkrok.msm.common.economy.AccountIdentifier;
 import com.ithinkrok.msm.common.economy.Currency;
 import com.ithinkrok.msm.common.economy.EconomyContext;
+import com.ithinkrok.msm.common.economy.batch.Update;
+import com.ithinkrok.msm.common.economy.batch.UpdateType;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
@@ -29,7 +34,7 @@ public class MCColonyRewarder implements Rewarder {
     private final Map<Credit, Currency> creditCurrencies = new EnumMap<>(Credit.class);
 
     /**
-     * Apply to all, including score (score is handled server side)
+     * Apply to all, including score
      */
     private final Map<Credit, Calculator> creditMultipliers = new EnumMap<>(Credit.class);
 
@@ -137,7 +142,25 @@ public class MCColonyRewarder implements Rewarder {
 
     @Override
     public void addScoreReward(UUID user, CreditAmount... amountsPerType) {
-        //TODO message controller
+        if(!gameGroup.isAccredited()) return;
+
+        for(CreditAmount ca : amountsPerType) {
+            Currency currency = creditCurrencies.get(ca.getCredit());
+            if(currency == null) continue;
+
+            Calculator typeMultCalc = creditMultipliers.get(ca.getCredit());
+            BigDecimal typeMult = typeMultCalc.calculateDecimal(variables(), currency.getMathContext());
+
+            BigDecimal amount = ca.getAmount().multiply(typeMult, currency.getMathContext());
+
+            if(amount.compareTo(BigDecimal.ZERO) > 0) {
+                Update update = new Update(new AccountIdentifier(user, currency), UpdateType.DEPOSIT, amount);
+                gameGroup.getEconomy().getProvider().executeUpdate(update, "minigame reward", result -> {
+                    String message = gameGroup.getLocale("reward.score.get", currency.format(amount));
+                    MSMPlugin.getApiProtocol().sendMessagePacket(Collections.singleton(user), message);
+                });
+            }
+        }
     }
 
 

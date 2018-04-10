@@ -173,6 +173,7 @@ wool_head.given=&dYou now have the wool. Right click someone to transfer it to t
 #Rewards
 reward.immediate.get=&6 You are rewarded &b%s
 reward.participation.get=&6You have been rewarded &b%s &6for participating
+reward.score.get=&6You win &b%s
 
 vote_weight.upgrade=Additional Vote %s
 vote_weight.buy=&6&bYou now have a permanent additional vote!
