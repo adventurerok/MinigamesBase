@@ -318,7 +318,7 @@ public class BaseUser implements Listener, User {
                 //Assume we don't have a speed modifier either
 
                 ItemAttributeModifier speed = new ItemAttributeModifier(
-                        Attribute.GENERIC_ATTACK_SPEED, "Speed Override", 4,
+                        Attribute.GENERIC_ATTACK_SPEED, "Speed Override", 0,
                         Operation.ADDITIVE, Slot.MAIN_HAND);
 
                 itemAttributes.addModifier(speed);
