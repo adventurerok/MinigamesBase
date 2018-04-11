@@ -23,6 +23,7 @@ import com.ithinkrok.minigames.api.event.user.UserEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserJoinEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserQuitEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserBreakBlockEvent;
+import com.ithinkrok.minigames.api.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.map.GameMapInfo;
 import com.ithinkrok.minigames.api.metadata.Metadata;
@@ -1097,6 +1098,15 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
 
             CustomEntity customEntity = getCustomEntity(customName);
 
+            CustomEventExecutor.executeEvent(event, customEntity.getListeners());
+        }
+
+        @CustomEventHandler
+        public void eventUserInteract(UserInteractEvent event) {
+            String customName = EntityUtils.getCustomEntityName(event.getClickedEntity());
+            if (customName == null) return;
+
+            CustomEntity customEntity = getCustomEntity(customName);
             CustomEventExecutor.executeEvent(event, customEntity.getListeners());
         }
 
