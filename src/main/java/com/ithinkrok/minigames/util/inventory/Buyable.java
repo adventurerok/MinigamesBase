@@ -80,6 +80,7 @@ public abstract class Buyable extends ClickableItem {
         currencyCostLocale = config.getString("cost_currency_locale", "buyable.cost.currency");
         currencyAmountLocale = config.getString("currency_amount_locale", "buyable.currency_amount");
         purchaseLocale = config.getString("purchase_locale");
+        broadcastLocale = config.getString("broadcast_locale");
         notAccreditedLocale = config.getString("not_accredited_locale", "buyable.not_accredited");
 
         extraCostsLocale = config.getString("extra_costs_locale", "buyable.costs.extra");
