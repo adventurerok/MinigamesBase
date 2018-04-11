@@ -60,9 +60,11 @@ public class GameBukkitListener implements Listener {
 
     private final Map<UUID, Integer> notInGameGroupErrors = new ConcurrentHashMap<>();
 
+
     public GameBukkitListener(Game game) {
         this.game = game;
     }
+
 
     @EventHandler
     public void eventPlayerJoined(PlayerJoinEvent event) {
@@ -70,6 +72,7 @@ public class GameBukkitListener implements Listener {
 
         game.rejoinPlayer(event.getPlayer());
     }
+
 
     @EventHandler
     public void eventWeatherChanged(WeatherChangeEvent event) {
@@ -89,7 +92,6 @@ public class GameBukkitListener implements Listener {
 
 
     /**
-     *
      * @throws UnknownWorldException If there is no gamegroup for the world
      */
     private GameGroup getGameGroup(World world) {
@@ -97,19 +99,13 @@ public class GameBukkitListener implements Listener {
 
         GameGroup gg = game.getGameGroupFromWorldName(world.getName());
 
-        if(gg == null) {
+        if (gg == null) {
             throw new UnknownWorldException(world);
         }
 
         return gg;
     }
 
-    private static class UnknownWorldException extends RuntimeException {
-
-        public UnknownWorldException(World world) {
-            super("No GameGroup for world: " + world.getName());
-        }
-    }
 
     @EventHandler
     public void eventPlayerQuit(PlayerQuitEvent event) {
@@ -129,13 +125,21 @@ public class GameBukkitListener implements Listener {
         notInGameGroupErrors.remove(user.getUuid());
     }
 
+
     private void notInGameGroupError(Entity player) {
+        if (player instanceof Player && !Bukkit.getOnlinePlayers().contains(player)) {
+            System.out.println("Not in GG called for an offline player " + player.getName() + " in world " +
+                               player.getWorld().getName());
+            return;
+        }
+
         System.out
                 .println("Player not in GG: '" + player.getName() + "' in world '" + player.getWorld().getName() + "'");
 
-        int count = notInGameGroupErrors.compute(player.getUniqueId(), (uuid, integer) -> integer == null ? 0 : integer + 1);
+        int count = notInGameGroupErrors
+                .compute(player.getUniqueId(), (uuid, integer) -> integer == null ? 0 : integer + 1);
 
-        if(count > 100) {
+        if (count > 100) {
 
             //Schedule a server restart due to this
             //Allow 1 player online when restarting as at least 1 player is not in a gamegroup
@@ -148,14 +152,16 @@ public class GameBukkitListener implements Listener {
             Bukkit.broadcastMessage("The server will restart if 1 or less players are online");
             Bukkit.broadcastMessage(
                     "If you believe you are glitched please move to another server in the network or disconnect");
-        } else if(player instanceof Player) {
+        } else if (player instanceof Player) {
             game.rejoinPlayer((Player) player);
         }
     }
 
+
     public void eventLingeringPotionSplash(LingeringPotionSplashEvent event) {
         event.getAreaEffectCloud();
     }
+
 
     @EventHandler
     public void eventPotionSplash(PotionSplashEvent event) {
@@ -175,6 +181,7 @@ public class GameBukkitListener implements Listener {
 
         gameGroup.gameEvent(new MapPotionSplashEvent(gameGroup, map, event, throwerUser));
     }
+
 
     @EventHandler
     public void eventPlayerChat(AsyncPlayerChatEvent event) {
@@ -197,6 +204,7 @@ public class GameBukkitListener implements Listener {
         user.getGameGroup().userEvent(userEvent);
     }
 
+
     @EventHandler
     public void eventBlockExp(BlockExpEvent event) {
         if (event instanceof BlockBreakEvent) return;
@@ -211,6 +219,7 @@ public class GameBukkitListener implements Listener {
         gameGroup.gameEvent(new MapBlockBreakNaturallyEvent(gameGroup, map, event));
     }
 
+
     private void checkWorldIsInMap(World world, GameMap map) {
         MapWorldInfo worldInfo = map.getWorldInfo(world);
 
@@ -218,6 +227,7 @@ public class GameBukkitListener implements Listener {
             throw new RuntimeException("Map still registered to old GameGroup");
         }
     }
+
 
     @EventHandler
     public void eventBlockBurn(BlockBurnEvent event) {
@@ -230,10 +240,12 @@ public class GameBukkitListener implements Listener {
         gameGroup.gameEvent(new MapBlockBurnEvent(gameGroup, map, event));
     }
 
+
     @EventHandler
     public void eventBlockSpread(BlockSpreadEvent event) {
         eventBlockGrow(event);
     }
+
 
     @EventHandler
     public void eventBlockGrow(BlockGrowEvent event) {
@@ -245,6 +257,7 @@ public class GameBukkitListener implements Listener {
 
         gameGroup.gameEvent(new MapBlockGrowEvent(gameGroup, map, event));
     }
+
 
     @EventHandler
     public void eventItemSpawn(ItemSpawnEvent event) {
@@ -258,6 +271,7 @@ public class GameBukkitListener implements Listener {
         gameGroup.gameEvent(new MapItemSpawnEvent(gameGroup, map, event));
     }
 
+
     @EventHandler
     public void eventCreatureSpawn(CreatureSpawnEvent event) {
         String mapName = event.getEntity().getWorld().getName();
@@ -270,6 +284,7 @@ public class GameBukkitListener implements Listener {
         gameGroup.gameEvent(new MapCreatureSpawnEvent(gameGroup, map, event));
     }
 
+
     @EventHandler
     public void eventEntityTarget(EntityTargetEvent event) {
         String mapName = event.getEntity().getWorld().getName();
@@ -281,6 +296,7 @@ public class GameBukkitListener implements Listener {
 
         gameGroup.gameEvent(new MapEntityTargetEvent(gameGroup, map, event));
     }
+
 
     @EventHandler
     public void eventEntityDeath(EntityDeathEvent event) {
@@ -296,6 +312,7 @@ public class GameBukkitListener implements Listener {
 
         gameGroup.gameEvent(new MapEntityDeathEvent(gameGroup, map, event));
     }
+
 
     @EventHandler
     public void eventRegainHealth(EntityRegainHealthEvent event) {
@@ -315,6 +332,7 @@ public class GameBukkitListener implements Listener {
         }
     }
 
+
     @EventHandler
     public void eventProjectileLaunch(ProjectileLaunchEvent event) {
         String mapName = event.getEntity().getWorld().getName();
@@ -330,6 +348,7 @@ public class GameBukkitListener implements Listener {
         gameGroup.gameEvent(new MapProjectileLaunchEvent(gameGroup, map, event));
     }
 
+
     @EventHandler
     public void eventBlockIgnite(BlockIgniteEvent event) {
         String mapName = event.getBlock().getWorld().getName();
@@ -341,6 +360,7 @@ public class GameBukkitListener implements Listener {
 
         gameGroup.gameEvent(new MapBlockIgniteEvent(gameGroup, map, event));
     }
+
 
     @EventHandler
     public void eventEntityExplode(EntityExplodeEvent event) {
@@ -354,6 +374,7 @@ public class GameBukkitListener implements Listener {
         gameGroup.gameEvent(new MapEntityExplodeEvent(gameGroup, map, event));
     }
 
+
     @EventHandler
     public void eventPlayerDropItem(PlayerDropItemEvent event) {
         User user = game.getUser(event.getPlayer());
@@ -364,9 +385,10 @@ public class GameBukkitListener implements Listener {
 
         user.getGameGroup().userEvent(new UserDropItemEvent(user, event));
 
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
         user.getGameGroup().userEvent(new UserInventoryUpdateEvent(user));
     }
+
 
     @EventHandler
     public void eventPlayerPickupItem(PlayerPickupItemEvent event) {
@@ -378,9 +400,10 @@ public class GameBukkitListener implements Listener {
 
         user.getGameGroup().userEvent(new UserPickupItemEvent(user, event));
 
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
         user.getGameGroup().userEvent(new UserInventoryUpdateEvent(user));
     }
+
 
     @EventHandler
     public void eventPlayerItemHeld(PlayerItemHeldEvent event) {
@@ -392,6 +415,7 @@ public class GameBukkitListener implements Listener {
 
         user.getGameGroup().userEvent(new UserItemHeldEvent(user, event));
     }
+
 
     @EventHandler
     public void eventPlayerInteractWorld(PlayerInteractEvent event) {
@@ -406,6 +430,7 @@ public class GameBukkitListener implements Listener {
         if (event.isCancelled() && InventoryUtils.isArmor(event.getItem())) event.getPlayer().updateInventory();
     }
 
+
     @EventHandler
     public void eventPlayerRespawn(PlayerRespawnEvent event) {
         User user = game.getUser(event.getPlayer());
@@ -416,6 +441,7 @@ public class GameBukkitListener implements Listener {
 
         user.getGameGroup().userEvent(new UserRespawnEvent(user, event));
     }
+
 
     @EventHandler
     public void eventPlayerItemConsume(PlayerItemConsumeEvent event) {
@@ -428,6 +454,7 @@ public class GameBukkitListener implements Listener {
         user.getGameGroup().userEvent(new UserItemConsumeEvent(user, event));
     }
 
+
     @EventHandler
     public void eventBlockBreak(BlockBreakEvent event) {
         User user = game.getUser(event.getPlayer());
@@ -439,6 +466,7 @@ public class GameBukkitListener implements Listener {
         user.getGameGroup().userEvent(new UserBreakBlockEvent(user, event));
     }
 
+
     @EventHandler
     public void eventBlockPlace(BlockPlaceEvent event) {
         User user = game.getUser(event.getPlayer());
@@ -449,6 +477,7 @@ public class GameBukkitListener implements Listener {
 
         user.getGameGroup().userEvent(new UserPlaceBlockEvent(user, event));
     }
+
 
     @EventHandler
     public void eventCommandPreprocess(PlayerCommandPreprocessEvent event) {
@@ -500,6 +529,7 @@ public class GameBukkitListener implements Listener {
 
         event.setCancelled(true);
     }
+
 
     @EventHandler(priority = EventPriority.LOW)
     public void eventEntityDamagedByEntity(EntityDamageByEntityEvent event) {
@@ -556,6 +586,7 @@ public class GameBukkitListener implements Listener {
 
         gameGroup.userEvent(new UserAttackEvent(attacker, event, target, representing));
     }
+
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void eventEntityDamaged(EntityDamageEvent event) {
@@ -640,11 +671,11 @@ public class GameBukkitListener implements Listener {
         //Log death messages
         if (attacker != null) {
             System.out.println(attacked.getName() + " died: reason=" + event.getCause() + ", finalDamage=" +
-                                       event.getFinalDamage() + ", damage=" + event.getDamage() + ", attacker=" +
-                                       attacker.getName() + ", holding=" + attacker.getInventory().getItemInHand());
+                               event.getFinalDamage() + ", damage=" + event.getDamage() + ", attacker=" +
+                               attacker.getName() + ", holding=" + attacker.getInventory().getItemInHand());
         } else {
             System.out.println(attacked.getName() + " died: reason=" + event.getCause() + ", finalDamage=" +
-                                       event.getFinalDamage() + ", attacker=null");
+                               event.getFinalDamage() + ", attacker=null");
         }
 
         if (!deathEvent.getPlayDeathSound() || !attackedInGame) return;
@@ -653,6 +684,7 @@ public class GameBukkitListener implements Listener {
                 .playSound(attacked.getLocation(), EntityUtils.getDeathSound(attacked.getVisibleEntityType()), 1.0f,
                            1.0f);
     }
+
 
     @EventHandler
     public void eventPlayerFoodLevelChange(FoodLevelChangeEvent event) {
@@ -665,6 +697,7 @@ public class GameBukkitListener implements Listener {
         user.getGameGroup().userEvent(new UserFoodLevelChangeEvent(user, event));
     }
 
+
     @EventHandler
     public void eventPlayerInteractEntity(PlayerInteractEntityEvent event) {
         User user = game.getUser(event.getPlayer());
@@ -676,6 +709,7 @@ public class GameBukkitListener implements Listener {
         user.getGameGroup().userEvent(new UserRightClickEntityEvent(user, event));
     }
 
+
     @EventHandler
     public void eventPlayerInventoryClick(InventoryClickEvent event) {
         User user = game.getUser(event.getWhoClicked());
@@ -686,9 +720,10 @@ public class GameBukkitListener implements Listener {
 
         user.getGameGroup().userEvent(new UserInventoryClickEvent(user, event));
 
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
         user.getGameGroup().userEvent(new UserInventoryUpdateEvent(user));
     }
+
 
     @EventHandler
     public void eventPlayerInventoryClose(InventoryCloseEvent event) {
@@ -701,12 +736,14 @@ public class GameBukkitListener implements Listener {
         user.getGameGroup().userEvent(new UserInventoryCloseEvent(user, event));
     }
 
+
     @EventHandler
     public void eventGameGroupSpawned(GameGroupSpawnedEvent event) {
         for (GameGroup gameGroup : game.getGameGroups()) {
             gameGroup.gameEvent(new ControllerSpawnGameGroupEvent(gameGroup, event));
         }
     }
+
 
     @EventHandler
     public void eventGameGroupUpdate(GameGroupUpdateEvent event) {
@@ -715,12 +752,14 @@ public class GameBukkitListener implements Listener {
         }
     }
 
+
     @EventHandler
     public void eventGameGroupKilled(GameGroupKilledEvent event) {
         for (GameGroup gameGroup : game.getGameGroups()) {
             gameGroup.gameEvent(new ControllerKillGameGroupEvent(gameGroup, event));
         }
     }
+
 
     @EventHandler
     public void eventSignChange(SignChangeEvent event) {
@@ -731,5 +770,12 @@ public class GameBukkitListener implements Listener {
         }
 
         user.getGameGroup().userEvent(new UserEditSignEvent(user, event));
+    }
+
+    private static class UnknownWorldException extends RuntimeException {
+
+        public UnknownWorldException(World world) {
+            super("No GameGroup for world: " + world.getName());
+        }
     }
 }
