@@ -620,7 +620,9 @@ public class BaseUser implements Listener, User {
             throw new RuntimeException("No support for changing a user to a different actual player yet");
         }
 
-        revalidateTask.cancel();
+        if(revalidateTask != null) {
+            revalidateTask.cancel();
+        }
 
         playerState.capture(entity);
 
