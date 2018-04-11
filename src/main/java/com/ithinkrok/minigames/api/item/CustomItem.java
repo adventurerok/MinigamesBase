@@ -147,6 +147,9 @@ public class CustomItem implements CustomListener, Nameable {
 
     @CustomEventHandler
     public void onInteract(UserInteractEvent event) {
+        //we handle these in onUserAttack
+        if(event instanceof UserAttackEvent) return;
+
         switch(event.getInteractType()) {
             case PHYSICAL:
             case REPRESENTING:
