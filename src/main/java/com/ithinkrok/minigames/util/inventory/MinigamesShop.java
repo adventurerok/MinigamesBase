@@ -1,13 +1,16 @@
 package com.ithinkrok.minigames.util.inventory;
 
+import com.ithinkrok.minigames.api.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.api.inventory.ClickableInventory;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.event.CustomEventHandler;
+import com.ithinkrok.util.event.CustomListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MinigamesShop {
+public class MinigamesShop implements CustomListener {
 
     public static void showToUser(User user) {
         Config shopShared = user.getGameGroup().getSharedObjectOrEmpty("shop");
@@ -30,6 +33,13 @@ public class MinigamesShop {
         inventory.loadFromConfig(combinedItems);
 
         user.showInventory(inventory, null);
+    }
+
+    @CustomEventHandler
+    public void onUserInteract(UserInteractEvent event) {
+        event.setCancelled(true);
+
+        showToUser(event.getUser());
     }
 
 }
