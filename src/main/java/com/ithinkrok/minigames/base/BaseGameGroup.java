@@ -618,7 +618,7 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
      */
     @Override
     public void setAcceptingPlayers(boolean acceptingPlayers) {
-        if(this.acceptingPlayers && !acceptingPlayers) {
+        if (this.acceptingPlayers && !acceptingPlayers) {
             //game probably starting. Start the timer
             GameTimer.getOrCreate(this);
         }
@@ -1053,20 +1053,26 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
                 sendUpdatePayload();
                 return;
             }
-            if (!(event.getUser() instanceof BaseUser)) {
+            User user = event.getUser();
+            if (!(user instanceof BaseUser)) {
                 throw new UnsupportedOperationException("Only supports BaseUser");
             }
 
             //Update the user's name in the name cache
-            getDatabase().updateNameCache(event.getUser().getUuid(), event.getUser().getName());
+            getDatabase().updateNameCache(user.getUuid(), user.getName());
 
-            usersInGroup.put(event.getUser().getUuid(), (BaseUser) event.getUser());
+            usersInGroup.put(user.getUuid(), (BaseUser) user);
 
-            game.getLogger().info("Teleporting user " + event.getUser().getName() + " to GameGroup map");
-            boolean success = currentMap.teleportUser(event.getUser());
+            String msg = "Teleporting user " + user.getName() +
+                         " to GameGroup map " + currentMap.getInfo().getName() +
+                         " for GameGroup " + getName();
+
+            game.getLogger().info(msg);
+
+            boolean success = currentMap.teleportUser(user);
 
             if (!success) {
-                game.getLogger().warning("Failed to teleport user " + event.getUser().getName() + " to GameGroup map");
+                game.getLogger().warning("Failed to teleport user " + user.getName() + " to GameGroup map");
             }
 
             sendUpdatePayload();
