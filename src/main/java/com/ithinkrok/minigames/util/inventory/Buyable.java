@@ -48,6 +48,7 @@ public abstract class Buyable extends ClickableItem {
     String extraCostsOnlyLocale;
     String costsItemLocale;
     String purchaseLocale;
+    String broadcastLocale;
     String notAccreditedLocale;
 
     String noItemLocale;
@@ -190,6 +191,10 @@ public abstract class Buyable extends ClickableItem {
 
             if(purchaseLocale != null) {
                 user.sendLocale(purchaseLocale);
+            }
+
+            if(broadcastLocale != null) {
+                user.getGameGroup().sendLocale(broadcastLocale, user.getFormattedName());
             }
 
             user.playSound(user.getLocation(), new SoundEffect(NamedSounds.fromName("ENTITY_BLAZE_HURT"), 1.0f, 1.0f));
