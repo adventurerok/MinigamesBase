@@ -86,6 +86,10 @@ public class ItemAttributeModifier {
 
     }
 
+    public ItemAttributeModifier cloneWithAmount(double amount) {
+        return new ItemAttributeModifier(attribute, name, amount, operation, slot, uuid);
+    }
+
 
     public ItemAttributeModifier(Config config) {
         String attribute = config.getString("attribute");

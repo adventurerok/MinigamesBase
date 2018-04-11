@@ -5,6 +5,8 @@ import com.ithinkrok.minigames.api.event.user.game.UserAbilityCooldownEvent;
 import com.ithinkrok.minigames.api.event.user.inventory.UserItemHeldEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserAttackEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserInteractEvent;
+import com.ithinkrok.minigames.api.item.attributes.ItemAttributeModifier;
+import com.ithinkrok.minigames.api.item.attributes.ItemAttributes;
 import com.ithinkrok.minigames.api.item.event.CustomItemLoreCalculateEvent;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
@@ -18,13 +20,13 @@ import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
 import com.ithinkrok.util.lang.LanguageLookup;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by paul on 02/01/16.
@@ -61,6 +63,8 @@ public class CustomItem implements CustomListener, Nameable {
 
     private final List<EnchantmentEffect> enchantmentEffects = new ArrayList<>();
 
+    private final List<AttribModifier> attributes = new ArrayList<>();
+
     public CustomItem(String name, Config config) {
         this.name = name;
 
@@ -77,7 +81,14 @@ public class CustomItem implements CustomListener, Nameable {
         if (config.contains("right_timeout")) configureTimeout(config.getConfigOrNull("right_timeout"));
         if( config.contains("enchantments")) configureEnchantments(config.getConfigOrNull("enchantments"));
         if (config.contains("listeners")) configureListeners(config.getConfigOrNull("listeners"));
+        if(config.contains("attributes")) configureAttributes(config.getConfigList("attributes"));
     }
+
+
+    private void configureAttributes(List<Config> configs) {
+        attributes.addAll(configs.stream().map(AttribModifier::new).collect(Collectors.toList()));
+    }
+
 
     public CombatMode getCombatMode() {
         return combatMode;
@@ -254,6 +265,17 @@ public class CustomItem implements CustomListener, Nameable {
             }
         }
 
+        if(attributes != null) {
+            ItemAttributes temp = new ItemAttributes();
+            for(AttribModifier attribModifier : attributes) {
+                double amount = attribModifier.actualAmount.calculate(variables);
+                ItemAttributeModifier toApply = attribModifier.base.cloneWithAmount(amount);
+                temp.addModifier(toApply);
+            }
+
+            item = temp.apply(item);
+        }
+
         //Make us unbreakable if we are
         if(unbreakable) {
             item = InventoryUtils.setUnbreakable(item, true);
@@ -283,6 +305,16 @@ public class CustomItem implements CustomListener, Nameable {
         public EnchantmentEffect(Enchantment enchantment, Calculator levelCalculator) {
             this.enchantment = enchantment;
             this.levelCalculator = levelCalculator;
+        }
+    }
+
+    private static class AttribModifier {
+        private ItemAttributeModifier base;
+        private Calculator actualAmount;
+
+        public AttribModifier(Config config) {
+            base = new ItemAttributeModifier(config);
+            actualAmount = new ExpressionCalculator(config.getString("amount"));
         }
     }
 
