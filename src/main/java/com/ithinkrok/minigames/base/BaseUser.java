@@ -87,7 +87,7 @@ public class BaseUser implements Listener, User {
     private final AttackerTracker fireAttacker = new AttackerTracker(this);
     private final AttackerTracker witherAttacker = new AttackerTracker(this);
     private final AttackerTracker lastAttacker = new AttackerTracker(this);
-    private final UserVariableHandler userVariableHandler = new UserVariableHandler(this);
+    private final UserVariableHandler userVariableHandler;
     private final CooldownHandler cooldownHandler = new CooldownHandler(this);
     private final ClassToInstanceMap<UserMetadata> metadataMap = MutableClassToInstanceMap.create();
     private final String name;
@@ -120,6 +120,7 @@ public class BaseUser implements Listener, User {
         this.team = team;
         this.uuid = uuid;
         this.entity = entity;
+        this.userVariableHandler = new UserVariableHandler(this);
         this.economyAccount = new EconomyAccount(gameGroup.getEconomy(), uuid);
 
         this.name = entity.getName();
