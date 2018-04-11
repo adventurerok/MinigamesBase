@@ -28,6 +28,7 @@ import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.ListenerHolder;
 import com.ithinkrok.util.lang.LanguageLookup;
 import com.ithinkrok.util.lang.Messagable;
+import com.ithinkrok.util.math.MutableVariables;
 
 import java.util.Collection;
 import java.util.List;
@@ -235,4 +236,11 @@ public interface GameGroup
 
 
     void setAccredited(boolean accredit);
+
+
+    /**
+     *
+     * @return A variables object for the GameGroup
+     */
+    MutableVariables getGlobalVariables();
 }

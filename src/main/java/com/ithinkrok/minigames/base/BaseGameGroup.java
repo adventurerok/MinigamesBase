@@ -56,6 +56,8 @@ import com.ithinkrok.util.event.CustomListener;
 import com.ithinkrok.util.lang.LangFile;
 import com.ithinkrok.util.lang.LanguageLookup;
 import com.ithinkrok.util.lang.MultipleLanguageLookup;
+import com.ithinkrok.util.math.MapVariables;
+import com.ithinkrok.util.math.MutableVariables;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -114,6 +116,8 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     private boolean created = false;
 
     private boolean accredited = true;
+
+    private final MutableVariables globalVariables = new MapVariables();
 
 
     public BaseGameGroup(BaseGame game, String name, String type, String configFile, List<String> parameters) {
@@ -1043,6 +1047,12 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
     public void setAccredited(boolean accredit) {
         this.accredited = accredit;
         database.setSavingAllowed(accredit);
+    }
+
+
+    @Override
+    public MutableVariables getGlobalVariables() {
+        return globalVariables;
     }
 
 

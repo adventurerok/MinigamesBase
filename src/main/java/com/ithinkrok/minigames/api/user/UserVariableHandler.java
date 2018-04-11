@@ -49,6 +49,8 @@ public class UserVariableHandler implements MutableVariables {
                 return user.getGlobalConfig().getDouble(name, 0);
             }
         });
+
+        addCustomVariableHandler("global", user.getGameGroup().getGlobalVariables());
     }
 
 
