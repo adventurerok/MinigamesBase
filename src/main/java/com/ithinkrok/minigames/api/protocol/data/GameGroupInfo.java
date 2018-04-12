@@ -4,7 +4,7 @@ import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.config.ConfigSerializable;
 import com.ithinkrok.util.config.MemoryConfig;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by paul on 16/02/16.
@@ -21,7 +21,7 @@ public class GameGroupInfo implements ConfigSerializable {
 
     private String motd = "A motd";
 
-    private int playerCount = 0;
+    private Set<UUID> players = new HashSet<>();
 
     private int maxPlayerCount = 40;
 
@@ -34,12 +34,35 @@ public class GameGroupInfo implements ConfigSerializable {
         fromConfig(config);
     }
 
+    public GameGroupInfo(GameGroupInfo copy) {
+        this.controller = copy.controller;
+        this.name = copy.name;
+        this.type = copy.type;
+        this.params = new ArrayList<>(copy.params);
+
+        this.acceptingPlayers = copy.acceptingPlayers;
+        this.motd = copy.motd;
+        this.players = new HashSet<>(copy.players);
+        this.maxPlayerCount = copy.maxPlayerCount;
+    }
+
+    @SuppressWarnings("Duplicates")
     public void fromConfig(Config config) {
         if(config.contains("accepting")) acceptingPlayers = config.getBoolean("accepting");
 
         if(config.contains("motd")) motd = config.getString("motd");
 
-        if(config.contains("player_count")) playerCount = config.getInt("player_count");
+        if(config.contains("players")){
+            List<String> playerUUIDStrings = config.getStringList("players");
+
+            Set<UUID> newPlayers = new HashSet<>();
+
+            for (String uuidString : playerUUIDStrings) {
+                newPlayers.add(UUID.fromString(uuidString));
+            }
+
+            players = newPlayers;
+        }
 
         if(config.contains("max_players")) maxPlayerCount = config.getInt("max_players");
     }
@@ -69,7 +92,7 @@ public class GameGroupInfo implements ConfigSerializable {
     }
 
     public int getPlayerCount() {
-        return playerCount;
+        return players.size();
     }
 
     public int getMaxPlayerCount() {
@@ -86,8 +109,14 @@ public class GameGroupInfo implements ConfigSerializable {
 
         result.set("accepting", acceptingPlayers);
         result.set("motd", motd);
-        result.set("player_count", playerCount);
+        result.set("player_count", players.size());
         result.set("max_players", maxPlayerCount);
+
+        List<String> playerUUIDStrings = new ArrayList<>();
+        for (UUID playerUUID : players) {
+            playerUUIDStrings.add(playerUUID.toString());
+        }
+        result.set("players", playerUUIDStrings);
 
         return result;
     }

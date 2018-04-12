@@ -8,10 +8,12 @@ import org.bukkit.event.HandlerList;
  */
 public class GameGroupUpdateEvent extends GameGroupEvent {
 
+    private final GameGroupInfo oldGameGroup;
     private static final HandlerList handlers = new HandlerList();
 
-    public GameGroupUpdateEvent(GameGroupInfo gameGroupInfo) {
+    public GameGroupUpdateEvent(GameGroupInfo gameGroupInfo, GameGroupInfo oldGameGroup) {
         super(gameGroupInfo);
+        this.oldGameGroup = oldGameGroup;
     }
 
     @Override
@@ -21,5 +23,10 @@ public class GameGroupUpdateEvent extends GameGroupEvent {
 
     public static HandlerList getHandlerList() {
         return handlers;
+    }
+
+
+    public GameGroupInfo getOldGameGroup() {
+        return oldGameGroup;
     }
 }

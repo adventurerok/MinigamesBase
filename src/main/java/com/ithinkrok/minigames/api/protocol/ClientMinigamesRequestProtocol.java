@@ -89,10 +89,15 @@ public class ClientMinigamesRequestProtocol implements ClientListener {
     }
 
     private void handleEventGameGroupUpdate(Config payload) {
+        GameGroupInfo old = controllerInfo.getGameGroup(payload.getString("name"));
+        if(old != null) old = new GameGroupInfo(old);
+
+        GameGroupInfo finalOld = old;
+
         GameGroupInfo gameGroup = controllerInfo.updateGameGroup(payload);
 
         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-            GameGroupUpdateEvent event = new GameGroupUpdateEvent(gameGroup);
+            GameGroupUpdateEvent event = new GameGroupUpdateEvent(gameGroup, finalOld);
             plugin.getServer().getPluginManager().callEvent(event);
         });
     }
