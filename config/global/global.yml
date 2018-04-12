@@ -64,3 +64,13 @@ commands:
     permission: "mg.base.shop"
     usage: "/<command>"
     class: "com.ithinkrok.minigames.util.command.ShopCommand"
+
+custom_items:
+  hub_returner:
+    display_name_locale: "hub_returner.name"
+    description_locale: "hub_returner.desc"
+    material: "BED"
+    listeners:
+      hub_return:
+        events: ["rightClick"]
+        class: "com.ithinkrok.minigames.util.item.HubTeleporter"
