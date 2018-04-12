@@ -70,6 +70,7 @@ custom_items:
     display_name_locale: "hub_returner.name"
     description_locale: "hub_returner.desc"
     material: "BED"
+    durability: 14
     listeners:
       hub_return:
         events: ["rightClick"]
