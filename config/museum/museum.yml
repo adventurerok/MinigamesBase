@@ -1,0 +1,26 @@
+
+pre_configs:
+  - "global/global.yml"
+
+lang_files:
+#  - "towny/lang/towny.lang"
+#  - "towny/lang/items.lang"
+
+maps:
+  museum: "museum/maps/museum.yml"
+
+shared_objects:
+  game:
+    chat_prefix: "&7[&4Museum&7] &e"
+    friendly_fire: true
+    cancel_death: false
+  start_info:
+    game_state: "museum"
+    map: "museum"
+  user:
+    use_new_combat: true
+
+game_states:
+  museum: {}
+
+custom_items: {}

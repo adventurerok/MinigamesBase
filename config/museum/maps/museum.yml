@@ -1,0 +1,11 @@
+description: "The museum world!"
+
+worlds:
+  map:
+    folder: "museum"
+    environment: "normal"
+    type: "saved"
+#  map_nether:
+#    folder: "museum_nether"
+#    environment: "nether"
+#    type: "saved"
