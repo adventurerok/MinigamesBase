@@ -95,6 +95,12 @@ public class GameGroupInfo implements ConfigSerializable {
         return players.size();
     }
 
+
+    public Set<UUID> getPlayers() {
+        return new HashSet<>(players);
+    }
+
+
     public int getMaxPlayerCount() {
         return maxPlayerCount;
     }

@@ -3,6 +3,7 @@ package com.ithinkrok.minigames.hub;
 import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.event.ListenerLoadedEvent;
 import com.ithinkrok.minigames.api.event.controller.ControllerSpawnGameGroupEvent;
+import com.ithinkrok.minigames.api.event.controller.ControllerUpdateGameGroupEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserJoinEvent;
 import com.ithinkrok.minigames.api.event.user.state.UserAttackedEvent;
 import com.ithinkrok.minigames.api.event.user.state.UserDamagedEvent;
@@ -34,9 +35,7 @@ import org.bukkit.Material;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.Vector;
 
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by paul on 20/02/16.
@@ -49,11 +48,8 @@ public class HubListener extends SignListener {
         InfoSigns.registerSignType("%high_score%", HighScoreSign.class, HighScoreSign::new);
     }
 
-
-    private ItemGiver itemGiver;
-
     private final Map<Material, JumpPad> jumpPadMap = new EnumMap<>(Material.class);
-
+    private ItemGiver itemGiver;
     private double superPopperPower;
     private String superPopperVictimLocale;
     private String superPopperAttackerLocale;
@@ -67,6 +63,7 @@ public class HubListener extends SignListener {
 
     private String lobbyCreatedLocale;
     private ConfigMessageFactory clickJoinMessageFactory;
+    private String playerJoinClickLocale;
 
     private Config scoreboardConfig;
 
@@ -75,27 +72,28 @@ public class HubListener extends SignListener {
 
     private SoundEffect pvpWinSound, pvpLossSound;
 
+
     @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent<GameGroup, ?> event) {
         super.onListenerLoaded(event);
 
         Config config = event.getConfigOrEmpty();
 
-        if(config.contains("items")) {
+        if (config.contains("items")) {
             itemGiver = new ItemGiver(config.getConfigOrNull("items"));
         }
 
-        if(config.contains("jump_pads")) {
+        if (config.contains("jump_pads")) {
             List<Config> jumpPadList = config.getConfigList("jump_pads");
 
-            for(Config jumpConfig : jumpPadList) {
+            for (Config jumpConfig : jumpPadList) {
                 JumpPad pad = new JumpPad(jumpConfig);
 
                 jumpPadMap.put(pad.getMaterial(), pad);
             }
         }
 
-        if(config.contains("super_popper")) {
+        if (config.contains("super_popper")) {
             Config superPopperConfig = config.getConfigOrEmpty("super_popper");
 
             superPopperPower = superPopperConfig.getDouble("power");
@@ -108,7 +106,7 @@ public class HubListener extends SignListener {
             superPopperAttackerSound = MinigamesConfigs.getSoundEffect(superPopperConfig, "attacker_sound");
         }
 
-        if(config.contains("pvp_sword")) {
+        if (config.contains("pvp_sword")) {
             Config pvpSwordConfig = config.getConfigOrEmpty("pvp_sword");
 
             pvpSwordItem = pvpSwordConfig.getString("custom_item", "pvp_sword");
@@ -119,7 +117,7 @@ public class HubListener extends SignListener {
             pvpLossSound = MinigamesConfigs.getSoundEffect(pvpSwordConfig, "loss_sound");
         }
 
-        if(config.contains("welcome")) {
+        if (config.contains("welcome")) {
             welcomeTitleLocale = config.getString("welcome.title_locale");
             welcomeSubtitleLocale = config.getString("welcome.subtitle_locale");
         }
@@ -130,7 +128,10 @@ public class HubListener extends SignListener {
 
         String clickJoinLocale = event.getCreator().getLocale(config.getString("click_join_locale"));
         clickJoinMessageFactory = new ConfigMessageFactory(clickJoinLocale);
+
+        playerJoinClickLocale = config.getString("player_join_locale", "hub.player_join_click");
     }
+
 
     @CustomEventHandler
     public void onUserJoin(UserJoinEvent event) {
@@ -141,15 +142,15 @@ public class HubListener extends SignListener {
         event.getUser().setMaxHealth(20);
         event.getUser().setFoodLevel(20);
 
-        if(itemGiver != null) {
+        if (itemGiver != null) {
             itemGiver.giveToUser(event.getUser());
         }
 
-        if(!jumpPadMap.isEmpty()) {
+        if (!jumpPadMap.isEmpty()) {
             event.getUser().repeatInFuture(new JumpPadTask(event.getUser(), jumpPadMap), 2, 2);
         }
 
-        if(welcomeTitleLocale != null) {
+        if (welcomeTitleLocale != null) {
             LanguageLookup lookup = event.getUser().getLanguageLookup();
             String welcomeTitle = lookup.getLocale(welcomeTitleLocale);
             String welcomeSubtitle = lookup.getLocale(welcomeSubtitleLocale, event.getUser().getDisplayName());
@@ -157,7 +158,7 @@ public class HubListener extends SignListener {
             event.getUser().showTitle(welcomeTitle, welcomeSubtitle);
         }
 
-        if(scoreboardConfig != null) {
+        if (scoreboardConfig != null) {
             HubScoreboardHandler scoreboardHandler = new HubScoreboardHandler(scoreboardConfig);
 
             event.getUser().setScoreboardHandler(scoreboardHandler);
@@ -170,18 +171,17 @@ public class HubListener extends SignListener {
     }
 
 
-
     @CustomEventHandler(ignoreCancelled = true)
     public void onUserAttackedByUser(UserAttackedEvent event) {
-        if(!event.wasAttackedByUser()) return;
+        if (!event.wasAttackedByUser()) return;
 
-        if(event.getDamageCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
+        if (event.getDamageCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
 
             //Prevent pvp users from being affected by the super popper
             String userHeldId = InventoryUtils.getIdentifier(event.getUser().getInventory().getItemInMainHand());
             CustomItem item = event.getGameGroup().getCustomItem(userHeldId);
 
-            if(item != null && item.getName().equals(pvpSwordItem)) {
+            if (item != null && item.getName().equals(pvpSwordItem)) {
                 event.getAttackerUser().showAboveHotbarLocale(superPopperPvpLocale);
                 event.setCancelled(true);
                 return;
@@ -195,31 +195,33 @@ public class HubListener extends SignListener {
 
             event.getUser().showAboveHotbarLocale(superPopperVictimLocale, event.getAttackerUser().getDisplayName());
 
-            if(event.getUser() != event.getAttackerUser()) {
-                event.getAttackerUser().showAboveHotbarLocale(superPopperAttackerLocale, event.getUser().getDisplayName());
+            if (event.getUser() != event.getAttackerUser()) {
+                event.getAttackerUser()
+                        .showAboveHotbarLocale(superPopperAttackerLocale, event.getUser().getDisplayName());
             }
 
-            if(superPopperVictimSound != null) {
+            if (superPopperVictimSound != null) {
                 event.getUser().playSound(event.getUser().getLocation(), superPopperVictimSound);
             }
 
-            if(superPopperAttackerSound != null) {
+            if (superPopperAttackerSound != null) {
                 event.getAttackerUser().playSound(event.getAttackerUser().getLocation(), superPopperAttackerSound);
             }
 
             event.setCancelled(true);
             event.getAttacker().remove();
-        } else if(event.getDamageCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+        } else if (event.getDamageCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
 
             //Prevent users attacking other users if they are not using the pvp sword
             String attackerWeaponId = InventoryUtils.getIdentifier(event.getWeapon());
 
             CustomItem item = event.getGameGroup().getCustomItem(attackerWeaponId);
-            if(item == null || !pvpSwordItem.equals(item.getName())) {
+            if (item == null || !pvpSwordItem.equals(item.getName())) {
                 event.setCancelled(true);
             }
         }
     }
+
 
     @CustomEventHandler(priority = CustomEventHandler.HIGH)
     public void onUserDamaged(UserDamagedEvent event) {
@@ -228,10 +230,11 @@ public class HubListener extends SignListener {
         String userHeldId = InventoryUtils.getIdentifier(event.getUser().getInventory().getItemInHand());
 
         CustomItem item = event.getGameGroup().getCustomItem(userHeldId);
-        if(item == null || !pvpSwordItem.equals(item.getName())) {
+        if (item == null || !pvpSwordItem.equals(item.getName())) {
             event.setCancelled(true);
         }
     }
+
 
     @CustomEventHandler
     public void onUserDeath(UserDeathEvent event) {
@@ -242,20 +245,21 @@ public class HubListener extends SignListener {
         died.clearArmor();
         died.resetUserStats(true);
 
-        if(pvpLossSound != null) {
+        if (pvpLossSound != null) {
             died.playSound(died.getLocation(), pvpLossSound);
         }
 
-        if(!event.hasKillerUser() && !event.hasAssistUser()) return;
+        if (!event.hasKillerUser() && !event.hasAssistUser()) return;
 
         User killer = event.hasKillerUser() ? event.getKillerUser() : event.getAssistUser();
 
-        if(pvpWinSound != null) {
+        if (pvpWinSound != null) {
             killer.playSound(killer.getLocation(), pvpWinSound);
         }
 
         event.getGameGroup().sendLocale(pvpWinLocale, killer.getFormattedName(), died.getFormattedName());
     }
+
 
     @CustomEventHandler
     public void onUserHunger(UserFoodLevelChangeEvent event) {
@@ -264,20 +268,23 @@ public class HubListener extends SignListener {
         event.getUser().setSaturation(20);
     }
 
+
     @CustomEventHandler
     public void onUserDropItem(UserDropItemEvent event) {
         event.setCancelled(true);
     }
+
 
     @CustomEventHandler
     public void onUserPickupItem(UserPickupItemEvent event) {
         event.setCancelled(true);
     }
 
+
     @CustomEventHandler
     public void onGameGroupCreated(ControllerSpawnGameGroupEvent event) {
         String type = event.getControllerGameGroup().getType();
-        if(type.equals("hub")) return;
+        if (type.equals("hub")) return;
 
         event.getGameGroup().sendLocale(lobbyCreatedLocale, type);
 
@@ -286,5 +293,36 @@ public class HubListener extends SignListener {
                 .getControllerGameGroup().getName());
 
         event.getGameGroup().sendMessageNoPrefix(builder.getResult());
+    }
+
+
+    @CustomEventHandler
+    public void onGameGroupUpdated(ControllerUpdateGameGroupEvent event) {
+        Set<UUID> currentPlayers = event.getControllerGameGroup().getPlayers();
+        Set<UUID> oldPlayers = event.getOldControllerGameGroup().getPlayers();
+
+        if (currentPlayers.size() < oldPlayers.size() || !event.getControllerGameGroup().isAcceptingPlayers()) return;
+
+        //prevent hub messages
+        if(event.getControllerGameGroup().getType().equals(event.getGameGroup().getType())) return;
+
+        Set<UUID> newPlayers = new HashSet<>(currentPlayers);
+        newPlayers.removeAll(oldPlayers);
+
+        UUID joined = newPlayers.iterator().next();
+
+        event.getGameGroup().getDatabase().lookupName(joined, nameResult -> {
+            String name = nameResult.name;
+            if (name == null) return;
+
+            String type = event.getControllerGameGroup().getType();
+            String message = event.getGameGroup().getLocale(playerJoinClickLocale, name, type);
+            ConfigMessageFactory factory = new ConfigMessageFactory(message);
+            ConfigMessageBuilder builder = factory.newBuilder();
+            String command = "/join " +event.getControllerGameGroup().getName();
+            builder.setClickAction("join", ConfigMessageBuilder.CLICK_RUN_COMMAND, command);
+
+            event.getGameGroup().sendMessageNoPrefix(builder.getResult());
+        });
     }
 }

@@ -39,3 +39,4 @@ scoreboard.balance=%s
 hub.lobby_created=&6A new &c%s &6lobby was created\!
 
 hub.click_join_builder=&6Click {join:&7[&aHere&7]} &6to join it
+hub.player_join_click=&a%s &6-> {join:&7[&c%s&7]}
