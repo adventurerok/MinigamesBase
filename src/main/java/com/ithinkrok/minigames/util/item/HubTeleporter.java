@@ -5,10 +5,11 @@ import com.ithinkrok.minigames.api.event.user.world.UserInteractEvent;
 import com.ithinkrok.minigames.api.protocol.ClientMinigamesRequestProtocol;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.CustomEventHandler;
+import com.ithinkrok.util.event.CustomListener;
 
 import java.util.Collections;
 
-public class HubTeleporter {
+public class HubTeleporter implements CustomListener {
 
 
     private String hubType;
