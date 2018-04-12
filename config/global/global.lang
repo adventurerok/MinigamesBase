@@ -178,6 +178,6 @@ reward.score.get=&6You win &b%s
 vote_weight.upgrade=Additional Vote %s
 vote_weight.buy=&6&bYou now have a permanent additional vote!
 
-hub_returner.name=&4Hub Teleporter
+hub_returner.name=&4Return to Hub
 hub_returner.desc=&cTeleports you back to the hub.
 hub_returner.return=&cTeleporting you to the hub...
