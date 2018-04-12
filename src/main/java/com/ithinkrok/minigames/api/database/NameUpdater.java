@@ -1,4 +1,4 @@
-package com.ithinkrok.minigames.api.util;
+package com.ithinkrok.minigames.api.database;
 
 import com.google.common.base.Charsets;
 import org.apache.commons.io.IOUtils;
@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 
-public class NameUpdater extends Thread {
+public final class NameUpdater extends Thread {
 
     private final static NameUpdater singleton = new NameUpdater();
 
@@ -91,17 +91,5 @@ public class NameUpdater extends Thread {
         }
     }
 
-
-    public static class NameResult {
-
-        public final UUID uuid;
-        public final String name;
-
-
-        private NameResult(UUID uuid, String name) {
-            this.uuid = uuid;
-            this.name = name;
-        }
-    }
 
 }

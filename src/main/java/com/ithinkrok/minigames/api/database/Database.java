@@ -1,7 +1,6 @@
 package com.ithinkrok.minigames.api.database;
 
 import com.ithinkrok.minigames.api.user.User;
-import com.ithinkrok.minigames.api.util.NameUpdater;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,7 +8,9 @@ import java.sql.ResultSet;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 import java.util.function.IntConsumer;
@@ -17,11 +18,14 @@ import java.util.function.IntConsumer;
 /**
  * Created by paul on 20/02/16.
  */
-public class Database implements DatabaseTaskRunner, Consumer<NameUpdater.NameResult> {
+public class Database implements DatabaseTaskRunner, Consumer<NameResult> {
 
     private final DatabaseTaskRunner taskRunner;
 
     private boolean savingAllowed = true;
+
+    private Map<UUID, String> localNameCache = new ConcurrentHashMap<>();
+
 
     public Database(DatabaseTaskRunner taskRunner) {
         this.taskRunner = taskRunner;
@@ -41,16 +45,6 @@ public class Database implements DatabaseTaskRunner, Consumer<NameUpdater.NameRe
                 consumer.accept(def);
             }
         });
-    }
-
-
-    public boolean isSavingAllowed() {
-        return savingAllowed;
-    }
-
-
-    public void setSavingAllowed(boolean savingAllowed) {
-        this.savingAllowed = savingAllowed;
     }
 
 
@@ -84,6 +78,16 @@ public class Database implements DatabaseTaskRunner, Consumer<NameUpdater.NameRe
     }
 
 
+    public boolean isSavingAllowed() {
+        return savingAllowed;
+    }
+
+
+    public void setSavingAllowed(boolean savingAllowed) {
+        this.savingAllowed = savingAllowed;
+    }
+
+
     public void setIntUserValue(User user, String name, int value) {
         setIntUserValue(user.getUuid(), name, value);
     }
@@ -95,7 +99,7 @@ public class Database implements DatabaseTaskRunner, Consumer<NameUpdater.NameRe
 
 
     private void setUserValue(UUID user, String property, Object value) {
-        if(!savingAllowed) return;
+        if (!savingAllowed) return;
 
         String type;
 
@@ -249,7 +253,7 @@ public class Database implements DatabaseTaskRunner, Consumer<NameUpdater.NameRe
         Instant updateIfBefore = Instant.now().minus(24, ChronoUnit.HOURS);
 
         for (NameHolder nameHolder : result) {
-            if(nameHolder.getNameKnownAt().isBefore(updateIfBefore)) {
+            if (nameHolder.getNameKnownAt().isBefore(updateIfBefore)) {
                 NameUpdater.lookupName(nameHolder.getPlayerUUID(), this);
             }
         }
@@ -264,7 +268,7 @@ public class Database implements DatabaseTaskRunner, Consumer<NameUpdater.NameRe
 
 
     public void setUserScore(UUID user, String userName, String gameType, double value) {
-        if(!savingAllowed) return;
+        if (!savingAllowed) return;
 
         doDatabaseTask(accessor -> {
             new UserScore(user, userName, gameType, value).save(accessor);
@@ -272,7 +276,40 @@ public class Database implements DatabaseTaskRunner, Consumer<NameUpdater.NameRe
     }
 
 
+    public void lookupName(UUID uuid, Consumer<NameResult> consumer) {
+        if (localNameCache.containsKey(uuid)) {
+            consumer.accept(new NameResult(uuid, localNameCache.get(uuid)));
+            return;
+        }
+
+        doDatabaseTask(accessor -> {
+            try(Connection conn = accessor.getConnection();
+            PreparedStatement statement = conn.prepareStatement(
+                    "SELECT name FROM mg_name_cache " +
+                    "WHERE uuid=UNHEX(REPLACE(?,'-',''))"
+            )) {
+                statement.setString(1, uuid.toString());
+
+                try(ResultSet results = statement.executeQuery()) {
+                    if(!results.next()) {
+                        consumer.accept(new NameResult(uuid, null));
+                    } else {
+                        consumer.accept(new NameResult(uuid, results.getString("name")));
+                    }
+                }
+            }
+        });
+    }
+
+
+    @Override
+    public void accept(NameResult nameResult) {
+        updateNameCache(nameResult.uuid, nameResult.name);
+    }
+
+
     public void updateNameCache(UUID user, String name) {
+        localNameCache.put(user, name);
         doDatabaseTask(accessor -> {
             try (Connection conn = accessor.getConnection();
                  PreparedStatement statement = conn.prepareStatement(
@@ -289,11 +326,5 @@ public class Database implements DatabaseTaskRunner, Consumer<NameUpdater.NameRe
                 statement.executeUpdate();
             }
         });
-    }
-
-
-    @Override
-    public void accept(NameUpdater.NameResult nameResult) {
-        updateNameCache(nameResult.uuid, nameResult.name);
     }
 }
