@@ -83,9 +83,13 @@ public final class NameUpdater extends Thread {
             consumers.forEach(nameResultConsumer -> nameResultConsumer.accept(new NameResult(uuid, name)));
 
         } catch (IOException | ParseException e) {
+
             if(!badUUIDs.contains(uuid)) {
                 System.err.println("Error on name updater thread name lookup for UUID (perhaps invalid) " + uuid);
-                e.printStackTrace();
+                if(!e.getMessage().contains("Unexpected token END OF FILE at position 0")) {
+                    //the one we check against is the normal error for an invalid UUID
+                    e.printStackTrace();
+                }
                 badUUIDs.add(uuid);
             }
         }
