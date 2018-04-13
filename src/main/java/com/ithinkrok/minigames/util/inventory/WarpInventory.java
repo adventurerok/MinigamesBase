@@ -7,11 +7,13 @@ import com.ithinkrok.minigames.api.map.MapPoint;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
 import com.ithinkrok.minigames.api.util.MinigamesConfigs;
+import com.ithinkrok.util.StringUtils;
 import com.ithinkrok.util.config.Config;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class WarpInventory {
 
@@ -23,14 +25,19 @@ public class WarpInventory {
             ItemStack display;
             display = MinigamesConfigs.getItemStack(warp, "item");
 
-            if(display == null) {
+            if (display == null) {
                 display = new ItemStack(Material.EMPTY_MAP);
             }
 
 
-            display = InventoryUtils.setItemName(display, warp.getString("name"));
-            if(warp.contains("desc")) {
-                display = InventoryUtils.addLore(display, warp.getStringList("lore"));
+            String warpName = StringUtils.convertAmpersandToSelectionCharacter(warp.getString("name"));
+            display = InventoryUtils.setItemName(display, warpName);
+            if (warp.contains("desc")) {
+                List<String> lore = warp.getStringList("lore").stream()
+                        .map(StringUtils::convertAmpersandToSelectionCharacter)
+                        .collect(Collectors.toList());
+
+                display = InventoryUtils.addLore(display, lore);
             }
 
             ClickableItem clickable = new ClickableItem(display, warp.getInt("slot", -1)) {
