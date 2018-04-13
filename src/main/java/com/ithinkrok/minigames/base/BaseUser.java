@@ -299,27 +299,29 @@ public class BaseUser implements Listener, User {
         }
 
         //Check to see if we should apply the changes to the item
-        if (!useNewCombat && newItem != null && WeaponStats.isWeapon(newItem.getType())) {
+        if (!useNewCombat && newItem != null) {
             ItemAttributes itemAttributes = new ItemAttributes(newItem);
 
             //Make sure we haven't already made the changes
             if (itemAttributes.getModifier("Damage Override") == null) {
-                //turns out giving an item attributes means it only uses those to calculate its damage, rather than
-                //its weapon type
-                double legacyDamage = WeaponStats.getLegacyDamage(newItem.getType());
-                double newDamage = WeaponStats.getDefaultNewDamage();
-                double damageChange = legacyDamage - newDamage;
+                if(WeaponStats.isWeapon(newItem.getType())) {
+                    //turns out giving an item attributes means it only uses those to calculate its damage, rather than
+                    //its weapon type
+                    double legacyDamage = WeaponStats.getLegacyDamage(newItem.getType());
+                    double newDamage = WeaponStats.getDefaultNewDamage();
+                    double damageChange = legacyDamage - newDamage;
 
-                ItemAttributeModifier damage = new ItemAttributeModifier(
-                        Attribute.GENERIC_ATTACK_DAMAGE, "Damage Override", damageChange,
-                        Operation.ADDITIVE, Slot.MAIN_HAND);
+                    ItemAttributeModifier damage = new ItemAttributeModifier(
+                            Attribute.GENERIC_ATTACK_DAMAGE, "Damage Override", damageChange,
+                            Operation.ADDITIVE, Slot.MAIN_HAND);
 
-                itemAttributes.addModifier(damage);
+                    itemAttributes.addModifier(damage);
+                }
 
                 //Assume we don't have a speed modifier either
 
                 ItemAttributeModifier speed = new ItemAttributeModifier(
-                        Attribute.GENERIC_ATTACK_SPEED, "Speed Override", 0,
+                        Attribute.GENERIC_ATTACK_SPEED, "Speed Override", 6,
                         Operation.ADDITIVE, Slot.MAIN_HAND);
 
                 itemAttributes.addModifier(speed);
