@@ -5,7 +5,11 @@ worlds:
     folder: "museum"
     environment: "normal"
     type: "saved"
-#  map_nether:
-#    folder: "museum_nether"
-#    environment: "nether"
-#    type: "saved"
+  map_nether:
+    folder: "museum_nether"
+    environment: "nether"
+    type: "saved"
+  map_the_end:
+    folder: "museum_the_end"
+    environment: "the_end"
+    type: "saved"
