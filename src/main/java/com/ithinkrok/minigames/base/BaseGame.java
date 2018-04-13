@@ -380,11 +380,7 @@ public class BaseGame implements Game, FileLoader {
         BaseGameGroup gameGroup = getGameGroupForJoining(player.getUniqueId());
 
         if (gameGroup == null) {
-            if (nameToGameGroup.isEmpty()) {
-                //The fallback gamegroup config must not require parameters
-                createGameGroup(fallbackConfig, new ArrayList<>());
-            }
-            gameGroup = getSpawnGameGroup();
+            gameGroup = getOrCreateGameGroup(fallbackConfig, new ArrayList<>());
         }
 
         BaseUser user = gameGroup.getUser(player.getUniqueId());
@@ -419,6 +415,19 @@ public class BaseGame implements Game, FileLoader {
         user.doInFuture(task -> {
             hideNonGameGroupPlayers(finalUser);
         });
+    }
+
+
+    private BaseGameGroup getOrCreateGameGroup(String type, ArrayList<String> params) {
+        for (BaseGameGroup gg : getGameGroups()) {
+            if(!gg.isAcceptingPlayers()) continue;
+            if(!gg.getType().equals(type)) continue;
+            if(!gg.getParameters().equals(params)) continue;
+
+            return gg;
+        }
+
+        return createGameGroup(type, params);
     }
 
 
