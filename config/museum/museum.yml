@@ -26,6 +26,7 @@ game_states:
       main:
         class: "com.ithinkrok.minigames.util.gamestate.SimpleLobbyListener"
         config:
+          use_map_scoreboard: false
           give_on_join:
             clear_inventory: true
             custom_items:

@@ -1,5 +1,10 @@
 description: "The museum world!"
 
+spawn:
+  x: -199950.5
+  y: 124.1
+  z: -299979.5
+
 worlds:
   map:
     folder: "museum"
