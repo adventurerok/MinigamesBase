@@ -11,6 +11,7 @@ import com.ithinkrok.minigames.api.event.map.MapCreatureSpawnEvent;
 import com.ithinkrok.minigames.api.event.user.UserEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserJoinEvent;
 import com.ithinkrok.minigames.api.event.user.game.UserQuitEvent;
+import com.ithinkrok.minigames.api.event.user.state.UserDamagedEvent;
 import com.ithinkrok.minigames.api.event.user.world.UserChatEvent;
 import com.ithinkrok.minigames.api.metadata.Metadata;
 import com.ithinkrok.minigames.api.task.GameTask;
@@ -23,6 +24,7 @@ import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
+import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,6 +88,16 @@ public class SimpleAftermathListener implements CustomListener {
             }, 20, 20);
 
             event.getGameGroup().bindTaskToCurrentGameState(task);
+        }
+    }
+
+    @CustomEventHandler
+    public void onUserDamaged(UserDamagedEvent event) {
+        event.setCancelled(true);
+        event.getUser().setHealth(event.getUser().getEntity().getMaxHealth());
+
+        if(Objects.equals(event.getDamageCause(), EntityDamageEvent.DamageCause.VOID)) {
+            event.getUser().teleport(event.getUser().getLocation().add(0, 63, 0));
         }
     }
 
