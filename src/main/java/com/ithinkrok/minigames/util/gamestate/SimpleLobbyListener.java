@@ -73,7 +73,9 @@ public class SimpleLobbyListener implements CustomListener {
 
         nextGameState = config.getString("next_gamestate");
 
-        configureCountdown(config.getConfigOrEmpty("start_countdown"));
+        if(config.contains("start_countdown")) {
+            configureCountdown(config.getConfigOrEmpty("start_countdown"));
+        }
 
         String lobbyMapName = config.getString("lobby_map");
         if(lobbyMapName != null) {
@@ -201,7 +203,9 @@ public class SimpleLobbyListener implements CustomListener {
     }
 
     private void resetCountdown(GameGroup gameGroup) {
-        gameGroup.startCountdown(startCountdown);
+        if(startCountdown != null) {
+            gameGroup.startCountdown(startCountdown);
+        }
     }
 
     @CustomEventHandler
@@ -213,11 +217,13 @@ public class SimpleLobbyListener implements CustomListener {
     public void onGameStateChanged(GameStateChangedEvent event) {
         if (!Objects.equals(event.getNewGameState(), gameState)) return;
 
-        Random random = new Random();
-        double lobbyMapKey = random.nextDouble() * possibleLobbyMaps.lastKey();
-        String mapName = possibleLobbyMaps.higherEntry(lobbyMapKey).getValue();
+        if(!possibleLobbyMaps.isEmpty()) {
+            Random random = new Random();
+            double lobbyMapKey = random.nextDouble() * possibleLobbyMaps.lastKey();
+            String mapName = possibleLobbyMaps.higherEntry(lobbyMapKey).getValue();
 
-        event.getGameGroup().changeMap(mapName);
+            event.getGameGroup().changeMap(mapName);
+        }
 
         resetCountdown(event.getGameGroup());
 
@@ -228,7 +234,7 @@ public class SimpleLobbyListener implements CustomListener {
 
     @CustomEventHandler
     public void onCountdownFinished(CountdownFinishedEvent event) {
-        if (!event.getCountdown().getName().equals(startCountdown.getName())) return;
+        if (startCountdown == null || !event.getCountdown().getName().equals(startCountdown.getName())) return;
 
         int userCount = event.getGameGroup().getUserCount();
         if (userCount < 1) return;
