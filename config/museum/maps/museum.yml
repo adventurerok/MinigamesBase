@@ -13,3 +13,15 @@ worlds:
     folder: "museum_the_end"
     environment: "the_end"
     type: "saved"
+
+custom_items:
+  warp_chooser:
+    display_name_locale: "museum_teleporter.name"
+    material: "COMPASS"
+    listeners:
+      warp:
+        events: ["rightClick"]
+        class: "com.ithinkrok.minigames.util.item.WarpChooser"
+        config:
+          title_locale: "museum_teleporter.title"
+          warps: []

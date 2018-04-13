@@ -21,6 +21,17 @@ shared_objects:
     use_new_combat: true
 
 game_states:
-  museum: {}
+  museum:
+    listeners:
+      main:
+        class: "com.ithinkrok.minigames.util.gamestate.SimpleLobbyListener"
+        config:
+          give_on_join:
+            clear_inventory: true
+            custom_items:
+              - name: "warp_chooser"
+                slot: 0
+              - name: "hub_returner"
+                slot: 8
 
 custom_items: {}
