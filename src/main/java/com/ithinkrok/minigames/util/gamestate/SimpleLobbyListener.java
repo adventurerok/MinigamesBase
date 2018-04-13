@@ -63,6 +63,9 @@ public class SimpleLobbyListener implements CustomListener {
     private String startingEventuallyLocale;
     private String startedLocale;
 
+    private boolean teleportToSpawn;
+    private boolean useMapScoreboard;
+
     private TreeMap<Double, String> possibleLobbyMaps = new TreeMap<>();
 
     @CustomEventHandler
@@ -72,6 +75,9 @@ public class SimpleLobbyListener implements CustomListener {
         config = event.getConfig();
 
         nextGameState = config.getString("next_gamestate");
+
+        useMapScoreboard = config.getBoolean("use_map_scoreboard", true);
+        teleportToSpawn = config.getBoolean("teleport_to_spawn", true);
 
         if(config.contains("start_countdown")) {
             configureCountdown(config.getConfigOrEmpty("start_countdown"));
@@ -186,7 +192,9 @@ public class SimpleLobbyListener implements CustomListener {
 
         giveOnJoin.giveToUser(user);
 
-        user.teleport(user.getGameGroup().getCurrentMap().getSpawn());
+        if(teleportToSpawn) {
+            user.teleport(user.getGameGroup().getCurrentMap().getSpawn());
+        }
 
         String message;
 
@@ -198,8 +206,10 @@ public class SimpleLobbyListener implements CustomListener {
 
         }
 
-        user.setScoreboardHandler(new MapScoreboardHandler(user));
-        user.updateScoreboard();
+        if(useMapScoreboard) {
+            user.setScoreboardHandler(new MapScoreboardHandler(user));
+            user.updateScoreboard();
+        }
     }
 
     private void resetCountdown(GameGroup gameGroup) {
