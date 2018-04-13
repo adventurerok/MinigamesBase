@@ -32,7 +32,7 @@ public class WarpInventory {
 
             String warpName = StringUtils.convertAmpersandToSelectionCharacter(warp.getString("name"));
             display = InventoryUtils.setItemName(display, warpName);
-            if (warp.contains("desc")) {
+            if (warp.contains("lore")) {
                 List<String> lore = warp.getStringList("lore").stream()
                         .map(StringUtils::convertAmpersandToSelectionCharacter)
                         .collect(Collectors.toList());
