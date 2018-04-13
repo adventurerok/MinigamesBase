@@ -1,15 +1,16 @@
 description: "The museum world!"
 
-spawn:
-  x: -199950.5
-  y: 124.1
-  z: -299979.5
+
 
 worlds:
   map:
     folder: "museum"
     environment: "normal"
     type: "saved"
+    spawn:
+      x: -199950.5
+      y: 124.1
+      z: -299979.5
   map_nether:
     folder: "museum_nether"
     environment: "nether"
@@ -29,4 +30,25 @@ custom_items:
         class: "com.ithinkrok.minigames.util.item.WarpChooser"
         config:
           title_locale: "museum_teleporter.title"
-          warps: []
+          warps:
+            - name: "&aOriginal Hut"
+              lore: ["Where it all started..."]
+              pos: "-180,75,998422"
+            - name: "&aOriginal Flair"
+              lore: ["Flair is created!"]
+              pos: "-216,65,998116"
+            - name: "&aFort Fiare"
+              lore: ["We gonna burn."]
+              pos: "5262,72,998469"
+            - name: "&eGigaCavern"
+              lore: ["My first proper survival world"]
+              pos: "251051,68,-1049598"
+            - name: "&eThe Base Between"
+              lore: ["To link up GigaCavern and the rest of the Random Seed bases"]
+              pos: "251387,70,-1049848"
+            - name: "&eFort Factory Mob"
+              lore: ["Do you know how to make a mob farm?"]
+              pos: "251443,64,-1049008"
+            - name: "&eSandy Mines"
+              lore: ["Literally the only mine with a (once) working cart system"]
+              pos: "251760,30,-1049703"
