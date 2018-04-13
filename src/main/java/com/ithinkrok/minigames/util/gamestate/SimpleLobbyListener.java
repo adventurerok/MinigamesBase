@@ -289,6 +289,14 @@ public class SimpleLobbyListener implements CustomListener {
             case IRON_PLATE:
             case WOOD_DOOR:
             case TRAP_DOOR:
+            case ACACIA_DOOR:
+            case BIRCH_DOOR:
+            case IRON_DOOR:
+            case JUNGLE_DOOR:
+            case SPRUCE_DOOR:
+            case WOODEN_DOOR:
+            case DARK_OAK_DOOR:
+            case IRON_TRAPDOOR:
                 return true;
             default:
                 return false;
