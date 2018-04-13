@@ -69,6 +69,8 @@ public class BaseMap implements GameMap, ConfigHolder {
 
         loadMapWorlds(gameGroup);
 
+        spawn = getDefaultWorld().getSpawnLocation();
+
         ConfigParser
                 .parseConfig(gameGroup, this, gameGroup, this, gameMapInfo.getConfigName(), gameMapInfo.getConfig());
 
@@ -120,10 +122,9 @@ public class BaseMap implements GameMap, ConfigHolder {
 
 
         if (config.contains("spawn")) {
-            spawn = BukkitConfigUtils.getLocation(config, world, "spawn");
+            Location spawn = BukkitConfigUtils.getLocation(config, world, "spawn");
             if (spawn == null) {
                 System.err.println("Invalid map spawn for map " + gameMapInfo.getName());
-                spawn = world.getSpawnLocation();
             } else {
                 world.setSpawnLocation(spawn.getBlockX(), spawn.getBlockY(), spawn.getBlockZ());
             }
