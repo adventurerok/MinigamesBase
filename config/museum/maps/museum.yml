@@ -52,3 +52,6 @@ custom_items:
             - name: "&eSandy Mines"
               lore: ["Literally the only mine with a (once) working cart system"]
               pos: "251760,30,-1049703"
+            - name: "&eThe Vault"
+              lore: ["Where better to store your nice diamonds?"]
+              pos: "251842,64,-1051083"
