@@ -31,27 +31,43 @@ custom_items:
         config:
           title_locale: "museum_teleporter.title"
           warps:
-            - name: "&aOriginal Hut"
+            - name: "&cOriginal Hut"
+              item: "wool,1,14"
               lore: ["Where it all started..."]
               pos: "-180,75,998422"
-            - name: "&aOriginal Flair"
+            - name: "&cOriginal Flair"
+              item: "wool,1,14"
               lore: ["Flair is created!"]
               pos: "-216,65,998116"
-            - name: "&aFort Fiare"
+            - name: "&cFort Fiare"
+              item: "wool,1,14"
               lore: ["We gonna burn."]
               pos: "5262,72,998469"
             - name: "&eGigaCavern"
+              item: "wool,1,4"
               lore: ["My first proper survival world"]
               pos: "251051,68,-1049598"
             - name: "&eThe Base Between"
+              item: "wool,1,4"
               lore: ["To link up GigaCavern and the rest of the Random Seed bases"]
               pos: "251387,70,-1049848"
             - name: "&eFort Factory Mob"
+              item: "wool,1,4"
               lore: ["Do you know how to make a mob farm?"]
               pos: "251443,64,-1049008"
             - name: "&eSandy Mines"
+              item: "wool,1,4"
               lore: ["Literally the only mine with a (once) working cart system"]
               pos: "251760,30,-1049703"
             - name: "&eThe Vault"
+              item: "wool,1,4"
               lore: ["Where better to store your nice diamonds?"]
               pos: "251842,64,-1051083"
+            - name: "&aThe Hut (OG1)"
+              item: "wool,1,13"
+              lore: ["Hooray for the first server!"]
+              pos: "199557,68,-1049584"
+            - name: "&aCacti and Reeds (OG1)"
+              item: "wool,1,13"
+              lore: ["The cacti quest has begun. Not that we went far"]
+              pos: "199538,64,-1049121"
