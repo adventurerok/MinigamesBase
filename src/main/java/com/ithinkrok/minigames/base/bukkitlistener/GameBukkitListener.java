@@ -495,15 +495,21 @@ public class GameBukkitListener implements Listener {
 
         Map<String, Object> arguments = CommandUtils.parseArgumentListToMap(correctedArgs);
 
-        User user = sender;
+        User user = null;
         TeamIdentifier teamIdentifier;
 
         if (arguments.containsKey("u")) {
             OfflinePlayer player = Bukkit.getPlayer(arguments.get("u").toString());
             if (player != null) {
                 User other = sender.getUser(player.getUniqueId());
-                if (other != null) user = other;
+                if (other != null) {
+                    user = other;
+                }
             }
+        }
+
+        if(user == null){
+            user = sender;
         }
 
         teamIdentifier = user.getTeamIdentifier();
