@@ -40,7 +40,42 @@ public class DebugCommand implements CustomListener {
         addSubExecutor("customlist", "mg.base.debug.customlist", this::customListCommand);
         addSubExecutor("econ", "mg.base.debug.econ", this::econCommand);
         addSubExecutor("load", "mg.base.debug.load", this::loadCommand);
+        addSubExecutor("visible", "mg.base.debug.visible", this::visibleCommand);
     }
+
+
+    private boolean visibleCommand(MinigamesCommandSender sender, MinigamesCommand command) {
+        if(!command.requireUser(sender)) return false;
+
+        User user = command.getUser();
+        if(!user.isPlayer()) {
+            sender.sendLocale("command.debug.visible.not_player");
+            return true;
+        }
+
+        List<String> visible = new ArrayList<>();
+        List<String> invisible = new ArrayList<>();
+        List<String> notPlayer = new ArrayList<>();
+
+        for (User other : command.getGameGroup().getUsers()) {
+            if(other == user) continue;
+
+            if(!other.isPlayer()) {
+                notPlayer.add(other.getName());
+            } else if(user.getPlayer().canSee(other.getPlayer())) {
+                visible.add(other.getName());
+            } else {
+                invisible.add(other.getName());
+            }
+        }
+
+        sender.sendLocale("command.debug.visible.visibles", visible.toString());
+        sender.sendLocale("command.debug.visible.invisibles", invisible.toString());
+        sender.sendLocale("command.debug.visible.not_players", notPlayer.toString());
+
+        return true;
+    }
+
 
     private boolean loadCommand(MinigamesCommandSender sender, MinigamesCommand command) {
         if(!command.requireArgumentCount(sender, 1)) return false;

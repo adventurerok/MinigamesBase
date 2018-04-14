@@ -24,18 +24,28 @@ command.countdown.set=&aSet the seconds remaining of the countdown to %s
 command.countdown.finished=&aFinished the current countdown early
 command.countdown.stopped=&aStopped the current countdown
 
+command.shop.open=&6Opened the rewards shop!
+command.shop.none=&cThis gamemode doesn't have a shop yet.
+
+##Debug command section
 command.debug.unknown=&cUnknown subcommand %s
+
 command.debug.team.unknown=&cUnknown team %s
 command.debug.team.success=%s&a's team changed to %s
+
 command.debug.custom.unknown=&cUnknown custom item %s
 command.debug.custom.success=&aGiven %s &athe custom item %s
+
 command.debug.level.success=%s&a's %s level set to %s
 command.debug.level.value=%s&a's %s level is %s
+
 command.debug.kit.unknown=&cUnknown kit %s
 command.debug.kit.success=%s&a's kit changed to %s
+
 command.debug.customlist.title=&6List of all custom items:
 command.debug.customlist.line=&a%s
 command.debug.customlist.separator=&7, &a
+
 command.debug.econ.unknown=&cUnknown currency %s
 command.debug.econ.title=&6Econ Debug for currency: %s
 command.debug.econ.type=&6Currency type: &a%s
@@ -45,13 +55,16 @@ command.debug.econ.optbalance.present=&6Balance (from optional): &a%s
 command.debug.econ.optbalance.notpresent=&cOptional balance not present
 command.debug.econ.balance=&6Balance (from async): &a%s
 command.debug.econ.deposit=&6Deposit: &b%s&6, new balance is: &a%s
+
 command.debug.econ.withdraw=&6Withdraw: &b%s&6, new balance is: &a%s
 command.debug.econ.nullresult=&cNull result!
 command.debug.load.failure=&cFailed to load config: %s
 command.debug.load.success=&aSuccess! Config loaded!
 
-command.shop.open=&6Opened the rewards shop!
-command.shop.none=&cThis gamemode doesn't have a shop yet.
+command.debug.visible.not_player=&cThat user is not a player
+command.debug.visible.visibles=&6Visible players\: &a%s
+command.debug.visible.invisibles=&6Invisible players\: &c%s
+command.debug.visible.not_players=&6Not players\: &5%s
 
 #Global money messages
 money.transfer.too_expensive=&cYou do not have that amount of money
