@@ -320,7 +320,6 @@ public class GameBukkitListener implements Listener {
         GameGroup gameGroup = game.getGameGroupFromWorldName(mapName);
         if (gameGroup == null) return;
 
-        //Don't send entity death events for users
         User user = EntityUtils.getActualUser(gameGroup, event.getEntity());
         if (user != null) {
             gameGroup.userEvent(new UserRegainHealthEvent(user, event));
@@ -339,13 +338,22 @@ public class GameBukkitListener implements Listener {
         GameGroup gameGroup = game.getGameGroupFromWorldName(mapName);
         if (gameGroup == null) return;
 
-        //Don't send entity death events for users
-        if (EntityUtils.getActualUser(gameGroup, event.getEntity()) != null) return;
-
         GameMap map = gameGroup.getCurrentMap();
         checkWorldIsInMap(event.getEntity().getWorld(), map);
 
         gameGroup.gameEvent(new MapProjectileLaunchEvent(gameGroup, map, event));
+    }
+
+    @EventHandler
+    public void eventProjectileHit(ProjectileHitEvent event) {
+        String mapName = event.getEntity().getWorld().getName();
+        GameGroup gameGroup = game.getGameGroupFromWorldName(mapName);
+        if (gameGroup == null) return;
+
+        GameMap map = gameGroup.getCurrentMap();
+        checkWorldIsInMap(event.getEntity().getWorld(), map);
+
+        gameGroup.gameEvent(new MapProjectileHitEvent(gameGroup, map, event));
     }
 
 
