@@ -492,6 +492,10 @@ public class BaseUser implements Listener, User {
         updateScoreboard();
 
         if (disguise != null) disguise(disguise);
+
+        doInFuture(task -> {
+            playerState.restore(player, PlayerState.CaptureParts.NAME);
+        }, 20);
     }
 
 
