@@ -48,13 +48,6 @@ game_states:
             - material: "GOLD_PLATE"
               power: 2.5
               sound: "ENTITY_WITHER_SHOOT"
-          super_popper:
-            power: 2.0
-            victim_locale: "super_popper.victim"
-            attacker_locale: "super_popper.attacker"
-            pvp_locale: "super_popper.pvp"
-            victim_sound: "ENTITY_FIREWORK_LARGE_BLAST"
-            attacker_sound: "ENTITY_ARROW_HIT"
           pvp_sword:
             custom_item: "pvp_sword"
             win_sound: "ENTITY_ZOMBIE_VILLAGER_CURE"
@@ -71,6 +64,15 @@ game_states:
             balances_locale: "scoreboard.balances"
           lobby_created_locale: "hub.lobby_created"
           click_join_locale: "hub.click_join_builder"
+      popper:
+        class: "com.ithinkrok.minigames.util.listener.PopperListener"
+        config:
+          power: 2.0
+          victim_locale: "super_popper.victim"
+          attacker_locale: "super_popper.attacker"
+          pvp_locale: "super_popper.pvp"
+          victim_sound: "ENTITY_FIREWORK_LARGE_BLAST"
+          attacker_sound: "ENTITY_ARROW_HIT"
 
 custom_items:
   game_chooser:

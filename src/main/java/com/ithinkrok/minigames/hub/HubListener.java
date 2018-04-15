@@ -33,7 +33,6 @@ import com.ithinkrok.util.lang.LanguageLookup;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.util.Vector;
 
 import java.util.*;
 
@@ -50,13 +49,7 @@ public class HubListener extends SignListener {
 
     private final Map<Material, JumpPad> jumpPadMap = new EnumMap<>(Material.class);
     private ItemGiver itemGiver;
-    private double superPopperPower;
-    private String superPopperVictimLocale;
-    private String superPopperAttackerLocale;
-    private String superPopperPvpLocale;
 
-    private SoundEffect superPopperVictimSound;
-    private SoundEffect superPopperAttackerSound;
 
     private String welcomeTitleLocale;
     private String welcomeSubtitleLocale;
@@ -91,19 +84,6 @@ public class HubListener extends SignListener {
 
                 jumpPadMap.put(pad.getMaterial(), pad);
             }
-        }
-
-        if (config.contains("super_popper")) {
-            Config superPopperConfig = config.getConfigOrEmpty("super_popper");
-
-            superPopperPower = superPopperConfig.getDouble("power");
-
-            superPopperVictimLocale = superPopperConfig.getString("victim_locale");
-            superPopperAttackerLocale = superPopperConfig.getString("attacker_locale");
-            superPopperPvpLocale = superPopperConfig.getString("pvp_locale");
-
-            superPopperVictimSound = MinigamesConfigs.getSoundEffect(superPopperConfig, "victim_sound");
-            superPopperAttackerSound = MinigamesConfigs.getSoundEffect(superPopperConfig, "attacker_sound");
         }
 
         if (config.contains("pvp_sword")) {
@@ -175,42 +155,7 @@ public class HubListener extends SignListener {
     public void onUserAttackedByUser(UserAttackedEvent event) {
         if (!event.wasAttackedByUser()) return;
 
-        if (event.getDamageCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
-
-            //Prevent pvp users from being affected by the super popper
-            String userHeldId = InventoryUtils.getIdentifier(event.getUser().getInventory().getItemInMainHand());
-            CustomItem item = event.getGameGroup().getCustomItem(userHeldId);
-
-            if (item != null && item.getName().equals(pvpSwordItem)) {
-                event.getAttackerUser().showAboveHotbarLocale(superPopperPvpLocale);
-                event.setCancelled(true);
-                return;
-            }
-
-            Vector velocity = event.getUser().getLocation().getDirection();
-            velocity.setY(0.5f);
-            velocity.multiply(superPopperPower);
-
-            event.getUser().setVelocity(velocity);
-
-            event.getUser().showAboveHotbarLocale(superPopperVictimLocale, event.getAttackerUser().getDisplayName());
-
-            if (event.getUser() != event.getAttackerUser()) {
-                event.getAttackerUser()
-                        .showAboveHotbarLocale(superPopperAttackerLocale, event.getUser().getDisplayName());
-            }
-
-            if (superPopperVictimSound != null) {
-                event.getUser().playSound(event.getUser().getLocation(), superPopperVictimSound);
-            }
-
-            if (superPopperAttackerSound != null) {
-                event.getAttackerUser().playSound(event.getAttackerUser().getLocation(), superPopperAttackerSound);
-            }
-
-            event.setCancelled(true);
-            event.getAttacker().remove();
-        } else if (event.getDamageCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+        if (event.getDamageCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
 
             //Prevent users attacking other users if they are not using the pvp sword
             String attackerWeaponId = InventoryUtils.getIdentifier(event.getWeapon());
@@ -304,7 +249,7 @@ public class HubListener extends SignListener {
         if (currentPlayers.size() <= oldPlayers.size() || !event.getControllerGameGroup().isAcceptingPlayers()) return;
 
         //prevent hub messages
-        if(event.getControllerGameGroup().getType().equals(event.getGameGroup().getType())) return;
+        if (event.getControllerGameGroup().getType().equals(event.getGameGroup().getType())) return;
 
         Set<UUID> newPlayers = new HashSet<>(currentPlayers);
         newPlayers.removeAll(oldPlayers);
@@ -319,7 +264,7 @@ public class HubListener extends SignListener {
             String message = event.getGameGroup().getLocale(playerJoinClickLocale, name, type);
             ConfigMessageFactory factory = new ConfigMessageFactory(message);
             ConfigMessageBuilder builder = factory.newBuilder();
-            String command = "/join " +event.getControllerGameGroup().getName();
+            String command = "/join " + event.getControllerGameGroup().getName();
             builder.setClickAction("join", ConfigMessageBuilder.CLICK_RUN_COMMAND, command);
 
             event.getGameGroup().sendMessageNoPrefix(builder.getResult());
