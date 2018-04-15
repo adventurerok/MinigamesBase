@@ -594,7 +594,7 @@ public class GameBukkitListener implements Listener {
     }
 
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGH)
     public void eventEntityDamaged(EntityDamageEvent event) {
         GameGroup gameGroup = getGameGroup(event.getEntity().getWorld());
 
