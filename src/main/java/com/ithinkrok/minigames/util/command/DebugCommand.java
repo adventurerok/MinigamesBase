@@ -101,7 +101,7 @@ public class DebugCommand implements CustomListener {
                 user.getPlayer().hidePlayer(toggle.getPlayer());
                 sender.sendLocale("command.debug.visible.hidden", toggle.getFormattedName());
             } else {
-                user.getPlayer().showPlayer(toggle.getPlayer());
+                PlayerUtils.showPlayer(user.getPlayer(), toggle.getPlayer());
                 sender.sendLocale("command.debug.visible.shown", toggle.getFormattedName());
             }
         }

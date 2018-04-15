@@ -37,6 +37,7 @@ import com.ithinkrok.minigames.api.user.UserVariableHandler;
 import com.ithinkrok.minigames.api.user.scoreboard.ScoreboardDisplay;
 import com.ithinkrok.minigames.api.user.scoreboard.ScoreboardHandler;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
+import com.ithinkrok.minigames.api.util.PlayerUtils;
 import com.ithinkrok.minigames.api.util.SoundEffect;
 import com.ithinkrok.minigames.api.util.disguise.Disguise;
 import com.ithinkrok.minigames.base.util.playerstate.PlayerState;
@@ -167,31 +168,17 @@ public class BaseUser implements Listener, User {
 
     @Override
     public void fixCloakedUsers() {
-        for (BaseUser u : gameGroup.getUsers()) {
-            if (this == u) continue;
+        doInFuture(task -> {
+            for(BaseUser u : gameGroup.getUsers()) {
+                if(this == u) continue;
 
-            if (u.isCloaked()) hidePlayer(u);
-            else {
-                //                hidePlayer(u);
+                if(u.isCloaked()) hidePlayer(u);
+                else showPlayer(u);
 
-                doInFuture(task -> {
-                    if (!u.isCloaked()) {
-                        showPlayer(u);
-                    }
-                });
+                if(isCloaked()) u.hidePlayer(this);
+                else u.showPlayer(this);
             }
-
-            if (isCloaked()) u.hidePlayer(this);
-            else {
-                //                u.hidePlayer(this);
-
-                doInFuture(task -> {
-                    if (!isCloaked()) {
-                        u.showPlayer(this);
-                    }
-                });
-            }
-        }
+        }, 5);
     }
 
 
@@ -204,7 +191,7 @@ public class BaseUser implements Listener, User {
 
     private void showPlayer(User other) {
         if (!isPlayer() || !other.isPlayer()) return;
-        getPlayer().showPlayer(other.getPlayer());
+        PlayerUtils.showPlayer(getPlayer(), other.getPlayer());
     }
 
 

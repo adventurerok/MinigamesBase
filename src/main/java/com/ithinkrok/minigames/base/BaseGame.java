@@ -592,7 +592,7 @@ public class BaseGame implements Game, FileLoader {
         //TODO check they are shown again when they join a game together
         for (Player player : plugin.getServer().getOnlinePlayers()) {
             BaseUser other = getUser(player);
-            if (other != null && other.getGameGroup() == user.getGameGroup()) continue;
+            if (other == null || other.getGameGroup() == user.getGameGroup()) continue;
 
             user.getPlayer().hidePlayer(player);
             player.hidePlayer(user.getPlayer());
