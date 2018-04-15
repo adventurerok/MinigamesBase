@@ -23,19 +23,24 @@ public class PopperListener implements CustomListener {
     private SoundEffect superPopperVictimSound;
     private SoundEffect superPopperAttackerSound;
 
+    private double yGain;
+    private boolean useArrowDirection;
 
     @CustomEventHandler
     public void onListenerLoaded(ListenerLoadedEvent<GameGroup, ?> event) {
-        Config superPopperConfig = event.getConfigOrEmpty();
+        Config config = event.getConfigOrEmpty();
 
-        superPopperPower = superPopperConfig.getDouble("power");
+        superPopperPower = config.getDouble("power");
 
-        superPopperVictimLocale = superPopperConfig.getString("victim_locale");
-        superPopperAttackerLocale = superPopperConfig.getString("attacker_locale");
-        superPopperPvpLocale = superPopperConfig.getString("pvp_locale");
+        superPopperVictimLocale = config.getString("victim_locale");
+        superPopperAttackerLocale = config.getString("attacker_locale");
+        superPopperPvpLocale = config.getString("pvp_locale");
 
-        superPopperVictimSound = MinigamesConfigs.getSoundEffect(superPopperConfig, "victim_sound");
-        superPopperAttackerSound = MinigamesConfigs.getSoundEffect(superPopperConfig, "attacker_sound");
+        superPopperVictimSound = MinigamesConfigs.getSoundEffect(config, "victim_sound");
+        superPopperAttackerSound = MinigamesConfigs.getSoundEffect(config, "attacker_sound");
+
+        yGain = config.getDouble("y_gain", 0.5);
+        useArrowDirection = config.getBoolean("use_arrow_direction", false);
     }
 
 
@@ -52,8 +57,14 @@ public class PopperListener implements CustomListener {
                 return;
             }
 
-            Vector velocity = event.getUser().getLocation().getDirection();
-            velocity.setY(0.5f);
+            Vector velocity;
+            if(!useArrowDirection) {
+                velocity = event.getUser().getLocation().getDirection();
+            } else {
+                velocity = event.getAttacker().getVelocity().normalize();
+            }
+
+            velocity.setY(yGain);
             velocity.multiply(superPopperPower);
 
             event.getUser().setVelocity(velocity);
