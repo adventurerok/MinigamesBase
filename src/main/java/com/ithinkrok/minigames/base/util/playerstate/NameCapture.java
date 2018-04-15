@@ -39,6 +39,9 @@ public class NameCapture {
         if(entity instanceof Player) {
             ((Player) entity).setDisplayName(customName);
             ((Player) entity).setPlayerListName(tabListName);
+            if(tabListName == null) {
+                System.out.println("Null tab list name");
+            }
         } else {
             entity.setCustomName(customName);
         }
