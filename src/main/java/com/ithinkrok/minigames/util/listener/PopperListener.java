@@ -44,7 +44,7 @@ public class PopperListener implements CustomListener {
     }
 
 
-    @CustomEventHandler(ignoreCancelled = true, priority = CustomEventHandler.LOW)
+    @CustomEventHandler(priority = CustomEventHandler.LOW)
     public void onUserAttackedByUser(UserAttackedEvent event) {
         if (event.getDamageCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
 
