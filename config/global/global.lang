@@ -203,3 +203,7 @@ warp_chooser.title=Warp Chooser
 
 museum_teleporter.name=&6Museum Destinations...
 museum_teleporter.title=Historic Sites
+
+super_popper.victim=&aYou have been popped by &c%s
+super_popper.attacker=&aYou have popped &c%s
+super_popper.pvp=&cYou cannot use the super popper on someone in a PvP duel!

@@ -10,10 +10,6 @@ gamegroups_menu.desc=&aSee games in progress and lobbies!
 gamegroups_menu.title=Current Games
 
 super_popper.name=&b&lSuper &7Popper
-super_popper.victim=&aYou have been popped by &c%s
-super_popper.attacker=&aYou have popped &c%s
-super_popper.pvp=&cYou cannot use the super popper on someone in a PvP duel!
-
 ultra_popper.name=&b&lUltra &7Popper
 
 pvp_sword.name=&b&lPvP &7Sword
