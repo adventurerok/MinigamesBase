@@ -11,14 +11,19 @@ worlds:
       x: -199950.5
       y: 124.1
       z: -299979.5
+    game_rules: &game_rules
+      doMobLoot: false
+      mobGriefing: false
   map_nether:
     folder: "museum_nether"
     environment: "nether"
     type: "saved"
+    game_rules: *game_rules
   map_the_end:
     folder: "museum_the_end"
     environment: "the_end"
     type: "saved"
+    game_rules: *game_rules
 
 custom_items:
   warp_chooser:
