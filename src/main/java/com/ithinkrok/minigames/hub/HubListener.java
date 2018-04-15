@@ -301,7 +301,7 @@ public class HubListener extends SignListener {
         Set<UUID> currentPlayers = event.getControllerGameGroup().getPlayers();
         Set<UUID> oldPlayers = event.getOldControllerGameGroup().getPlayers();
 
-        if (currentPlayers.size() < oldPlayers.size() || !event.getControllerGameGroup().isAcceptingPlayers()) return;
+        if (currentPlayers.size() <= oldPlayers.size() || !event.getControllerGameGroup().isAcceptingPlayers()) return;
 
         //prevent hub messages
         if(event.getControllerGameGroup().getType().equals(event.getGameGroup().getType())) return;
