@@ -61,10 +61,13 @@ command.debug.econ.nullresult=&cNull result!
 command.debug.load.failure=&cFailed to load config: %s
 command.debug.load.success=&aSuccess! Config loaded!
 
-command.debug.visible.not_player=&cThat user is not a player
+command.debug.visible.not_player=&cThe user &d%s &cis not a player
 command.debug.visible.visibles=&6Visible players\: &a%s
 command.debug.visible.invisibles=&6Invisible players\: &c%s
 command.debug.visible.not_players=&6Not players\: &5%s
+command.debug.visible.unknown_player=&cUnknown player &d%s
+command.debug.visible.hidden=&6Hidden player &c%s
+command.debug.visible.shown=&6Shown player &a%s
 
 #Global money messages
 money.transfer.too_expensive=&cYou do not have that amount of money

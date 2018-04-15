@@ -21,6 +21,8 @@ import com.ithinkrok.util.config.YamlConfigIO;
 import com.ithinkrok.util.event.CustomEventHandler;
 import com.ithinkrok.util.event.CustomListener;
 import com.ithinkrok.util.math.ExpressionCalculator;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -49,7 +51,7 @@ public class DebugCommand implements CustomListener {
 
         User user = command.getUser();
         if(!user.isPlayer()) {
-            sender.sendLocale("command.debug.visible.not_player");
+            sender.sendLocale("command.debug.visible.not_player", user.getFormattedName());
             return true;
         }
 
@@ -72,6 +74,27 @@ public class DebugCommand implements CustomListener {
         sender.sendLocale("command.debug.visible.visibles", visible.toString());
         sender.sendLocale("command.debug.visible.invisibles", invisible.toString());
         sender.sendLocale("command.debug.visible.not_players", notPlayer.toString());
+
+        if(command.hasArg(0)) {
+            String switchName = command.getStringArg(0, null);
+            Player otherPlayer = Bukkit.getPlayer(switchName);
+            User toggle = null;
+            if(otherPlayer != null) {
+                toggle = command.getGameGroup().getUser(otherPlayer.getUniqueId());
+            }
+
+            if(toggle == null) {
+                sender.sendLocale("command.debug.visible.unknown_player", switchName);
+            } else if(!toggle.isPlayer()){
+                sender.sendLocale("command.debug.visible.not_player", toggle.getFormattedName());
+            } else if(user.getPlayer().canSee(toggle.getPlayer())){
+                user.getPlayer().hidePlayer(toggle.getPlayer());
+                sender.sendLocale("command.debug.visible.hidden", toggle.getFormattedName());
+            } else {
+                user.getPlayer().showPlayer(toggle.getPlayer());
+                sender.sendLocale("command.debug.visible.shown", toggle.getFormattedName());
+            }
+        }
 
         return true;
     }
