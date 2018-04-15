@@ -86,7 +86,7 @@ public final class NameUpdater extends Thread {
 
             if(!badUUIDs.contains(uuid)) {
                 System.err.println("Error on name updater thread name lookup for UUID (perhaps invalid) " + uuid);
-                if(!e.getMessage().contains("Unexpected token END OF FILE at position 0")) {
+                if(e.getMessage() == null || !e.getMessage().contains("Unexpected token END OF FILE at position 0")) {
                     //the one we check against is the normal error for an invalid UUID
                     e.printStackTrace();
                 }
