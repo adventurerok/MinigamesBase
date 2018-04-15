@@ -59,7 +59,7 @@ public class PlayerState {
         }
 
         if(ArrayUtils.contains(captureParts, CaptureParts.NAME)) {
-            nameCapture = new NameCapture();
+            if(nameCapture == null) nameCapture = new NameCapture();
             nameCapture.capture(entity);
         }
     }
