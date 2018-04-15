@@ -8,6 +8,7 @@ import com.ithinkrok.minigames.api.event.MinigamesCommandEvent;
 import com.ithinkrok.minigames.api.item.CustomItem;
 import com.ithinkrok.minigames.api.team.Team;
 import com.ithinkrok.minigames.api.user.User;
+import com.ithinkrok.minigames.api.util.PlayerUtils;
 import com.ithinkrok.minigames.base.util.io.ConfigHolder;
 import com.ithinkrok.minigames.base.util.io.ConfigParser;
 import com.ithinkrok.minigames.base.util.io.FileLoader;
@@ -33,6 +34,7 @@ public class DebugCommand implements CustomListener {
 
     private final Map<String, SubExecutorInfo> subExecutors = new HashMap<>();
 
+
     public DebugCommand() {
         addSubExecutor("custom", "mg.base.debug.custom", this::customCommand);
         addSubExecutor("level", "mg.base.debug.level", this::levelCommand);
@@ -46,11 +48,16 @@ public class DebugCommand implements CustomListener {
     }
 
 
+    protected void addSubExecutor(String name, String permission, SubCommandExecutor executor) {
+        subExecutors.put(name, new SubExecutorInfo(executor, permission));
+    }
+
+
     private boolean visibleCommand(MinigamesCommandSender sender, MinigamesCommand command) {
-        if(!command.requireUser(sender)) return false;
+        if (!command.requireUser(sender)) return false;
 
         User user = command.getUser();
-        if(!user.isPlayer()) {
+        if (!user.isPlayer()) {
             sender.sendLocale("command.debug.visible.not_player", user.getFormattedName());
             return true;
         }
@@ -60,11 +67,11 @@ public class DebugCommand implements CustomListener {
         List<String> notPlayer = new ArrayList<>();
 
         for (User other : command.getGameGroup().getUsers()) {
-            if(other == user) continue;
+            if (other == user) continue;
 
-            if(!other.isPlayer()) {
+            if (!other.isPlayer()) {
                 notPlayer.add(other.getName());
-            } else if(user.getPlayer().canSee(other.getPlayer())) {
+            } else if (user.getPlayer().canSee(other.getPlayer())) {
                 visible.add(other.getName());
             } else {
                 invisible.add(other.getName());
@@ -75,19 +82,22 @@ public class DebugCommand implements CustomListener {
         sender.sendLocale("command.debug.visible.invisibles", invisible.toString());
         sender.sendLocale("command.debug.visible.not_players", notPlayer.toString());
 
-        if(command.hasArg(0)) {
+        if (command.hasArg(0)) {
             String switchName = command.getStringArg(0, null);
             Player otherPlayer = Bukkit.getPlayer(switchName);
             User toggle = null;
-            if(otherPlayer != null) {
+            if (otherPlayer != null) {
                 toggle = command.getGameGroup().getUser(otherPlayer.getUniqueId());
             }
 
-            if(toggle == null) {
+            if (toggle == null) {
                 sender.sendLocale("command.debug.visible.unknown_player", switchName);
-            } else if(!toggle.isPlayer()){
+            } else if (!toggle.isPlayer()) {
                 sender.sendLocale("command.debug.visible.not_player", toggle.getFormattedName());
-            } else if(user.getPlayer().canSee(toggle.getPlayer())){
+            } else if (command.hasParameter("show")) {
+                PlayerUtils.showPlayer(user.getPlayer(), toggle.getPlayer());
+                sender.sendLocale("command.debug.visible.shown", toggle.getFormattedName());
+            } else if (user.getPlayer().canSee(toggle.getPlayer())) {
                 user.getPlayer().hidePlayer(toggle.getPlayer());
                 sender.sendLocale("command.debug.visible.hidden", toggle.getFormattedName());
             } else {
@@ -101,8 +111,8 @@ public class DebugCommand implements CustomListener {
 
 
     private boolean loadCommand(MinigamesCommandSender sender, MinigamesCommand command) {
-        if(!command.requireArgumentCount(sender, 1)) return false;
-        if(!command.requireGameGroup(sender)) return false;
+        if (!command.requireArgumentCount(sender, 1)) return false;
+        if (!command.requireGameGroup(sender)) return false;
 
         String configName = command.getStringArg(0, null);
 
@@ -127,9 +137,10 @@ public class DebugCommand implements CustomListener {
         return true;
     }
 
+
     private boolean econCommand(MinigamesCommandSender sender, MinigamesCommand command) {
-        if(!command.requireArgumentCount(sender, 1)) return false;
-        if(!command.requireUser(sender)) return false;
+        if (!command.requireArgumentCount(sender, 1)) return false;
+        if (!command.requireUser(sender)) return false;
 
         User user = command.getUser();
 
@@ -137,7 +148,7 @@ public class DebugCommand implements CustomListener {
         Account account = user.getEconomyAccount();
         Currency currency = account.lookupCurrency(currencyName);
 
-        if(currency == null) {
+        if (currency == null) {
             sender.sendLocale("command.debug.econ.unknown", currencyName);
             return true;
         }
@@ -148,7 +159,7 @@ public class DebugCommand implements CustomListener {
         sender.sendLocale("command.debug.econ.decimals", currency.getDecimalPlaces());
 
         Optional<Balance> optBalance = account.getBalance(currency);
-        if(optBalance.isPresent()) {
+        if (optBalance.isPresent()) {
             sender.sendLocale("command.debug.econ.optbalance.present",
                               currency.format(optBalance.get().getAmount()));
         } else {
@@ -157,7 +168,7 @@ public class DebugCommand implements CustomListener {
 
         BigDecimal nonFinalChange = BigDecimal.ZERO;
 
-        if(command.hasArg(1)) {
+        if (command.hasArg(1)) {
             nonFinalChange = new BigDecimal(command.getStringArg(1, null));
         }
 
@@ -168,9 +179,9 @@ public class DebugCommand implements CustomListener {
                               currency.format(balance.getAmount()));
 
             int compare = change.compareTo(BigDecimal.ZERO);
-            if(compare > 0) {
+            if (compare > 0) {
                 account.deposit(currency, change, "debug econ deposit", result -> {
-                    if(result == null) {
+                    if (result == null) {
                         sender.sendLocale("command.debug.econ.nullresult");
                         return;
                     }
@@ -179,9 +190,9 @@ public class DebugCommand implements CustomListener {
                                       result.getTransactionResult(),
                                       currency.format(result.getBalanceChange().getNewBalance()));
                 });
-            } else if(compare < 0) {
+            } else if (compare < 0) {
                 account.withdraw(currency, change.negate(), "debug econ withdraw", result -> {
-                    if(result == null) {
+                    if (result == null) {
                         sender.sendLocale("command.debug.econ.nullresult");
                         return;
                     }
@@ -196,9 +207,6 @@ public class DebugCommand implements CustomListener {
         return true;
     }
 
-    protected void addSubExecutor(String name, String permission, SubCommandExecutor executor) {
-        subExecutors.put(name, new SubExecutorInfo(executor, permission));
-    }
 
     @CustomEventHandler
     public void onCommand(MinigamesCommandEvent event) {
@@ -225,6 +233,7 @@ public class DebugCommand implements CustomListener {
         event.setValidCommand(validCommand);
     }
 
+
     private boolean moneyCommand(MinigamesCommandSender sender, MinigamesCommand command) {
         if (!command.requireUser(sender)) return true;
 
@@ -242,6 +251,7 @@ public class DebugCommand implements CustomListener {
         return true;
     }
 
+
     private boolean teamCommand(MinigamesCommandSender sender, MinigamesCommand command) {
         if (!command.requireUser(sender)) return true;
         if (!command.requireArgumentCount(sender, 1)) return false;
@@ -257,6 +267,7 @@ public class DebugCommand implements CustomListener {
 
         return true;
     }
+
 
     private boolean customCommand(MinigamesCommandSender sender, MinigamesCommand command) {
         if (!command.requireUser(sender)) return true;
@@ -277,6 +288,7 @@ public class DebugCommand implements CustomListener {
         return true;
     }
 
+
     private boolean customListCommand(MinigamesCommandSender sender, MinigamesCommand command) {
         Collection<CustomItem> allCustoms = command.getUser().getGameGroup().getAllCustomItems();
 
@@ -288,10 +300,10 @@ public class DebugCommand implements CustomListener {
         String separator = sender.getLanguageLookup().getLocale("command.debug.customlist.separator");
         StringBuilder current = new StringBuilder();
 
-        for(int index = 0; index < customList.size(); ++index) {
+        for (int index = 0; index < customList.size(); ++index) {
             String itemName = customList.get(index).getName();
 
-            if(current.length() == 0 || current.length() + itemName.length() < 60) {
+            if (current.length() == 0 || current.length() + itemName.length() < 60) {
                 current.append(itemName);
             } else {
                 sender.sendLocaleNoPrefix("command.debug.customlist.line", current.toString());
@@ -299,17 +311,18 @@ public class DebugCommand implements CustomListener {
                 current.append(itemName);
             }
 
-            if(index != customList.size() - 1) {
+            if (index != customList.size() - 1) {
                 current.append(separator);
             }
         }
 
-        if(current.length() > 0) {
+        if (current.length() > 0) {
             sender.sendLocaleNoPrefix("command.debug.customlist.line", current.toString());
         }
 
         return true;
     }
+
 
     private boolean levelCommand(MinigamesCommandSender sender, MinigamesCommand command) {
         if (!command.requireUser(sender)) return true;
@@ -317,7 +330,7 @@ public class DebugCommand implements CustomListener {
 
         String upgrade = command.getStringArg(0, null);
 
-        if(command.hasArg(1)) {
+        if (command.hasArg(1)) {
             int level = (int) new ExpressionCalculator(
                     command.getStringArg(1, "0")
             ).calculate(command.getUser().getUserVariables());
@@ -331,6 +344,7 @@ public class DebugCommand implements CustomListener {
 
         return true;
     }
+
 
     private boolean kitCommand(MinigamesCommandSender sender, MinigamesCommand command) {
         if (!command.requireUser(sender)) return true;
@@ -349,14 +363,17 @@ public class DebugCommand implements CustomListener {
         return true;
     }
 
+
     protected interface SubCommandExecutor {
 
         boolean onCommand(MinigamesCommandSender sender, MinigamesCommand command);
     }
 
     private static class SubExecutorInfo {
+
         SubCommandExecutor executor;
         String permission;
+
 
         public SubExecutorInfo(SubCommandExecutor executor, String permission) {
             this.executor = executor;
