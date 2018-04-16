@@ -5,11 +5,14 @@ enable_weather: false
 type: saved
 
 spawn:
-  x: 348.5
-  y: 135.1
-  z: -357.5
-  yaw: -90
-  pitch: -15
+  x: 107.5
+  y: 66.1
+  z: -51.5
+  yaw: 162
+  pitch: 0
+
+game_rules:
+  doMobSpawning: false
 
 listeners:
   spleef:
