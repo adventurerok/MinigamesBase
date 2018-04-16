@@ -369,6 +369,18 @@ public class GameBukkitListener implements Listener {
         gameGroup.gameEvent(new MapBlockIgniteEvent(gameGroup, map, event));
     }
 
+    @EventHandler
+    public void eventBlockExplode(BlockExplodeEvent event) {
+        String mapName = event.getBlock().getWorld().getName();
+        GameGroup gameGroup = game.getGameGroupFromWorldName(mapName);
+        if (gameGroup == null) return;
+
+        GameMap map = gameGroup.getCurrentMap();
+        checkWorldIsInMap(event.getBlock().getWorld(), map);
+
+        gameGroup.gameEvent(new MapBlockExplodeEvent(gameGroup, map, event));
+    }
+
 
     @EventHandler
     public void eventEntityExplode(EntityExplodeEvent event) {
