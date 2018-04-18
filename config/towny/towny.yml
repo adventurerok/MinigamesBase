@@ -11,7 +11,7 @@ maps:
 
 shared_objects:
   game:
-    chat_prefix: "&7[&4Towny&7] &e"
+    chat_prefix: "&7[&4Factions&7] &e"
     friendly_fire: true
     cancel_death: false
   start_info:
