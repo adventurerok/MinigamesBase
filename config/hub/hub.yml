@@ -117,6 +117,12 @@ custom_items:
             - type: "apocalypse"
               slot: 22
               item: "SKULL_ITEM,1,1,&4&lApocalypse"
+            - type: "popper_run"
+              slot: 20
+              item: "BONE,1,0,&e&lPopper &4&lRun"
+            - type: "factions"
+              slot: 4
+              item: "DIAMOND_PICKAXE,1,0,&b&lFactions!"
           direct_join_enabled_item: "DIAMOND_BLOCK,1,0,&c&lDisable Direct Join"
           direct_join_disabled_item: "COAL_BLOCK,1,0,&a&lEnable Direct Join"
   gamegroups_menu:
