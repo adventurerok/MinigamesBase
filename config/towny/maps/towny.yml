@@ -4,12 +4,15 @@ worlds:
   map:
     folder: "towny"
     environment: "normal"
+    enable_time: true
     type: "saved"
   map_nether:
     folder: "towny_nether"
     environment: "nether"
+    enable_time: true
     type: "saved"
   map_the_end:
     folder: "towny_the_end"
     environment: "the_end"
+    enable_time: true
     type: "saved"
