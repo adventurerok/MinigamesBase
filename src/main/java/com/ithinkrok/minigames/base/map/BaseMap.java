@@ -113,6 +113,12 @@ public class BaseMap implements GameMap, ConfigHolder {
 
 
     @Override
+    public World getDefaultWorld() {
+        return worlds.get(defaultWorldName);
+    }
+
+
+    @Override
     public GameMapInfo getInfo() {
         return gameMapInfo;
     }
@@ -190,9 +196,6 @@ public class BaseMap implements GameMap, ConfigHolder {
     @Override
     public CustomEntity getCustomEntity(String name) {
         return customEntityMap.get(name);
-    }    @Override
-    public World getDefaultWorld() {
-        return worlds.get(defaultWorldName);
     }
 
 
@@ -225,6 +228,12 @@ public class BaseMap implements GameMap, ConfigHolder {
 
 
     @Override
+    public Location getSpawn() {
+        return spawn;
+    }
+
+
+    @Override
     public List<CustomListener> getListeners() {
         return listeners;
     }
@@ -233,7 +242,10 @@ public class BaseMap implements GameMap, ConfigHolder {
     @Override
     public Map<String, CustomListener> getListenerMap() {
         return listenerMap;
-    }    @Override
+    }
+
+
+    @Override
     public World getWorld(String name) {
         World world = worlds.get(name);
 
@@ -259,24 +271,6 @@ public class BaseMap implements GameMap, ConfigHolder {
 
 
     @Override
-    public Location getLocation(MapPoint point) {
-        //Return null if passed in null
-        if(point == null) return null;
-
-        World world = worlds.get(point.getWorld());
-
-        float yaw = point.getYaw();
-        float pitch = point.getPitch();
-
-        //Account for the fact that NaN yaw/pitch indicate that they shouldn't be changed / are not present
-        if (Float.isNaN(yaw)) yaw = 0;
-        if (Float.isNaN(pitch)) pitch = 0;
-
-        return new Location(world, point.getX(), point.getY(), point.getZ(), yaw, pitch);
-    }
-
-
-    @Override
     public MapPoint getMapPoint(Location loc) {
         String worldName = getWorldInfo(loc.getWorld()).getName();
 
@@ -287,7 +281,10 @@ public class BaseMap implements GameMap, ConfigHolder {
     @Override
     public MapWorldInfo getWorldInfo(World world) {
         return getInfo().getWorlds().get(reverseWorldNames.get(world.getName()));
-    }    @Override
+    }
+
+
+    @Override
     public Collection<World> getWorlds() {
         return worlds.values();
     }
@@ -312,8 +309,20 @@ public class BaseMap implements GameMap, ConfigHolder {
 
 
     @Override
-    public Location getSpawn() {
-        return spawn;
+    public Location getLocation(MapPoint point) {
+        //Return null if passed in null
+        if (point == null) return null;
+
+        World world = worlds.get(point.getWorld());
+
+        float yaw = point.getYaw();
+        float pitch = point.getPitch();
+
+        //Account for the fact that NaN yaw/pitch indicate that they shouldn't be changed / are not present
+        if (Float.isNaN(yaw)) yaw = 0;
+        if (Float.isNaN(pitch)) pitch = 0;
+
+        return new Location(world, point.getX(), point.getY(), point.getZ(), yaw, pitch);
     }
 
 
@@ -436,12 +445,6 @@ public class BaseMap implements GameMap, ConfigHolder {
 
 
     @Override
-    public Config getSharedObject(String name) {
-        return sharedObjects.get(name);
-    }
-
-
-    @Override
     public Config getSharedObjectOrEmpty(String name) {
         Config sharedObject = getSharedObject(name);
 
@@ -450,10 +453,16 @@ public class BaseMap implements GameMap, ConfigHolder {
 
 
     @Override
+    public Config getSharedObject(String name) {
+        return sharedObjects.get(name);
+    }
+
+
+    @Override
     public void removeListener(String name) {
         CustomListener old = listenerMap.remove(name);
 
-        if(old != null) {
+        if (old != null) {
             listeners.remove(old);
         }
     }

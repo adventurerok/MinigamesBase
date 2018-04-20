@@ -41,6 +41,21 @@ public class MapWorldInfo {
         return config.getString("folder");
     }
 
+    public String getNetherWorld() {
+        String defaultNether = name.endsWith("_nether") ? name.substring(7) : name + "_nether";
+        return config.getString("nether_world", defaultNether);
+    }
+
+    public double getNetherScale() {
+        double defaultScale = name.endsWith("_nether") ? 8 : (1/8d);
+        return config.getDouble("nether_scale", defaultScale);
+    }
+
+    public String getEndWorld() {
+        String defaultEnd = name.endsWith("_the_end") ? name.substring(8) : name + "_the_end";
+        return config.getString("end_world", defaultEnd);
+    }
+
     /**
      * @return If we are the default world for the map
      */

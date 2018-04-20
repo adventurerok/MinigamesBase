@@ -32,6 +32,7 @@ import com.ithinkrok.msm.bukkit.protocol.ClientAPIProtocol;
 import com.ithinkrok.util.command.CommandUtils;
 import com.ithinkrok.util.config.Config;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.Creature;
@@ -344,6 +345,7 @@ public class GameBukkitListener implements Listener {
         gameGroup.gameEvent(new MapProjectileLaunchEvent(gameGroup, map, event));
     }
 
+
     @EventHandler
     public void eventProjectileHit(ProjectileHitEvent event) {
         String mapName = event.getEntity().getWorld().getName();
@@ -368,6 +370,7 @@ public class GameBukkitListener implements Listener {
 
         gameGroup.gameEvent(new MapBlockIgniteEvent(gameGroup, map, event));
     }
+
 
     @EventHandler
     public void eventBlockExplode(BlockExplodeEvent event) {
@@ -528,7 +531,7 @@ public class GameBukkitListener implements Listener {
             }
         }
 
-        if(user == null){
+        if (user == null) {
             user = sender;
         }
 
@@ -713,6 +716,52 @@ public class GameBukkitListener implements Listener {
 
 
     @EventHandler
+    public void eventPlayerPortal(PlayerPortalEvent event) {
+        User user = game.getUser(event.getPlayer());
+        if (user == null) {
+            notInGameGroupError(event.getPlayer());
+            return;
+        }
+
+        GameMap map = user.getMap();
+        MapWorldInfo info = map.getWorldInfo(user.getLocation().getWorld());
+        if (info == null) {
+            throw new RuntimeException("User should be in valid map world: " + user.getName() + " in world " +
+                                       user.getLocation().getWorld().getName());
+        }
+
+        if (event.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) {
+            String netherWorld = info.getNetherWorld();
+            World nether = map.getWorld(netherWorld);
+            if (nether != null) {
+                double scaledX = event.getFrom().getX() * info.getNetherScale();
+                double scaledZ = event.getFrom().getZ() * info.getNetherScale();
+                Location newTo = new Location(nether, scaledX, event.getFrom().getY(), scaledZ);
+                event.setTo(newTo);
+                event.useTravelAgent(true);
+                event.getPortalTravelAgent().setCanCreatePortal(true);
+            }
+        } else if (event.getCause() == PlayerTeleportEvent.TeleportCause.END_PORTAL) {
+            String endWorld = info.getEndWorld();
+            World end = map.getWorld(endWorld);
+            if(end != null) {
+                if (end.getEnvironment() == World.Environment.THE_END) {
+                    event.setTo(end.getSpawnLocation());
+                } else {
+                    event.getPortalTravelAgent().setCanCreatePortal(false);
+                    if (user.isPlayer() && user.getPlayer().getBedSpawnLocation() != null &&
+                        user.getPlayer().getBedSpawnLocation().getWorld().equals(end)) {
+                        event.setTo(user.getPlayer().getBedSpawnLocation());
+                    } else {
+                        event.setTo(end.getSpawnLocation());
+                    }
+                }
+            }
+        }
+    }
+
+
+    @EventHandler
     public void eventPlayerFoodLevelChange(FoodLevelChangeEvent event) {
         User user = game.getUser(event.getEntity());
         if (user == null) {
@@ -797,6 +846,7 @@ public class GameBukkitListener implements Listener {
 
         user.getGameGroup().userEvent(new UserEditSignEvent(user, event));
     }
+
 
     private static class UnknownWorldException extends RuntimeException {
 
