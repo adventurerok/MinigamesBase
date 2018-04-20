@@ -13,6 +13,9 @@ shared_objects:
   game:
     chat_prefix: "&7[&4Factions&7] &e"
     friendly_fire: true
+    no_team_fire: true
+    not_in_game_fire: true
+    mob_fire: true
     cancel_death: false
   start_info:
     game_state: "towny"
