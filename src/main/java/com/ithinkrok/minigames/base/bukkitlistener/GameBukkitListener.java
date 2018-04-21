@@ -723,6 +723,9 @@ public class GameBukkitListener implements Listener {
             return;
         }
 
+        //if we are already handled return
+        if(event.getTo() != null) return;
+
         GameMap map = user.getMap();
         MapWorldInfo info = map.getWorldInfo(user.getLocation().getWorld());
         if (info == null) {
