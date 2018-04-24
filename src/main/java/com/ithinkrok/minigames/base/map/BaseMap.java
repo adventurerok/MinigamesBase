@@ -222,7 +222,7 @@ public class BaseMap implements GameMap, ConfigHolder {
 
     @Override
     public boolean teleportUser(User user) {
-        if (user.getLocation().getWorld().equals(getSpawn().getWorld())) return true;
+        if (reverseWorldNames.containsKey(user.getLocation().getWorld().getName())) return true;
         return user.teleport(getSpawn());
     }
 
