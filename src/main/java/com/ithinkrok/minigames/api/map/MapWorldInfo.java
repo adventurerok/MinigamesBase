@@ -42,7 +42,7 @@ public class MapWorldInfo {
     }
 
     public String getNetherWorld() {
-        String defaultNether = name.endsWith("_nether") ? name.substring(7) : name + "_nether";
+        String defaultNether = name.endsWith("_nether") ? name.substring(0, name.length() - 7) : name + "_nether";
         return config.getString("nether_world", defaultNether);
     }
 
@@ -52,7 +52,7 @@ public class MapWorldInfo {
     }
 
     public String getEndWorld() {
-        String defaultEnd = name.endsWith("_the_end") ? name.substring(8) : name + "_the_end";
+        String defaultEnd = name.endsWith("_the_end") ? name.substring(0, name.length() - 8) : name + "_the_end";
         return config.getString("end_world", defaultEnd);
     }
 
