@@ -1,5 +1,6 @@
 package com.ithinkrok.minigames.base.bukkitlistener;
 
+import com.google.common.collect.MapMaker;
 import com.ithinkrok.minigames.api.Game;
 import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.Kit;
@@ -61,6 +62,7 @@ public class GameBukkitListener implements Listener {
 
     private final Map<UUID, Integer> notInGameGroupErrors = new ConcurrentHashMap<>();
 
+    private final Map<Player, Boolean> disconnectedPlayers = new MapMaker().weakKeys().makeMap();
 
     public GameBukkitListener(Game game) {
         this.game = game;
@@ -70,6 +72,8 @@ public class GameBukkitListener implements Listener {
     @EventHandler
     public void eventPlayerJoined(PlayerJoinEvent event) {
         event.setJoinMessage(null);
+
+        disconnectedPlayers.remove(event.getPlayer());
 
         game.rejoinPlayer(event.getPlayer());
     }
@@ -121,6 +125,8 @@ public class GameBukkitListener implements Listener {
         UserQuitEvent userEvent = new UserQuitEvent(user, UserQuitEvent.QuitReason.QUIT_SERVER);
         user.getGameGroup().userEvent(userEvent);
 
+        disconnectedPlayers.put(event.getPlayer(), true);
+
         game.doInFuture(task -> game.checkResourcesRestart());
 
         notInGameGroupErrors.remove(user.getUuid());
@@ -128,7 +134,7 @@ public class GameBukkitListener implements Listener {
 
 
     private void notInGameGroupError(Entity player) {
-        if (player instanceof Player && !Bukkit.getOnlinePlayers().contains(player)) {
+        if (player instanceof Player && disconnectedPlayers.containsKey(player)) {
             System.out.println("Not in GG called for an offline player " + player.getName() + " in world " +
                                player.getWorld().getName());
             return;
