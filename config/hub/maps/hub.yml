@@ -2,6 +2,7 @@ folder: "hub"
 description: "The hub"
 environment: normal
 enable_weather: false
+start_weather: sun
 type: saved
 
 spawn:
