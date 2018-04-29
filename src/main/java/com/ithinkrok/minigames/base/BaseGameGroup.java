@@ -159,7 +159,8 @@ public class BaseGameGroup implements GameGroup, ConfigHolder, FileLoader {
             String resolvedMap = fillInParameters(startMap);
             try {
                 changeMap(resolvedMap);
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                e.printStackTrace();
                 System.err.println(
                         "Bad map \"" + resolvedMap + "\" provided for GameGroup " + name + ", " + "trying fallback");
 
