@@ -146,13 +146,16 @@ public class BaseMap implements GameMap, ConfigHolder {
                 case "sun":
                     world.setStorm(false);
                     world.setThundering(false);
+                    break;
                 case "rain":
                     world.setThundering(false);
                     world.setStorm(true);
+                    break;
                 case "thunder":
                 case "storm":
                     world.setStorm(true);
                     world.setThundering(true);
+                    break;
                 default:
                     throw new RuntimeException("Invalid weather condition: " + config.getString("start_weather"));
             }

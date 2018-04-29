@@ -17,6 +17,7 @@ shared_objects:
   start_info:
     game_state: "hub"
     map: "hub"
+    backup_map: "hub"
   game:
     all_fire: true
     max_players: 250
