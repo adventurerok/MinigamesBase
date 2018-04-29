@@ -535,13 +535,12 @@ public class GameBukkitListener implements Listener {
                     user = other;
                 }
             }
-        }
 
-        if (user == null) {
+        } else {
             user = sender;
         }
 
-        teamIdentifier = user.getTeamIdentifier();
+        teamIdentifier = user != null ? user.getTeamIdentifier() : null;
 
 
         if (arguments.containsKey("t")) {
