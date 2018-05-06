@@ -54,10 +54,6 @@ public class HubListener extends SignListener {
     private String welcomeTitleLocale;
     private String welcomeSubtitleLocale;
 
-    private String lobbyCreatedLocale;
-    private ConfigMessageFactory clickJoinMessageFactory;
-    private String playerJoinClickLocale;
-
     private Config scoreboardConfig;
 
     private String pvpSwordItem = "";
@@ -104,12 +100,6 @@ public class HubListener extends SignListener {
 
         scoreboardConfig = config.getConfigOrNull("scoreboard");
 
-        lobbyCreatedLocale = config.getString("lobby_created_locale");
-
-        String clickJoinLocale = event.getCreator().getLocale(config.getString("click_join_locale"));
-        clickJoinMessageFactory = new ConfigMessageFactory(clickJoinLocale);
-
-        playerJoinClickLocale = config.getString("player_join_locale", "hub.player_join_click");
     }
 
 
@@ -226,48 +216,5 @@ public class HubListener extends SignListener {
     }
 
 
-    @CustomEventHandler
-    public void onGameGroupCreated(ControllerSpawnGameGroupEvent event) {
-        String type = event.getControllerGameGroup().getType();
-        if (type.equals("hub")) return;
 
-        event.getGameGroup().sendLocale(lobbyCreatedLocale, type);
-
-        ConfigMessageBuilder builder = clickJoinMessageFactory.newBuilder();
-        builder.setClickAction("join", ConfigMessageBuilder.CLICK_RUN_COMMAND, "/join " + event
-                .getControllerGameGroup().getName());
-
-        event.getGameGroup().sendMessageNoPrefix(builder.getResult());
-    }
-
-
-    @CustomEventHandler
-    public void onGameGroupUpdated(ControllerUpdateGameGroupEvent event) {
-        Set<UUID> currentPlayers = event.getControllerGameGroup().getPlayers();
-        Set<UUID> oldPlayers = event.getOldControllerGameGroup().getPlayers();
-
-        if (currentPlayers.size() <= oldPlayers.size() || !event.getControllerGameGroup().isAcceptingPlayers()) return;
-
-        //prevent hub messages
-        if (event.getControllerGameGroup().getType().equals(event.getGameGroup().getType())) return;
-
-        Set<UUID> newPlayers = new HashSet<>(currentPlayers);
-        newPlayers.removeAll(oldPlayers);
-
-        UUID joined = newPlayers.iterator().next();
-
-        event.getGameGroup().getDatabase().lookupName(joined, nameResult -> {
-            String name = nameResult.name;
-            if (name == null) return;
-
-            String type = event.getControllerGameGroup().getType();
-            String message = event.getGameGroup().getLocale(playerJoinClickLocale, name, type);
-            ConfigMessageFactory factory = new ConfigMessageFactory(message);
-            ConfigMessageBuilder builder = factory.newBuilder();
-            String command = "/join " + event.getControllerGameGroup().getName();
-            builder.setClickAction("join", ConfigMessageBuilder.CLICK_RUN_COMMAND, command);
-
-            event.getGameGroup().sendMessageNoPrefix(builder.getResult());
-        });
-    }
 }

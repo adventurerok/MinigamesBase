@@ -63,6 +63,9 @@ game_states:
             games_info_locale: "scoreboard.games_info"
             players_on_hub_locale: "scoreboard.players_on_hub"
             balances_locale: "scoreboard.balances"
+      games_join:
+        class: "com.ithinkrok.minigames.util.listener.GamesJoinListener"
+        config:
           lobby_created_locale: "hub.lobby_created"
           click_join_locale: "hub.click_join_builder"
       popper:

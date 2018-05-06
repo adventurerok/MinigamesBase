@@ -24,6 +24,12 @@ shared_objects:
     use_new_combat: true
 
 game_states:
-  towny: {}
+  towny:
+    listeners:
+      games_join:
+        class: "com.ithinkrok.minigames.util.listener.GamesJoinListener"
+        config:
+          lobby_created_locale: "hub.lobby_created"
+          click_join_locale: "hub.click_join_builder"
 
 custom_items: {}
