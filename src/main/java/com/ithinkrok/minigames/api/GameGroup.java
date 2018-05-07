@@ -27,7 +27,7 @@ import com.ithinkrok.msm.common.economy.Economy;
 import com.ithinkrok.util.config.Config;
 import com.ithinkrok.util.event.ListenerHolder;
 import com.ithinkrok.util.lang.LanguageLookup;
-import com.ithinkrok.util.lang.Messagable;
+import com.ithinkrok.util.lang.PrefixedMessagable;
 import com.ithinkrok.util.math.MutableVariables;
 
 import java.util.Collection;
@@ -40,7 +40,7 @@ import java.util.Map;
  * A group of users playing an instance of a particular minigame.
  */
 public interface GameGroup
-        extends LanguageLookup, Messagable, TaskScheduler, SharedObjectAccessor, MetadataHolder<Metadata>,
+        extends LanguageLookup, PrefixedMessagable, TaskScheduler, SharedObjectAccessor, MetadataHolder<Metadata>,
         SchematicResolver, TeamUserResolver, DatabaseTaskRunner, ListenerHolder {
 
     List<String> getParameters();

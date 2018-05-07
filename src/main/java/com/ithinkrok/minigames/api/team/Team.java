@@ -11,7 +11,7 @@ import com.ithinkrok.minigames.api.user.UserResolver;
 import com.ithinkrok.msm.common.economy.Account;
 import com.ithinkrok.util.event.CustomListener;
 import com.ithinkrok.util.lang.LanguageLookup;
-import com.ithinkrok.util.lang.Messagable;
+import com.ithinkrok.util.lang.PrefixedMessagable;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
@@ -24,7 +24,7 @@ import java.util.UUID;
  * Created by paul on 20/02/16.
  */
 public interface Team
-        extends Messagable, LanguageLookup, SharedObjectAccessor, TaskScheduler, UserResolver, MetadataHolder<Metadata>,Nameable {
+        extends PrefixedMessagable, LanguageLookup, SharedObjectAccessor, TaskScheduler, UserResolver, MetadataHolder<Metadata>,Nameable {
     void makeEntityRepresentTeam(Entity entity);
 
     Collection<CustomListener> getListeners();

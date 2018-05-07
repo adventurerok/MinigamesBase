@@ -5,7 +5,7 @@ import com.ithinkrok.minigames.api.Kit;
 import com.ithinkrok.minigames.api.team.TeamIdentifier;
 import com.ithinkrok.minigames.api.user.User;
 import com.ithinkrok.util.command.CustomCommand;
-import com.ithinkrok.util.lang.Messagable;
+import com.ithinkrok.util.lang.PrefixedMessagable;
 
 import java.util.*;
 
@@ -64,28 +64,28 @@ public class MinigamesCommand extends CustomCommand {
         return kit;
     }
 
-    public boolean requireGameGroup(Messagable sender) {
+    public boolean requireGameGroup(PrefixedMessagable sender) {
         if (gameGroup != null) return true;
 
         sender.sendLocale("command.requires.game_group");
         return false;
     }
 
-    public boolean requireArgumentCount(Messagable sender, int minArgs) {
+    public boolean requireArgumentCount(PrefixedMessagable sender, int minArgs) {
         if (getArgumentCount() >= minArgs) return true;
 
         sender.sendLocale("command.requires.arguments", minArgs);
         return false;
     }
 
-    public boolean requireUser(Messagable sender) {
+    public boolean requireUser(PrefixedMessagable sender) {
         if (user != null) return true;
 
         sender.sendLocale("command.requires.user");
         return false;
     }
 
-    public boolean requireTeamIdentifier(Messagable sender) {
+    public boolean requireTeamIdentifier(PrefixedMessagable sender) {
         if (teamIdentifier != null) return true;
 
         sender.sendLocale("command.requires.team_identifier");
