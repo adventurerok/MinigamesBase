@@ -92,3 +92,18 @@ custom_items:
               lore: ["It's a bit of a mess, I know :P"]
               item: "prismarine"
               pos: "-1026355.15,71.03,-1025038.06"
+            - name: "Jofly's Home (eightworld)"
+              lore: ["People to Spare: bosscamcam123"]
+              item: "prismarine"
+              pos: "-1024059.5,87.1,-1017374.5"
+            - name: "Jofly's Trading Post (eightworld)"
+              lore: ["NO REFUNDS"]
+              item: "prismarine"
+              pos: "-1024414.5,84.1,-1017329.5"
+            - name: "Lily and Bunny's Place (eightworld)"
+              item: "prismarine"
+              pos: "-1023961.2,83.1,-1017542.5"
+            - name: "Harry Dom (eightworld)"
+              lore: ["You know anything about this Idicam?"]
+              item: "prismarine"
+              pos: "-1023198.2,90.1,-1016255.4"
