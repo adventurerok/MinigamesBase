@@ -76,3 +76,11 @@ custom_items:
               item: "wool,1,13"
               lore: ["The cacti quest has begun. Not that we went far"]
               pos: "199538,64,-1049121"
+            - name: "Eightworld Spawn"
+              item: "prismarine"
+              lore: ["The second world on Ithinkrok's Factions"]
+              pos: "-1025925.5.89.5,-1021670.5"
+            - name: "Griefed Faction Base (eightworld)"
+              item: "prismarine"
+              lore: ["bosscamcam123 is the Manager / Boss"]
+              pos: "-1025380.5,92,-1021470.5"
