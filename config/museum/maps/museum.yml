@@ -79,7 +79,7 @@ custom_items:
             - name: "Eightworld Spawn"
               item: "prismarine"
               lore: ["The second world on Ithinkrok's Factions"]
-              pos: "-1025925.5,.89.5,-1021670.5"
+              pos: "-1025925.5,89.5,-1021670.5"
             - name: "Griefed Faction Base (eightworld)"
               item: "prismarine"
               lore: ["bosscamcam123 is the Manager / Boss"]
