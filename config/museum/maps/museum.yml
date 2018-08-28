@@ -149,6 +149,9 @@ custom_items:
               lore: []
               item: "prismarine"
               pos: "-1039296.2,86,-1021673.5"
+            - name: "Crafting Dragon (eightworld)"
+              item: "prismarine"
+              pos: "-1026728.8,82,-1015043.3,27.5,-3.5"
             - name: "Creative Spawn"
               lore: ["Follow the path up the trees for a surprise :)"]
               item: "sponge"
