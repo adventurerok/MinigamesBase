@@ -11,6 +11,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Constructor;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,6 +77,10 @@ public class ClickableInventory {
 
     public String getIdentifier() {
         return identifier;
+    }
+
+    public Collection<ClickableItem> getItems() {
+        return items.values();
     }
 
 
