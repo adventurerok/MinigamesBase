@@ -6,6 +6,8 @@ import com.ithinkrok.minigames.api.inventory.event.CalculateItemForUserEvent;
 import com.ithinkrok.minigames.api.inventory.event.UserClickItemEvent;
 import com.ithinkrok.minigames.api.util.InventoryUtils;
 import com.ithinkrok.util.config.Config;
+import com.ithinkrok.util.math.Calculator;
+import com.ithinkrok.util.math.ExpressionCalculator;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -23,6 +25,8 @@ public class SubInventory extends ClickableItem {
     private String subInventoryNameLocale;
 
     private boolean isBackButton;
+
+    Calculator canSee;
 
     public SubInventory(ItemStack baseDisplay, int slot) {
         super(baseDisplay, slot);
@@ -53,17 +57,25 @@ public class SubInventory extends ClickableItem {
         haveBackButton = config.getBoolean("back_button", true);
 
         subInventoryNameLocale = config.getString("name_locale");
+
+        canSee = new ExpressionCalculator(config.getString("can_see", "true"));
     }
+
+
 
 
     @Override
     public void onCalculateItem(CalculateItemForUserEvent event) {
         if(isBackButton) return;
 
+        //hide the item if we shouldn't be able to see it
+        if(!canSee.calculateBoolean(event.getUser().getUserVariables())) {
+            event.setDisplay(null);
+            return;
+        }
+
         ItemStack display = event.getDisplay();
-
         InventoryUtils.setItemName(display, event.getUser().getLanguageLookup().getLocale(subInventoryNameLocale));
-
         event.setDisplay(display);
     }
 
