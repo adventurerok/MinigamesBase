@@ -85,13 +85,14 @@ public class ClickableInventory {
 
 
     public Inventory createInventory(User user, Inventory old) {
-        if (old == null || items.size() > old.getSize()) {
-            int highestSlot = items.size();
-            for (ClickableItem item : items.values()) {
-                if (item.getSlot() + 1 > highestSlot) {
-                    highestSlot = item.getSlot() + 1;
-                }
+        int highestSlot = items.size();
+        for (ClickableItem item : items.values()) {
+            if (item.getSlot() + 1 > highestSlot) {
+                highestSlot = item.getSlot() + 1;
             }
+        }
+
+        if (old == null || highestSlot > old.getSize()) {
             old = user.createInventory(highestSlot, title);
         } else {
             old.clear();

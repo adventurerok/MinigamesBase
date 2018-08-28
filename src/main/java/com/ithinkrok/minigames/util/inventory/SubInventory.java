@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.WeakHashMap;
 
 public class SubInventory extends ClickableItem {
@@ -47,9 +48,7 @@ public class SubInventory extends ClickableItem {
             sharedObject = config.getString("shared_object");
         }
 
-        if(config.contains("items")) {
-            items = config.getConfigList("items");
-        }
+        items = config.getConfigList("items");
 
         haveBackButton = config.getBoolean("back_button", true);
 
@@ -97,10 +96,10 @@ public class SubInventory extends ClickableItem {
                 previousInventories.put(inv, event.getInventory());
 
                 int slots = inv.getItems().size();
-                int maxSlot = inv.getItems().stream().mapToInt(ClickableItem::getSlot).max().getAsInt();
+                OptionalInt maxSlot = inv.getItems().stream().mapToInt(ClickableItem::getSlot).max();
 
-                if(maxSlot > slots) {
-                    slots = maxSlot;
+                if(maxSlot.isPresent() && maxSlot.getAsInt() > slots) {
+                    slots = maxSlot.getAsInt();
                 }
 
                 int bottomLeft = (slots / 9) * 9 + 13;
