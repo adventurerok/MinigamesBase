@@ -103,7 +103,7 @@ public class SubInventory extends ClickableItem {
                     slots = maxSlot;
                 }
 
-                int bottomLeft = (slots / 9) * 9 + 9;
+                int bottomLeft = (slots / 9) * 9 + 13;
 
                 inv.addItem(createBackButton(bottomLeft));
             }
