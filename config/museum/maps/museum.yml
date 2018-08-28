@@ -107,3 +107,29 @@ custom_items:
               lore: ["You know anything about this Idicam?"]
               item: "prismarine"
               pos: "-1023198.2,90.1,-1016255.4"
+            - name: "EShaunTerror (eightworld)"
+              lore: ["It was a nice wooden base before the terror"]
+              item: "prismarine"
+              pos: "-1025562.7,124,-1017778.5"
+            - name: "Civilization (eightworld)"
+              lore: []
+              item: "prismarine"
+              pos: "-1039296.2,86,-1021673.5"
+            - name: "Creative Spawn"
+              lore: ["Follow the path up the trees for a surprise :)"]
+              item: "sponge"
+              pos: "-2560008.5,80,-1024029.5"
+            - name: "DJ S3rl (creative)"
+              item: "sponge"
+              pos: "-2559967.5,65,-1019418.5"
+            - name: "Nether Road (creative)"
+              lore: ["Built by The_Ramen_God"]
+              item: "sponge"
+              pos: "-2556020.5,65,-1035307.5"
+            - name: "Peasent Village (creative)"
+              lore: ["shoo shoo"]
+              item: "sponge"
+              pos: "-2557114.5,65,-1038388.5"
+            - name: "CheesePuff422's House"
+              item: "sponge"
+              pos: "-6038324.5,65,-1509911.0"
