@@ -11,10 +11,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Constructor;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by paul on 02/01/16.
@@ -92,7 +89,7 @@ public class ClickableInventory {
             }
         }
 
-        if (old == null || highestSlot > old.getSize()) {
+        if (old == null || highestSlot > old.getSize() || !Objects.equals(old.getTitle(), title)) {
             old = user.createInventory(highestSlot, title);
         } else {
             old.clear();

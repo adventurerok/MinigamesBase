@@ -115,6 +115,8 @@ public class BaseUser implements Listener, User {
 
     private GameTask revalidateTask;
 
+    private boolean changingInventory = false;
+
 
     public BaseUser(BaseGameGroup gameGroup, BaseTeam team, UUID uuid, LivingEntity entity) {
         this.gameGroup = gameGroup;
@@ -1003,8 +1005,12 @@ public class BaseUser implements Listener, User {
             if (old == null) {
                 getPlayer().openInventory(newInventory);
             } else {
+                changingInventory = true;
+
                 doInFuture(task1 -> {
                     getPlayer().openInventory(newInventory);
+
+                    doInFuture(task2 -> changingInventory = false);
                 });
             }
         });
@@ -1659,7 +1665,7 @@ public class BaseUser implements Listener, User {
 
         @CustomEventHandler(priority = CustomEventHandler.INTERNAL_FIRST)
         public void eventInventoryClose(UserInventoryCloseEvent event) {
-            if (!isViewingClickableInventory()) return;
+            if (!isViewingClickableInventory() || changingInventory) return;
 
             openInventory = null;
         }
