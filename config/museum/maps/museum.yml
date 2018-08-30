@@ -25,6 +25,21 @@ worlds:
     type: "saved"
     game_rules: *game_rules
 
+shared_objects:
+  museum:
+    locations:
+      museum:
+        pos: "0,0,0"
+      og1:
+        pos: "200000,0,-1048576"
+        future: "og2"
+      og2:
+        pos: "225000,0,-1048575"
+        past: "og1"
+        future: "og3"
+      og3:
+        pos: ""
+
 custom_items:
   warp_chooser:
     display_name_locale: "museum_teleporter.name"
