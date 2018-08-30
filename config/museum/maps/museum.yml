@@ -14,16 +14,19 @@ worlds:
     game_rules: &game_rules
       doMobLoot: false
       mobGriefing: false
+    generator: "void"
   map_nether:
     folder: "museum_nether"
     environment: "nether"
     type: "saved"
     game_rules: *game_rules
+    generator: "void"
   map_the_end:
     folder: "museum_the_end"
     environment: "the_end"
     type: "saved"
     game_rules: *game_rules
+    generator: "void"
 
 shared_objects:
   museum:
@@ -31,14 +34,15 @@ shared_objects:
       museum:
         pos: "0,0,0"
       og1:
-        pos: "200000,0,-1048576"
+        pos: "199545,64,-1049597"
         future: "og2"
       og2:
-        pos: "225000,0,-1048575"
+        pos: "225145,64,-1049597"
         past: "og1"
         future: "og3"
       og3:
-        pos: ""
+        pos: "-307335,64,-1305597"
+        past: "og2"
       eightworld:
         pos: "-1024000,0,-1024000"
 

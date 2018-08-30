@@ -37,6 +37,18 @@ public class MapWorldInfo {
         return config;
     }
 
+
+    /**
+     *
+     * Returns the bukkit chunk generator string.
+     * null is interpreted to mean a void generator for instance worlds, and the default generator otherwise.
+     *
+     * @return The generator code to use for this world.
+     */
+    public String getGenerator() {
+        return config.getString("generator", null);
+    }
+
     public String getWorldFolder() {
         return config.getString("folder");
     }

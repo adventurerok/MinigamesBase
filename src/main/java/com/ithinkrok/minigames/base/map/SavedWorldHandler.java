@@ -3,6 +3,7 @@ package com.ithinkrok.minigames.base.map;
 import com.ithinkrok.minigames.api.GameGroup;
 import com.ithinkrok.minigames.api.map.GameMap;
 import com.ithinkrok.minigames.api.map.MapWorldInfo;
+import com.ithinkrok.minigames.base.generation.VoidGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
@@ -25,6 +26,16 @@ public class SavedWorldHandler implements WorldHandler {
             WorldCreator creator = new WorldCreator(info.getWorldFolder());
 
             creator.environment(info.getEnvironment());
+
+            if(info.getGenerator() != null) {
+                switch(info.getGenerator()) {
+                    case "void":
+                        creator.generator(new VoidGenerator());
+                        break;
+                    default:
+                        creator.generator(info.getGenerator());
+                }
+            }
 
             world = creator.createWorld();
         }
