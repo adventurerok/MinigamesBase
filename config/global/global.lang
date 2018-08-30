@@ -205,6 +205,15 @@ hub_returner.return=&cTeleporting you to the hub...
 warp_chooser.name=&6Warp Chooser
 warp_chooser.title=Warp Chooser
 
+time_back.name=&3Backwards in Time
+time_forward.name=&4Forwards in Time
+
+museum.no_location=&cUnknown Zone
+museum.no_future=&cThis zone has no future
+museum.no_past=&cThis zone has no known past
+museum.to_the_future=&aWelcome to the future!
+museum.to_the_past=&aWelcome to the past!
+
 museum_teleporter.name=&6Museum Destinations...
 museum_teleporter.title=Historic Sites
 

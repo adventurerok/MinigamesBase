@@ -32,6 +32,10 @@ game_states:
             custom_items:
               - name: "warp_chooser"
                 slot: 0
+              - name: "time_back"
+                slot: 2
+              - name: "time_forward"
+                slot: 3
               - name: "hub_returner"
                 slot: 8
 

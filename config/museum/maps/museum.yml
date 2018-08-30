@@ -39,8 +39,28 @@ shared_objects:
         future: "og3"
       og3:
         pos: ""
+      eightworld:
+        pos: "-1024000,0,-1024000"
 
 custom_items:
+  time_back:
+    display_name_locale: "time_back.name"
+    material: "sapling"
+    listeners:
+      time:
+        events: ["rightClick"]
+        class: "com.ithinkrok.minigames.util.item.TimeWarper"
+        config:
+          to_the_future: false
+  time_forward:
+    display_name_locale: "time_forward.name"
+    material: "eye_of_ender"
+    listeners:
+      time:
+        events: ["rightClick"]
+        class: "com.ithinkrok.minigames.util.item.TimeWarper"
+        config:
+          to_the_future: true
   warp_chooser:
     display_name_locale: "museum_teleporter.name"
     material: "COMPASS"

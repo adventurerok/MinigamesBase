@@ -233,4 +233,21 @@ public class MapPoint {
 
         return setXYZ(x, y, z);
     }
+
+
+    /**
+     * Computes the square of the distance to point other, or returns INFINITY if other is in a different world
+     *
+     * @param other The point to compute square distance to
+     * @return The distance
+     */
+    public double distanceSquared(MapPoint other) {
+        if(!Objects.equals(world, other.world)) return Double.POSITIVE_INFINITY;
+
+        double dx = other.x - x;
+        double dy = other.y - y;
+        double dz = other.z - z;
+
+        return dx * dx + dy * dy + dz * dz;
+    }
 }
