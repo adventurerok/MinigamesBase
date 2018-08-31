@@ -44,7 +44,13 @@ shared_objects:
         pos: "-307335,64,-1305597"
         past: "og2"
       eightworld:
-        pos: "-1024000,0,-1024000"
+        pos: "-1024000,64,-1024000"
+        past: "eightworldjuly"
+        size: 30000
+      eightworldjuly:
+        pos: "-153600,64,-153600"
+        future: "eightworld"
+        size: 30000
 
 custom_items:
   time_back:

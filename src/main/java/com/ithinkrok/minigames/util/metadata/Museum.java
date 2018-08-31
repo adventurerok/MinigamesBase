@@ -85,7 +85,7 @@ public class Museum extends Metadata {
             pos = MinigamesConfigs.getMapPoint(cfg, "pos");
             past = cfg.getString("past");
             future = cfg.getString("future");
-            size = 10000;
+            size = cfg.getDouble("size", 10000);
         }
 
 
