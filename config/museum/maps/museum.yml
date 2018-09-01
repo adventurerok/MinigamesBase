@@ -49,7 +49,12 @@ shared_objects:
         size: 30000
       eightworldjuly:
         pos: "-153600,64,-153600"
+        past: "eightworldjuly"
         future: "eightworld"
+        size: 30000
+      eightworlddec:
+        pos: "-204800,64,-153600"
+        future: "eightworldjuly"
         size: 30000
 
 custom_items:
