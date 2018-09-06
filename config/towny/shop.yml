@@ -1,0 +1,15 @@
+
+
+shared_objects:
+  shop:
+    items:
+      - class: "com.ithinkrok.minigames.util.inventory.SubInventory"
+        display: "iron_ore"
+        config:
+          name_locale: "shop.ores"
+          items:
+            - class: "com.ithinkrok.minigames.util.inventory.ItemBuyable"
+              config:
+                item: "iron_ore,8"
+                cost: 800
+                currency: "vault"

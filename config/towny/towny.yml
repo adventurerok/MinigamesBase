@@ -1,9 +1,10 @@
 
 pre_configs:
   - "global/global.yml"
+  - "towny/shop.yml"
 
 lang_files:
-#  - "towny/lang/towny.lang"
+  - "towny/lang/towny.lang"
 #  - "towny/lang/items.lang"
 
 maps:
