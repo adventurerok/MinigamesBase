@@ -103,6 +103,7 @@ buyable.user.pay_team=&ePaid &c$%s &eusing your own money as your team did not h
 buyable.cost.team=&7Cost\: &3%s &7(&6Team Money&7)
 buyable.cost.user=&7Cost\: &3%s &7(&6Player Money&7)
 buyable.cost.currency=&7Cost\: &3%s
+buyable.reward.currency=&aGives you\: &2%s
 buyable.currency_amount=&8(&7You have\: &6%s&8)
 buyable.costs.extra=&7Additional Costs:
 buyable.costs.extra_only=&7Trade for:
@@ -111,6 +112,8 @@ buyable.no_item=&cYou do not have the required &4%s x &4%s &cto purchase this it
 buyable.items_taken=&cThe required items were taken from your inventory
 buyable.not_accredited=&cThis game is not accredited so purchases with that currency are not allowed
 buyable.unknown_currency=&cUnknown currency '%s'. Tell ithinkrok.
+buyable.comma=&7, 
+buyable.and=&7and 
 
 item_buyable.no_space=&cYou do not have enough inventory space!
 
