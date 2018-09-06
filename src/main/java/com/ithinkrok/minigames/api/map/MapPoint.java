@@ -156,10 +156,19 @@ public class MapPoint {
         return Objects.hash(world, x, y, z, yaw, pitch);
     }
 
+
     @Override
     public String toString() {
-        return super.toString();
+        return "MapPoint{" +
+               "world='" + world + '\'' +
+               ", x=" + x +
+               ", y=" + y +
+               ", z=" + z +
+               ", yaw=" + yaw +
+               ", pitch=" + pitch +
+               '}';
     }
+
 
     /**
      * Gets a new MapPoint with this MapPoint's position added to the provided x,y,z arguments.
