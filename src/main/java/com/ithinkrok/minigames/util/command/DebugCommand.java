@@ -46,6 +46,19 @@ public class DebugCommand implements CustomListener {
         addSubExecutor("load", "mg.base.debug.load", this::loadCommand);
         addSubExecutor("visible", "mg.base.debug.visible", this::visibleCommand);
         addSubExecutor("user", "mg.base.debug.user", this::userCommand);
+        addSubExecutor("error", "mg.base.debug.error", this::errorCommand);
+    }
+
+
+    private boolean errorCommand(MinigamesCommandSender sender, MinigamesCommand command) {
+        sender.sendMessageNoPrefix("Debug error test: messaging sender");
+        System.out.println("Debug error test: System.out.println");
+        System.err.println("Debug error test: System.err.println");
+
+        RuntimeException test = new RuntimeException("Debug error test: RuntimeException");
+        test.printStackTrace();
+
+        return true;
     }
 
 
