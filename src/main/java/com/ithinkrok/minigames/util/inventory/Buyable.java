@@ -304,9 +304,9 @@ public abstract class Buyable extends ClickableItem {
         BigDecimal moneyCost = getCost(event.getUser());
 
         if (moneyCost.compareTo(BigDecimal.ZERO) > 0) {
-            display = InventoryUtils.addLore(display, lookup.getLocale(extraCostsLocale));
+            InventoryUtils.addLore(display, lookup.getLocale(extraCostsLocale));
         } else {
-            display = InventoryUtils.addLore(display, lookup.getLocale(extraCostsOnlyLocale));
+            InventoryUtils.addLore(display, lookup.getLocale(extraCostsOnlyLocale));
         }
 
         PlayerInventory inventory = event.getUser().getInventory();
@@ -324,7 +324,7 @@ public abstract class Buyable extends ClickableItem {
             String itemName = lookup.getLocale(customItem.getDisplayNameLocale());
 
             String lore = lookup.getLocale(costsItemLocale, prefix + requiredAmount, prefix + itemName);
-            display = InventoryUtils.addLore(display, lore);
+            InventoryUtils.addLore(display, lore);
         }
 
         for (Map.Entry<ItemStack, Calculator> itemToAmount : itemCosts.entrySet()) {
@@ -338,7 +338,7 @@ public abstract class Buyable extends ClickableItem {
             String itemName = InventoryUtils.getItemStackDefaultName(itemToAmount.getKey());
 
             String lore = lookup.getLocale(costsItemLocale, prefix + requiredAmount, prefix + itemName);
-            display = InventoryUtils.addLore(display, lore);
+            InventoryUtils.addLore(display, lore);
         }
 
 
