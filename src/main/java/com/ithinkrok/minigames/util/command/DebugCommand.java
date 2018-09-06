@@ -45,6 +45,33 @@ public class DebugCommand implements CustomListener {
         addSubExecutor("econ", "mg.base.debug.econ", this::econCommand);
         addSubExecutor("load", "mg.base.debug.load", this::loadCommand);
         addSubExecutor("visible", "mg.base.debug.visible", this::visibleCommand);
+        addSubExecutor("user", "mg.base.debug.user", this::userCommand);
+    }
+
+
+    private boolean userCommand(MinigamesCommandSender sender, MinigamesCommand command) {
+        if(!command.requireUser(sender)) return false;
+
+        User user = command.getUser();
+
+        sender.sendLocale("command.debug.user");
+        sender.sendLocale("command.debug.user.names", user.getName(), user.getDisplayName(), user.getTabListName());
+
+        String teamName = user.getTeamName() != null ? user.getTeamName() : "none";
+        sender.sendLocale("command.debug.user.team", teamName);
+
+        String kitName = user.getKitName() != null ? user.getKitName() : "none";
+        sender.sendLocale("command.debug.user.kit", kitName);
+
+        sender.sendLocale("command.debug.user.location", user.getMapLocation());
+
+        sender.sendLocale("command.debug.user.in_game", user.isInGame());
+
+        sender.sendLocale("command.debug.user.cloaked", user.isCloaked());
+
+        sender.sendLocale("command.debug.user.viewing_inventory", user.isViewingClickableInventory());
+
+        return true;
     }
 
 

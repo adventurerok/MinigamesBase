@@ -69,6 +69,15 @@ command.debug.visible.unknown_player=&cUnknown player &d%s
 command.debug.visible.hidden=&6Hidden player &c%s
 command.debug.visible.shown=&6Shown player &a%s
 
+command.debug.user=&7=== &6User Info &7===
+command.debug.user.names=&6Name: &a%s &6Display name: &f%s, &6Tab name: &f%s
+command.debug.user.team=&6Team: &a%s
+command.debug.user.kit=&6Kit: &a%s
+command.debug.user.location=&6Location: &a%s
+command.debug.user.in_game=&6In game? &a%s
+command.debug.user.cloaked=&6Cloaked? &a%s
+command.debug.user.viewing_inventory=&6ClickableInventory? &a%s
+
 #Global money messages
 money.transfer.too_expensive=&cYou do not have that amount of money
 money.transfer.team=%s &3transferred &a$%s &eto your team's account!
