@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 /**
  * Created by paul on 08/01/16.
  */
-public abstract class Buyable extends ClickableItem {
+public class Buyable extends ClickableItem {
 
     final Map<ItemStack, Calculator> itemCosts = new HashMap<>();
     final Map<String, Calculator> customItemCosts = new HashMap<>();
@@ -247,7 +247,10 @@ public abstract class Buyable extends ClickableItem {
     }
 
 
-    public abstract boolean onPurchase(BuyablePurchaseEvent event);
+    public boolean onPurchase(BuyablePurchaseEvent event) {
+        //no longer abstract if we can give money
+        return true;
+    }
 
 
     private void doUpgradesOnBuy(User user) {
