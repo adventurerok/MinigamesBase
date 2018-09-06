@@ -50,6 +50,7 @@ public abstract class Buyable extends ClickableItem {
     String purchaseLocale;
     String broadcastLocale;
     String notAccreditedLocale;
+    String unknownCurrencyLocale;
 
     String noItemLocale;
     String itemsTakenLocale;
@@ -82,6 +83,7 @@ public abstract class Buyable extends ClickableItem {
         purchaseLocale = config.getString("purchase_locale");
         broadcastLocale = config.getString("broadcast_locale");
         notAccreditedLocale = config.getString("not_accredited_locale", "buyable.not_accredited");
+        unknownCurrencyLocale = config.getString("unknown_currency_locale", "buyable.unknown_currency");
 
         extraCostsLocale = config.getString("extra_costs_locale", "buyable.costs.extra");
         extraCostsOnlyLocale = config.getString("extra_costs_only_locale", "buyable.costs.extra_only");
@@ -138,6 +140,11 @@ public abstract class Buyable extends ClickableItem {
     public void onClick(UserClickItemEvent event) {
         BuyablePurchaseHandler handler = new BuyablePurchaseHandler(this, event);
         User user = event.getUser();
+
+        if(getCurrency(user) == null) {
+            user.sendLocale(unknownCurrencyLocale, this.currency);
+            return;
+        }
 
         //Check if we have the money to afford the purchase
         if (!handler.checkHasMoney()) {
@@ -228,13 +235,23 @@ public abstract class Buyable extends ClickableItem {
 
     private void addMoneyCostLore(CalculateItemForUserEvent event) {
         User user = event.getUser();
+        LanguageLookup lookup = user.getLanguageLookup();
+        Currency currency = getCurrency(user);
+        ItemStack display = event.getDisplay();
+
+        if(currency == null) {
+            System.out.println("Found buyable with unknown currency: " + display + " with currency " + this.currency);
+            InventoryUtils.addLore(display, lookup.getLocale(unknownCurrencyLocale, this.currency));
+            event.setDisplay(display);
+            return;
+        }
 
         //Check if the cost exists
         BigDecimal cost = getCost(user);
         if (cost.compareTo(BigDecimal.ZERO) <= 0) return;
 
         Money userMoney = Money.getOrCreate(user);
-        Currency currency = getCurrency(user);
+
         boolean hasMoney = true;
         boolean unknownMoney = false;
 
@@ -261,19 +278,17 @@ public abstract class Buyable extends ClickableItem {
         ChatColor costColor = (unknownMoney ? ChatColor.BLUE : hasMoney ? ChatColor.GREEN : ChatColor.RED);
 
         String costString = costColor + currency.format(cost);
-        LanguageLookup lookup = user.getLanguageLookup();
 
-        ItemStack display = event.getDisplay();
 
         if (team) {
-            display = InventoryUtils.addLore(display, lookup.getLocale(teamCostLocale, costString));
+            InventoryUtils.addLore(display, lookup.getLocale(teamCostLocale, costString));
         } else if(currency.getCurrencyType().equals(CurrencyType.MINIGAME_SPECIFIC)){
-            display = InventoryUtils.addLore(display, lookup.getLocale(userCostLocale, costString));
+            InventoryUtils.addLore(display, lookup.getLocale(userCostLocale, costString));
         } else {
-            display = InventoryUtils.addLore(display, lookup.getLocale(currencyCostLocale, costString));
+            InventoryUtils.addLore(display, lookup.getLocale(currencyCostLocale, costString));
 
             if(knownBalance != null) {
-                display = InventoryUtils.addLore(display, lookup.getLocale(currencyAmountLocale, currency.format(knownBalance)));
+                InventoryUtils.addLore(display, lookup.getLocale(currencyAmountLocale, currency.format(knownBalance)));
             }
         }
 

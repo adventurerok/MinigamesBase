@@ -110,6 +110,7 @@ buyable.costs.item=&7- &3%sx &3%s
 buyable.no_item=&cYou do not have the required &4%s x &4%s &cto purchase this item!
 buyable.items_taken=&cThe required items were taken from your inventory
 buyable.not_accredited=&cThis game is not accredited so purchases with that currency are not allowed
+buyable.unknown_currency=&cUnknown currency '%s'. Tell ithinkrok.
 
 item_buyable.no_space=&cYou do not have enough inventory space!
 
