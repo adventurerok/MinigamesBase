@@ -348,7 +348,12 @@ public abstract class Buyable extends ClickableItem {
     public BigDecimal getCost(User user) {
         Currency currency = getCurrency(user);
 
-        return cost.calculateDecimal(user.getUserVariables(), new MathContext(currency.getDecimalPlaces()));
+        if(currency != null) {
+            return cost.calculateDecimal(user.getUserVariables(), new MathContext(currency.getDecimalPlaces()));
+        } else {
+            //use decimal32 for null currency's MathContext to avoid NPEs here as we detect null currencies elsewhere
+            return cost.calculateDecimal(user.getUserVariables(), MathContext.DECIMAL32);
+        }
     }
 
     public Currency getCurrency(User user) {
