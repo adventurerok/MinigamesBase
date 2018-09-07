@@ -3,6 +3,13 @@
 shared_objects:
   shop:
     items:
+      - class: "com.ithinkrok.minigames.util.inventory.Buyable"
+        display: "gold_ingot,1,0,&6Copper to Dollar"
+        config:
+          cost: 1
+          currency: "token_copper"
+          costs:
+            vault: -1
       - class: "com.ithinkrok.minigames.util.inventory.SubInventory"
         display: "iron_ore"
         config:
