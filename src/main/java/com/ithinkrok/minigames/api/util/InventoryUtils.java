@@ -8,8 +8,10 @@ import net.minecraft.server.v1_12_R1.NBTTagString;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -82,7 +84,7 @@ public class InventoryUtils {
             case POTION:
             case SPLASH_POTION:
             case LINGERING_POTION:
-            case TIPPED_ARROW:
+            case TIPPED_ARROW: {
                 String effectName = parts[0].toUpperCase();
 
                 int amp = parts.length > 1 ? Integer.parseInt(parts[1]) - 1 : 0;
@@ -92,10 +94,19 @@ public class InventoryUtils {
 
                 PotionMeta meta = (PotionMeta) item.getItemMeta();
                 PotionType potionType = PotionType.getByEffect(type);
-                if(potionType == null) potionType = PotionType.UNCRAFTABLE;
+                if (potionType == null) potionType = PotionType.UNCRAFTABLE;
                 meta.setBasePotionData(new PotionData(potionType, false, false));
                 meta.addCustomEffect(new PotionEffect(type, duration, amp), true);
                 item.setItemMeta(meta);
+                break;
+            }
+            case MOB_SPAWNER: {
+                EntityType type = EntityType.valueOf(parts[0].toUpperCase());
+
+                item.setDurability(type.getTypeId());
+
+                break;
+            }
         }
     }
 
