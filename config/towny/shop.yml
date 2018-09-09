@@ -27,6 +27,6 @@ shared_objects:
           items:
             - class: "com.ithinkrok.minigames.util.inventory.ItemBuyable"
               config:
-                item: "mob_spawner:chicken"
+                item: "mob_spawner"
                 cost: 25000
                 currency: "vault"

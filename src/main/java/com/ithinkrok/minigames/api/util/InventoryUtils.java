@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.potion.*;
 
 import java.util.*;
@@ -100,10 +101,13 @@ public class InventoryUtils {
                 item.setItemMeta(meta);
                 break;
             }
-            case MOB_SPAWNER: {
+            case MONSTER_EGG: {
                 EntityType type = EntityType.valueOf(parts[0].toUpperCase());
 
-                item.setDurability(type.getTypeId());
+                SpawnEggMeta meta = (SpawnEggMeta) item.getItemMeta();
+                meta.setSpawnedType(type);
+
+                item.setItemMeta(meta);
 
                 break;
             }
