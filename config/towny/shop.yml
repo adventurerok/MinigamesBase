@@ -20,3 +20,13 @@ shared_objects:
                 item: "iron_ore,8"
                 cost: 800
                 currency: "vault"
+      - class: "com.ithinkrok.minigames.util.inventory.SubInventory"
+        display: "mob_spawner"
+        config:
+          name_locale: "shop.spawners"
+          items:
+            - class: "com.ithinkrok.minigames.util.inventory.ItemBuyable"
+              config:
+                item: "mob_spawner:chicken"
+                cost: 25000
+                currency: "vault"
