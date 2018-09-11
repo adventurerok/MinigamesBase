@@ -45,17 +45,25 @@ shared_objects:
         past: "og2"
       eightworld:
         pos: "-1024000,64,-1024000"
-        past: "eightworldjuly"
+        past: "eightworld-july"
         size: 30000
-      eightworldjuly:
+      eightworld-july:
         pos: "-153600,64,-153600"
-        past: "eightworlddec"
+        past: "eightworld-dec"
         future: "eightworld"
         size: 30000
-      eightworlddec:
+      eightworld-dec:
         pos: "-204800,64,-153600"
-        future: "eightworldjuly"
+        future: "eightworld-july"
         size: 30000
+      itrf:
+        pos: "0,64,0"
+        past: "itrf-june"
+        size: 10000
+      itrf-june:
+        pos: "-15360,64,10240"
+        future: "itrf"
+        size: 10000
 
 custom_items:
   time_back:
