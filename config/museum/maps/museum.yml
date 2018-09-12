@@ -31,8 +31,6 @@ worlds:
 shared_objects:
   museum:
     locations:
-      museum:
-        pos: "0,0,0"
       og1:
         pos: "199545,64,-1049597"
         future: "og2"
