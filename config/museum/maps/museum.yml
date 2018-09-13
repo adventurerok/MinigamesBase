@@ -56,11 +56,16 @@ shared_objects:
         size: 30000
       itrf:
         pos: "0,64,0"
+        past: "itrf-sep"
+        size: 10000
+      itrf-sep:
+        pos: "-30720,64,-5120"
+        future: "itrf"
         past: "itrf-june"
         size: 10000
       itrf-june:
         pos: "-15360,64,10240"
-        future: "itrf"
+        future: "itrf-sep"
         size: 10000
 
 custom_items:
