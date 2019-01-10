@@ -137,6 +137,10 @@ custom_items:
               item: "wool,1,13"
               lore: ["The cacti quest has begun. Not that we went far"]
               pos: "199538,64,-1049121"
+            - name: "The Great Farm"
+              item: "nether_brick"
+              lore: ["A competition between ithinkrok and WaterTrickster"]
+              pos: "10074,64,-1050767"2
             - name: "Ithinkrok's Factions Spawn"
               lore: ["The server is UP and it's never comin' down"]
               item: "wood,1,3"
