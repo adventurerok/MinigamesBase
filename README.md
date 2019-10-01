@@ -18,7 +18,7 @@ and there is no GameGroup of that type, it creates a new one for them
 us what the player wants to play before they arrive (MinigamesBase functionality **in bold**)
   1. **A User in a hub uses a sign to join a minigame**
   2. **We send a request to the controller to put their player into that minigame**
-  3. The controller finds a server for the request, and alerts it on what minigame the player wants to join/create
+  3. The controller finds a server for the request, and alerts it on what minigame the player wants to join/create [we handle this request here](src/main/java/com/ithinkrok/minigames/api/protocol/ClientMinigamesProtocol.java)
   4. **The receiving server sends a request to the controller to send that player over to them**
   5. The controller forwards this request to the server the player is on (the hub server)
   6. The player's server requests that BungeeCord move the player to the receiving server
